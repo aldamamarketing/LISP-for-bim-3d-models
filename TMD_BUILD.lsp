@@ -197,10 +197,12 @@
 ;;; =====================================================================================
 ;;; 3. BARRIDO COMANDAL INTERATIVO (c:TMD_BUILD)
 ;;; =====================================================================================
-(defun c:TMD_BUILD ( / ss i ent count old_cmdecho path_vigas ph w_ent wire_list mode kw)
+(defun c:TMD_BUILD ( / ss i ent count old_cmdecho old_pickstyle path_vigas ph w_ent wire_list mode kw)
   
-  (setq old_cmdecho (getvar "CMDECHO")) 
+  (setq old_cmdecho (getvar "CMDECHO")
+        old_pickstyle (getvar "PICKSTYLE")) 
   (setvar "CMDECHO" 0)
+  (setvar "PICKSTYLE" 0) ;; Desactivar grupos para operar de forma atómica
   
   ;; 1. Chequeo de dependencias
   (if (not TMD:viga-build-geom) 
@@ -241,7 +243,14 @@
     )
   )
 
-  (if (= ss "EXIT") (progn (princ "\n[⚠] Cancelado.") (setvar "CMDECHO" old_cmdecho) (exit)))
+  (if (= ss "EXIT") 
+    (progn 
+      (princ "\n[⚠] Cancelado.") 
+      (setvar "CMDECHO" old_cmdecho) 
+      (setvar "PICKSTYLE" old_pickstyle)
+      (exit)
+    )
+  )
   
   (setq wire_list (list))
   (if (and ss (not (= ss "EXIT")))
@@ -293,6 +302,7 @@
   )
   
   (setvar "CMDECHO" old_cmdecho)
+  (setvar "PICKSTYLE" old_pickstyle)
   (princ "\n=============================================\n")
   (princ)
 )
