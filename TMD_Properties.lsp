@@ -148,6 +148,9 @@
       ;; Autodetectar el checkbox "Link"
       (if (= v_afini v_affim) (setq v_link "1") (setq v_link "0"))
       (if (and (= v_nini "*Varios*") (= v_nfim "*Varios*")) (setq v_link "0"))
+      
+      ;; [NUEVO] Forzar desvinculación para Columnas para evitar altura 0 bloqueada
+      (if (= v_tipo "COLUNA") (setq v_link "0"))
     )
   )
   
@@ -213,6 +216,7 @@
   ;; Acciones y Callbacks
   (action_tile "chk_link" "(TMD:prop-ui-link-toggle $value)")
   (action_tile "btn_rot90" "(TMD:prop-ui-rot-add)")
+  (action_tile "cbo_tipo" "(progn (setq v_tipo (nth (atoi $value) lst_tipos)) (if (= v_tipo \"COLUNA\") (mode_tile \"chk_link\" 1) (mode_tile \"chk_link\" 0)))")
   
   ;; [NOTA DEBUG] AutoLISP requiere que múltiples expresiones en action_tile estén envueltas en (progn ...)
   (action_tile "accept" "(progn 
@@ -231,6 +235,7 @@
   (action_tile "cancel" "(princ \"\\n[DEBUG EVENT] Boton Cancelar presionado.\") (done_dialog 0)")
   
   ;; Forzar estado inicial de la UI
+  (if (= v_tipo "COLUNA") (mode_tile "chk_link" 1) (mode_tile "chk_link" 0))
   (TMD:prop-ui-link-toggle v_link)
 
   (princ "\n[DEBUG DCL-6] Esperando interaccion del usuario...")
@@ -276,8 +281,8 @@
           )
           
           (princ (strcat "\n[TMD] Pincel configurado para: " res_tipo ". Ejecutando Comando de Inserción..."))
-          ;; Redirigir de forma asíncrona a TMD_WIRES para evitar Stack Overflow en ciclos infinitos
-          (vla-sendcommand (vla-get-activedocument (vlax-get-acad-object)) "TMD_WIRES ")
+          ;; Redirigir de forma asíncrona a TMD_WIRES_PINCEL para respetar la configuración del DCL
+          (vla-sendcommand (vla-get-activedocument (vlax-get-acad-object)) "TMD_WIRES_PINCEL ")
         )
         (progn
           (princ "\n[DEBUG APPLY-3B] Modificando modelo fisico")
@@ -329,14 +334,14 @@
             (if (and nini (not (vl-string-search "*Varios*" nini)))   (vlax-ldata-put w_ent "TMD_NIVEL_INI" nini))
             (if (and afini (not (vl-string-search "*Varios*" afini)))  (vlax-ldata-put w_ent "TMD_AFASTAMENTO" afini))
             
-            (if (= link "1")
+            (if (and (= link "1") (/= t_tipo "COLUNA"))
               (progn 
-                ;; Linked! Topo = Base
+                ;; Linked! Topo = Base (Solo para Vigas)
                 (if (and nini (not (vl-string-search "*Varios*" nini)))  (vlax-ldata-put w_ent "TMD_NIVEL_FIM" nini))
                 (if (and afini (not (vl-string-search "*Varios*" afini))) (vlax-ldata-put w_ent "TMD_AFASTAMENTO_TOPO" afini))
               )
               (progn
-                ;; Topo Independiente
+                ;; Topo Independiente o es una Columna (Siempre independiente)
                 (if (and nfim (not (vl-string-search "*Varios*" nfim)))  (vlax-ldata-put w_ent "TMD_NIVEL_FIM" nfim))
                 (if (and affim (not (vl-string-search "*Varios*" affim))) (vlax-ldata-put w_ent "TMD_AFASTAMENTO_TOPO" affim))
               )
@@ -384,7 +389,12 @@
                     (vlax-ldata-put w_ent "TMD_PARAMS" p_dict)
                   )
                 )
-                (if TMD:build-single-wire (TMD:build-single-wire w_ent))
+                (if TMD:build-single-wire 
+                  (if (> (distance p1 p2) 0.1)
+                    (TMD:build-single-wire w_ent)
+                    (princ "\n[!] ERRO: Altura 0 detectada. O sólido não foi regenerado.")
+                  )
+                )
               )
               (progn
                 ;; B. TRASLACIÓN PURA (Smart Move) - Solo cambió la Z de forma paralela

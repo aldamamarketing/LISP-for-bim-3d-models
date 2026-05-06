@@ -112,6 +112,37 @@
 ;;; 2. MOTOR GEOMÉTRICO CENTRALIZADO (A FONTE DA VERDADE)
 ;;; -------------------------------------------------------------------------------------
 
+;; [NUEVO] Generador de Envolvente para Juntas (Cutter)
+(defun TMD:viga-build-envelope (pt_a pt_b just rot p_x p_y p_forma dist gap / cx cy x2 y2 ent_ghost)
+  (if (not just) (setq just "MC"))
+  (setq cx (cond ((vl-string-search "L" just) (/ p_x 2.0)) ((vl-string-search "R" just) (* -1.0 (/ p_x 2.0))) (t 0.0)))
+  (setq cy (cond ((vl-string-search "B" just) (/ p_y 2.0)) ((vl-string-search "T" just) (* -1.0 (/ p_y 2.0))) (t 0.0)))
+  
+  (vl-cmdf "_.UCS" "_World")
+  (if (> (distance pt_a pt_b) 0.01)
+    (progn
+      (vl-cmdf "_.UCS" "_ZAxis" "_non" pt_a "_non" pt_b)
+      (if (and rot (/= rot 0.0)) (vl-cmdf "_.UCS" "_Z" rot))
+      
+      (setq x2 (/ p_x 2.0) y2 (/ p_y 2.0))
+      
+      (cond
+        ((= p_forma "CIRC_VAZIO")
+         (vl-cmdf "_.CYLINDER" "_non" (list cx cy 0.0) (+ x2 gap) dist)
+        )
+        (t ;; Para Rectangulares, U, C, I usamos el BOX envolvente
+         (vl-cmdf "_.BOX" "_non" (list (- (+ (* -1.0 x2) cx) gap) (- (+ (* -1.0 y2) cy) gap) 0.0) 
+                         "_non" (list (+ x2 cx gap) (+ y2 cy gap) dist))
+        )
+      )
+      (setq ent_ghost (entlast))
+      (vl-cmdf "_.UCS" "_World")
+      ent_ghost
+    )
+    nil
+  )
+)
+
 (defun TMD:viga-build-geom (ent_old pt_a pt_b just rot p_nome p_forma p_x p_y p_e p_labio p_material dist / 
                              ent_outer ent_inner cx cy x2 y2 e2 ent1 ent2 ent3 ent4 ent5 j2:bx j2:cyl nivel_global)
   
@@ -121,9 +152,17 @@
   (setq cy (cond ((vl-string-search "B" just) (/ p_y 2.0)) ((vl-string-search "T" just) (* -1.0 (/ p_y 2.0))) (t 0.0)))
   
   ;; Sincronização do Eixo Z Analítico
-  (vl-cmdf "_.UCS" "_World")
-  (vl-cmdf "_.UCS" "_ZAxis" "_non" pt_a "_non" pt_b)
-  (if (and rot (/= rot 0.0)) (vl-cmdf "_.UCS" "_Z" rot))
+  (if (< (distance pt_a pt_b) 0.01)
+    (progn 
+      (princ "\n[!] ERRO: Distância entre pontos insuficiente para gerar sólido.")
+      (setq ent_outer nil)
+    )
+    (progn
+      (vl-cmdf "_.UCS" "_World")
+      (vl-cmdf "_.UCS" "_ZAxis" "_non" pt_a "_non" pt_b)
+      (if (and rot (/= rot 0.0)) (vl-cmdf "_.UCS" "_Z" rot))
+    )
+  )
   
   ;; Variáveis matemáticas puras
   (setq x2 (/ p_x 2.0) y2 (/ p_y 2.0) e2 (/ p_e 2.0))

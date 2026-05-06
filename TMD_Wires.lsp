@@ -272,27 +272,37 @@
 ;;; 4. BUCLE DETERMINISTA B.I.M (Estilo Revit)
 ;;; =====================================================================================
 
-(defun TMD:wire-interactive-draw (/ old_osmode pt_in ptA ptB old_lay p_tipo p_perfil p_nini p_afini p_nfim p_affim l_z1 l_z2 just rot loop_drawing ent_name e_data last_ent history_pts jy jx p_dict s)
+(defun TMD:wire-interactive-draw (is_standalone / old_osmode pt_in ptA ptB old_lay p_tipo p_perfil p_nini p_afini p_nfim p_affim l_z1 l_z2 just rot loop_drawing ent_name e_data last_ent history_pts jy jx p_dict s niv_a niv_b)
   (setq old_osmode (getvar "OSMODE"))
   (vl-cmdf "_.UCS" "_World")
   
   ;; 1. Leer Configuración Global (Pincel)
   (setq p_tipo (vlax-ldata-get "dict_TMDigital" "PINCEL_TIPO"))
-  (if (not p_tipo) (setq p_tipo "VIGA"))
+  (if (or (not p_tipo) is_standalone) (setq p_tipo "VIGA"))
+  
   (setq p_perfil (vlax-ldata-get "dict_TMDigital" "PINCEL_PERFIL"))
   (setq just (vlax-ldata-get "dict_TMDigital" "PINCEL_JUST"))
+  (if (or (not just) (= just "")) (setq just "MC"))
   (setq rot (atof (if (vlax-ldata-get "dict_TMDigital" "PINCEL_ROT") (vlax-ldata-get "dict_TMDigital" "PINCEL_ROT") "0.0")))
   
-  (setq p_nini (vlax-ldata-get "dict_TMDigital" "PINCEL_N_INI"))
-  (setq p_afini (atof (if (vlax-ldata-get "dict_TMDigital" "PINCEL_AF_INI") (vlax-ldata-get "dict_TMDigital" "PINCEL_AF_INI") "0.0")))
-  (setq p_nfim (vlax-ldata-get "dict_TMDigital" "PINCEL_N_FIM"))
-  (setq p_affim (atof (if (vlax-ldata-get "dict_TMDigital" "PINCEL_AF_FIM") (vlax-ldata-get "dict_TMDigital" "PINCEL_AF_FIM") "0.0")))
+  (if is_standalone
+    (setq p_nini nil p_nfim nil p_afini 0.0 p_affim 0.0)
+    (progn
+      (setq p_nini (vlax-ldata-get "dict_TMDigital" "PINCEL_N_INI"))
+      (setq p_afini (atof (if (vlax-ldata-get "dict_TMDigital" "PINCEL_AF_INI") (vlax-ldata-get "dict_TMDigital" "PINCEL_AF_INI") "0.0")))
+      (setq p_nfim (vlax-ldata-get "dict_TMDigital" "PINCEL_N_FIM"))
+      (setq p_affim (atof (if (vlax-ldata-get "dict_TMDigital" "PINCEL_AF_FIM") (vlax-ldata-get "dict_TMDigital" "PINCEL_AF_FIM") "0.0")))
+    )
+  )
   
   (if (not TMD:prop-get-level-z) (load "TMD_Properties.lsp"))
-  (setq l_z1 (TMD:prop-get-level-z p_nini))
-  (setq l_z2 (TMD:prop-get-level-z p_nfim))
+  (setq l_z1 (if p_nini (TMD:prop-get-level-z p_nini) nil))
+  (setq l_z2 (if p_nfim (TMD:prop-get-level-z p_nfim) nil))
   
-  (princ (strcat "\n[TMD] MODO: " p_tipo " | Nivel Base: " (if p_nini p_nini "-") " | Nivel Topo: " (if p_nfim p_nfim "-")))
+  (if is_standalone
+    (princ "\n[TMD] MODO LIBRE (3D Snap) | [R, T, E] p/ Ajustes")
+    (princ (strcat "\n[TMD] MODO: " p_tipo " | Nivel Base: " (if p_nini p_nini "-") " | Nivel Topo: " (if p_nfim p_nfim "-")))
+  )
   
   (setq loop_drawing T ptA nil last_ent nil history_pts nil)
   
@@ -306,10 +316,23 @@
     
     (vlax-ldata-put ent_name "TMD_CLASSE" "ESTRUTURA_LINE")
     (vlax-ldata-put ent_name "TMD_TIPO" p_tipo)
-    (vlax-ldata-put ent_name "TMD_NIVEL_INI" p_nini)
-    (vlax-ldata-put ent_name "TMD_AFASTAMENTO" (rtos p_afini 2 2))
-    (vlax-ldata-put ent_name "TMD_NIVEL_FIM" p_nfim)
-    (vlax-ldata-put ent_name "TMD_AFASTAMENTO_TOPO" (rtos p_affim 2 2))
+    
+    ;; [BIM LÓGICO] Calcular niveles y desfases por posición real Z
+    (setq niv_a (TMD:wire-get-nearest-level (caddr ptA)))
+    (setq niv_b (TMD:wire-get-nearest-level (caddr ptB)))
+    
+    (setq lz_a (if (/= niv_a "NÃO DEFINIDO") (TMD:prop-get-level-z niv_a) nil))
+    (setq lz_b (if (/= niv_b "NÃO DEFINIDO") (TMD:prop-get-level-z niv_b) nil))
+    
+    (setq off_a (if lz_a (- (caddr ptA) lz_a) (caddr ptA)))
+    (setq off_b (if lz_b (- (caddr ptB) lz_b) (caddr ptB)))
+    
+    (vlax-ldata-put ent_name "TMD_NIVEL_INI" niv_a)
+    (vlax-ldata-put ent_name "TMD_AFASTAMENTO" (rtos off_a 2 2))
+    
+    (vlax-ldata-put ent_name "TMD_NIVEL_FIM" niv_b)
+    (vlax-ldata-put ent_name "TMD_AFASTAMENTO_TOPO" (rtos off_b 2 2))
+    
     (vlax-ldata-put ent_name "TMD_JUSTIFICACAO" just)
     (vlax-ldata-put ent_name "TMD_ROTACAO" (rtos rot 2 2))
     
@@ -319,7 +342,7 @@
     (if TMD:build-single-wire (TMD:build-single-wire ent_name))
     (if j2:auto-resolve-nodes (j2:auto-resolve-nodes ent_name))
     (setq last_ent ent_name)
-    (princ "\n[✔] Estrutura BIM gerada.")
+    (princ (strcat "\n[BIM] " niv_a " (" (rtos off_a 2 0) ") -> " niv_b " (" (rtos off_b 2 0) ")"))
   )
 
   (while loop_drawing
@@ -359,8 +382,20 @@
                 (setq just (TMD:wire-get-smart-just just))
               )
               ((= pt_in "Undo")
-                (entdel last_ent)
-                (if (setq s (vlax-ldata-get last_ent "TMD_CHILD_SOLID")) (entdel (handent s)))
+                ;; Primero buscar y borrar el sólido hijo (si existe)
+                (if (and last_ent (entget last_ent))
+                  (progn
+                    (setq s (vlax-ldata-get last_ent "TMD_CHILD_SOLID"))
+                    (if (and s (= (type s) 'STR))
+                      (progn
+                        (setq s_ent (handent s))
+                        (if (and s_ent (entget s_ent)) (entdel s_ent))
+                      )
+                    )
+                    ;; Luego borrar el wire
+                    (entdel last_ent)
+                  )
+                )
                 (setq last_ent nil)
                 (if (/= p_tipo "COLUNA")
                   (progn
@@ -368,7 +403,7 @@
                   )
                   (setq ptA nil)
                 )
-                (princ "\n[TMD] Último segmento cancelado.")
+                (princ "\n[TMD] Último segmento e sólido removidos.")
               )
             )
             ;; Reconstruir con el ajuste en caliente
@@ -448,9 +483,18 @@
   )
   
   (setvar "OSMODE" old_osmode)
-  (princ "\n[TM Digital] Retornando ao Inspector...")
-  ;; Llamar a Properties de forma Asíncrona para evitar Stack Overflow
-  (vla-sendcommand (vla-get-activedocument (vlax-get-acad-object)) "TMD_PROPERTIES ")
+  (if (not is_standalone)
+    (progn
+      (princ "\n[TM Digital] Retornando ao Inspector...")
+      (vla-sendcommand (vla-get-activedocument (vlax-get-acad-object)) "TMD_PROPERTIES ")
+    )
+    (princ "\n[TM Digital] Comando Finalizado.")
+  )
+)
+
+(defun c:TMD_WIRES_PINCEL ()
+  (TMD:wire-interactive-draw nil)
+  (princ)
 )
 
 (defun c:TMD_WIRES ()
@@ -462,7 +506,7 @@
   (if (not j2:auto-resolve-nodes) (load "TMD_JOINTS.lsp" "\nErro ao carregar juntas."))
   (if (not TMD:build-single-wire) (load "TMD_BUILD.lsp" "\nErro ao carregar construtor."))
   
-  (TMD:wire-interactive-draw)
+  (TMD:wire-interactive-draw T)
   (princ)
 )
 
