@@ -1,0 +1,16 @@
+# AutoCAD temporary files
+*.bak
+*.dwl
+*.dwl2
+*.err
+*.log
+
+# Backups and copies (optional, let me know if you want to keep them)
+*copy.lsp
+*_Backup.lsp
+*v-1.lsp
+*v-2.lsp
+
+# OS files
+Thumbs.db
+Desktop.ini
