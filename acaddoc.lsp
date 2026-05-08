@@ -62,6 +62,7 @@
 (TMD:sys-load "TMD_Tags.lsp")
 (TMD:sys-load "TMD_Niveis.lsp")
 (TMD:sys-load "TMD_FACE_CUT.lsp")
+(TMD:sys-load "TMD_SYNC.lsp")
 (TMD:sys-load "TMD_CNC.lsp")
 (TMD:sys-load "TMD_Teja_TR25.lsp")
 (TMD:sys-load "TMD_Abas.lsp")

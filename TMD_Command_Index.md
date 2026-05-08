@@ -10,12 +10,14 @@ Este documento es la **Fuente de Verdad** del proyecto. Antes de crear una nueva
 | Comando | Archivo | Descripción | Uso Recomendado |
 | :--- | :--- | :--- | :--- |
 | **TMD_PROPERTIES** | `TMD_Properties.lsp` | **Inspector BIM v5.0**. Interface principal para editar ADN, Justificación y Rotação. | Siempre que se necesite editar parámetros de elementos existentes. |
-| **TMD_WIRES** | `TMD_Wires.lsp` | **Modelador Analítico v5.0**. Dibujo continuo de vigas y columnas (1-clic). | Para crear nuevos esqueletos estructurales. |
+| **TMD_WIRES** | `TMD_Wires.lsp` | **Modo Libre 3D**: Trazado continuo de vigas ignorando bloqueos del pincel. Calcula niveles/offsets dinámicamente. | Para dibujo rápido 3D basado en Snaps. |
+| **TMD_WIRES_PINCEL** | `TMD_Wires.lsp` | **Modo Determinado**: Trazado que respeta ciegamente la configuración de niveles y tipos del Inspector. | Invocado automáticamente desde el DCL. |
 | **TMD_BUILD** | `TMD_Build.lsp` | **Compilador Generativo**. Convierte Wires en Sólidos 3D y aplica juntas. | Para generar el modelo físico 3D final. |
 | **TMD_JOINTS** | `TMD_JOINTS.lsp` | **Gestor de Juntas**. Resuelve interferencias (Flush, Miter, Crossing). | Para detallar encuentros entre perfiles. |
 | **TMD_ALIGN** | `TMD_Align.lsp` | **Alineación Industrial**. Motor estilo Corel (L, R, T, B, C, E). | Organización rápida de componentes y grupos. |
-| **TMD_SYNC** | `TMD_Utils.lsp` | **Sanador BIM**. Repara vínculos perdidos entre Wires y Sólidos. | Después de copiar o mover elementos de forma masiva. |
-| **TMD_NIVEIS** | `TMD_Niveis.lsp` | **Gestor de Niveles**. Define las alturas Z del proyecto. | Configuración inicial del proyecto. |
+| **TMD_SYNC** | `TMD_SYNC.lsp` | **Motor de Integridad BIM (v5.1)**. Detecta clones y re-vincula el ADN usando huellas digitales. | Tras operaciones de copia o guardado masivo. |
+| **TMD_SYNC_SPATIAL** | `TMD_Utils.lsp` | **Sanador Espacial (Legacy)**. Repara vínculos perdidos basándose en proximidad geométrica. | Fallback si el motor de huellas falla. |
+| **TMD_NIVEIS** | `TMD_Niveis.lsp` | **Sincronizador BIM**: Gestor de niveles con edición global. Propaga cambios de Z y Nombre a todo el modelo. | Configuración y cambios globales de altura. |
 
 ---
 
@@ -67,4 +69,4 @@ Este documento es la **Fuente de Verdad** del proyecto. Antes de crear una nueva
 4. **Z-Control**: Siempre consulte `TMD_NIVEIS` antes de forzar una coordenada Z absoluta.
 
 ---
-**Versión:** 5.0 | **Estado:** Estable | **Última Actualización:** 06/05/2026
+**Versión:** 5.0 | **Estado:** Estable | **Última Actualización:** 06/05/2026 (Sync Engine)

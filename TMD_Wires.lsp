@@ -316,6 +316,7 @@
     
     (vlax-ldata-put ent_name "TMD_CLASSE" "ESTRUTURA_LINE")
     (vlax-ldata-put ent_name "TMD_TIPO" p_tipo)
+    (vlax-ldata-put ent_name "TMD_SELF_HANDLE" (vla-get-handle (vlax-ename->vla-object ent_name)))
     
     ;; [BIM LÓGICO] Calcular niveles y desfases por posición real Z
     (setq niv_a (TMD:wire-get-nearest-level (caddr ptA)))
@@ -465,9 +466,10 @@
                 (setq ptB pt_in)
                 (if l_z2 (setq ptB (list (car ptB) (cadr ptB) (+ l_z2 p_affim))))
                 
-                ;; [FIX] Evitar Vigas Perfectamente Verticales (Distancia X,Y = 0)
-                (if (< (distance (list (car ptA) (cadr ptA) 0.0) (list (car ptB) (cadr ptB) 0.0)) 0.001)
-                  (princ "\n[!] As vigas não podem ser perfeitamente verticais. Coordenada ignorada.")
+                ;; [FIX] Evitar Vigas Verticales solo en modo anclado a niveles. 
+                ;; En Modo Libre (is_standalone) permitimos que la geometría mande.
+                (if (and (not is_standalone) (< (distance (list (car ptA) (cadr ptA) 0.0) (list (car ptB) (cadr ptB) 0.0)) 0.001))
+                  (princ "\n[!] No modo anclado, as vigas não podem ser perfeitamente verticais.")
                   (progn
                     (TMD:wire-do-draw)
                     (setq history_pts (cons ptA history_pts))
@@ -581,6 +583,7 @@
                         (setq params (subst (cons "ROTACAO" rot) (assoc "ROTACAO" params) params))
                         (setq params (subst (cons "JUSTIFICACAO" just) (assoc "JUSTIFICACAO" params) params))
                         (vlax-ldata-put ent "TMD_PARAMS" params)
+                        (vlax-ldata-put ent "TMD_SELF_HANDLE" (vla-get-handle (vlax-ename->vla-object ent)))
                         (if TMD:build-single-wire (TMD:build-single-wire ent))))))
                 ((or (= val 116) (= val 84)) ;; T
                   (foreach ent wires
@@ -591,6 +594,7 @@
                         (setq jy (cond ((= jy "T") "M") ((= jy "M") "B") (t "T")))
                         (setq params (subst (cons "JUSTIFICACAO" (strcat jy jx)) (assoc "JUSTIFICACAO" params) params))
                         (vlax-ldata-put ent "TMD_PARAMS" params)
+                        (vlax-ldata-put ent "TMD_SELF_HANDLE" (vla-get-handle (vlax-ename->vla-object ent)))
                         (if TMD:build-single-wire (TMD:build-single-wire ent))))))
                 ((or (= val 101) (= val 69)) ;; E
                   (foreach ent wires
@@ -601,6 +605,7 @@
                         (setq jx (cond ((= jx "L") "C") ((= jx "C") "R") (t "L")))
                         (setq params (subst (cons "JUSTIFICACAO" (strcat jy jx)) (assoc "JUSTIFICACAO" params) params))
                         (vlax-ldata-put ent "TMD_PARAMS" params)
+                        (vlax-ldata-put ent "TMD_SELF_HANDLE" (vla-get-handle (vlax-ename->vla-object ent)))
                         (if TMD:build-single-wire (TMD:build-single-wire ent))))))
                 ((member val '(13 32)) (setq loop nil running_all nil)) ;; ENTER/SPACE volta para o Inspector
                 ((= val 27) (setq loop nil running_all nil))            ;; ESC sai de tudo

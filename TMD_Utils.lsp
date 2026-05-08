@@ -345,6 +345,13 @@
     ((= cmd "TMD_JOINTS") "Gerencia juntas estruturais (Miter, Flush, Gap). Automatiza as supressões 3D entre vigas que se interceptam.")
     ((= cmd "TMD_MATCH") "Match Properties BIM: Copia todas as propriedades lógicas (ADN) de um objeto mestre para os destinos selecionados.")
     ((= cmd "TMD_NIVEIS") "Gestor de Níveis: Define e organiza as alturas (Z) de trabalho para inserção automática de elementos.")
+    ((= cmd "TMD_SYNC") (strcat "Motor de Integridad BIM (v5.1).\n"
+                                "  - Escanea el dibujo buscando clones y huérfanos.\n"
+                                "  - Repara vínculos LData usando huellas digitales (Handles).\n"
+                                "  - Útil tras operaciones de copiado o guardado como."))
+    ((= cmd "TMD_SYNC_SPATIAL") (strcat "Sanador Espacial (Legacy).\n"
+                                        "  - Re-vincula sólidos y wires basándose en su cercanía física.\n"
+                                        "  - Fallback recomendado si la sincronización por huella digital no es suficiente."))
     ((= cmd "TMD_WIRES") "Gerenciador Analítico: Cria e edita o esqueleto (linhas) da estrutura, definindo perfil, rotação e justificação.")
     ((= cmd "TMD_WIRES_EDIT_ROT") "Gira as linhas estruturais selecionadas em 90 graus. (Uso via CUI/Menu Contextual)")
     ((= cmd "TMD_WIRES_EDIT_CATALOG") "Abre o gestor de catálogo para alterar o perfil das linhas selecionadas. (Uso via CUI)")
@@ -468,6 +475,11 @@
 ;;; 5. SINCRONIZADOR Y SANADOR B.I.M (TMD_SYNC)
 ;;; -------------------------------------------------------------------------------------
 
+;; FUNCIÓN: TMD:sync-model
+;; PROPÓSITO: Motor de "Matchmaking" espacial. Busca reconstruir vínculos perdidos entre
+;;            sólidos 3D y sus líneas analíticas (wires) basándose en proximidad geométrica.
+;; QUIÉN LA LLAMA: Comando c:TMD_SYNC_SPATIAL (Legacy) y motores de auditoría.
+;; NOTA: Útil cuando el usuario mueve o copia objetos sin usar herramientas TMD.
 (defun TMD:sync-model (silent / ss_solids ss_wires i s_ent w_ent paired_solids paired_wires orphan_solids orphan_wires
                       s_parent_h s_parent_ent s_min s_max s_cent w_cent pt1 pt2 dist match_count o_sol o_wire matched_wire vla_sol centroid p_dirs)
   (vl-load-com)
@@ -594,8 +606,11 @@
   (princ)
 )
 
-;; COMANDO PÚBLICO (INTERACTIVO)
-(defun c:TMD_SYNC ()
+;; COMANDO: TMD_SYNC_SPATIAL (Legacy)
+;; PROPÓSITO: Ejecución interactiva del motor de sincronización por proximidad.
+;; QUIÉN LA LLAMA: Usuario (Línea de comandos).
+;; NOTA: Renombrado de TMD_SYNC a TMD_SYNC_SPATIAL para evitar colisión con el nuevo motor de huella digital.
+(defun c:TMD_SYNC_SPATIAL ()
   (TMD:sync-model nil)
   (princ)
 )
