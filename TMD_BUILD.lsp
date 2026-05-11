@@ -1,7 +1,10 @@
 ;;; =====================================================================================
 ;;; TM DIGITAL - MOTOR DE COMPILACIÓN BIM (TMD_BUILD.lsp)
 ;;; =====================================================================================
-;;; v5.2.4 - Integración Estándar con TMD_Wires (Clasificación y Capas)
+;;; v5.3.0 - Arquitectura 2 Fases: Realidad Física Primero.
+;;;   Fase 1 (sync-reality): Lee estado físico → Actualiza LData
+;;;   Fase 2 (reconstruct): Toma LData como verdad → Reconstruye
+;;;   Ref: TMD_BIM_Sync_Protocol.md v2.0
 ;;; =====================================================================================
 
 (vl-load-com)
@@ -116,45 +119,103 @@
 )
 
 ;;; =====================================================================================
-;;; 3. NÚCLEO COMPILADOR
+;;; 3A. FASE 1: SINCRONIZACIÓN DE REALIDAD FÍSICA → LDATA
+;;; -------------------------------------------------------------------------------------
+;;; DECISIÓN: La geometría física SIEMPRE tiene prioridad sobre LData.
+;;;   LData es un espejo de la realidad, nunca al revés.
+;;;   - Lee rotación del sólido existente via análisis de sección transversal
+;;;   - Re-evalúa TIPO (VIGA/COLUNA/CONTRAV.) según orientación del wire
+;;;   - Actualiza PT_A/PT_B con la posición actual del wire
+;;;   Ref: TMD_BIM_Sync_Protocol.md
 ;;; =====================================================================================
-(defun TMD:build-single-wire (ent / params p_nome ptA ptB p_forma p_x p_y p_e dist just rot lay solid_lay solid_ent old_solid_h old_solid real_rot ldata_rot)
+(defun TMD:build-sync-reality (ent / params old_solid_h old_solid real_rot e_data ptA ptB tipo)
   (if (and ent (entget ent) (= (vlax-ldata-get ent "TMD_CLASSE") "ESTRUTURA_LINE"))
     (progn
       (setq params (vlax-ldata-get ent "TMD_PARAMS"))
       (if params
         (progn
+          ;; --- 1. Sincronizar ROTACIÓN del sólido físico ---
           (setq old_solid_h (vlax-ldata-get ent "TMD_CHILD_SOLID"))
           (if (and old_solid_h (setq old_solid (handent old_solid_h)) (entget old_solid))
-            (progn
-              (if (and TMD:sync-extract-rotation (setq real_rot (TMD:sync-extract-rotation ent old_solid)))
-                (progn
-                  (setq ldata_rot (atof (vl-princ-to-string (cdr (assoc "ROTACAO" params)))))
-                  (if (not (equal real_rot ldata_rot 1.0))
-                    (progn
-                      (princ (strcat "\n    [V] Sincronização de Pose: " (rtos real_rot 2 1) "°"))
-                      (setq params (subst (cons "ROTACAO" real_rot) (assoc "ROTACAO" params) params))
-                      (vlax-ldata-put ent "TMD_PARAMS" params)
-                    )
+            (if TMD:sync-extract-rotation
+              (progn
+                (setq real_rot (TMD:sync-extract-rotation ent old_solid))
+                (if real_rot
+                  (progn
+                    (princ (strcat "\n    [V] Sincronização de Pose: " (rtos real_rot 2 1) "°"))
+                    (setq params (if (assoc "ROTACAO" params)
+                      (subst (cons "ROTACAO" real_rot) (assoc "ROTACAO" params) params)
+                      (cons (cons "ROTACAO" real_rot) params)))
+                    (vlax-ldata-put ent "TMD_ROTACAO" (rtos real_rot 2 1))
                   )
                 )
               )
-              (entdel old_solid)
             )
           )
-          
+
+          ;; --- 2. Sincronizar PT_A, PT_B con posición actual del wire ---
+          (setq e_data (entget ent)
+                ptA (cdr (assoc 10 e_data))
+                ptB (cdr (assoc 11 e_data)))
+          (setq params (if (assoc "PT_A" params)
+            (subst (cons "PT_A" ptA) (assoc "PT_A" params) params)
+            (cons (cons "PT_A" ptA) params)))
+          (setq params (if (assoc "PT_B" params)
+            (subst (cons "PT_B" ptB) (assoc "PT_B" params) params)
+            (cons (cons "PT_B" ptB) params)))
+
+          ;; --- 3. Re-evaluar TIPO según vector del wire ---
+          (if TMD:wire-evaluate-vector
+            (progn
+              (setq tipo (TMD:wire-evaluate-vector ptA ptB))
+              (vlax-ldata-put ent "TMD_TIPO" tipo)
+            )
+          )
+
+          ;; --- 4. Persistir TMD_PARAMS sincronizado ---
+          (vlax-ldata-put ent "TMD_PARAMS" params)
+        )
+      )
+    )
+  )
+)
+
+;;; =====================================================================================
+;;; 3B. FASE 2: RECONSTRUCCIÓN DESDE LDATA (SIN LECTURA FÍSICA)
+;;; -------------------------------------------------------------------------------------
+;;; DECISIÓN: Esta función NUNCA lee la geometría del sólido existente.
+;;;   Confía en TMD_PARAMS (ya sincronizado por Fase 1 o editado por el usuario).
+;;;   Borra el sólido viejo y crea uno nuevo según los datos almacenados.
+;;; =====================================================================================
+(defun TMD:build-reconstruct (ent / params p_nome ptA ptB p_forma p_x p_y p_e dist just rot
+                                    lay solid_lay solid_ent old_solid_h old_solid e_data)
+  (if (and ent (entget ent) (= (vlax-ldata-get ent "TMD_CLASSE") "ESTRUTURA_LINE"))
+    (progn
+      (setq params (vlax-ldata-get ent "TMD_PARAMS"))
+      (if params
+        (progn
+          ;; --- 1. Eliminar sólido anterior ---
+          (setq old_solid_h (vlax-ldata-get ent "TMD_CHILD_SOLID"))
+          (if (and old_solid_h (setq old_solid (handent old_solid_h)) (entget old_solid))
+            (entdel old_solid)
+          )
+
+          ;; --- 2. Extraer parámetros de construcción ---
           (setq p_nome (vlax-ldata-get ent "TMD_NOME") e_data (entget ent)
                 ptA (cdr (assoc 10 e_data)) ptB (cdr (assoc 11 e_data)) dist (distance ptA ptB)
                 p_forma (cdr (assoc "FORMA" params)) p_x (cdr (assoc "DIM_X" params))
                 p_y (cdr (assoc "DIM_Y" params)) p_e (cdr (assoc "ESPESSURA" params))
                 just (cdr (assoc "JUSTIFICACAO" params)) rot (cdr (assoc "ROTACAO" params)))
-          
+
+          ;; --- 3. Determinar capa correcta ---
           (setq lay (cdr (assoc 8 e_data)))
           (setq solid_lay (if (vl-string-search "WIRE-" lay) (vl-string-subst "06-" "WIRE-" lay) lay))
           (if (not (tblsearch "LAYER" solid_lay)) (vl-cmdf "_.-LAYER" "_M" solid_lay ""))
-          
+
+          ;; --- 4. Construir geometría ---
           (setq solid_ent (TMD:viga-build-geom nil ptA ptB just rot p_nome p_forma p_x p_y p_e 0.0 "ACO" dist))
-          
+
+          ;; --- 5. Inyectar metadatos BIM ---
           (if solid_ent
             (progn
               (vlax-ldata-put solid_ent "TMD_PARAMS" params)
@@ -164,7 +225,7 @@
               (vlax-ldata-put solid_ent "TMD_NIVEL_FIM" (vlax-ldata-get ent "TMD_NIVEL_FIM"))
               (vlax-ldata-put solid_ent "TMD_AFASTAMENTO" (vlax-ldata-get ent "TMD_AFASTAMENTO"))
               (vlax-ldata-put solid_ent "TMD_AFASTAMENTO_TOPO" (vlax-ldata-get ent "TMD_AFASTAMENTO_TOPO"))
-              
+
               (vlax-ldata-put solid_ent "TMD_PARENT_WIRE" (vla-get-handle (vlax-ename->vla-object ent)))
               (vlax-ldata-put ent "TMD_CHILD_SOLID" (vla-get-handle (vlax-ename->vla-object solid_ent)))
               (vlax-ldata-put ent "TMD_SELF_HANDLE" (vla-get-handle (vlax-ename->vla-object ent)))
@@ -177,4 +238,15 @@
   )
 )
 
-(princ "\n[TMD] Motor BUILD v5.2.4 (Estándar Wires) Cargado.") (princ)
+;;; =====================================================================================
+;;; 3C. WRAPPER DE COMPATIBILIDAD
+;;; -------------------------------------------------------------------------------------
+;;; Mantiene la API para los 18+ callers existentes.
+;;; Ejecuta Fase 1 (sync realidad) → Fase 2 (rebuild) secuencialmente.
+;;; =====================================================================================
+(defun TMD:build-single-wire (ent)
+  (TMD:build-sync-reality ent)
+  (TMD:build-reconstruct ent)
+)
+
+(princ "\n[TMD] Motor BUILD v5.3.0 (Realidad Física Primero) Cargado.") (princ)

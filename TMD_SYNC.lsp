@@ -118,7 +118,8 @@
 ;; FUNCIÓN: TMD:sync-extract-rotation
 ;; PROPÓSITO: Detecta la rotación real de un sólido respecto a su wire analizando su geometría.
 ;; RETORNO: Ángulo en grados (0, 90, 180, 270) o real.
-(defun TMD:sync-extract-rotation (w_ent s_ent / p1 p2 v_z v_x v_y s_bbox s_min s_max s_cent vec_rel ang_rad ang_deg proj_x proj_y)
+(defun TMD:sync-extract-rotation (w_ent s_ent / p1 p2 v_z v_x v_y p_mid p_x p_y reg exp item len max_l best_v proj_x proj_y ang_rad ang_deg)
+  (princ "\n    [DEBUG] Analisando rotação física...")
   (setq p1 (cdr (assoc 10 (entget w_ent))) p2 (cdr (assoc 11 (entget w_ent))))
   (setq v_z (TMD:sync-get-vector w_ent))
   
@@ -129,27 +130,51 @@
   )
   (setq v_y (TMD:util-vector-unit (TMD:util-vector-cross v_z v_x)))
   
-  ;; Obtener centroide y caja de contorno
-  (setq s_bbox (TMD:sync-get-bbox s_ent)
-        s_min (car s_bbox) s_max (cadr s_bbox)
-        s_cent (list (/ (+ (car s_min) (car s_max)) 2.0) (/ (+ (cadr s_min) (cadr s_max)) 2.0) (/ (+ (caddr s_min) (caddr s_max)) 2.0)))
+  ;; Crear sección transversal en el punto medio para analizar la orientación real
+  (setq p_mid (list (/ (+ (car p1) (car p2)) 2.0) (/ (+ (cadr p1) (cadr p2)) 2.0) (/ (+ (caddr p1) (caddr p2)) 2.0)))
+  (setq p_x (mapcar '+ p_mid v_x) p_y (mapcar '+ p_mid v_y))
   
-  ;; Proyectar el vector relativo (Max - Centroid) sobre el plano local transversal del Wire
-  (setq vec_rel (mapcar '- s_max s_cent))
-  (setq proj_x (apply '+ (mapcar '* vec_rel v_x))
-        proj_y (apply '+ (mapcar '* vec_rel v_y)))
+  (setq reg (vl-catch-all-apply 'vla-SectionSolid (list (vlax-ename->vla-object s_ent) (vlax-3d-point p_mid) (vlax-3d-point p_x) (vlax-3d-point p_y))))
   
-  ;; Calcular el ángulo en ese plano
-  (setq ang_rad (atan proj_y proj_x))
-  (setq ang_deg (* (/ ang_rad pi) 180.0))
-  
-  ;; Normalizar para devolver el ángulo paramétrico esperado (0, 90, etc.)
-  (cond
-    ((< (abs ang_deg) 5.0) 0.0)
-    ((< (abs (- ang_deg 90.0)) 5.0) 90.0)
-    ((< (abs (- ang_deg 180.0)) 5.0) 180.0)
-    ((< (abs (+ ang_deg 90.0)) 5.0) 270.0)
-    (t ang_deg)
+  (if (and reg (not (vl-catch-all-error-p reg)))
+    (progn
+      (princ " (Seção OK)")
+      (setq exp (vlax-invoke reg 'Explode) max_l 0.0 best_v v_x)
+      (vla-delete reg)
+      (foreach item exp
+        (if (= (vla-get-ObjectName item) "AcDbLine")
+          (progn
+            (setq len (vla-get-Length item))
+            (if (> len max_l)
+              (progn (setq max_l len) (setq best_v (mapcar '- (vlax-get item 'EndPoint) (vlax-get item 'StartPoint))))
+            )
+          )
+        )
+        (vla-delete item)
+      )
+      
+      (setq proj_x (apply '+ (mapcar '* best_v v_x)) proj_y (apply '+ (mapcar '* best_v v_y)))
+      (setq ang_rad (atan proj_y proj_x) ang_deg (* (/ ang_rad pi) 180.0))
+      
+      (princ (strcat "\n    [DEBUG] Angulo Bruto: " (rtos ang_deg 2 2) "°"))
+      
+      ;; Normalizar a 0-180 (la orientación física de un perfil es simétrica cada 180)
+      (while (< ang_deg 0) (setq ang_deg (+ ang_deg 180.0)))
+      (setq ang_deg (rem ang_deg 180.0))
+      
+      ;; Snapping a ángulos estándar con tolerancia de 1 grado
+      (cond
+        ((< (abs ang_deg) 1.0) (setq ang_deg 0.0))
+        ((< (abs (- ang_deg 90.0)) 1.0) (setq ang_deg 90.0))
+      )
+      
+      (princ (strcat " -> Final: " (rtos ang_deg 2 2) "°"))
+      ang_deg
+    )
+    (progn
+      (princ "\n    [!] ERROR: Falha ao seccionar sólido.")
+      (atof (vl-princ-to-string (cdr (assoc "ROTACAO" (vlax-ldata-get w_ent "TMD_PARAMS")))))
+    )
   )
 )
 

@@ -1,7 +1,10 @@
 ;;; =====================================================================================
-;;; TM DIGITAL - B.I.M INSPECTOR & PINCEL (V5.2.2)
+;;; TM DIGITAL - B.I.M INSPECTOR & PINCEL (V5.3.0)
 ;;; =====================================================================================
-;;; v5.2.2 - Re-activación de Auto-Sanado (Guardian de integridad física)
+;;; v5.3.0 - Realidad Física Primero: Lee estado físico antes de mostrar diálogo.
+;;;   DECISIÓN: LData es un espejo de la realidad, nunca al revés.
+;;;   Properties SIEMPRE sincroniza el estado físico al abrir,
+;;;   y al aplicar, usa TMD:build-reconstruct (sin delta).
 ;;; =====================================================================================
 
 (vl-load-com)
@@ -105,6 +108,22 @@
       (setq v_link (TMD:to-str (TMD:prop-get-pincel "LINK" "1")))
     )
     (progn
+      ;; --- FASE 1: Sincronizar realidad física → LData ANTES de leer valores ---
+      ;; Esto garantiza que el diálogo muestre la rotación/tipo REAL del sólido,
+      ;; no valores obsoletos del LData.
+      (setq _si 0)
+      (while (< _si (sslength sel))
+        (setq _se (ssname sel _si)
+              _so (cdr (assoc 0 (entget _se)))
+              _sw (if (= _so "LINE") _se
+                    (if (setq _sp (vlax-ldata-get _se "TMD_PARENT_WIRE")) (handent _sp) nil)))
+        (if (and _sw (entget _sw) TMD:build-sync-reality)
+          (TMD:build-sync-reality _sw)
+        )
+        (setq _si (1+ _si))
+      )
+
+      ;; --- Ahora leer valores del LData (ya sincronizado con la realidad) ---
       (if (= mode 1)
         (setq lst_tipos (list (TMD:prop-get-common sel "TMD_TIPO" "VIGA")))
         (setq lst_tipos (list "TODOS" "VIGA" "COLUNA" "CONTRAVENTAMENTO"))
@@ -222,7 +241,49 @@
             (setq curr_nini (vlax-ldata-get w_ent "TMD_NIVEL_INI") curr_afini (vlax-ldata-get w_ent "TMD_AFASTAMENTO") l_z1 (TMD:prop-get-level-z curr_nini)) (if l_z1 (setq p1 (list (car p1) (cadr p1) (+ l_z1 (atof curr_afini)))))
             (setq curr_nfim (vlax-ldata-get w_ent "TMD_NIVEL_FIM") curr_affim (vlax-ldata-get w_ent "TMD_AFASTAMENTO_TOPO") l_z2 (TMD:prop-get-level-z curr_nfim)) (if l_z2 (setq p2 (list (car p2) (cadr p2) (+ l_z2 (atof curr_affim)))))
             (setq delta_z1 (- (caddr p1) (caddr old_p1)) delta_z2 (- (caddr p2) (caddr old_p2))) (if (> (abs (- delta_z1 delta_z2)) 0.001) (setq needs_rebuild T))
-            (if needs_rebuild (progn (setq e_data (entget w_ent)) (setq e_data (subst (cons 10 p1) (assoc 10 e_data) e_data)) (setq e_data (subst (cons 11 p2) (assoc 11 e_data) e_data)) (entmod e_data) (entupd w_ent) (setq p_dict (vlax-ldata-get w_ent "TMD_PARAMS")) (if p_dict (progn (setq p_dict (subst (cons "PT_A" p1) (assoc "PT_A" p_dict) p_dict)) (setq p_dict (subst (cons "PT_B" p2) (assoc "PT_B" p_dict) p_dict)) (vlax-ldata-put w_ent "TMD_PARAMS" p_dict))) (if TMD:build-single-wire (TMD:build-single-wire w_ent))) (if (> (abs delta_z1) 0.001) (progn (setq v_obj (vlax-ename->vla-object w_ent)) (vla-Move v_obj (vlax-3d-point '(0 0 0)) (vlax-3d-point (list 0 0 delta_z1))) (setq solid_h (vlax-ldata-get w_ent "TMD_CHILD_SOLID")) (if (and solid_h (setq s_ent (handent solid_h)) (entget s_ent)) (vla-Move (vlax-ename->vla-object s_ent) (vlax-3d-point '(0 0 0)) (vlax-3d-point (list 0 0 delta_z1)))) (setq p_dict (vlax-ldata-get w_ent "TMD_PARAMS")) (if p_dict (progn (setq p_dict (subst (cons "PT_A" p1) (assoc "PT_A" p_dict) p_dict)) (setq p_dict (subst (cons "PT_B" p2) (assoc "PT_B" p_dict) p_dict)) (vlax-ldata-put w_ent "TMD_PARAMS" p_dict))))))
+            ;; --- Sincronizar TMD_PARAMS con valores explícitos del usuario ---
+            (setq p_dict (vlax-ldata-get w_ent "TMD_PARAMS"))
+            (if p_dict
+              (progn
+                (if (and rot (not (vl-string-search "*Varios*" rot)))
+                  (setq p_dict (if (assoc "ROTACAO" p_dict)
+                    (subst (cons "ROTACAO" (atof rot)) (assoc "ROTACAO" p_dict) p_dict)
+                    (cons (cons "ROTACAO" (atof rot)) p_dict))))
+                (if (and just (not (vl-string-search "*Varios*" just)))
+                  (setq p_dict (if (assoc "JUSTIFICACAO" p_dict)
+                    (subst (cons "JUSTIFICACAO" just) (assoc "JUSTIFICACAO" p_dict) p_dict)
+                    (cons (cons "JUSTIFICACAO" just) p_dict))))
+              )
+            )
+            ;; --- Actualizar geometría del wire y TMD_PARAMS ---
+            (setq e_data (entget w_ent))
+            (setq e_data (subst (cons 10 p1) (assoc 10 e_data) e_data))
+            (setq e_data (subst (cons 11 p2) (assoc 11 e_data) e_data))
+            (entmod e_data) (entupd w_ent)
+            (if p_dict
+              (progn
+                (setq p_dict (if (assoc "PT_A" p_dict)
+                  (subst (cons "PT_A" p1) (assoc "PT_A" p_dict) p_dict)
+                  (cons (cons "PT_A" p1) p_dict)))
+                (setq p_dict (if (assoc "PT_B" p_dict)
+                  (subst (cons "PT_B" p2) (assoc "PT_B" p_dict) p_dict)
+                  (cons (cons "PT_B" p2) p_dict)))
+                (vlax-ldata-put w_ent "TMD_PARAMS" p_dict)
+              )
+            )
+            ;; --- Reconstruir (Fase 2 directa, sin re-leer realidad física) ---
+            (if needs_rebuild
+              (if TMD:build-reconstruct (TMD:build-reconstruct w_ent))
+              (if (> (abs delta_z1) 0.001)
+                (progn
+                  (setq v_obj (vlax-ename->vla-object w_ent))
+                  (vla-Move v_obj (vlax-3d-point '(0 0 0)) (vlax-3d-point (list 0 0 delta_z1)))
+                  (setq solid_h (vlax-ldata-get w_ent "TMD_CHILD_SOLID"))
+                  (if (and solid_h (setq s_ent (handent solid_h)) (entget s_ent))
+                    (vla-Move (vlax-ename->vla-object s_ent) (vlax-3d-point '(0 0 0)) (vlax-3d-point (list 0 0 delta_z1))))
+                )
+              )
+            )
           )
         )
       )
@@ -257,4 +318,4 @@
 
 (defun TMD:prop-ui-rot-add (/ cur_rot new_rot cur_idx_just cur_just new_just lst) (setq cur_rot (atof (get_tile "eb_rot")) new_rot (+ cur_rot 90.0)) (if (>= new_rot 360.0) (setq new_rot (- new_rot 360.0))) (set_tile "eb_rot" (rtos new_rot 2 0)) (setq lst '("TL" "TC" "TR" "ML" "MC" "MR" "BL" "BC" "BR") cur_idx_just (atoi (get_tile "cbo_just")) cur_just (nth cur_idx_just lst)) (if (not TMD:wire-get-smart-just) (load "TMD_Wires.lsp")) (setq new_just (if TMD:wire-get-smart-just (TMD:wire-get-smart-just cur_just) cur_just)) (TMD:prop-set-list-index "cbo_just" lst new_just))
 
-(princ "\n[TM Digital] TMD_Properties v5.2.2 Cargado.") (princ)
+(princ "\n[TM Digital] TMD_Properties v5.3.0 (Realidad Física Primero) Cargado.") (princ)
