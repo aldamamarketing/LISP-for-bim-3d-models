@@ -230,14 +230,68 @@
 (defun TMD:util-get-directional-len-FORCE (s_ent w_ent / p1 p2 obj copy minp maxp pmin pmax len)
   (setq p1 (cdr (assoc 10 (entget w_ent)))
         p2 (cdr (assoc 11 (entget w_ent))))
-  (setq obj (vlax-ename->vla-object s_ent))
-  (setq copy (vla-copy obj))
-  (TMD:util-force-align-x copy p1 p2)
-  (vla-getboundingbox copy 'minp 'maxp)
-  (setq pmin (vlax-safearray->list minp) pmax (vlax-safearray->list maxp))
-  (setq len (abs (- (car pmax) (car pmin))))
-  (vla-delete copy)
-  len
+  (if (and p1 p2)
+    (progn
+      (setq obj (vlax-ename->vla-object s_ent))
+      (setq copy (vla-copy obj))
+      (TMD:util-force-align-x copy p1 p2)
+      (vla-getboundingbox copy 'minp 'maxp)
+      (setq pmin (vlax-safearray->list minp) pmax (vlax-safearray->list maxp))
+      (setq len (abs (- (car pmax) (car pmin))))
+      (vla-delete copy)
+      len
+    )
+    0.0
+  )
+)
+
+;;; -------------------------------------------------------------------------------------
+;;; 4. AUDITORIA E INTEGRIDADE GEOMÉTRICA
+;;; -------------------------------------------------------------------------------------
+
+;; Obtém a justificação REAL (física) baseada na posição da linha em relação ao sólido
+(defun TMD:util-get-real-justification (w_ent s_ent / params p_x p_y w_p1 w_p2 v_z v_x v_y s_bbox s_min s_max s_cent vec_s off_x off_y jx jy)
+  (setq params (vlax-ldata-get w_ent "TMD_PARAMS"))
+  (if (and params (setq p_x (cdr (assoc "DIM_X" params))) (setq p_y (cdr (assoc "DIM_Y" params))))
+    (progn
+      (setq w_p1 (cdr (assoc 10 (entget w_ent)))
+            w_p2 (cdr (assoc 11 (entget w_ent))))
+      (setq v_z (TMD:util-vector-unit (mapcar '- w_p2 w_p1)))
+      
+      ;; Definir eixos locais do perfil (LCS)
+      (if (and (< (abs (car v_z)) 0.01) (< (abs (cadr v_z)) 0.01)) 
+        (setq v_x '(1.0 0.0 0.0)) 
+        (setq v_x (TMD:util-vector-unit (TMD:util-vector-cross '(0.0 0.0 1.0) v_z)))
+      )
+      (setq v_y (TMD:util-vector-unit (TMD:util-vector-cross v_z v_x)))
+      
+      ;; Centro do sólido e projeção
+      (vla-getboundingbox (vlax-ename->vla-object s_ent) 'minp 'maxp)
+      (setq s_min (vlax-safearray->list minp) s_max (vlax-safearray->list maxp))
+      (setq s_cent (list (/ (+ (car s_min) (car s_max)) 2.0) (/ (+ (cadr s_min) (cadr s_max)) 2.0) (/ (+ (caddr s_min) (caddr s_max)) 2.0)))
+      
+      (setq vec_s (mapcar '- s_cent w_p1)
+            off_x (apply '+ (mapcar '* vec_s v_x))
+            off_y (apply '+ (mapcar '* vec_s v_y)))
+      
+      ;; Mapeamento 1 de 9 posições
+      (setq jx (cond ((< off_x (* p_x -0.25)) "R") ((> off_x (* p_x 0.25)) "L") (t "C")))
+      (setq jy (cond ((< off_y (* p_y -0.25)) "T") ((> off_y (* p_y 0.25)) "B") (t "M")))
+      (strcat jy jx)
+    )
+    "MC" ;; Fallback
+  )
+)
+
+;; Auxiliares de Vetores (Garantia de existência)
+(defun TMD:util-vector-unit (v / d) (setq d (distance '(0 0 0) v)) (if (> d 1e-8) (mapcar '(lambda (x) (/ x d)) v) v))
+(defun TMD:util-vector-cross (a b) (list (- (* (cadr a) (caddr b)) (* (caddr a) (cadr b))) (- (* (caddr a) (car b)) (* (car a) (caddr b))) (- (* (car a) (cadr b)) (* (cadr a) (car b)))))
+
+;; FALLBACK: Obtém a maior dimensão do BoundingBox (usado quando o wire é perdido)
+(defun TMD:util-get-bbox-max-dim (ent / minp maxp p1 p2)
+  (vla-getboundingbox (vlax-ename->vla-object ent) 'minp 'maxp)
+  (setq p1 (vlax-safearray->list minp) p2 (vlax-safearray->list maxp))
+  (max (abs (- (car p2) (car p1))) (abs (- (cadr p2) (cadr p1))) (abs (- (caddr p2) (caddr p1))))
 )
 
 ;;; -------------------------------------------------------------------------------------

@@ -170,7 +170,7 @@
 ;;; 4. COMANDOS DE TABELAS
 ;;; -------------------------------------------------------------------------------------
 
-(defun c:TMD_TABLAS_NUMERAR ( / ss doc i ent w_ent nome s_h s_ent len list_items unique key mark idx)
+(defun c:TMD_TABLAS_NUMERAR ( / ss doc i ent w_ent nome s_h s_ent len list_items unique key mark idx skipped p1 p2)
   (setq doc (vla-get-ActiveDocument (vlax-get-acad-object))) (vla-StartUndoMark doc)
   (princ "\n[TMD] Selecione elementos para numerar [Grupo]: ")
   (initget "Grupo")
@@ -179,7 +179,7 @@
 
   (if (not ss) (progn (vla-EndUndoMark doc) (exit)))
   
-  (setq list_items nil)
+  (setq list_items nil skipped 0)
   (repeat (setq i (sslength ss))
     (setq ent (ssname ss (setq i (1- i))))
     (if (setq w_ent (TMD:tablas-resolve-wire ent))
@@ -187,14 +187,38 @@
         (setq nome (vlax-ldata-get w_ent "TMD_NOME")
               s_h (vlax-ldata-get w_ent "TMD_CHILD_SOLID")
               s_ent (if s_h (handent s_h) nil))
+        ;; Guard: nome deve existir para agrupar
+        (if (not nome) (setq nome "DESCONHECIDO"))
+        ;; Calcular comprimento com proteção nil
+        (setq len nil)
         (if (and s_ent (entget s_ent))
           (setq len (TMD:tablas-get-solid-len s_ent))
-          (setq len (distance (cdr (assoc 10 (entget w_ent))) (cdr (assoc 11 (entget w_ent))))))
+        )
+        (if (not len)
+          (progn
+            (setq p1 (cdr (assoc 10 (entget w_ent)))
+                  p2 (cdr (assoc 11 (entget w_ent))))
+            (if (and p1 p2)
+              (setq len (distance p1 p2))
+              (setq len 0.0)
+            )
+          )
+        )
         (setq list_items (cons (list w_ent nome len) list_items))
       )
+      ;; Entidade sem dados BIM — contar como ignorada
+      (setq skipped (1+ skipped))
     )
   )
   
+  ;; Avisar sobre elementos ignorados
+  (if (> skipped 0)
+    (princ (strcat "\n[!] " (itoa skipped) " elementos sem dados BIM foram ignorados. Execute TMD_SYNC para reparar."))
+  )
+  
+  (if (not list_items) 
+    (progn (princ "\n[!] Nenhum elemento BIM valido encontrado na selecao.") (vla-EndUndoMark doc) (princ) (exit)))
+
   ;; Agrupar geometrias unicas para definir marcas
   (setq unique nil)
   (foreach it list_items
