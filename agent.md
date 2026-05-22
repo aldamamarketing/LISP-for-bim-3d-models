@@ -19,9 +19,20 @@ Se ha abandonado el concepto de `TMD_PARENT_WIRE` y polilíneas base ("Wires"). 
 
 ## Módulos Afectados Recientemente
 - `TMD_Wires.lsp`: Controla el trazado interactivo (`c:TMD_WIRES`). Se actualizó para delegar la reconstrucción directamente en el motor sin reciclar bounding boxes (previniendo así derivas en rotación y justificación). Se aisló del sistema de niveles temporalmente para evitar fallos.
-- `TMD_Vigas.lsp`: Contiene el motor `TMD:viga-build-geom` que interpreta el "ADN" y dibuja las extrusiones y cajas (`j2:bx`, `j2:cyl`, `j2:pline`). 
-- `TMD_BUILD.lsp` / `TMD_SYNC.lsp`: En proceso de readaptación a la nueva filosofía sin Wires.
+- `TMD_Vigas.lsp`: Contiene el motor `TMD:viga-build-geom` que interpreta el "ADN" y dibuja las extrusiones y cajas (`j2:bx`, `j2:cyl`, `j2:pline`).
+- `TMD_Palette_Bridge.lsp`: Modificado para integrar el sistema de identidad persistente UUID y Handle Shadowing. Ahora listo para incorporar el cálculo preciso de la línea analítica y re-normalización de justificación.
+- `web/inspector.html`: Actualizado con el deduplicador de datos para evitar repoblaciones innecesarias del catálogo, reduciendo el parpadeo.
 
-## Próximos Pasos Identificados
-- Limpiar código heredado de la V4 (ej: `c:TMD_JOINTS_INSPECT`, `c:TMD_FORENSIC`, `c:TMD_SYNC_PREVIEW`, etc.) que han quedado obsoletos al integrar la paleta web.
-- Asegurar que la reconstrucción fuera del loop interactivo (por ejemplo, desde el panel de propiedades web) logre reconstruir el sólido sin deriva geométrica, a pesar de no contar con `PT_A` y `PT_B` explícitos en memoria.
+## Estado de la Refactorización Planeada (Menús y Justificación)
+Para solucionar el parpadeo/cierre abrupto de los dropdowns y la correcta justificación del sólido (LDATA y movimiento físico), se han diseñado las siguientes estrategias que quedan listas para ejecución:
+
+1. **Inspector Web (`web/inspector.html`):**
+   - Pausa de `leerJsDatos()` cuando el usuario tiene el catálogo abierto o campos `SELECT`/`INPUT` enfocados.
+   - Alineación de los valores de justificación a los códigos nativos estructurales (`"MC"`, `"TC"`, `"BC"`, `"ML"`, `"MR"`).
+2. **Puente y Geometría (`TMD_Palette_Bridge.lsp` & `TMD_Vigas.lsp`):**
+   - Función `TMD:normalize-just` para normalizar strings legacy.
+   - Función `TMD:get-analytical-line` para extraer con exactitud el eje de inserción original desde el sólido 3D de forma local (deshaciendo el desfase de la justificación anterior).
+   - Reconstrucción de la viga en `TMD:palette-update-param` usando la línea analítica, lo que permite que el sólido se desplace físicamente al cambiar la justificación, y crezca simétricamente al cambiar de perfil.
+   - Sincronización del rubber-band en `TMD:palette-pick-point` para usar el punto analítico opuesto exacto.
+   - Inyección redundante de `"TMD_JUSTIFICACAO"` y `"TMD_ROTACAO"` en LDATA.
+
