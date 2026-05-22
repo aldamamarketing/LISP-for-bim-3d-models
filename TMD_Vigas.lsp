@@ -23,8 +23,20 @@
 )
 
 (defun TMD:viga-csv-path ( / p)
-  (setq p (findfile "catalogo_metal.csv"))
-  (if p p (strcat (getvar "DWGPREFIX") "catalogo_metal.csv"))
+  (cond
+    ((setq p (findfile "catalogo_metal.csv")) p)
+    ((and (setq p (findfile "TMD_Vigas.lsp"))
+          (vl-file-size (strcat (vl-filename-directory p) "/catalogo_metal.csv"))
+          (> (vl-file-size (strcat (vl-filename-directory p) "/catalogo_metal.csv")) 0))
+     (strcat (vl-filename-directory p) "/catalogo_metal.csv")
+    )
+    ((and (setq p (findfile "TMD_Palette_Bridge.lsp"))
+          (vl-file-size (strcat (vl-filename-directory p) "/catalogo_metal.csv"))
+          (> (vl-file-size (strcat (vl-filename-directory p) "/catalogo_metal.csv")) 0))
+     (strcat (vl-filename-directory p) "/catalogo_metal.csv")
+    )
+    (t (strcat (getvar "DWGPREFIX") "catalogo_metal.csv"))
+  )
 )
 
 (defun TMD:viga-load-catalog (/ f line catalog path hr item _x _y _e _l v_forma gen_name)
@@ -152,6 +164,7 @@
   (setq cy (cond ((vl-string-search "B" just) (/ p_y 2.0)) ((vl-string-search "T" just) (* -1.0 (/ p_y 2.0))) (t 0.0)))
   
   ;; Sincronização do Eixo Z Analítico
+  ;; Sincronização do Eixo Z Analítico
   (if (< (distance pt_a pt_b) 0.01)
     (progn 
       (princ "\n[!] ERRO: Distância entre pontos insuficiente para gerar sólido.")
@@ -161,77 +174,92 @@
       (vl-cmdf "_.UCS" "_World")
       (vl-cmdf "_.UCS" "_ZAxis" "_non" pt_a "_non" pt_b)
       (if (and rot (/= rot 0.0)) (vl-cmdf "_.UCS" "_Z" rot))
+      
+      ;; Variáveis matemáticas puras
+      (setq x2 (/ p_x 2.0) y2 (/ p_y 2.0) e2 (/ p_e 2.0))
+      
+      (defun j2:pline (pts / p)
+        (vl-cmdf "_.PLINE")
+        (foreach p pts (vl-cmdf "_non" (list (+ (car p) cx) (+ (cadr p) cy) 0.0)))
+        (vl-cmdf "_C")
+        (entlast)
+      )
+
+      (defun j2:bx (x1 y1 z1 x2_c y2_c z2_c)
+        (vl-cmdf "_.BOX" "_non" (list (+ x1 cx) (+ y1 cy) z1) "_non" (list (+ x2_c cx) (+ y2_c cy) z2_c))
+        (entlast)
+      )
+
+      (defun j2:cyl (r z lz)
+        (vl-cmdf "_.CYLINDER" "_non" (list cx cy z) r lz)
+        (entlast)
+      )
+
+      ;; Construção por Operações Booleanas ou Extrusão (V5)
+      (cond
+        ((= p_forma "CIRC_VAZIO")
+         (setq ent_outer (j2:cyl x2 0.0 dist))
+         (if (> p_e 0)
+           (progn
+             (setq ent_inner (j2:cyl (- x2 p_e) -1.0 (+ dist 2.0)))
+             (vl-cmdf "_.SUBTRACT" ent_outer "" ent_inner "") (setq ent_outer (entlast))
+           )
+         )
+        )
+        ((= p_forma "RECT_VAZIO")
+         (setq ent_outer (j2:bx (* -1.0 x2) (* -1.0 y2) 0.0 x2 y2 dist))
+         (if (> p_e 0)
+           (progn
+             (setq ent_inner (j2:bx (+ (* -1.0 x2) p_e) (+ (* -1.0 y2) p_e) -1.0 (- x2 p_e) (- y2 p_e) (+ dist 2.0)))
+             (vl-cmdf "_.SUBTRACT" ent_outer "" ent_inner "") (setq ent_outer (entlast))
+           )
+         )
+        )
+        ((= p_forma "PERFIL_I")
+         (setq ent_pline (j2:pline (list 
+           (list (* -1.0 x2) (* -1.0 y2)) (list x2 (* -1.0 y2)) (list x2 (+ (* -1.0 y2) p_e)) 
+           (list e2 (+ (* -1.0 y2) p_e)) (list e2 (- y2 p_e)) (list x2 (- y2 p_e)) 
+           (list x2 y2) (list (* -1.0 x2) y2) (list (* -1.0 x2) (- y2 p_e)) 
+           (list (* -1.0 e2) (- y2 p_e)) (list (* -1.0 e2) (+ (* -1.0 y2) p_e)) (list (* -1.0 x2) (+ (* -1.0 y2) p_e))
+         )))
+         (setvar "SOLIDHIST" 1)
+         (vl-cmdf "_.EXTRUDE" ent_pline "" dist) (setq ent_outer (entlast))
+        )
+        ((= p_forma "PERFIL_U")
+         ;; Assumimos a alma (web) na esquerda (* -1.0 x2)
+         (setq ent_pline (j2:pline (list 
+           (list (* -1.0 x2) (* -1.0 y2)) (list x2 (* -1.0 y2)) (list x2 (+ (* -1.0 y2) p_e)) 
+           (list (+ (* -1.0 x2) p_e) (+ (* -1.0 y2) p_e)) (list (+ (* -1.0 x2) p_e) (- y2 p_e)) 
+           (list x2 (- y2 p_e)) (list x2 y2) (list (* -1.0 x2) y2)
+         )))
+         (setvar "SOLIDHIST" 1)
+         (vl-cmdf "_.EXTRUDE" ent_pline "" dist) (setq ent_outer (entlast))
+        )
+        ((= p_forma "PERFIL_C")
+         (if (and p_labio (> p_labio 0.0))
+           (setq ent_pline (j2:pline (list 
+             (list (* -1.0 x2) (* -1.0 y2)) (list x2 (* -1.0 y2)) (list x2 (+ (* -1.0 y2) p_e p_labio)) 
+             (list (- x2 p_e) (+ (* -1.0 y2) p_e p_labio)) (list (- x2 p_e) (+ (* -1.0 y2) p_e)) 
+             (list (+ (* -1.0 x2) p_e) (+ (* -1.0 y2) p_e)) (list (+ (* -1.0 x2) p_e) (- y2 p_e)) 
+             (list (- x2 p_e) (- y2 p_e)) (list (- x2 p_e) (- y2 p_e p_labio)) 
+             (list x2 (- y2 p_e p_labio)) (list x2 y2) (list (* -1.0 x2) y2)
+           )))
+           (setq ent_pline (j2:pline (list 
+             (list (* -1.0 x2) (* -1.0 y2)) (list x2 (* -1.0 y2)) (list x2 (+ (* -1.0 y2) p_e)) 
+             (list (+ (* -1.0 x2) p_e) (+ (* -1.0 y2) p_e)) (list (+ (* -1.0 x2) p_e) (- y2 p_e)) 
+             (list x2 (- y2 p_e)) (list x2 y2) (list (* -1.0 x2) y2)
+           )))
+         )
+         (setvar "SOLIDHIST" 1)
+         (vl-cmdf "_.EXTRUDE" ent_pline "" dist) (setq ent_outer (entlast))
+        )
+      )
+      
+      (vl-cmdf "_.UCS" "_World")
     )
   )
   
-  ;; Variáveis matemáticas puras
-  (setq x2 (/ p_x 2.0) y2 (/ p_y 2.0) e2 (/ p_e 2.0))
-  
-  ;; Macro de União Geométrica 3D para translação offset
-  (defun j2:bx (x1 y1 z1 x2_local y2_local z2)
-    (vl-cmdf "_.BOX" "_non" (list (+ x1 cx) (+ y1 cy) z1) "_non" (list (+ x2_local cx) (+ y2_local cy) z2))
-    (entlast)
-  )
-  (defun j2:cyl (r z h)
-    (vl-cmdf "_.CYLINDER" "_non" (list cx cy z) r h)
-    (entlast)
-  )
-  
-  ;; Construção por Operações Booleanas
-  (cond
-    ((= p_forma "CIRC_VAZIO")
-     (setq ent_outer (j2:cyl x2 0.0 dist))
-     (if (> p_e 0)
-       (progn
-         (setq ent_inner (j2:cyl (- x2 p_e) -1.0 (+ dist 2.0)))
-         (vl-cmdf "_.SUBTRACT" ent_outer "" ent_inner "") (setq ent_outer (entlast))
-       )
-     )
-    )
-    ((= p_forma "RECT_VAZIO")
-     (setq ent_outer (j2:bx (* -1.0 x2) (* -1.0 y2) 0.0 x2 y2 dist))
-     (if (> p_e 0)
-       (progn
-         (setq ent_inner (j2:bx (+ (* -1.0 x2) p_e) (+ (* -1.0 y2) p_e) -1.0 (- x2 p_e) (- y2 p_e) (+ dist 2.0)))
-         (vl-cmdf "_.SUBTRACT" ent_outer "" ent_inner "") (setq ent_outer (entlast))
-       )
-     )
-    )
-    ((= p_forma "PERFIL_I")
-     (setq ent1 (j2:bx (* -1.0 e2) (* -1.0 y2) 0.0 e2 y2 dist))
-     (setq ent2 (j2:bx (* -1.0 x2) (* -1.0 y2) 0.0 x2 (+ (* -1.0 y2) p_e) dist))
-     (setq ent3 (j2:bx (* -1.0 x2) (- y2 p_e) 0.0 x2 y2 dist))
-     (vl-cmdf "_.UNION" ent1 ent2 ent3 "") (setq ent_outer (entlast))
-    )
-    ((= p_forma "PERFIL_U")
-     ;; Assumimos a alma (web) na esquerda (* -1.0 x2)
-     (setq ent1 (j2:bx (* -1.0 x2) (* -1.0 y2) 0.0 (+ (* -1.0 x2) p_e) y2 dist))
-     (setq ent2 (j2:bx (+ (* -1.0 x2) p_e) (* -1.0 y2) 0.0 x2 (+ (* -1.0 y2) p_e) dist))
-     (setq ent3 (j2:bx (+ (* -1.0 x2) p_e) (- y2 p_e) 0.0 x2 y2 dist))
-     (vl-cmdf "_.UNION" ent1 ent2 ent3 "") (setq ent_outer (entlast))
-    )
-    ((= p_forma "PERFIL_C")
-     ;; Alma (Costas)
-     (setq ent1 (j2:bx (* -1.0 x2) (* -1.0 y2) 0.0 (+ (* -1.0 x2) p_e) y2 dist))
-     ;; Abas
-     (setq ent2 (j2:bx (+ (* -1.0 x2) p_e) (* -1.0 y2) 0.0 x2 (+ (* -1.0 y2) p_e) dist))
-     (setq ent3 (j2:bx (+ (* -1.0 x2) p_e) (- y2 p_e) 0.0 x2 y2 dist))
-     
-     (if (and p_labio (> p_labio 0.0))
-       (progn
-         ;; Labios
-         (setq ent4 (j2:bx (- x2 p_e) (+ (* -1.0 y2) p_e) 0.0 x2 (+ (* -1.0 y2) p_e p_labio) dist))
-         (setq ent5 (j2:bx (- x2 p_e) (- y2 p_e p_labio) 0.0 x2 (- y2 p_e) dist))
-         (vl-cmdf "_.UNION" ent1 ent2 ent3 ent4 ent5 "") (setq ent_outer (entlast))
-       )
-       (progn
-         (vl-cmdf "_.UNION" ent1 ent2 ent3 "") (setq ent_outer (entlast))
-       )
-     )
-    )
-  )
-  
-  (vl-cmdf "_.UCS" "_World")
+  ent_outer
   
   (if ent_outer
     (progn
@@ -242,13 +270,8 @@
       (vlax-ldata-put ent_outer "TMD_NOME" p_nome)
       (vlax-ldata-put ent_outer "TMD_NIVEL" (atof nivel_global))
       
-      ;; Injetar o ADN 4.0
-      (TMD:bim-set-adn ent_outer (list (cons "FORMA" p_forma) (cons "DIM_X" p_x) (cons "DIM_Y" p_y) (cons "ESPESSURA" p_e) (cons "LABIO" p_labio) (cons "MATERIAL" p_material) (cons "DISTANCIA" dist) (cons "JUSTIFICACAO" just) (cons "ROTACAO" rot) (cons "PT_A" pt_a) (cons "PT_B" pt_b)))
-      
-      (if (not (tblsearch "LAYER" "TMD-3D-MODEL"))
-        (vl-cmdf "_.-LAYER" "_M" "TMD-3D-MODEL" "_C" 8 "" "")
-      )
-      (vl-cmdf "_.CHPROP" ent_outer "" "_LA" "TMD-3D-MODEL" "")
+      ;; Injetar o ADN 5.0 (Sem PT_A, PT_B, DISTANCIA)
+      (TMD:bim-set-adn ent_outer (list (cons "FORMA" p_forma) (cons "DIM_X" p_x) (cons "DIM_Y" p_y) (cons "ESPESSURA" p_e) (cons "LABIO" p_labio) (cons "MATERIAL" p_material) (cons "JUSTIFICACAO" just) (cons "ROTACAO" rot)))
     )
   )
   ent_outer

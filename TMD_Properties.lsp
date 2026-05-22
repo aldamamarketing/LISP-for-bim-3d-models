@@ -2,14 +2,14 @@
 ;;; TM DIGITAL - B.I.M INSPECTOR & PINCEL (V5.3.0)
 ;;; =====================================================================================
 ;;; v5.3.0 - Realidad Física Primero: Lee estado físico antes de mostrar diálogo.
-;;;   DECISIÓN: LData es un espejo de la realidad, nunca al revés.
+;;;   DECISIÓN: LData es un espejo de la realidade, nunca al revés.
 ;;;   Properties SIEMPRE sincroniza el estado físico al abrir,
 ;;;   y al aplicar, usa TMD:build-reconstruct (sin delta).
 ;;; =====================================================================================
 
 (vl-load-com)
 
-;; Carga de dependencias
+;; Carga de dependências
 (if (not TMD:viga-load-catalog) (load "TMD_Vigas.lsp" "\nErro: TMD_Vigas.lsp não encontrado."))
 
 ;;; -------------------------------------------------------------------------------------
@@ -37,7 +37,7 @@
 )
 
 ;;; -------------------------------------------------------------------------------------
-;;; FUNCIÓN DE SANEADO: Sincronización de Realidad Física
+;;; FUNÇÃO DE SANEADO: Sincronização de Realidad Física
 ;;; -------------------------------------------------------------------------------------
 (defun TMD:prop-auto-correct-z (sel / i ent obj_type w_ent p1 p2 n_ini n_fim l_ini l_fim af_ini af_fim ph)
   (setq i 0)
@@ -246,7 +246,7 @@
             (if p_dict
               (progn
                 (if (and rot (not (vl-string-search "*Varios*" rot)))
-                  (setq p_dict (if (assoc "ROTACAO" p_dict)
+                   (setq p_dict (if (assoc "ROTACAO" p_dict)
                     (subst (cons "ROTACAO" (atof rot)) (assoc "ROTACAO" p_dict) p_dict)
                     (cons (cons "ROTACAO" (atof rot)) p_dict))))
                 (if (and just (not (vl-string-search "*Varios*" just)))
@@ -317,5 +317,13 @@
 (defun TMD:prop-ui-link-toggle (v) (mode_tile "cbo_niv_topo" (if (= v "1") 1 0)) (mode_tile "eb_af_topo" (if (= v "1") 1 0)))
 
 (defun TMD:prop-ui-rot-add (/ cur_rot new_rot cur_idx_just cur_just new_just lst) (setq cur_rot (atof (get_tile "eb_rot")) new_rot (+ cur_rot 90.0)) (if (>= new_rot 360.0) (setq new_rot (- new_rot 360.0))) (set_tile "eb_rot" (rtos new_rot 2 0)) (setq lst '("TL" "TC" "TR" "ML" "MC" "MR" "BL" "BC" "BR") cur_idx_just (atoi (get_tile "cbo_just")) cur_just (nth cur_idx_just lst)) (if (not TMD:wire-get-smart-just) (load "TMD_Wires.lsp")) (setq new_just (if TMD:wire-get-smart-just (TMD:wire-get-smart-just cur_just) cur_just)) (TMD:prop-set-list-index "cbo_just" lst new_just))
+
+;; Failsafe dynamic loading of the premium Web Inspector bridge
+(if (not c:TMD_INSPECT)
+  (if (and (boundp 'TMD:sys-load) TMD:sys-load)
+    (TMD:sys-load "TMD_Palette_Bridge.lsp")
+    (vl-catch-all-apply 'load (list "TMD_Palette_Bridge.lsp" nil))
+  )
+)
 
 (princ "\n[TM Digital] TMD_Properties v5.3.0 (Realidad Física Primero) Cargado.") (princ)

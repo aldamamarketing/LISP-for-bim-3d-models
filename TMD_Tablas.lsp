@@ -27,18 +27,14 @@
     (setq i (1+ i)))
   res)
 
-(defun TMD:tablas-get-solid-len (s_ent / parent)
-  (setq parent (vlax-ldata-get s_ent "TMD_PARENT_WIRE"))
-  (if (and parent (setq parent (handent parent)) (entget parent))
-    (TMD:util-get-directional-len s_ent parent)
-    (TMD:util-get-bbox-max-dim s_ent) ; Fallback se não houver wire
-  ))
+(defun TMD:tablas-get-solid-len (s_ent)
+  (car (TMD:GetSolidMetrics (vlax-ename->vla-object s_ent)))
+)
 
-(defun TMD:tablas-resolve-wire (ent / etype ph)
+(defun TMD:tablas-resolve-wire (ent / etype)
   (setq etype (cdr (assoc 0 (entget ent))))
-  (cond ((= etype "LINE") (if (vlax-ldata-get ent "TMD_TIPO") ent nil))
-        ((= etype "3DSOLID") (setq ph (vlax-ldata-get ent "TMD_PARENT_WIRE")) (if (and ph (setq ph (handent ph))) ph nil))
-        (t nil)))
+  (if (= etype "3DSOLID") ent nil)
+)
 
 ;;; -------------------------------------------------------------------------------------
 ;;; 2. MOTOR DE ANALISE (READ-ONLY MARKING)
@@ -70,12 +66,9 @@
              (not (member (setq w_handle (cdr (assoc 5 (entget w_ent)))) processed_handles)))
       (progn
         (setq processed_handles (cons w_handle processed_handles))
-        (setq nome (vlax-ldata-get w_ent "TMD_NOME")
-              s_h (vlax-ldata-get w_ent "TMD_CHILD_SOLID")
-              s_ent (if s_h (handent s_h) nil))
-        (if (and s_ent (entget s_ent))
-          (setq len (TMD:tablas-get-solid-len s_ent) is_wire nil)
-          (setq len (distance (cdr (assoc 10 (entget w_ent))) (cdr (assoc 11 (entget w_ent)))) is_wire T))
+        (setq nome (vlax-ldata-get w_ent "TMD_NOME"))
+        (if (not nome) (setq nome "DESCONHECIDO"))
+        (setq len (TMD:tablas-get-solid-len w_ent) is_wire nil)
         (setq peso_unit (if (setq entry (assoc nome catalog)) (nth 5 entry) 0.0))
         ;; LER MARCA PERSISTENTE (Ou vazio se nao numerado)
         (setq mark (vlax-ldata-get w_ent "TMD_MARK"))
@@ -172,9 +165,9 @@
 
 (defun c:TMD_TABLAS_NUMERAR ( / ss doc i ent w_ent nome s_h s_ent len list_items unique key mark idx skipped p1 p2)
   (setq doc (vla-get-ActiveDocument (vlax-get-acad-object))) (vla-StartUndoMark doc)
-  (princ "\n[TMD] Selecione elementos para numerar [Grupo]: ")
+  (princ "\n[TMD] Selecione 3DSOLIDS para numerar [Grupo]: ")
   (initget "Grupo")
-  (setq ss (ssget '((-4 . "<OR") (0 . "LINE") (0 . "3DSOLID") (-4 . "OR>"))))
+  (setq ss (ssget '((0 . "3DSOLID"))))
   (if (= ss "Grupo") (setq ss (TMD:group-select-engine)))
 
   (if (not ss) (progn (vla-EndUndoMark doc) (exit)))
@@ -184,27 +177,23 @@
     (setq ent (ssname ss (setq i (1- i))))
     (if (setq w_ent (TMD:tablas-resolve-wire ent))
       (progn
-        (setq nome (vlax-ldata-get w_ent "TMD_NOME")
-              s_h (vlax-ldata-get w_ent "TMD_CHILD_SOLID")
-              s_ent (if s_h (handent s_h) nil))
-        ;; Guard: nome deve existir para agrupar
+        (setq nome (vlax-ldata-get w_ent "TMD_NOME"))
         (if (not nome) (setq nome "DESCONHECIDO"))
-        ;; Calcular comprimento com proteção nil
-        (setq len nil)
-        (if (and s_ent (entget s_ent))
-          (setq len (TMD:tablas-get-solid-len s_ent))
+        
+        ;; Comprimento real do solido
+        (setq len (TMD:tablas-get-solid-len w_ent))
+        
+        ;; Determinar marca
+        (setq mark (vlax-ldata-get w_ent "TMD_MARK"))
+        (if (not mark)
+          (setq mark (if (vlax-ldata-get w_ent "TMD_POS") (vlax-ldata-get w_ent "TMD_POS") "-"))
         )
-        (if (not len)
-          (progn
-            (setq p1 (cdr (assoc 10 (entget w_ent)))
-                  p2 (cdr (assoc 11 (entget w_ent))))
-            (if (and p1 p2)
-              (setq len (distance p1 p2))
-              (setq len 0.0)
-            )
-          )
+        
+        (setq key (strcat nome "_" (rtos len 2 0)))
+        (if (not (assoc key list_items))
+          (setq list_items (append list_items (list (list key nome len mark (list w_ent)))))
+          (setq list_items (subst (append (assoc key list_items) (list w_ent)) (assoc key list_items) list_items))
         )
-        (setq list_items (cons (list w_ent nome len) list_items))
       )
       ;; Entidade sem dados BIM — contar como ignorada
       (setq skipped (1+ skipped))
@@ -235,17 +224,22 @@
     (setq mark (strcat "m" (itoa idx)))
     (foreach it list_items
       (if (= (strcat (nth 1 it) (rtos (nth 2 it) 2 2)) (car u))
-        (vlax-ldata-put (car it) "TMD_MARK" mark)))
+        (foreach item_ent (nth 4 it)
+          (vlax-ldata-put item_ent "TMD_MARK" mark)
+        )
+      )
+    )
     (setq idx (1+ idx)))
   
   (vla-EndUndoMark doc)
-  (princ (strcat "\n[OK] Numeracao concluida. " (itoa (length unique)) " marcas geradas.")) (princ))
+  (princ (strcat "\n[OK] Numeracao concluida. " (itoa (length unique)) " marcas geradas.")) (princ)
+)
 
 (defun c:TMD_TABLAS_MONTAGEM ( / doc ss cat source_data raw_data grps pt rows table i headers space)
   (setq doc (vla-get-ActiveDocument (vlax-get-acad-object))) (vla-StartUndoMark doc)
   (princ "\n[TMD] Selecione elementos para a Tabela [Grupo]: ")
   (initget "Grupo")
-  (setq ss (ssget '((-4 . "<OR") (0 . "LINE") (0 . "3DSOLID") (-4 . "OR>"))))
+  (setq ss (ssget '((0 . "3DSOLID"))))
   (if (= ss "Grupo") (setq ss (TMD:group-select-engine)))
 
   (if (not ss) (progn (vla-EndUndoMark doc) (exit)))
@@ -262,7 +256,7 @@
   (setq i 0) (foreach h headers (vla-setText table 1 i h) (setq i (1+ i)))
   (TMD:tablas-fill-table table grps)
   (setq i (1- (vla-get-Rows table))) (vla-MergeCells table i i 0 5)
-  (vla-setText table i 0 "* Medida baseada no wire (Sólido não compilado)")
+  (vla-setText table i 0 "* Medida calculada pela inércia do Sólido 3D")
   (vla-setCellAlignment table i 0 4)
   (vlax-ldata-put table "TMD_TAB_SOURCE" source_data)
   (vlax-ldata-put table "TMD_TAB_DATA" grps)
@@ -272,10 +266,14 @@
 (defun c:TMD_TABLAS_ATUALIZAR ( / doc ent table type smap cat raw grps summary n l w q isw mark ex processed_handles profiles bar_results total_bars kg_neto kg_compra waste_total rh th ts i j lr ss_temp h_list g_list usage tab_data tab_type)
   (setq doc (vla-get-ActiveDocument (vlax-get-acad-object))) (vla-StartUndoMark doc)
   (setq ent (car (entsel "\nSelecione a Tabela para atualizar: ")))
-  (if (or (not ent) (/= (cdr (assoc 0 (entget ent))) "ACAD_TABLE")) (progn (vla-EndUndoMark doc) (exit)))
-  (setq table (vlax-ename->vla-object ent))
-  (setq type (vlax-ldata-get ent "TMD_TAB_TYPE") smap (vlax-ldata-get ent "TMD_TAB_SOURCE"))
-  (if (not type) (progn (princ "\n[!] Tabela nao possui dados BIM.") (vla-EndUndoMark doc) (exit)))
+  (if (or (not ent) (/= (cdr (assoc 0 (entget ent))) "ACAD_TABLE"))
+    (progn (princ "\n[AVISO] Nenhuma tabela selecionada.") (vla-EndUndoMark doc))
+    (progn
+      (setq table (vlax-ename->vla-object ent))
+      (setq type (vlax-ldata-get ent "TMD_TAB_TYPE") smap (vlax-ldata-get ent "TMD_TAB_SOURCE"))
+      (if (not type)
+        (progn (princ "\n[!] Tabela nao possui dados BIM.") (vla-EndUndoMark doc))
+        (progn
 
   (setq cat (TMD:tablas-load-catalog))
   (setq raw_data nil)
@@ -383,7 +381,12 @@
     (setq i (1+ i)))
 
   (vlax-ldata-put ent "TMD_TAB_DATA" tab_data)
-  (vla-EndUndoMark doc) (princ (strcat "\n[OK] Tabela de " type " atualizada.")) (princ))
+  (vla-EndUndoMark doc) (princ (strcat "\n[OK] Tabela de " type " atualizada."))
+        )
+      )
+    )
+  )
+  (princ))
 
 (defun c:TMD_TABLAS_DESPIECE ( / doc ss i ent grps summary n l w q isw mark ex pt table row space assemblies g_name usage)
   (setq doc (vla-get-ActiveDocument (vlax-get-acad-object))) (vla-StartUndoMark doc)

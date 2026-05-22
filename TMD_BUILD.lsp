@@ -121,58 +121,28 @@
 ;;; =====================================================================================
 ;;; 3A. FASE 1: SINCRONIZACIÓN DE REALIDAD FÍSICA → LDATA
 ;;; -------------------------------------------------------------------------------------
-;;; DECISIÓN: La geometría física SIEMPRE tiene prioridad sobre LData.
-;;;   LData es un espejo de la realidad, nunca al revés.
-;;;   - Lee rotación del sólido existente via análisis de sección transversal
-;;;   - Re-evalúa TIPO (VIGA/COLUNA/CONTRAV.) según orientación del wire
-;;;   - Actualiza PT_A/PT_B con la posición actual del wire
-;;;   Ref: TMD_BIM_Sync_Protocol.md
+;;; DECISIÓN (V5): La geometría física del sólido es la verdad.
 ;;; =====================================================================================
-(defun TMD:build-sync-reality (ent / params old_solid_h old_solid real_rot e_data ptA ptB tipo)
-  (if (and ent (entget ent) (= (vlax-ldata-get ent "TMD_CLASSE") "ESTRUTURA_LINE"))
+(defun TMD:build-sync-reality (ent / params real_rot tipo)
+  (if (and ent (entget ent) (= (vlax-ldata-get ent "TMD_CLASSE") "ESTRUTURA"))
     (progn
       (setq params (vlax-ldata-get ent "TMD_PARAMS"))
       (if params
         (progn
-          ;; --- 1. Sincronizar ROTACIÓN del sólido físico ---
-          (setq old_solid_h (vlax-ldata-get ent "TMD_CHILD_SOLID"))
-          (if (and old_solid_h (setq old_solid (handent old_solid_h)) (entget old_solid))
-            (if TMD:sync-extract-rotation
-              (progn
-                (setq real_rot (TMD:sync-extract-rotation ent old_solid))
-                (if real_rot
-                  (progn
-                    (princ (strcat "\n    [V] Sincronização de Pose: " (rtos real_rot 2 1) "°"))
-                    (setq params (if (assoc "ROTACAO" params)
-                      (subst (cons "ROTACAO" real_rot) (assoc "ROTACAO" params) params)
-                      (cons (cons "ROTACAO" real_rot) params)))
-                    (vlax-ldata-put ent "TMD_ROTACAO" (rtos real_rot 2 1))
-                  )
+          ;; 1. Rotación real (si existe la función)
+          (if TMD:sync-extract-rotation
+            (progn
+              (setq real_rot (TMD:sync-extract-rotation ent ent))
+              (if real_rot
+                (progn
+                  (setq params (if (assoc "ROTACAO" params)
+                    (subst (cons "ROTACAO" real_rot) (assoc "ROTACAO" params) params)
+                    (cons (cons "ROTACAO" real_rot) params)))
+                  (vlax-ldata-put ent "TMD_ROTACAO" (rtos real_rot 2 1))
                 )
               )
             )
           )
-
-          ;; --- 2. Sincronizar PT_A, PT_B con posición actual del wire ---
-          (setq e_data (entget ent)
-                ptA (cdr (assoc 10 e_data))
-                ptB (cdr (assoc 11 e_data)))
-          (setq params (if (assoc "PT_A" params)
-            (subst (cons "PT_A" ptA) (assoc "PT_A" params) params)
-            (cons (cons "PT_A" ptA) params)))
-          (setq params (if (assoc "PT_B" params)
-            (subst (cons "PT_B" ptB) (assoc "PT_B" params) params)
-            (cons (cons "PT_B" ptB) params)))
-
-          ;; --- 3. Re-evaluar TIPO según vector del wire ---
-          (if TMD:wire-evaluate-vector
-            (progn
-              (setq tipo (TMD:wire-evaluate-vector ptA ptB))
-              (vlax-ldata-put ent "TMD_TIPO" tipo)
-            )
-          )
-
-          ;; --- 4. Persistir TMD_PARAMS sincronizado ---
           (vlax-ldata-put ent "TMD_PARAMS" params)
         )
       )
@@ -181,57 +151,82 @@
 )
 
 ;;; =====================================================================================
-;;; 3B. FASE 2: RECONSTRUCCIÓN DESDE LDATA (SIN LECTURA FÍSICA)
+;;; 3B. FASE 2: RECONSTRUCCIÓN DESDE LDATA (SIN LECTURA FÍSICA DE WIRE)
 ;;; -------------------------------------------------------------------------------------
-;;; DECISIÓN: Esta función NUNCA lee la geometría del sólido existente.
-;;;   Confía en TMD_PARAMS (ya sincronizado por Fase 1 o editado por el usuario).
-;;;   Borra el sólido viejo y crea uno nuevo según los datos almacenados.
+;;; DECISIÓN (V5): Borra el sólido viejo y crea uno nuevo según su propio LData.
+;;; Re-calcula la longitud y posición basándose en su BoundingBox.
 ;;; =====================================================================================
-(defun TMD:build-reconstruct (ent / params p_nome ptA ptB p_forma p_x p_y p_e dist just rot
-                                    lay solid_lay solid_ent old_solid_h old_solid e_data)
-  (if (and ent (entget ent) (= (vlax-ldata-get ent "TMD_CLASSE") "ESTRUTURA_LINE"))
+(defun TMD:build-reconstruct (ent / params p_nome p_forma p_x p_y p_e p_labio p_material dist just rot solid_ent s_mid s_bbox s_diff len_s s_vec ptA ptB v_x v_y off_x off_y cuts h_m mode ev cutter wire_m)
+  (if (and ent (entget ent) (= (vlax-ldata-get ent "TMD_CLASSE") "ESTRUTURA"))
     (progn
       (setq params (vlax-ldata-get ent "TMD_PARAMS"))
       (if params
         (progn
-          ;; --- 1. Eliminar sólido anterior ---
-          (setq old_solid_h (vlax-ldata-get ent "TMD_CHILD_SOLID"))
-          (if (and old_solid_h (setq old_solid (handent old_solid_h)) (entget old_solid))
-            (entdel old_solid)
-          )
+          ;; --- 1. Calcular PT_A y PT_B dinámicamente desde el Sólido ---
+          (if (not TMD:sync-get-centroid) (load "TMD_SYNC.lsp"))
+          (setq s_mid (TMD:sync-get-centroid ent)
+                s_bbox (TMD:sync-get-bbox ent)
+                s_diff (mapcar '- (cadr s_bbox) (car s_bbox))
+                len_s (apply 'max s_diff)
+                s_vec (TMD:util-vector-unit (mapcar '(lambda (d) (if (= d len_s) d 0.0)) s_diff))
+                ptA (mapcar '- s_mid (mapcar '(lambda (x) (* x (/ len_s 2.0))) s_vec))
+                ptB (mapcar '+ s_mid (mapcar '(lambda (x) (* x (/ len_s 2.0))) s_vec)))
+          
+          (setq dist len_s)
+
+          ;; Extraer offsets de justificación actuales para compensarlos y hallar el "Centro Real" (wire imaginario)
+          (setq p_x (cdr (assoc "DIM_X" params)) p_y (cdr (assoc "DIM_Y" params)) just (cdr (assoc "JUSTIFICACAO" params)))
+          (setq p_x (if (= (type p_x) 'STR) (atof p_x) p_x) p_y (if (= (type p_y) 'STR) (atof p_y) p_y))
+          
+          (if (and (< (abs (car s_vec)) 0.01) (< (abs (cadr s_vec)) 0.01)) (setq v_x '(1.0 0.0 0.0)) (setq v_x (TMD:util-vector-unit (TMD:util-vector-cross '(0.0 0.0 1.0) s_vec))))
+          (setq v_y (TMD:util-vector-unit (TMD:util-vector-cross s_vec v_x)))
+          
+          (setq off_x (cond ((wcmatch just "*L") (/ p_x -2.0)) ((wcmatch just "*R") (/ p_x 2.0)) (t 0.0)))
+          (setq off_y (cond ((wcmatch just "T*") (/ p_y 2.0)) ((wcmatch just "B*") (/ p_y -2.0)) (t 0.0)))
+          
+          ;; Desplazar ptA y ptB inversamente a la justificación para obtener el eje central de trazado
+          (setq ptA (mapcar '- ptA (mapcar '(lambda (v) (* v off_x)) v_x)))
+          (setq ptA (mapcar '- ptA (mapcar '(lambda (v) (* v off_y)) v_y)))
+          (setq ptB (mapcar '+ ptA (mapcar '(lambda (v) (* v len_s)) s_vec)))
 
           ;; --- 2. Extraer parámetros de construcción ---
-          (setq p_nome (vlax-ldata-get ent "TMD_NOME") e_data (entget ent)
-                ptA (cdr (assoc 10 e_data)) ptB (cdr (assoc 11 e_data)) dist (distance ptA ptB)
-                p_forma (cdr (assoc "FORMA" params)) p_x (cdr (assoc "DIM_X" params))
-                p_y (cdr (assoc "DIM_Y" params)) p_e (cdr (assoc "ESPESSURA" params))
-                just (cdr (assoc "JUSTIFICACAO" params)) rot (cdr (assoc "ROTACAO" params)))
+          (setq p_nome (vlax-ldata-get ent "TMD_NOME")
+                p_forma (cdr (assoc "FORMA" params))
+                p_e (cdr (assoc "ESPESSURA" params))
+                p_labio (cdr (assoc "LABIO" params))
+                p_material (cdr (assoc "MATERIAL" params))
+                rot (cdr (assoc "ROTACAO" params)))
+          
+          (setq p_e (if (= (type p_e) 'STR) (atof p_e) p_e)
+                p_labio (if (= (type p_labio) 'STR) (atof p_labio) p_labio)
+                rot (if (= (type rot) 'STR) (atof rot) rot))
 
-          ;; --- 3. Determinar capa correcta ---
-          (setq lay (cdr (assoc 8 e_data)))
-          (setq solid_lay (if (vl-string-search "WIRE-" lay) (vl-string-subst "06-" "WIRE-" lay) lay))
-          (if (not (tblsearch "LAYER" solid_lay)) (vl-cmdf "_.-LAYER" "_M" solid_lay ""))
+          ;; --- 3. Leer cortes guardados ---
+          (setq cuts (vlax-ldata-get ent "TMD_CUTTERS"))
 
-          ;; --- 4. Construir geometría ---
-          (setq solid_ent (TMD:viga-build-geom nil ptA ptB just rot p_nome p_forma p_x p_y p_e 0.0 "ACO" dist))
+          ;; --- 4. Eliminar sólido anterior ---
+          (entdel ent)
 
-          ;; --- 5. Inyectar metadatos BIM ---
-          (if solid_ent
+          ;; --- 5. Construir geometría (TMD_Vigas.lsp generará el nuevo ADN V5) ---
+          (setq solid_ent (TMD:viga-build-geom nil ptA ptB just rot p_nome p_forma p_x p_y p_e p_labio p_material dist))
+
+          ;; --- 6. Aplicar cortes (JOINTS) si existen ---
+          (if (and solid_ent cuts)
             (progn
-              (vlax-ldata-put solid_ent "TMD_PARAMS" params)
-              (vlax-ldata-put solid_ent "TMD_NOME" p_nome)
-              (vlax-ldata-put solid_ent "TMD_TIPO" (vlax-ldata-get ent "TMD_TIPO"))
-              (vlax-ldata-put solid_ent "TMD_NIVEL_INI" (vlax-ldata-get ent "TMD_NIVEL_INI"))
-              (vlax-ldata-put solid_ent "TMD_NIVEL_FIM" (vlax-ldata-get ent "TMD_NIVEL_FIM"))
-              (vlax-ldata-put solid_ent "TMD_AFASTAMENTO" (vlax-ldata-get ent "TMD_AFASTAMENTO"))
-              (vlax-ldata-put solid_ent "TMD_AFASTAMENTO_TOPO" (vlax-ldata-get ent "TMD_AFASTAMENTO_TOPO"))
-
-              (vlax-ldata-put solid_ent "TMD_PARENT_WIRE" (vla-get-handle (vlax-ename->vla-object ent)))
-              (vlax-ldata-put ent "TMD_CHILD_SOLID" (vla-get-handle (vlax-ename->vla-object solid_ent)))
-              (vlax-ldata-put ent "TMD_SELF_HANDLE" (vla-get-handle (vlax-ename->vla-object ent)))
-              (vlax-ldata-put solid_ent "TMD_SELF_HANDLE" (vla-get-handle (vlax-ename->vla-object solid_ent)))
+              (vlax-ldata-put solid_ent "TMD_CUTTERS" cuts)
+              (foreach c cuts
+                (setq h_m (car c) mode (nth 1 c) ev (nth 4 c))
+                (setq wire_m (handent h_m))
+                (if (and wire_m (entget wire_m))
+                  (if (= mode "Flush")
+                    (j2:do-flush solid_ent wire_m 0.0)
+                    (j2:do-miter solid_ent solid_ent wire_m) ;; Miter simplificado, j2:do-miter extrae wire internamente, ajustarlo en JOINTS
+                  )
+                )
+              )
             )
           )
+          solid_ent
         )
       )
     )

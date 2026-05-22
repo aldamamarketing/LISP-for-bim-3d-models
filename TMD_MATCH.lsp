@@ -77,8 +77,14 @@
      )
     )
     ((= etype "3DSOLID")
-     (setq ph (vlax-ldata-get ent "TMD_PARENT_WIRE"))
-     (if (and ph (= (type ph) 'STR)) (list (handent ph)) nil))
+     (if (vlax-ldata-get ent "TMD_PARAMS")
+       (list ent)
+       (progn
+         (setq ph (vlax-ldata-get ent "TMD_PARENT_WIRE"))
+         (if (and ph (= (type ph) 'STR)) (list (handent ph)) nil)
+       )
+     )
+    )
     (t nil)
   )
 )
@@ -118,59 +124,91 @@
 ;;; 3. APLICAÇÃO DO ADN AO DESTINO
 ;;; =====================================================================================
 
-(defun TMD:match-apply-to (wire_ent src_data / e_data ptA ptB dist new_params solid_h solid_ent)
+(defun TMD:match-apply-to (wire_ent src_data / e_data etype ptA ptB dist new_params solid_h solid_ent p_nome p_forma p_x p_y p_e p_labio p_material just rot metrics ent_name)
   (setq e_data (entget wire_ent))
-  (setq ptA (cdr (assoc 10 e_data)) ptB (cdr (assoc 11 e_data)))
+  (setq etype (cdr (assoc 0 e_data)))
+
+  (if (= etype "3DSOLID")
+    (progn
+      (if (not (type TMD:GetSolidMetrics)) (vl-catch-all-apply 'load (list "TMD_BOM.lsp")))
+      (setq metrics (if (type TMD:GetSolidMetrics) (TMD:GetSolidMetrics (vlax-ename->vla-object wire_ent)) nil))
+      (if metrics
+        (setq ptA (nth 3 metrics) ptB (nth 4 metrics) dist (nth 0 metrics))
+      )
+    )
+    (progn
+      (setq ptA (cdr (assoc 10 e_data)) ptB (cdr (assoc 11 e_data)))
+      (if (and ptA ptB) (setq dist (distance ptA ptB)))
+    )
+  )
 
   (if (or (not ptA) (not ptB)) (progn (princ "\n[!] Geometria inválida no destino.") nil)
     (progn
-      (setq dist (distance ptA ptB))
-      
-      (setq new_params
-        (list
-          (cons "FORMA"        (cdr (assoc "FORMA"     src_data)))
-          (cons "DIM_X"        (cdr (assoc "DIM_X"     src_data)))
-          (cons "DIM_Y"        (cdr (assoc "DIM_Y"     src_data)))
-          (cons "ESPESSURA"    (cdr (assoc "ESPESSURA" src_data)))
-          (cons "JUSTIFICACAO" (cdr (assoc "JUST"      src_data)))
-          (cons "ROTACAO"      (cdr (assoc "ROT"       src_data)))
-          ;; Garante geometria válida no destino
-          (cons "PT_A"         ptA)
-          (cons "PT_B"         ptB)
-          (cons "DISTANCIA"    dist)
-        )
-      )
+      (setq p_nome (cdr (assoc "NOME" src_data))
+            p_forma (cdr (assoc "FORMA" src_data))
+            p_x (atof (vl-princ-to-string (cdr (assoc "DIM_X" src_data))))
+            p_y (atof (vl-princ-to-string (cdr (assoc "DIM_Y" src_data))))
+            p_e (atof (vl-princ-to-string (cdr (assoc "ESPESSURA" src_data))))
+            p_labio (cdr (assoc "LABIO" src_data))
+            p_material (cdr (assoc "MATERIAL" src_data))
+            just (cdr (assoc "JUST" src_data))
+            rot (atof (vl-princ-to-string (cdr (assoc "ROT" src_data)))))
+            
+      (if (not p_labio) (setq p_labio 0.0) (setq p_labio (atof (vl-princ-to-string p_labio))))
+      (if (not p_material) (setq p_material "ACO"))
 
-      ;; Atualiza o ADN B.I.M
-      (vlax-ldata-put wire_ent "TMD_TIPO"   (cdr (assoc "TIPO" src_data)))
-      (vlax-ldata-put wire_ent "TMD_NOME"   (cdr (assoc "NOME" src_data)))
-      (vlax-ldata-put wire_ent "TMD_CLASSE" "ESTRUTURA_LINE")
-      (vlax-ldata-put wire_ent "TMD_PARAMS" new_params)
-      
-      ;; Copia Cortes (Cutters) se existirem na fonte
-      (if (assoc "CUTTERS" src_data)
-        (vlax-ldata-put wire_ent "TMD_CUTTERS" (cdr (assoc "CUTTERS" src_data)))
-      )
-
-      ;; Aplica a camada da linha fonte (Sincronização visual)
-      (setq e_data (subst (cons 8 (cdr (assoc "LAYER" src_data)))
-                          (assoc 8 e_data)
-                          e_data))
-      (entmod e_data)
-
-      ;; Remove o sólido filho desatualizado
-      (setq solid_h (vlax-ldata-get wire_ent "TMD_CHILD_SOLID"))
-      (if (and solid_h (= (type solid_h) 'STR))
+      (if (= etype "3DSOLID")
         (progn
-          (setq solid_ent (handent solid_h))
-          (if (and solid_ent (entget solid_ent)) (entdel solid_ent))
-          (vlax-ldata-put wire_ent "TMD_CHILD_SOLID" nil)
+          ;; V5: Reconstruir Sólido usando o motor geométrico
+          (setq ent_name (TMD:viga-build-geom wire_ent ptA ptB just rot p_nome p_forma p_x p_y p_e p_labio p_material dist))
+          (if ent_name
+            (progn
+              (vlax-ldata-put ent_name "TMD_CLASSE" "ESTRUTURA")
+              (vlax-ldata-put ent_name "TMD_TIPO" (cdr (assoc "TIPO" src_data)))
+              (vlax-ldata-put ent_name "TMD_SELF_HANDLE" (vla-get-handle (vlax-ename->vla-object ent_name)))
+            )
+          )
+        )
+        (progn
+          ;; Legado (V4): Atualiza o Wire analítico e manda compilar
+          (setq new_params
+            (list
+              (cons "FORMA"        p_forma)
+              (cons "DIM_X"        p_x)
+              (cons "DIM_Y"        p_y)
+              (cons "ESPESSURA"    p_e)
+              (cons "JUSTIFICACAO" just)
+              (cons "ROTACAO"      rot)
+              (cons "PT_A"         ptA)
+              (cons "PT_B"         ptB)
+              (cons "DISTANCIA"    dist)
+            )
+          )
+
+          (vlax-ldata-put wire_ent "TMD_TIPO"   (cdr (assoc "TIPO" src_data)))
+          (vlax-ldata-put wire_ent "TMD_NOME"   p_nome)
+          (vlax-ldata-put wire_ent "TMD_CLASSE" "ESTRUTURA_LINE")
+          (vlax-ldata-put wire_ent "TMD_PARAMS" new_params)
+          
+          (if (assoc "CUTTERS" src_data)
+            (vlax-ldata-put wire_ent "TMD_CUTTERS" (cdr (assoc "CUTTERS" src_data)))
+          )
+
+          (setq e_data (subst (cons 8 (cdr (assoc "LAYER" src_data))) (assoc 8 e_data) e_data))
+          (entmod e_data)
+
+          (setq solid_h (vlax-ldata-get wire_ent "TMD_CHILD_SOLID"))
+          (if (and solid_h (= (type solid_h) 'STR))
+            (progn
+              (setq solid_ent (handent solid_h))
+              (if (and solid_ent (entget solid_ent)) (entdel solid_ent))
+              (vlax-ldata-put wire_ent "TMD_CHILD_SOLID" nil)
+            )
+          )
+          
+          (if TMD:build-single-wire (TMD:build-single-wire wire_ent))
         )
       )
-      
-      ;; Reconstrói o sólido imediatamente se o motor estiver carregado
-      (if TMD:build-single-wire (TMD:build-single-wire wire_ent))
-
       T
     )
   )
@@ -183,6 +221,8 @@
 (defun c:TMD_MATCH ( / doc sel_src wires_src wire_src src_adn count ss_dest i ent_dest wires_dest)
   (setq doc (vla-get-ActiveDocument (vlax-get-acad-object)))
   (vla-StartUndoMark doc)
+  
+  (setq count 0)
 
   (princ "\n[TMD] MATCH PARAMÉTRICO - Seleccione viga FONTE (Referência)")
   (setq sel_src (entsel "\nSelecione viga FONTE: "))
@@ -199,7 +239,6 @@
               (redraw wire_src 3) ;; Destacar fonte
               (princ (strcat "\n    [ADN] Perfil: " (cdr (assoc "NOME" src_adn)) " | Tipo: " (cdr (assoc "TIPO" src_adn))))
               
-              (setq count 0)
               (princ "\nAgora selecione as vigas DESTINO (Window/Crossing/Single) [ESC para finalizar]:")
               
               ;; Loop de seleção de destinos

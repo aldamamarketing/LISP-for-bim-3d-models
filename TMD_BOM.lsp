@@ -12,60 +12,13 @@
   (+ (* (car v1) (car v2)) (* (cadr v1) (cadr v2)) (* (caddr v1) (caddr v2)))
 )
 
-(defun TMD:GetWireLength (ent / obj ldata ptA ptB len solidHandle solidEnt solidObj minPt maxPt p1 p2 p3 p4 p5 p6 p7 p8 pts projs u v d)
-  (setq len 0.0)
+(defun TMD:GetWireLength (ent / obj metrics len)
   (setq obj (vlax-ename->vla-object ent))
-  (setq ldata (vlax-ldata-get ent "TMD_PARAMS"))
-  
-  (setq solidHandle (vlax-ldata-get ent "TMD_CHILD_SOLID"))
-  (if solidHandle
-    (setq solidEnt (handent solidHandle))
+  (if (= (cdr (assoc 0 (entget ent))) "3DSOLID")
+    (setq len (car (TMD:GetSolidMetrics obj)))
+    (setq len (vlax-get-property obj 'Length)) ; Fallback seguro
   )
-  
-  (if (and solidEnt (entget solidEnt))
-    (progn
-      ;; Sólido existe, calcular longitud física real mediante proyección del Bounding Box
-      (setq solidObj (vlax-ename->vla-object solidEnt))
-      (vla-GetBoundingBox solidObj 'minPt 'maxPt)
-      (setq minPt (vlax-safearray->list minPt))
-      (setq maxPt (vlax-safearray->list maxPt))
-      
-      (setq p1 (list (car minPt) (cadr minPt) (caddr minPt)))
-      (setq p2 (list (car maxPt) (cadr minPt) (caddr minPt)))
-      (setq p3 (list (car maxPt) (cadr maxPt) (caddr minPt)))
-      (setq p4 (list (car minPt) (cadr maxPt) (caddr minPt)))
-      (setq p5 (list (car minPt) (cadr minPt) (caddr maxPt)))
-      (setq p6 (list (car maxPt) (cadr minPt) (caddr maxPt)))
-      (setq p7 (list (car maxPt) (cadr maxPt) (caddr maxPt)))
-      (setq p8 (list (car minPt) (cadr maxPt) (caddr maxPt)))
-      (setq pts (list p1 p2 p3 p4 p5 p6 p7 p8))
-      
-      (setq ptA (vlax-curve-getStartPoint obj))
-      (setq ptB (vlax-curve-getEndPoint obj))
-      (setq d (distance ptA ptB))
-      (if (> d 0.001)
-        (progn
-          (setq u (list (/ (- (car ptB) (car ptA)) d)
-                        (/ (- (cadr ptB) (cadr ptA)) d)
-                        (/ (- (caddr ptB) (caddr ptA)) d)))
-          (setq projs (mapcar '(lambda (p) (TMD:VectorDot p u)) pts))
-          (setq len (- (apply 'max projs) (apply 'min projs)))
-        )
-        (setq len d)
-      )
-    )
-    (progn
-      ;; Fallback: Medir el Wire
-      (if ldata
-        (progn
-          (setq ptA (cdr (assoc "PT_A" ldata)))
-          (setq ptB (cdr (assoc "PT_B" ldata)))
-          (if (and ptA ptB) (setq len (distance ptA ptB)))
-        )
-        (setq len (vlax-get-property obj 'Length))
-      )
-    )
-  )
+  (if (not len) (setq len 0.0))
   (fix (+ 0.5 len))
 )
 
@@ -73,6 +26,125 @@
   (let ((nome (vlax-ldata-get ent "TMD_NOME")))
     (if nome nome "DESCONHECIDO")
   )
+)
+
+;;; -------------------------------------------------------------------------------------
+;;; MOTOR FISICO - SOLID METRICS (INERCIA)
+;;; -------------------------------------------------------------------------------------
+
+(defun TMD:GetSolidMetrics (solidObj / moments dirs centroid m1 m2 m3 min_m u v w dx dy dz matrix copyObj minPt maxPt len ptA ptB)
+  (setq moments (vlax-safearray->list (vlax-variant-value (vla-get-PrincipalMoments solidObj))))
+  (setq dirs (vlax-safearray->list (vlax-variant-value (vla-get-PrincipalDirections solidObj))))
+  (setq centroid (vlax-safearray->list (vlax-variant-value (vla-get-Centroid solidObj))))
+  
+  (setq m1 (nth 0 moments) m2 (nth 1 moments) m3 (nth 2 moments))
+  
+  ;; Identificar momento de inercia minimo (Eje Longitudinal)
+  (setq min_m (min m1 m2 m3))
+  (cond
+    ((= min_m m1) 
+     (setq u (list (nth 0 dirs) (nth 1 dirs) (nth 2 dirs)))
+     (setq v (list (nth 3 dirs) (nth 4 dirs) (nth 5 dirs)))
+     (setq w (list (nth 6 dirs) (nth 7 dirs) (nth 8 dirs))))
+    ((= min_m m2) 
+     (setq u (list (nth 3 dirs) (nth 4 dirs) (nth 5 dirs)))
+     (setq v (list (nth 0 dirs) (nth 1 dirs) (nth 2 dirs)))
+     (setq w (list (nth 6 dirs) (nth 7 dirs) (nth 8 dirs))))
+    (t 
+     (setq u (list (nth 6 dirs) (nth 7 dirs) (nth 8 dirs)))
+     (setq v (list (nth 0 dirs) (nth 1 dirs) (nth 2 dirs)))
+     (setq w (list (nth 3 dirs) (nth 4 dirs) (nth 5 dirs))))
+  )
+  
+  ;; Crear una copia del solido para alinearlo al WCS y obtener su OBB (Oriented Bounding Box) exacto
+  (setq copyObj (vla-Copy solidObj))
+  
+  ;; Construir Matriz de Transformacion Inversa (Para rotar u->X, v->Y, w->Z y mover centroide a origen)
+  (setq dx (- 0 (+ (* (car u) (car centroid)) (* (cadr u) (cadr centroid)) (* (caddr u) (caddr centroid)))))
+  (setq dy (- 0 (+ (* (car v) (car centroid)) (* (cadr v) (cadr centroid)) (* (caddr v) (caddr centroid)))))
+  (setq dz (- 0 (+ (* (car w) (car centroid)) (* (cadr w) (cadr centroid)) (* (caddr w) (caddr centroid)))))
+  
+  (setq matrix (vlax-tmatrix
+                 (list
+                   (list (car u) (cadr u) (caddr u) dx)
+                   (list (car v) (cadr v) (caddr v) dy)
+                   (list (car w) (cadr w) (caddr w) dz)
+                   (list 0.0 0.0 0.0 1.0)
+                 )
+               ))
+               
+  (vla-TransformBy copyObj matrix)
+  
+  ;; Bounding box de la copia rotada (ahora alineada perfectamente a sus ejes de inercia)
+  (vla-GetBoundingBox copyObj 'minPt 'maxPt)
+  (setq minPt (vlax-safearray->list minPt))
+  (setq maxPt (vlax-safearray->list maxPt))
+  
+  ;; La longitud exacta es el delta en el eje X (ya que u se alineo con X)
+  (setq len (- (car maxPt) (car minPt)))
+  (setq width (- (cadr maxPt) (cadr minPt)))
+  (setq height (- (caddr maxPt) (caddr minPt)))
+  
+  ;; Limpiar copia
+  (vla-Delete copyObj)
+  
+  ;; Calcular ptA y ptB desde el Centroide original usando el vector longitudinal (u)
+  (setq ptA (list (- (car centroid) (* (car u) (/ len 2.0)))
+                  (- (cadr centroid) (* (cadr u) (/ len 2.0)))
+                  (- (caddr centroid) (* (caddr u) (/ len 2.0)))))
+  (setq ptB (list (+ (car centroid) (* (car u) (/ len 2.0)))
+                  (+ (cadr centroid) (* (cadr u) (/ len 2.0)))
+                  (+ (caddr centroid) (* (caddr u) (/ len 2.0)))))
+                  
+  ;; Si la longitud es menor que el ancho o alto de la seccion, marcar excepcion
+  (setq is_exception (if (or (< len width) (< len height)) T nil))
+  (if is_exception
+    (vlax-ldata-put solidObj "TMD_EXCEPTION" "SHORT_SOLID")
+    (vlax-ldata-put solidObj "TMD_EXCEPTION" nil)
+  )
+
+  ;; Retorna: (Length Vector Centroid ptA ptB Width Height IsException)
+  (list len u centroid ptA ptB width height is_exception)
+)
+
+(defun C:TMD_TEST_SOLID_METRICS ( / ent obj metrics len u centroid ptA ptB width height is_exception)
+  (setq ent (car (entsel "\n[TMD] Selecione um 3DSOLID para teste de inercia: ")))
+  (if (and ent (= (cdr (assoc 0 (entget ent))) "3DSOLID"))
+    (progn
+      (setq obj (vlax-ename->vla-object ent))
+      (setq metrics (TMD:GetSolidMetrics obj))
+      (setq len (nth 0 metrics)
+            u (nth 1 metrics)
+            centroid (nth 2 metrics)
+            ptA (nth 3 metrics)
+            ptB (nth 4 metrics)
+            width (nth 5 metrics)
+            height (nth 6 metrics)
+            is_exception (nth 7 metrics))
+            
+      (princ "\n--- RESULTADO DA FISICA (INERCIA) ---")
+      (princ (strcat "\nComprimento Exato: " (rtos len 2 2) " mm"))
+      (princ (strcat "\nSecao Transversal (LxA): " (rtos width 2 2) " x " (rtos height 2 2) " mm"))
+      (princ (strcat "\nVector Direcional: (" (rtos (car u) 2 2) ", " (rtos (cadr u) 2 2) ", " (rtos (caddr u) 2 2) ")"))
+      
+      (if is_exception
+        (princ "\n[!] EXCECAO: O comprimento e menor que as dimensoes da secao. (Possivel placa ou toco)")
+      )
+      
+      ;; Dibujar linea del eje longitudinal
+      (vl-cmdf "_.LINE" "_non" ptA "_non" ptB "")
+      (vl-cmdf "_.CHPROP" (entlast) "" "C" "1" "")
+      
+      ;; Dibujar punto en el centroide
+      (setvar "PDMODE" 34) (setvar "PDSIZE" 50)
+      (vl-cmdf "_.POINT" "_non" centroid)
+      (vl-cmdf "_.CHPROP" (entlast) "" "C" "3" "")
+      
+      (princ "\n[OK] Eixo longitudinal desenhado em vermelho, Centroide em verde.")
+    )
+    (princ "\n[!] Entidade selecionada nao e um 3DSOLID.")
+  )
+  (princ)
 )
 
 ;;; -------------------------------------------------------------------------------------
@@ -130,17 +202,25 @@
 ;;; -------------------------------------------------------------------------------------
 ;;; 1. TMD_TABLAS_NUMERAR
 ;;; -------------------------------------------------------------------------------------
-(defun C:TMD_TABLAS_NUMERAR ( / ss i ent nome comp key dict pos counter)
-  (princ "\n[TMD] Selecione elementos para numerar [Grupo]: ")
-  (setq ss (ssget '((0 . "LINE"))))
+(defun C:TMD_TABLAS_NUMERAR ( / ss i ent etype wires nome comp pos key dict counter)
+  (princ "\n[TMD] Selecione 3DSOLIDS para numerar [Grupo]: ")
+  (setq ss (ssget '((0 . "3DSOLID"))))
   (if (not ss)
-    (progn (princ "\n[AVISO] Nenhuma linha selecionada.") (exit))
+    (progn (princ "\n[AVISO] Nenhum solido selecionado.") (exit))
   )
   
-  (setq i 0 dict nil counter 1)
-  
+  ;; Coletar unicos
+  (setq i 0 dict nil wires nil)
   (while (< i (sslength ss))
     (setq ent (ssname ss i))
+    (if (not (member ent wires))
+      (setq wires (append wires (list ent)))
+    )
+    (setq i (1+ i))
+  )
+  
+  (setq counter 1)
+  (foreach ent wires
     (setq nome (TMD:GetWireName ent))
     (setq comp (TMD:GetWireLength ent))
     (setq key (strcat nome "_" (itoa comp)))
@@ -155,7 +235,6 @@
     )
     
     (vlax-ldata-put ent "TMD_POS" pos)
-    (setq i (1+ i))
   )
   (princ (strcat "\n[OK] Numeracao concluida. " (itoa (1- counter)) " marcas geradas.\n"))
   (princ)
@@ -164,16 +243,23 @@
 ;;; -------------------------------------------------------------------------------------
 ;;; 2. TMD_TABLAS_MONTAGEM
 ;;; -------------------------------------------------------------------------------------
-(defun C:TMD_TABLAS_MONTAGEM ( / ss i ent nome comp pos key dict itemData itemList pt ms table row pesoUnit headers)
-  (princ "\n[TMD] Selecione elementos para a Tabela de Montagem: ")
-  (setq ss (ssget '((0 . "LINE"))))
+(defun C:TMD_TABLAS_MONTAGEM ( / ss i ent etype wires nome comp pos key dict itemData itemList pt ms table row pesoUnit headers)
+  (princ "\n[TMD] Selecione 3DSOLIDS para a Tabela de Montagem: ")
+  (setq ss (ssget '((0 . "3DSOLID"))))
   (if (not ss)
-    (progn (princ "\n[AVISO] Nenhum elemento selecionado.") (exit))
+    (progn (princ "\n[AVISO] Nenhum solido selecionado.") (exit))
   )
   
-  (setq i 0 dict nil)
+  (setq i 0 dict nil wires nil)
   (while (< i (sslength ss))
     (setq ent (ssname ss i))
+    (if (not (member ent wires))
+      (setq wires (append wires (list ent)))
+    )
+    (setq i (1+ i))
+  )
+  
+  (foreach ent wires
     (setq pos (vlax-ldata-get ent "TMD_POS"))
     (if (not pos) (setq pos "-"))
     (setq nome (TMD:GetWireName ent))
@@ -185,7 +271,6 @@
       (setq dict (subst (cons key (list (1+ (car itemData)) pos nome comp)) (assoc key dict) dict))
       (setq dict (append dict (list (cons key (list 1 pos nome comp)))))
     )
-    (setq i (1+ i))
   )
   
   (setq itemList (mapcar 'cdr dict))

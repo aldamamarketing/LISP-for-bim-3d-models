@@ -30,31 +30,41 @@
 (defun unit (v) (TMD:util-vector-unit v))
 (defun vector-cross (v1 v2) (TMD:util-vector-cross v1 v2))
 
-(defun j2:get-wire (ent / t0 ph)
+(defun j2:get-wire (ent / t0)
   (if (and ent (entget ent))
     (progn
       (setq t0 (cdr (assoc 0 (entget ent))))
       (cond
         ((= t0 "LINE") (if (= (vlax-ldata-get ent "TMD_CLASSE") "ESTRUTURA_LINE") ent nil))
         ((= t0 "3DSOLID")
-         (setq ph (vlax-ldata-get ent "TMD_PARENT_WIRE"))
-         (if ph (handent ph) nil))
+         (if (= (vlax-ldata-get ent "TMD_CLASSE") "ESTRUTURA") ent nil))
         (t nil)
       )
     )
   )
 )
 
-(defun j2:get-solid (wire / h s)
-  (setq h (vlax-ldata-get wire "TMD_CHILD_SOLID"))
-  (if (and h (setq s (handent h)) (entget s)) s nil)
+(defun j2:get-solid (wire)
+  wire ;; En V5, el "wire" (elemento lógico) es el sólido en sí mismo
 )
 
-(defun j2:near-end-geom (wire_a wire_b / obj_b pa_a pb_a p_near_a p_near_b da db)
+(defun j2:get-ends (ent / s_mid s_bbox s_diff len_s s_vec)
+  (if (not TMD:sync-get-centroid) (load "TMD_SYNC.lsp"))
+  (setq s_mid (TMD:sync-get-centroid ent)
+        s_bbox (TMD:sync-get-bbox ent)
+        s_diff (mapcar '- (cadr s_bbox) (car s_bbox))
+        len_s (apply 'max s_diff)
+        s_vec (TMD:util-vector-unit (mapcar '(lambda (d) (if (= d len_s) d 0.0)) s_diff)))
+  (list (mapcar '- s_mid (mapcar '(lambda (x) (* x (/ len_s 2.0))) s_vec))
+        (mapcar '+ s_mid (mapcar '(lambda (x) (* x (/ len_s 2.0))) s_vec)))
+)
+
+(defun j2:near-end-geom (wire_a wire_b / obj_b ends_a pa_a pb_a p_near_a p_near_b da db)
   ;; Usar o motor geométrico do AutoCAD para achar a projeção mais próxima
   (setq obj_b (vlax-ename->vla-object wire_b)
-        pa_a  (cdr (assoc 10 (entget wire_a)))
-        pb_a  (cdr (assoc 11 (entget wire_a))))
+        ends_a (j2:get-ends wire_a)
+        pa_a  (car ends_a)
+        pb_a  (cadr ends_a))
   
   ;; Achar a distância de cada extremo da viga A até qualquer ponto da viga B
   (setq p_near_a (vlax-curve-getClosestPointTo obj_b pa_a)
@@ -68,12 +78,13 @@
 )
 
 ;; Valida se uma junta ainda é fisicamente possível (Proximidade)
-(defun j2:validate-and-clean (wire_ent / cuts new_cuts pa pb h_m tipo gap data ev em w_m obj_m p_target p_near d1)
+(defun j2:validate-and-clean (wire_ent / cuts new_cuts ends pa pb h_m tipo gap data ev em w_m obj_m p_target p_near d1)
   (setq cuts (vlax-ldata-get wire_ent "TMD_CUTTERS"))
   (if (and cuts (listp cuts))
     (progn
-      (setq pa (cdr (assoc 10 (entget wire_ent)))
-            pb (cdr (assoc 11 (entget wire_ent)))
+      (setq ends (j2:get-ends wire_ent)
+            pa (car ends)
+            pb (cadr ends)
             new_cuts nil)
       (foreach c cuts
         (setq h_m (car c) ev (nth 4 c) w_m (handent h_m))
@@ -106,12 +117,12 @@
 ;;; 2. GERAÇÃO DE GHOST USANDO MOTOR CENTRALIZADO
 ;;; =====================================================================================
 
-(defun j2:make-cutter (wire_ent gap / adn pa pb p_x p_y just rot dist p_forma ghost)
+(defun j2:make-cutter (wire_ent gap / adn ends pa pb p_x p_y just rot dist p_forma ghost)
   (setq adn (vlax-ldata-get wire_ent "TMD_PARAMS"))
   
-  ;; IMPORTANTE: Usar pontos reais da entidade (10 e 11) para bater com TMD_BUILD
-  (setq pa (cdr (assoc 10 (entget wire_ent)))
-        pb (cdr (assoc 11 (entget wire_ent))))
+  (setq ends (j2:get-ends wire_ent)
+        pa (car ends)
+        pb (cadr ends))
   
   (setq p_x   (cdr (assoc "DIM_X" adn))
         p_y   (cdr (assoc "DIM_Y" adn))
@@ -155,11 +166,13 @@
   )
 )
 
-(defun j2:do-miter (solid_v wire_v wire_m / pa_v pb_v pa_m pb_m p_int v_v v_m v_bis v_perp p2 p3 p_keep)
-  (setq pa_v (cdr (assoc 10 (entget wire_v)))
-        pb_v (cdr (assoc 11 (entget wire_v)))
-        pa_m (cdr (assoc 10 (entget wire_m)))
-        pb_m (cdr (assoc 11 (entget wire_m))))
+(defun j2:do-miter (solid_v wire_v wire_m / ends_v ends_m pa_v pb_v pa_m pb_m p_int v_v v_m v_bis v_perp p2 p3 p_keep)
+  (setq ends_v (j2:get-ends wire_v)
+        ends_m (j2:get-ends wire_m)
+        pa_v (car ends_v)
+        pb_v (cadr ends_v)
+        pa_m (car ends_m)
+        pb_m (cadr ends_m))
   
   (princ (strcat "\n  [DEBUG-M] Wire V: " (vl-princ-to-string pa_v) " -> " (vl-princ-to-string pb_v)))
   (princ (strcat "\n  [DEBUG-M] Wire M: " (vl-princ-to-string pa_m) " -> " (vl-princ-to-string pb_m)))
@@ -201,10 +214,11 @@
 ;;; 3.5 AUTO-RESOLVER NODOS (INVOCADO DESDE WIRES)
 ;;; =====================================================================================
 
-(defun j2:auto-resolve-nodes (wire_ent / pa pb process-node default_mode cache ss_all i ent_g)
+(defun j2:auto-resolve-nodes (wire_ent / ends pa pb process-node default_mode cache ss_all i ent_g)
   (setq default_mode (if *TMD_JOINT_DEFAULT* *TMD_JOINT_DEFAULT* "Flush"))
-  (setq pa (cdr (assoc 10 (entget wire_ent)))
-        pb (cdr (assoc 11 (entget wire_ent))))
+  (setq ends (j2:get-ends wire_ent)
+        pa (car ends)
+        pb (cadr ends))
   
   ;; RESET TOTAL DO ADN antes de re-calcular (Lógica do Usuário)
   (vlax-ldata-put wire_ent "TMD_CUTTERS" nil)
@@ -282,12 +296,12 @@
                 
                 ;; Regra 3: Se empatar, a viga que CONTINUA ganha da que MORRE no nodo
                 (t 
-                   (setq p_int (inters (cdr (assoc 10 (entget w1))) (cdr (assoc 11 (entget w1)))
-                                      (cdr (assoc 10 (entget w2))) (cdr (assoc 11 (entget w2))) nil))
+                   (setq p_int (inters (car (j2:get-ends w1)) (cadr (j2:get-ends w1))
+                                       (car (j2:get-ends w2)) (cadr (j2:get-ends w2)) nil))
                    (if (not p_int) (setq p_int pt))
                    
-                   (setq ends1 (list (distance p_int (cdr (assoc 10 (entget w1)))) (distance p_int (cdr (assoc 11 (entget w1))))))
-                   (setq ends2 (list (distance p_int (cdr (assoc 10 (entget w2)))) (distance p_int (cdr (assoc 11 (entget w2))))))
+                   (setq ends1 (list (distance p_int (car (j2:get-ends w1))) (distance p_int (cadr (j2:get-ends w1)))))
+                   (setq ends2 (list (distance p_int (car (j2:get-ends w2))) (distance p_int (cadr (j2:get-ends w2)))))
                    
                    (setq dies1 (if (vl-some '(lambda (d) (< d 2.0)) ends1) T nil))
                    (setq dies2 (if (vl-some '(lambda (d) (< d 2.0)) ends2) T nil))
@@ -311,7 +325,7 @@
                 (vlax-ldata-put w_slave "TMD_MARK" nil) ;; Limpar marca ao aplicar junta
                 (vlax-ldata-put w_slave "TMD_LEN_PHYS" nil) ;; Invalida cache de medida
                 
-                (if (and TMD:build-single-wire (not *TMD-SILENT-REBUILD*)) (TMD:build-single-wire w_slave))
+                (if (and TMD:build-reconstruct (not *TMD-SILENT-REBUILD*)) (TMD:build-reconstruct w_slave))
               )
               ;; Se o Mestre for a viga atual e o modo for Miter, aplicamos ao outro também
               (if (and (eq w_master wire_ent) (= default_mode "Miter"))
@@ -322,7 +336,7 @@
                   (setq cuts (vlax-ldata-get w_slave "TMD_CUTTERS"))
                   (setq cuts (vl-remove-if '(lambda (x) (and (listp x) (equal (car x) h_m) (equal (nth 4 x) ev))) (if (listp cuts) cuts nil)))
                   (vlax-ldata-put w_slave "TMD_CUTTERS" (cons (list h_m "Miter" 0.0 nil ev em) cuts))
-                  (if (and TMD:build-single-wire (not *TMD-SILENT-REBUILD*)) (TMD:build-single-wire w_slave))
+                  (if (and TMD:build-reconstruct (not *TMD-SILENT-REBUILD*)) (TMD:build-reconstruct w_slave))
                 )
               )
             )
@@ -488,13 +502,13 @@
     (progn
       ;; 1. Construir Caché Global (Otimização de Performance 0-Lag)
       (setq *TMD-BEAM-CACHE* nil)
-      (setq ss_all (ssget "X" '((0 . "LINE"))))
+      (setq ss_all (ssget "X" '((0 . "3DSOLID"))))
       (if ss_all
         (progn
           (setq i 0)
           (while (< i (sslength ss_all))
             (setq ent_g (ssname ss_all i))
-            (if (= (vlax-ldata-get ent_g "TMD_CLASSE") "ESTRUTURA_LINE")
+            (if (= (vlax-ldata-get ent_g "TMD_CLASSE") "ESTRUTURA")
               (setq *TMD-BEAM-CACHE* (cons ent_g *TMD-BEAM-CACHE*))
             )
             (setq i (1+ i))
@@ -582,7 +596,7 @@
                 (setq h_m (car c) mode (nth 1 c) ev (nth 4 c))
                 (princ (strcat "\n -> Cortado por: " h_m " | Modo: " mode " | Extremo: " ev))
                 ;; Desenhar indicação visual temporária
-                (setq pt (if (equal ev "A") (cdr (assoc 10 (entget wire))) (cdr (assoc 11 (entget wire)))))
+                (setq pt (if (equal ev "A") (car (j2:get-ends wire)) (cadr (j2:get-ends wire))))
                 (entmake (list '(0 . "CIRCLE") (cons 10 pt) '(40 . 10.0) '(62 . 2) (cons 8 "0")))
                 (entmake (list '(0 . "TEXT") (cons 10 (mapcar '+ pt '(5 5 0))) (cons 40 5.0) (cons 1 (strcat "JOINT: " h_m)) '(62 . 2) (cons 8 "0")))
               )

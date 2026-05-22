@@ -99,7 +99,7 @@
   (setq closest_name "NÃO DEFINIDO")
   (if TMD:niveis-get
     (progn
-      (setq levels (TMD:niveis-get) min_diff 99999.0 closest_name nil)
+      (setq levels (TMD:niveis-get) min_diff 99999.0 closest_name "NÃO DEFINIDO")
       (foreach lvl levels
         (setq diff (abs (- z_val (cadr lvl))))
         (if (<= diff 5.0)
@@ -134,13 +134,13 @@
 
   (cond
     ((= v_type "COLUNA") 
-     (setq cfg (if *TMD_DEF_COLUNA* *TMD_DEF_COLUNA* (list (list "PADRAO" "TUBE" 100.0 100.0 2.0) "MC" "0.0")))
+     (setq cfg (if *TMD_DEF_COLUNA* *TMD_DEF_COLUNA* (list (list "PADRAO" "RECT_VAZIO" 100.0 100.0 2.0) "MC" "0.0")))
      (setq layer "TMD-WIRE-COLUNA" color 5))     
     ((= v_type "VIGA") 
-     (setq cfg (if *TMD_DEF_VIGA* *TMD_DEF_VIGA* (list (list "PADRAO" "TUBE" 100.0 100.0 2.0) "MC" "0.0")))
+     (setq cfg (if *TMD_DEF_VIGA* *TMD_DEF_VIGA* (list (list "PADRAO" "RECT_VAZIO" 100.0 100.0 2.0) "MC" "0.0")))
      (setq layer "TMD-WIRE-VIGA" color 3))         
     ((= v_type "CONTRAVENTAMENTO") 
-     (setq cfg (if *TMD_DEF_DIAGONAL* *TMD_DEF_DIAGONAL* (list (list "PADRAO" "TUBE" 100.0 100.0 2.0) "MC" "0.0")))
+     (setq cfg (if *TMD_DEF_DIAGONAL* *TMD_DEF_DIAGONAL* (list (list "PADRAO" "RECT_VAZIO" 100.0 100.0 2.0) "MC" "0.0")))
      (setq layer "TMD-WIRE-DIAGONAL" color 6))
   )
   
@@ -186,9 +186,9 @@
   ;; Simular caixa no entorno de ptA orientada para ptB
   (setq v_type (TMD:wire-evaluate-vector ptA ptB))
   (cond
-    ((= v_type "COLUNA") (setq cfg (if *TMD_DEF_COLUNA* *TMD_DEF_COLUNA* (list (list "PADRAO" "TUBE" 100.0 100.0 2.0) "MC" "0.0"))))
-    ((= v_type "VIGA") (setq cfg (if *TMD_DEF_VIGA* *TMD_DEF_VIGA* (list (list "PADRAO" "TUBE" 100.0 100.0 2.0) "MC" "0.0"))))
-    (t (setq cfg (if *TMD_DEF_DIAGONAL* *TMD_DEF_DIAGONAL* (list (list "PADRAO" "TUBE" 100.0 100.0 2.0) "MC" "0.0"))))
+    ((= v_type "COLUNA") (setq cfg (if *TMD_DEF_COLUNA* *TMD_DEF_COLUNA* (list (list "PADRAO" "RECT_VAZIO" 100.0 100.0 2.0) "MC" "0.0"))))
+    ((= v_type "VIGA") (setq cfg (if *TMD_DEF_VIGA* *TMD_DEF_VIGA* (list (list "PADRAO" "RECT_VAZIO" 100.0 100.0 2.0) "MC" "0.0"))))
+    (t (setq cfg (if *TMD_DEF_DIAGONAL* *TMD_DEF_DIAGONAL* (list (list "PADRAO" "RECT_VAZIO" 100.0 100.0 2.0) "MC" "0.0"))))
   )
   (setq perfil_item (nth 0 cfg))
   (setq p_x (atof (vl-princ-to-string (nth 2 perfil_item))) p_y (atof (vl-princ-to-string (nth 3 perfil_item))))
@@ -307,43 +307,40 @@
   (setq loop_drawing T ptA nil last_ent nil history_pts nil)
   
   ;; Función interna de dibujo para reutilizar
-  (defun TMD:wire-do-draw ()
-    (if (setq ly (tblobjname "LAYER" "TMD-3D-MODEL")) (vla-put-LayerOn (vlax-ename->vla-object ly) :vlax-false))
-    (setq old_lay (getvar "CLAYER")) (setvar "CLAYER" "0")
-    (vl-cmdf "_.LINE" "_non" ptA "_non" ptB "")
-    (setq ent_name (entlast)) (setvar "CLAYER" old_lay)
-    (if (setq ly (tblobjname "LAYER" "TMD-3D-MODEL")) (vla-put-LayerOn (vlax-ename->vla-object ly) :vlax-true))
+  (defun TMD:wire-do-draw (p_a p_b)
+    ;; Determinar configuración según p_tipo
+    (cond
+      ((= p_tipo "COLUNA") (setq cfg (if *TMD_DEF_COLUNA* *TMD_DEF_COLUNA* (list (list "PADRAO" "RECT_VAZIO" 100.0 100.0 2.0) "MC" "0.0"))))
+      ((= p_tipo "VIGA") (setq cfg (if *TMD_DEF_VIGA* *TMD_DEF_VIGA* (list (list "PADRAO" "RECT_VAZIO" 100.0 100.0 2.0) "MC" "0.0"))))
+      (t (setq cfg (if *TMD_DEF_DIAGONAL* *TMD_DEF_DIAGONAL* (list (list "PADRAO" "RECT_VAZIO" 100.0 100.0 2.0) "MC" "0.0"))))
+    )
+    (setq perfil_item (nth 0 cfg))
+    (setq p_nome (nth 0 perfil_item) p_forma (nth 1 perfil_item) 
+          p_x (atof (vl-princ-to-string (nth 2 perfil_item))) 
+          p_y (atof (vl-princ-to-string (nth 3 perfil_item))) 
+          p_e (atof (vl-princ-to-string (nth 4 perfil_item))) 
+          p_labio (atof (if (> (length perfil_item) 5) (vl-princ-to-string (nth 5 perfil_item)) "0.0")) 
+          p_material (if (> (length perfil_item) 6) (nth 6 perfil_item) "ACO"))
     
-    (vlax-ldata-put ent_name "TMD_CLASSE" "ESTRUTURA_LINE")
-    (vlax-ldata-put ent_name "TMD_TIPO" p_tipo)
-    (vlax-ldata-put ent_name "TMD_SELF_HANDLE" (vla-get-handle (vlax-ename->vla-object ent_name)))
+    (setq dist (distance p_a p_b))
     
-    ;; [BIM LÓGICO] Calcular niveles y desfases por posición real Z
-    (setq niv_a (TMD:wire-get-nearest-level (caddr ptA)))
-    (setq niv_b (TMD:wire-get-nearest-level (caddr ptB)))
+    ;; Generar sólido directo (V5) sin la línea base
+    (setq ent_name (TMD:viga-build-geom nil p_a p_b just rot p_nome p_forma p_x p_y p_e p_labio p_material dist))
     
-    (setq lz_a (if (/= niv_a "NÃO DEFINIDO") (TMD:prop-get-level-z niv_a) nil))
-    (setq lz_b (if (/= niv_b "NÃO DEFINIDO") (TMD:prop-get-level-z niv_b) nil))
-    
-    (setq off_a (if lz_a (- (caddr ptA) lz_a) (caddr ptA)))
-    (setq off_b (if lz_b (- (caddr ptB) lz_b) (caddr ptB)))
-    
-    (vlax-ldata-put ent_name "TMD_NIVEL_INI" niv_a)
-    (vlax-ldata-put ent_name "TMD_AFASTAMENTO" (rtos off_a 2 2))
-    
-    (vlax-ldata-put ent_name "TMD_NIVEL_FIM" niv_b)
-    (vlax-ldata-put ent_name "TMD_AFASTAMENTO_TOPO" (rtos off_b 2 2))
-    
-    (vlax-ldata-put ent_name "TMD_JUSTIFICACAO" just)
-    (vlax-ldata-put ent_name "TMD_ROTACAO" (rtos rot 2 2))
-    
-    (TMD:wire-apply-data ent_name ptA ptB just rot)
-    (if (and p_perfil (/= p_perfil "PADRÃO")) (vlax-ldata-put ent_name "TMD_NOME" p_perfil))
-    
-    (if TMD:build-single-wire (TMD:build-single-wire ent_name))
-    (if j2:auto-resolve-nodes (j2:auto-resolve-nodes ent_name))
-    (setq last_ent ent_name)
-    (princ (strcat "\n[BIM] " niv_a " (" (rtos off_a 2 0) ") -> " niv_b " (" (rtos off_b 2 0) ")"))
+    (if ent_name
+      (progn
+        (vlax-ldata-put ent_name "TMD_CLASSE" "ESTRUTURA")
+        (vlax-ldata-put ent_name "TMD_TIPO" p_tipo)
+        (vlax-ldata-put ent_name "TMD_SELF_HANDLE" (vla-get-handle (vlax-ename->vla-object ent_name)))
+        
+        (vlax-ldata-put ent_name "TMD_JUSTIFICACAO" just)
+        (vlax-ldata-put ent_name "TMD_ROTACAO" (rtos rot 2 2))
+        
+        (if (and p_perfil (/= p_perfil "PADRÃO")) (vlax-ldata-put ent_name "TMD_NOME" p_perfil))
+        
+        (setq last_ent ent_name)
+      )
+    )
   )
 
   (while loop_drawing
@@ -383,19 +380,8 @@
                 (setq just (TMD:wire-get-smart-just just))
               )
               ((= pt_in "Undo")
-                ;; Primero buscar y borrar el sólido hijo (si existe)
                 (if (and last_ent (entget last_ent))
-                  (progn
-                    (setq s (vlax-ldata-get last_ent "TMD_CHILD_SOLID"))
-                    (if (and s (= (type s) 'STR))
-                      (progn
-                        (setq s_ent (handent s))
-                        (if (and s_ent (entget s_ent)) (entdel s_ent))
-                      )
-                    )
-                    ;; Luego borrar el wire
-                    (entdel last_ent)
-                  )
+                  (entdel last_ent)
                 )
                 (setq last_ent nil)
                 (if (/= p_tipo "COLUNA")
@@ -410,17 +396,8 @@
             ;; Reconstruir con el ajuste en caliente
             (if (and last_ent (/= pt_in "Undo"))
               (progn
-                (vlax-ldata-put last_ent "TMD_JUSTIFICACAO" just)
-                (vlax-ldata-put last_ent "TMD_ROTACAO" (rtos rot 2 2))
-                (setq p_dict (vlax-ldata-get last_ent "TMD_PARAMS"))
-                (if p_dict
-                  (progn
-                    (setq p_dict (subst (cons "JUSTIFICACAO" just) (assoc "JUSTIFICACAO" p_dict) p_dict))
-                    (setq p_dict (subst (cons "ROTACAO" rot) (assoc "ROTACAO" p_dict) p_dict))
-                    (vlax-ldata-put last_ent "TMD_PARAMS" p_dict)
-                  )
-                )
-                (if TMD:build-single-wire (TMD:build-single-wire last_ent))
+                (if (and last_ent (entget last_ent)) (entdel last_ent))
+                (if (and last_ptA last_ptB) (TMD:wire-do-draw last_ptA last_ptB))
                 (princ (strcat "\n[TMD] Atualizado -> Just: " just " | Rot: " (rtos rot 2 0) "°"))
               )
             )
@@ -433,7 +410,7 @@
       ((= (type pt_in) 'LIST)
         (if (not ptA)
           (progn
-            ;; PRIMER CLIC Vacio
+            ;; PRIMER CLIC
             (setq ptA pt_in)
             (if l_z1 (setq ptA (list (car ptA) (cadr ptA) (+ l_z1 p_afini))))
             
@@ -441,8 +418,9 @@
               (progn
                 (setq ptB (list (car ptA) (cadr ptA) 0.0))
                 (if l_z2 (setq ptB (list (car ptB) (cadr ptB) (+ l_z2 p_affim))) (setq ptB (list (car ptB) (cadr ptB) (+ (caddr ptA) 3000.0))))
-                (TMD:wire-do-draw)
-                (setq ptA pt_in) ;; Fake persistence to allow Top/Edge loop, but isolated visually.
+                (setq last_ptA ptA last_ptB ptB)
+                (TMD:wire-do-draw last_ptA last_ptB)
+                (setq ptA pt_in)
               )
               (progn
                 ;; Guardar historia y esperar el siguiente clic
@@ -458,7 +436,8 @@
                 (if l_z1 (setq ptA (list (car ptA) (cadr ptA) (+ l_z1 p_afini))))
                 (setq ptB (list (car ptA) (cadr ptA) 0.0))
                 (if l_z2 (setq ptB (list (car ptB) (cadr ptB) (+ l_z2 p_affim))) (setq ptB (list (car ptB) (cadr ptB) (+ (caddr ptA) 3000.0))))
-                (TMD:wire-do-draw)
+                (setq last_ptA ptA last_ptB ptB)
+                (TMD:wire-do-draw last_ptA last_ptB)
                 (setq ptA pt_in)
               )
               (progn
@@ -471,7 +450,8 @@
                 (if (and (not is_standalone) (< (distance (list (car ptA) (cadr ptA) 0.0) (list (car ptB) (cadr ptB) 0.0)) 0.001))
                   (princ "\n[!] No modo anclado, as vigas não podem ser perfeitamente verticais.")
                   (progn
-                    (TMD:wire-do-draw)
+                    (setq last_ptA ptA last_ptB ptB)
+                    (TMD:wire-do-draw last_ptA last_ptB)
                     (setq history_pts (cons ptA history_pts))
                     (setq ptA ptB) ;; El fin es el nuevo inicio
                   )

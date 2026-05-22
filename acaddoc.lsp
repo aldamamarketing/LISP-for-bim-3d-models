@@ -7,10 +7,15 @@
 (princ "\n[TM DIGITAL] Iniciando ambiente corporativo v4.2...")
 
 ;; 1. DETECÇÃO DINÂMICA DE REDE
-;; Detecta onde o acaddoc.lsp está (independente da letra da unidade Z:, X:, etc)
-(setq *TMD-LISP-PATH-RAW* (vl-filename-directory (findfile "acaddoc.lsp")))
-(if (not *TMD-LISP-PATH-RAW*) (setq *TMD-LISP-PATH-RAW* "Z:/Autocad Config/LISP")) ; Fallback
-
+;; Se existir a pasta Z:\Autocad Config\LISP, prioriza a rede corporal.
+(if (vl-file-directory-p "Z:/Autocad Config/LISP")
+  (setq *TMD-LISP-PATH-RAW* "Z:/Autocad Config/LISP")
+  (progn
+    (setq *TMD-LISP-PATH-RAW* (vl-filename-directory (findfile "acaddoc.lsp")))
+    (if (not *TMD-LISP-PATH-RAW*) (setq *TMD-LISP-PATH-RAW* "Z:/Autocad Config/LISP")) ; Fallback
+  )
+)
+ 
 (setq *TMD-BASE-PATH* (vl-filename-directory *TMD-LISP-PATH-RAW*)) ; Z:/Autocad Config
 (setq *TMD-LISP-PATH* (strcat *TMD-LISP-PATH-RAW* "/"))
 (setq *TMD-CUI-PATH*  (strcat *TMD-BASE-PATH* "/CUI/"))
@@ -56,6 +61,7 @@
 (TMD:sys-load "TMD_JOINTS.lsp")
 (TMD:sys-load "TMD_MATCH.lsp")
 (TMD:sys-load "TMD_Properties.lsp") ; Inspector
+(TMD:sys-load "TMD_Palette_Bridge.lsp")
 (TMD:sys-load "TMD_Tablas.lsp")
 (TMD:sys-load "TMD_Align.lsp")
 (TMD:sys-load "TMD_Groups.lsp")
