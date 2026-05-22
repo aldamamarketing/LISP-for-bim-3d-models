@@ -7,7 +7,7 @@
 ;; Emulador local padrão de Functions V2 roda geralmente na porta 5001.
 ;; Para usar remoto, mude para a URL gerada pelo Firebase Deploy.
 (if (not *LISPCENTRAL-SERVER*)
-  (setq *LISPCENTRAL-SERVER* "http://localhost:5001/lispcentral/us-central1/getRoutine")
+  (setq *LISPCENTRAL-SERVER* "https://getroutine-wgpjjgorxa-uc.a.run.app")
 )
 (if (not *LISPCENTRAL-KEY*)
   (setq *LISPCENTRAL-KEY* "lispcentral_test_key")
