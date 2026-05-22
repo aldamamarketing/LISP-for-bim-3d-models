@@ -269,6 +269,8 @@
       (vlax-ldata-put ent_outer "TMD_TIPO" "VIGA")
       (vlax-ldata-put ent_outer "TMD_NOME" p_nome)
       (vlax-ldata-put ent_outer "TMD_NIVEL" (atof nivel_global))
+      (vlax-ldata-put ent_outer "TMD_JUSTIFICACAO" just)
+      (vlax-ldata-put ent_outer "TMD_ROTACAO" rot)
       
       ;; Injetar o ADN 5.0 (Sem PT_A, PT_B, DISTANCIA)
       (TMD:bim-set-adn ent_outer (list (cons "FORMA" p_forma) (cons "DIM_X" p_x) (cons "DIM_Y" p_y) (cons "ESPESSURA" p_e) (cons "LABIO" p_labio) (cons "MATERIAL" p_material) (cons "JUSTIFICACAO" just) (cons "ROTACAO" rot)))

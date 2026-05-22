@@ -577,11 +577,11 @@
                         <td class="prop-label">Justificación</td>
                         <td class="prop-value">
                             <select id="sel-just" class="prop-select" onchange="modificarPropiedad('justificacion', this.value)" disabled>
-                                <option value="Centro">Centro / Eje Analítico</option>
-                                <option value="Superior">Superior / Ala Alta</option>
-                                <option value="Inferior">Inferior / Ala Baja</option>
-                                <option value="Esquerda">Esquerda / Lat. Izquierda</option>
-                                <option value="Direita">Direita / Lat. Derecha</option>
+                                <option value="MC">Centro / Eje Analítico</option>
+                                <option value="TC">Superior / Ala Alta</option>
+                                <option value="BC">Inferior / Ala Baja</option>
+                                <option value="ML">Esquerda / Lat. Izquierda</option>
+                                <option value="MR">Direita / Lat. Derecha</option>
                             </select>
                         </td>
                     </tr>
@@ -708,6 +708,31 @@
         var currentWireHandle = null;
         var lastDataHash = "";
         var isPicking = false; // Flag para pausar el polling durante getpoint
+        var isInteracting = false; // Flag para pausar el polling por interacción activa con controles
+        var interactionTimeout = null;
+
+        // Función para registrar interacción del usuario y pausar el refresco por 2 segundos
+        function registrarInteraccion() {
+            isInteracting = true;
+            if (interactionTimeout) clearTimeout(interactionTimeout);
+            interactionTimeout = setTimeout(function() {
+                isInteracting = false;
+            }, 2500); // 2.5 segundos de congelamiento protector
+        }
+
+        // Registrar eventos en los controles interactivos para evitar robos de foco
+        document.addEventListener('DOMContentLoaded', function() {
+            const controles = ['custom-perfil-container', 'sel-just', 'sel-rotacion', 'btn-pta', 'btn-ptb'];
+            controles.forEach(id => {
+                const el = document.getElementById(id);
+                if (el) {
+                    el.addEventListener('mouseenter', registrarInteraccion);
+                    el.addEventListener('mousedown', registrarInteraccion);
+                    el.addEventListener('focus', registrarInteraccion);
+                    el.addEventListener('change', registrarInteraccion);
+                }
+            });
+        });
 
         document.body.addEventListener('mouseenter', function() {
             if (isPicking) {
@@ -719,6 +744,7 @@
         // Profile Catalog Custom Dropdown controls
         function toggleProfileDropdown(event) {
             event.stopPropagation();
+            registrarInteraccion();
             
             // Disable click if no selection is active
             const handle = document.getElementById('disp-handle').innerText;
@@ -750,6 +776,7 @@
         });
 
         function filterProfiles(query) {
+            registrarInteraccion();
             const options = document.querySelectorAll('#custom-perfil-options .custom-option');
             const term = query.toLowerCase().trim();
             
@@ -764,6 +791,7 @@
         }
 
         function selectProfile(profileName) {
+            registrarInteraccion();
             document.getElementById('custom-perfil-text').innerText = profileName;
             document.getElementById('sel-perfil').value = profileName;
             closeProfileDropdown();
@@ -868,7 +896,7 @@
             document.getElementById('btn-pta').disabled = false;
             document.getElementById('btn-ptb').disabled = false;
             
-            document.getElementById('sel-just').value = data.justificacion ? data.justificacion : "Centro";
+            document.getElementById('sel-just').value = data.justificacion ? data.justificacion : "MC";
             document.getElementById('sel-rotacion').value = data.rotacion !== undefined ? data.rotacion : "0";
             
             populateProfiles(data.seccion);
@@ -983,7 +1011,17 @@
 
         // Dynamic JSONP CORS-safe refresh loop
         function leerJsDatos() {
-            if (isPicking) return; // No interrumpir comandos interactivos de AutoCAD
+            if (isPicking || isInteracting) return; // No interrumpir comandos interactivos ni interacción activa de usuario
+            
+            // Pausar o ciclo de atualização se o dropdown estiver aberto ou um campo estiver sob foco
+            const dropdown = document.getElementById('custom-perfil-dropdown');
+            if (dropdown && dropdown.style.display === 'block') {
+                return;
+            }
+            if (document.activeElement && 
+                (document.activeElement.tagName === 'SELECT' || document.activeElement.tagName === 'INPUT')) {
+                return;
+            }
             
             const oldScript = document.getElementById('tmd-query-script');
             if (oldScript) {
@@ -1009,3 +1047,4 @@
     </script>
 </body>
 </html>
+

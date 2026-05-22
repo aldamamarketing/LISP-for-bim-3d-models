@@ -186,13 +186,20 @@
         (setq largo (TMD:get-entity-length ent))
       )
       
-      (if (= tipoEnt "Solido Generico (3DSOLID)")
+      (if (= (cdr (assoc 0 (entget ent))) "3DSOLID")
         (progn
-          (if (not (type TMD:GetSolidMetrics)) (vl-catch-all-apply 'load (list "TMD_BOM.lsp")))
-          (if (type TMD:GetSolidMetrics)
+          (setq analytical_line (TMD:get-analytical-line ent))
+          (if analytical_line
+            (setq m_pta (car analytical_line)
+                  m_ptb (cadr analytical_line))
             (progn
-              (setq metrics (TMD:GetSolidMetrics (vlax-ename->vla-object ent)))
-              (setq m_pta (nth 3 metrics) m_ptb (nth 4 metrics))
+              (if (not (type TMD:GetSolidMetrics)) (vl-catch-all-apply 'load (list "TMD_BOM.lsp")))
+              (if (type TMD:GetSolidMetrics)
+                (progn
+                  (setq metrics (TMD:GetSolidMetrics (vlax-ename->vla-object ent)))
+                  (setq m_pta (nth 3 metrics) m_ptb (nth 4 metrics))
+                )
+              )
             )
           )
         )
@@ -206,7 +213,7 @@
       (if (not rotacion) (setq rotacion 0))
       
       (setq justificacion (cdr (assoc "JUSTIFICACAO" params)))
-      (if (not justificacion) (setq justificacion "Centro"))
+      (setq justificacion (TMD:normalize-just justificacion))
       
       ;; Gravação do arquivo JS temporário em todas as rotas possíveis (CORS local safe)
       (TMD:write-to-all-paths handle seccion rotacion justificacion largo marca cutters adnActive tipoEnt)
@@ -224,6 +231,106 @@
     )
   )
   (princ)
+)
+
+;;; ==========================================================================
+;;; 2.5. NORMALIZAÇÃO DE JUSTIFICAÇÃO E CÁLCULO DE EIXO ANALÍTICO
+;;; ==========================================================================
+
+(defun TMD:normalize-just (just)
+  (cond
+    ((not just) "MC")
+    ((= (type just) 'STR)
+     (cond
+       ((or (= just "Centro") (= just "MC") (= just "MIDDLE_CENTER")) "MC")
+       ((or (= just "Superior") (= just "TC") (= just "TOP_CENTER")) "TC")
+       ((or (= just "Inferior") (= just "BC") (= just "BOTTOM_CENTER")) "BC")
+       ((or (= just "Esquerda") (= just "ML") (= just "MIDDLE_LEFT")) "ML")
+       ((or (= just "Direita") (= just "MR") (= just "MIDDLE_RIGHT")) "MR")
+       (t "MC")
+     )
+    )
+    (t "MC")
+  )
+)
+
+(defun TMD:geom-normalize (v / len)
+  (setq len (sqrt (apply '+ (mapcar '(lambda (x) (* x x)) v))))
+  (if (> len 1e-8)
+    (mapcar '(lambda (x) (/ x len)) v)
+    v
+  )
+)
+
+(defun TMD:geom-cross (u v)
+  (list
+    (- (* (cadr u) (caddr v)) (* (caddr u) (cadr v)))
+    (- (* (caddr u) (car v)) (* (car u) (caddr v)))
+    (- (* (car u) (cadr v)) (* (cadr u) (car v)))
+  )
+)
+
+(defun TMD:geom-arbitrary-axis (z-vec / ux uy)
+  (setq z-vec (TMD:geom-normalize z-vec))
+  (if (and (< (abs (car z-vec)) 0.015625)
+           (< (abs (cadr z-vec)) 0.015625))
+    (setq ux (TMD:geom-cross '(0.0 1.0 0.0) z-vec))
+    (setq ux (TMD:geom-cross '(0.0 0.0 1.0) z-vec))
+  )
+  (setq ux (TMD:geom-normalize ux))
+  (setq uy (TMD:geom-cross z-vec ux))
+  (setq uy (TMD:geom-normalize uy))
+  (list ux uy)
+)
+
+(defun TMD:geom-rotated-axes (uz rot_deg / rad cos_a sin_a axes ux uy ux_rot uy_rot)
+  (setq rad (* rot_deg (/ pi 180.0)))
+  (setq cos_a (cos rad) sin_a (sin rad))
+  (setq axes (TMD:geom-arbitrary-axis uz))
+  (setq ux (car axes) uy (cadr axes))
+  (setq ux_rot (mapcar '+ (mapcar '(lambda (x) (* x cos_a)) ux) (mapcar '(lambda (x) (* x sin_a)) uy)))
+  (setq uy_rot (mapcar '- (mapcar '(lambda (x) (* x cos_a)) uy) (mapcar '(lambda (x) (* x sin_a)) ux)))
+  (list ux_rot uy_rot)
+)
+
+(defun TMD:get-analytical-line (ent / params just rot p_x p_y metrics m_pta m_ptb cx cy uz axes ux uy pt_a pt_b)
+  (if (not (type TMD:GetSolidMetrics)) (vl-catch-all-apply 'load (list "TMD_BOM.lsp")))
+  (setq metrics (if (type TMD:GetSolidMetrics) (TMD:GetSolidMetrics (vlax-ename->vla-object ent)) nil))
+  (setq params (vlax-ldata-get ent "TMD_PARAMS"))
+  (if (and metrics params)
+    (progn
+      (setq m_pta (nth 3 metrics)
+            m_ptb (nth 4 metrics)
+            just (cdr (assoc "JUSTIFICACAO" params))
+            rot (cdr (assoc "ROTACAO" params))
+            p_x (cdr (assoc "DIM_X" params))
+            p_y (cdr (assoc "DIM_Y" params)))
+      
+      (setq just (TMD:normalize-just just))
+      (if (not rot) (setq rot 0.0))
+      (if (not p_x) (setq p_x 100.0))
+      (if (not p_y) (setq p_y 100.0))
+      (setq p_x (atof (vl-princ-to-string p_x))
+            p_y (atof (vl-princ-to-string p_y))
+            rot (atof (vl-princ-to-string rot)))
+      
+      ;; 1. Calcular offsets de justificación
+      (setq cx (cond ((vl-string-search "L" just) (/ p_x 2.0)) ((vl-string-search "R" just) (* -1.0 (/ p_x 2.0))) (t 0.0)))
+      (setq cy (cond ((vl-string-search "B" just) (/ p_y 2.0)) ((vl-string-search "T" just) (* -1.0 (/ p_y 2.0))) (t 0.0)))
+      
+      ;; 2. Obtener dirección longitudinal uz y los ejes X e Y locales rotados
+      (setq uz (TMD:geom-normalize (mapcar '- m_ptb m_pta)))
+      (setq axes (TMD:geom-rotated-axes uz rot))
+      (setq ux (car axes) uy (cadr axes))
+      
+      ;; 3. Restar cx y cy de m_pta y m_ptb para obtener pt_a y pt_b reales (eje analítico)
+      (setq pt_a (mapcar '- m_pta (mapcar '(lambda (x) (* x cx)) ux) (mapcar '(lambda (y) (* y cy)) uy)))
+      (setq pt_b (mapcar '- m_ptb (mapcar '(lambda (x) (* x cx)) ux) (mapcar '(lambda (y) (* y cy)) uy)))
+      
+      (list pt_a pt_b)
+    )
+    nil
+  )
 )
 
 ;;; ==========================================================================
@@ -444,7 +551,7 @@
 ;;; ==========================================================================
 ;;; 5. ATUALIZADOR DE PARÂMETROS BIM (CHAMADO POR JS)
 ;;; ==========================================================================
-(defun TMD:palette-update-param (handle paramName val / ent params rotVal doc catData catList foundItem p_nome p_forma p_x p_y p_e p_labio p_material just rot metrics m_pta m_ptb dist ent_name)
+(defun TMD:palette-update-param (handle paramName val / ent params rotVal doc catData catList foundItem p_nome p_forma p_x p_y p_e p_labio p_material just rot metrics m_pta m_ptb dist ent_name tmd_uuid analytical_line pt_a pt_b)
   (setq ent (handent handle))
   (if ent
     (progn
@@ -452,11 +559,29 @@
       (vla-StartUndoMark doc)
       
       (setq params (vlax-ldata-get ent "TMD_PARAMS"))
-      (if (not params) (setq params '(("NOME" . "H100") ("ROTACAO" . 0) ("JUSTIFICACAO" . "Centro"))))
+      (if (not params) (setq params '(("NOME" . "H100") ("ROTACAO" . 0) ("JUSTIFICACAO" . "MC"))))
       
       ;; Obtener UUID actual o generar uno nuevo
       (setq tmd_uuid (vlax-ldata-get ent "TMD_UUID"))
       (if (not tmd_uuid) (setq tmd_uuid (strcat "TMD-" (rtos (getvar "CDATE") 2 8) "-" (itoa (fix (* (rem (getvar "DATE") 1.0) 1000000))))))
+      
+      ;; Extraer línea analítica real ANTES de aplicar los nuevos parámetros
+      (setq analytical_line (TMD:get-analytical-line ent))
+      (if (and analytical_line (= (cdr (assoc 0 (entget ent))) "3DSOLID"))
+        (setq pt_a (car analytical_line)
+              pt_b (cadr analytical_line))
+        (progn
+          ;; Fallback si no es un 3DSOLID o no tiene metrics/params viejos
+          (if (not (type TMD:GetSolidMetrics)) (vl-catch-all-apply 'load (list "TMD_BOM.lsp")))
+          (setq metrics (if (type TMD:GetSolidMetrics) (TMD:GetSolidMetrics (vlax-ename->vla-object ent)) nil))
+          (if metrics
+            (setq pt_a (nth 3 metrics) pt_b (nth 4 metrics))
+            (setq pt_a (cdr (assoc 10 (entget ent)))
+                  pt_b (cdr (assoc 11 (entget ent))))
+          )
+        )
+      )
+      (setq dist (distance pt_a pt_b))
       
       (cond
         ((= paramName "SECCION")
@@ -487,7 +612,7 @@
          (setq params (TMD:subst-assoc "ROTACAO" rotVal params))
         )
         ((= paramName "JUSTIFICACION")
-         (setq params (TMD:subst-assoc "JUSTIFICACAO" val params))
+         (setq params (TMD:subst-assoc "JUSTIFICACAO" (TMD:normalize-just val) params))
         )
       )
       
@@ -498,33 +623,28 @@
       ;; Si es un 3DSOLID V5 reconstruir directamente con TMD:viga-build-geom
       (if (= (cdr (assoc 0 (entget ent))) "3DSOLID")
         (progn
-          (if (not (type TMD:GetSolidMetrics)) (vl-catch-all-apply 'load (list "TMD_BOM.lsp")))
-          (setq metrics (if (type TMD:GetSolidMetrics) (TMD:GetSolidMetrics (vlax-ename->vla-object ent)) nil))
-          (if metrics
+          (setq p_nome (cdr (assoc "NOME" params))
+                p_forma (cdr (assoc "FORMA" params))
+                p_x (atof (vl-princ-to-string (cdr (assoc "DIM_X" params))))
+                p_y (atof (vl-princ-to-string (cdr (assoc "DIM_Y" params))))
+                p_e (atof (vl-princ-to-string (cdr (assoc "ESPESSURA" params))))
+                p_labio (cdr (assoc "LABIO" params))
+                p_material (cdr (assoc "MATERIAL" params))
+                just (cdr (assoc "JUSTIFICACAO" params))
+                rot (atof (vl-princ-to-string (cdr (assoc "ROTACAO" params)))))
+          (if (not p_labio) (setq p_labio 0.0) (setq p_labio (atof (vl-princ-to-string p_labio))))
+          (if (not p_material) (setq p_material "ACO"))
+          
+          (setq ent_name (TMD:viga-build-geom ent pt_a pt_b just rot p_nome p_forma p_x p_y p_e p_labio p_material dist))
+          (if ent_name
             (progn
-              (setq m_pta (nth 3 metrics) m_ptb (nth 4 metrics) dist (nth 0 metrics))
-              (setq p_nome (cdr (assoc "NOME" params))
-                    p_forma (cdr (assoc "FORMA" params))
-                    p_x (atof (vl-princ-to-string (cdr (assoc "DIM_X" params))))
-                    p_y (atof (vl-princ-to-string (cdr (assoc "DIM_Y" params))))
-                    p_e (atof (vl-princ-to-string (cdr (assoc "ESPESSURA" params))))
-                    p_labio (cdr (assoc "LABIO" params))
-                    p_material (cdr (assoc "MATERIAL" params))
-                    just (cdr (assoc "JUSTIFICACAO" params))
-                    rot (atof (vl-princ-to-string (cdr (assoc "ROTACAO" params)))))
-              (if (not p_labio) (setq p_labio 0.0) (setq p_labio (atof (vl-princ-to-string p_labio))))
-              (if (not p_material) (setq p_material "ACO"))
-              
-              (setq ent_name (TMD:viga-build-geom ent m_pta m_ptb just rot p_nome p_forma p_x p_y p_e p_labio p_material dist))
-              (if ent_name
-                (progn
-                  (vlax-ldata-put ent_name "TMD_CLASSE" "ESTRUTURA")
-                  (vlax-ldata-put ent_name "TMD_TIPO" (vlax-ldata-get ent "TMD_TIPO"))
-                  (vlax-ldata-put ent_name "TMD_SELF_HANDLE" (vla-get-handle (vlax-ename->vla-object ent_name)))
-                  (vlax-ldata-put ent_name "TMD_UUID" tmd_uuid)
-                  (vlax-ldata-put ent_name "TMD_HOST_HANDLE" (vla-get-handle (vlax-ename->vla-object ent_name)))
-                )
-              )
+              (vlax-ldata-put ent_name "TMD_CLASSE" "ESTRUTURA")
+              (vlax-ldata-put ent_name "TMD_TIPO" (vlax-ldata-get ent "TMD_TIPO"))
+              (vlax-ldata-put ent_name "TMD_SELF_HANDLE" (vla-get-handle (vlax-ename->vla-object ent_name)))
+              (vlax-ldata-put ent_name "TMD_UUID" tmd_uuid)
+              (vlax-ldata-put ent_name "TMD_HOST_HANDLE" (vla-get-handle (vlax-ename->vla-object ent_name)))
+              (vlax-ldata-put ent_name "TMD_JUSTIFICACAO" just)
+              (vlax-ldata-put ent_name "TMD_ROTACAO" rot)
             )
           )
         )
@@ -550,22 +670,33 @@
   (princ)
 )
 
-(defun TMD:palette-pick-point (handle ptType / ent doc pt_val params metrics m_pta m_ptb dist p_nome p_forma p_x p_y p_e p_labio p_material just rot ent_name tmd_uuid)
+(defun TMD:palette-pick-point (handle ptType / ent doc pt_val params metrics m_pta m_ptb dist p_nome p_forma p_x p_y p_e p_labio p_material just rot ent_name tmd_uuid analytical_line pt_a pt_b)
   (setq ent (handent handle))
   (if ent
     (progn
       (setq params (vlax-ldata-get ent "TMD_PARAMS"))
       
-      ;; Extraer Puntos Reales ANTES de preguntar, para la línea elástica (rubber-band)
-      (if (not (type TMD:GetSolidMetrics)) (vl-catch-all-apply 'load (list "TMD_BOM.lsp")))
-      (setq metrics (if (type TMD:GetSolidMetrics) (TMD:GetSolidMetrics (vlax-ename->vla-object ent)) nil))
-      (if metrics
+      ;; Extraer línea analítica real ANTES de preguntar, para la línea elástica (rubber-band)
+      (setq analytical_line (TMD:get-analytical-line ent))
+      (if (and analytical_line (= (cdr (assoc 0 (entget ent))) "3DSOLID"))
+        (setq pt_a (car analytical_line)
+              pt_b (cadr analytical_line))
         (progn
-          (setq m_pta (nth 3 metrics) m_ptb (nth 4 metrics))
-          
+          (if (not (type TMD:GetSolidMetrics)) (vl-catch-all-apply 'load (list "TMD_BOM.lsp")))
+          (setq metrics (if (type TMD:GetSolidMetrics) (TMD:GetSolidMetrics (vlax-ename->vla-object ent)) nil))
+          (if metrics
+            (setq pt_a (nth 3 metrics) pt_b (nth 4 metrics))
+            (setq pt_a (cdr (assoc 10 (entget ent)))
+                  pt_b (cdr (assoc 11 (entget ent))))
+          )
+        )
+      )
+      
+      (if (and pt_a pt_b)
+        (progn
           (if (= ptType "PT_A")
-            (setq pt_val (getpoint m_ptb "\n[TMD] Selecione nova coordenada para PT_A (Inicio): "))
-            (setq pt_val (getpoint m_pta "\n[TMD] Selecione nova coordenada para PT_B (Fim): "))
+            (setq pt_val (getpoint pt_b "\n[TMD] Selecione nova coordenada para PT_A (Inicio): "))
+            (setq pt_val (getpoint pt_a "\n[TMD] Selecione nova coordenada para PT_B (Fim): "))
           )
           
           (if pt_val
@@ -577,8 +708,8 @@
               (setq tmd_uuid (vlax-ldata-get ent "TMD_UUID"))
               (if (not tmd_uuid) (setq tmd_uuid (strcat "TMD-" (rtos (getvar "CDATE") 2 8) "-" (itoa (fix (* (rem (getvar "DATE") 1.0) 1000000))))))
           
-              (if (= ptType "PT_A") (setq m_pta pt_val) (setq m_ptb pt_val))
-              (setq dist (distance m_pta m_ptb))
+              (if (= ptType "PT_A") (setq pt_a pt_val) (setq pt_b pt_val))
+              (setq dist (distance pt_a pt_b))
               
               (setq p_nome (cdr (assoc "NOME" params))
                     p_forma (cdr (assoc "FORMA" params))
@@ -593,7 +724,7 @@
               (if (not p_labio) (setq p_labio 0.0) (setq p_labio (atof (vl-princ-to-string p_labio))))
               (if (not p_material) (setq p_material "ACO"))
               
-              (setq ent_name (TMD:viga-build-geom ent m_pta m_ptb just rot p_nome p_forma p_x p_y p_e p_labio p_material dist))
+              (setq ent_name (TMD:viga-build-geom ent pt_a pt_b just rot p_nome p_forma p_x p_y p_e p_labio p_material dist))
               (if ent_name
                 (progn
                   (vlax-ldata-put ent_name "TMD_CLASSE" "ESTRUTURA")
@@ -601,14 +732,15 @@
                   (vlax-ldata-put ent_name "TMD_SELF_HANDLE" (vla-get-handle (vlax-ename->vla-object ent_name)))
                   (vlax-ldata-put ent_name "TMD_UUID" tmd_uuid)
                   (vlax-ldata-put ent_name "TMD_HOST_HANDLE" (vla-get-handle (vlax-ename->vla-object ent_name)))
+                  (vlax-ldata-put ent_name "TMD_JUSTIFICACAO" just)
+                  (vlax-ldata-put ent_name "TMD_ROTACAO" rot)
                 )
               )
+              (if doc (vla-EndUndoMark doc))
+              (if ent_name (sssetfirst nil (ssadd ent_name)))
+              (TMD:query-active-selection nil)
             )
           )
-          
-          (if doc (vla-EndUndoMark doc))
-          (if ent_name (sssetfirst nil (ssadd ent_name)))
-          (TMD:query-active-selection nil)
         )
       )
     )
