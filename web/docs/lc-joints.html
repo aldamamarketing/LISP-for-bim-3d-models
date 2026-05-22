@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>LC_JOINTS - Documentação | LispCentral</title>
+  <link rel="stylesheet" href="../styles.css">
+</head>
+<body>
+
+  <header>
+    <div class="logo">Lisp<span>Central</span></div>
+    <nav>
+      <a href="/" class="btn btn-secondary" style="border:none;">Home</a>
+      <a href="/docs/index.html" class="btn btn-secondary" style="border:none; background:var(--bg-card);">Documentação</a>
+      <a href="/download.html" class="btn">Testar Grátis</a>
+    </nav>
+  </header>
+
+  <div class="docs-layout">
+    <!-- Sidebar -->
+    <aside class="docs-sidebar">
+      <h4>Guia de Início</h4>
+      <ul class="docs-nav">
+        <li><a href="/docs/index.html">Introdução</a></li>
+        <li><a href="/download.html">Instalação</a></li>
+      </ul>
+      
+      <h4 style="margin-top:20px;">Comandos (LC_)</h4>
+      <ul class="docs-nav">
+        <li><a href="/docs/lc-joints.html" class="active">LC_JOINTS</a></li>
+        <li><a href="/docs/lc-build.html">LC_BUILD</a></li>
+        <li><a href="/docs/lc-align.html">LC_ALIGN</a></li>
+        <li><a href="/docs/lc-bom.html">LC_TABLAS</a></li>
+        <li><a href="/docs/lc-sync.html">LC_SYNC</a></li>
+      </ul>
+    </aside>
+
+    <!-- Content -->
+    <main class="docs-content">
+      <div class="breadcrumbs">
+        <a href="/">Home</a> &gt; <a href="/docs/index.html">Documentação</a> &gt; <span>Comandos</span>
+      </div>
+
+      <h1>LC_JOINTS</h1>
+      <p>Ferramenta avançada para resolver conexões e recortes (copes) entre sólidos 3D estruturais (vigas e colunas) no AutoCAD.</p>
+
+      <h2>Sintaxe</h2>
+      <div class="cmd-box">
+        Comando: LC_JOINTS
+      </div>
+
+      <h2>Descrição</h2>
+      <p>O <code>LC_JOINTS</code> substitui os antigos comandos <code>TMD_JOINTS</code>. Ele permite realizar automaticamente operações de subtração e junção entre vigas que se cruzam.</p>
+      <p>Como trabalhamos nativamente com <code>3DSOLID</code>, o sistema lê o Bounding Box e a direção de extrusão para gerar recortes limpos e alinhados, preservando a inteligência LDATA.</p>
+
+      <h2>Modos de Operação</h2>
+      <ul>
+        <li><b>Flush:</b> Recorta a viga secundária rentando exatamente pela face interior da aba da primária.</li>
+        <li><b>Miter (Meia-esquadria):</b> Conexão a 45 graus para esquinas de tubos quadrados ou vigas do mesmo perfil.</li>
+        <li><b>Crossing:</b> Furo passante. Subtrai a geometria exata da viga passante na viga alvo.</li>
+        <li><b>Auto:</b> Detecta cruzamentos numa seleção múltipla e resolve usando Flush.</li>
+        <li><b>Clear:</b> Limpa todas as operações booleanas e restaura o sólido original.</li>
+      </ul>
+
+    </main>
+  </div>
+
+  <footer>
+    <p>&copy; 2026 LispCentral por TM Digital. Todos os direitos reservados.</p>
+  </footer>
+</body>
+</html>

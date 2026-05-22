@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Baixe o carregador remoto LispCentral e comece sua automação no AutoCAD agora mesmo.">
+  <title>LispCentral - Central de Downloads</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+  <header>
+    <div class="logo">Lisp<span>Central</span></div>
+    <nav>
+      <a href="/index.html" class="btn btn-secondary" style="border:none;">Home</a>
+      <a href="/docs/index.html" class="btn btn-secondary" style="border:none;">Documentação</a>
+      <a href="/download.html" class="btn">Testar Grátis</a>
+    </nav>
+  </header>
+
+  <section class="section">
+    <h1 class="section-title">Teste Grátis - Instalação Rápida</h1>
+    
+    <div class="card" style="max-width: 600px; margin: 0 auto; text-align: center; margin-bottom: 40px;">
+      <h2>1. Obter API Key</h2>
+      <p>Insira seu e-mail corporativo para gerar uma chave de teste válida para o MVP e baixar o configurador.</p>
+      
+      <form id="trialForm">
+        <div class="form-group">
+          <input type="email" id="trialEmail" class="form-control" placeholder="engenheiro@empresa.com" required>
+        </div>
+        <button type="submit" class="btn" style="width: 100%;">Gerar API Key e Baixar</button>
+      </form>
+      
+      <div id="apiKeyResult" style="display: none;">
+        <p>Sucesso! Sua Chave de Teste (API Key) é:</p>
+        <div class="code-snippet" id="generatedKey" style="font-weight: bold; font-size: 1.2rem; margin-bottom: 15px;"></div>
+      </div>
+    </div>
+
+    <div class="card" style="max-width: 600px; margin: 0 auto;">
+      <h2>2. Como Usar</h2>
+      <ol style="margin-left: 20px;">
+        <li style="margin-bottom: 10px;">Após clicar em gerar, seu navegador baixará o arquivo <code>TMD_Loader.lsp</code> já configurado.</li>
+        <li style="margin-bottom: 10px;">Abra seu AutoCAD.</li>
+        <li style="margin-bottom: 10px;">Arraste o arquivo <code>TMD_Loader.lsp</code> para dentro da janela do AutoCAD.</li>
+        <li style="margin-bottom: 10px;">Digite o comando no AutoCAD:
+          <div class="cmd-box" style="margin: 10px 0; padding: 10px;">TMD_LOAD_REMOTE</div>
+        </li>
+      </ol>
+      <p style="color: var(--text-muted); font-size: 0.9rem;">
+        Se você já possui o arquivo loader, não precisa baixar novamente. Apenas abra o arquivo com um bloco de notas e atualize a variável <code>*LISPCENTRAL-KEY*</code> com a nova chave.
+      </p>
+    </div>
+  </section>
+
+  <footer>
+    <p>&copy; 2026 LispCentral por TM Digital. Todos os direitos reservados.</p>
+  </footer>
+
+  <script>
+    document.getElementById('trialForm').addEventListener('submit', function(e) {
+      e.preventDefault();
+      const email = document.getElementById('trialEmail').value;
+      if(email) {
+        // Gerar chave simulada: trial_tmd_xxxx
+        const randomId = Math.floor(Math.random() * 10000).toString().padStart(4, '0');
+        const newKey = "trial_tmd_" + randomId;
+        
+        document.getElementById('generatedKey').innerText = newKey;
+        document.getElementById('trialForm').style.display = 'none';
+        document.getElementById('apiKeyResult').style.display = 'block';
+
+        // LISP Template
+        const lispTemplate = `;;; =====================================================================================
+;;; LISPCENTRAL - CARREGADOR REMOTO DE ROTINAS (TMD_Loader.lsp)
+;;; =====================================================================================
+(vl-load-com)
+
+(if (not *LISPCENTRAL-SERVER*)
+  (setq *LISPCENTRAL-SERVER* "https://getroutine-wgpjjgorxa-uc.a.run.app")
+)
+(if (not *LISPCENTRAL-KEY*)
+  (setq *LISPCENTRAL-KEY* "${newKey}")
+)
+
+(defun TMD:load-remote-routine (routine_id / xmlhttp url status response)
+  (princ (strcat "\\n[LispCentral] Baixando rotina '" routine_id "' da nuvem..."))
+  (setq url (strcat *LISPCENTRAL-SERVER* "?apiKey=" *LISPCENTRAL-KEY* "&routine=" routine_id))
+  (setq xmlhttp (vlax-create-object "MSXML2.XMLHTTP.6.0"))
+  (if xmlhttp
+    (progn
+      (vl-catch-all-apply
+        '(lambda ()
+           (vlax-invoke-method xmlhttp 'open "GET" url :vlax-false)
+           (vlax-invoke-method xmlhttp 'send)
+         )
+      )
+      (setq status (vl-catch-all-apply 'vlax-get-property (list xmlhttp 'status)))
+      (if (= status 200)
+        (progn
+          (setq response (vlax-get-property xmlhttp 'responseText))
+          (eval (read (strcat "(progn " response "\\n(princ)\\n)")))
+          (princ (strcat "\\n[✔] Rotina '" routine_id "' carregada e ativada com sucesso."))
+        )
+        (progn
+          (princ (strcat "\\n[⚠] Falha ao baixar '" routine_id "' (Status: " (vl-princ-to-string status) ")."))
+          (if (= status 401)
+            (princ "\\n[⚠] Chave de API inválida ou assinatura expirada.")
+          )
+        )
+      )
+      (vlax-release-object xmlhttp)
+    )
+    (princ "\\n[Erro] Falha ao instanciar o objeto XMLHTTP do Windows.")
+  )
+  (princ)
+)
+
+(defun c:TMD_LOAD_REMOTE ()
+  (princ "\\n[LispCentral] Conectando ao servidor de assinaturas...")
+  (TMD:load-remote-routine "TMD_JOINTS")
+  (TMD:load-remote-routine "TMD_BUILD")
+  (princ "\\n[LispCentral] Sincronização finalizada.")
+  (princ)
+)
+
+(princ "\\n[LispCentral] Carregador online pronto. Digite TMD_LOAD_REMOTE para sincronizar.")
+(princ)
+`;
+        
+        // Disparar o download automático
+        const blob = new Blob([lispTemplate], { type: 'text/plain' });
+        const downloadUrl = URL.createObjectURL(blob);
+        const downloadBtn = document.createElement('a');
+        downloadBtn.href = downloadUrl;
+        downloadBtn.download = "TMD_Loader.lsp";
+        downloadBtn.className = "btn";
+        downloadBtn.style.marginTop = "15px";
+        downloadBtn.innerText = "Download Iniciado (Clique aqui se não iniciar)";
+        document.getElementById('apiKeyResult').appendChild(downloadBtn);
+        downloadBtn.click();
+      }
+    });
+  </script>
+</body>
+</html>

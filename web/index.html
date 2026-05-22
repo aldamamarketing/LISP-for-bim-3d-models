@@ -1,9 +1,10 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>LispCentral - AutoLISP SaaS Platform</title>
+  <meta name="description" content="LispCentral - Automação Estrutural Inteligente na Nuvem para AutoCAD. Sólidos 3D e produtividade extrema.">
+  <title>LispCentral - Automação 3D Direta no AutoCAD</title>
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
@@ -11,119 +12,44 @@
   <header>
     <div class="logo">Lisp<span>Central</span></div>
     <nav>
-      <a href="#features" class="btn btn-secondary" style="border:none;">Características</a>
-      <a href="#trial" class="btn btn-secondary" style="border:none;">Probar Gratis</a>
-      <a href="#feedback" class="btn btn-secondary" style="border:none;">Feedback</a>
+      <a href="/index.html" class="btn btn-secondary" style="border:none;">Home</a>
+      <a href="/docs/index.html" class="btn btn-secondary" style="border:none;">Documentação</a>
+      <a href="/download.html" class="btn">Testar Grátis</a>
     </nav>
   </header>
 
   <section class="hero">
-    <h1>Automatización Estructural Inteligente en la Nube</h1>
-    <p>Experimenta la potencia de la suite TMD directamente en AutoCAD, servida en tiempo real y siempre actualizada sin instalaciones complejas.</p>
-    <a href="#trial" class="btn">Obtener Clave de Prueba Gratuita</a>
-    <a href="#download" class="btn btn-secondary">Descargar Loader</a>
+    <h1>Automação Estrutural na Nuvem</h1>
+    <p>Experimente a potência da suíte TMD (agora LC) diretamente no AutoCAD, servida em tempo real e sempre atualizada sem instalações complexas.</p>
+    <a href="/download.html" class="btn">Iniciar Teste Gratuito</a>
+    <a href="/docs/index.html" class="btn btn-secondary">Explorar Comandos</a>
   </section>
 
   <section id="features" class="section">
-    <h2 class="section-title">¿Por qué LispCentral?</h2>
+    <h2 class="section-title">Por que LispCentral?</h2>
     <div class="grid">
       <div class="card">
-        <h3>Sólidos Independientes (V5)</h3>
-        <p>Trabaja directamente sobre geometría nativa en 3D (3DSOLID) sin depender de líneas base. Manipulación al instante con grips de AutoCAD.</p>
+        <h3>Sólidos Independentes (V5)</h3>
+        <p>Trabalhe diretamente sobre geometria nativa em 3D (3DSOLID) sem depender de linhas base. Manipulação instantânea com grips nativos do AutoCAD.</p>
       </div>
       <div class="card">
-        <h3>Siempre Actualizado</h3>
-        <p>El código se carga dinámicamente en RAM desde la nube. Olvídate de actualizar archivos físicos en cientos de computadoras.</p>
+        <h3>Nuvem & Sincronização</h3>
+        <p>O código é carregado dinamicamente na RAM. Esqueça o trabalho de atualizar centenas de máquinas fisicamente. Você sempre terá a última versão.</p>
       </div>
       <div class="card">
-        <h3>Paleta Interactiva Web</h3>
-        <p>Una interfaz rica y responsiva servida directamente desde internet para controlar tus vigas, juntas y justificaciones.</p>
-      </div>
-    </div>
-  </section>
-
-  <section id="trial" class="section">
-    <h2 class="section-title">Comienza tu Prueba Gratuita</h2>
-    <div class="card" style="max-width: 600px; margin: 0 auto; text-align: center;">
-      <p>Ingresa tu correo electrónico para generar una API Key de prueba temporal válida para el MVP.</p>
-      <form id="trialForm">
-        <div class="form-group">
-          <input type="email" id="trialEmail" class="form-control" placeholder="tu@email.com" required>
-        </div>
-        <button type="submit" class="btn" style="width: 100%;">Generar API Key</button>
-      </form>
-      
-      <div id="apiKeyResult">
-        <p>¡Éxito! Tu API Key de prueba es:</p>
-        <div class="code-snippet" id="generatedKey" style="font-weight: bold; font-size: 1.2rem;"></div>
-        <p style="font-size: 0.9rem; margin-top: 15px; color: var(--text-muted);">
-          Edita el archivo <code>TMD_Loader.lsp</code> y coloca esta clave en <code>*LISPCENTRAL-KEY*</code> para probar la carga.
-        </p>
-      </div>
-    </div>
-  </section>
-
-  <section id="download" class="section">
-    <h2 class="section-title">Instalación Rápida</h2>
-    <div class="card">
-      <ol style="margin-left: 20px;">
-        <li style="margin-bottom: 10px;">Obtén tu API Key arriba.</li>
-        <li style="margin-bottom: 10px;">Descarga o configura tu cargador dinámico <code>TMD_Loader.lsp</code>.</li>
-        <li style="margin-bottom: 10px;">Arrastra el archivo a AutoCAD y ejecuta el comando:
-          <div class="code-snippet" style="margin-top: 10px; display: inline-block;">TMD_LOAD_REMOTE</div>
-        </li>
-      </ol>
-    </div>
-  </section>
-
-  <section id="feedback" class="section">
-    <h2 class="section-title">Envíanos tu Feedback</h2>
-    <div class="card" style="max-width: 600px; margin: 0 auto;">
-      <form id="feedbackForm">
-        <div class="form-group">
-          <label for="fbName">Nombre</label>
-          <input type="text" id="fbName" class="form-control" required>
-        </div>
-        <div class="form-group">
-          <label for="fbMessage">Tus comentarios</label>
-          <textarea id="fbMessage" class="form-control" rows="4" required></textarea>
-        </div>
-        <button type="submit" class="btn btn-secondary" style="width: 100%;">Enviar Feedback</button>
-      </form>
-      <div id="feedbackResult" style="display: none; margin-top: 15px; color: #a6e22e; text-align: center;">
-        ¡Gracias por tus comentarios!
+        <h3>Desempenho Extremo</h3>
+        <p>Desenvolvido focado no Motor Físico Primeiro. Extrusões, operações booleanas e dados embutidos via LDATA para gestão de metadados BIM.</p>
       </div>
     </div>
   </section>
 
   <footer>
-    <p>&copy; 2026 LispCentral por TM Digital. Todos los derechos reservados.</p>
+    <p>&copy; 2026 LispCentral por TM Digital. Todos os direitos reservados.</p>
+    <p style="margin-top: 10px;">
+      <a href="/legal/privacy.html" style="color: var(--text-muted); margin: 0 10px;">Política de Privacidade</a> | 
+      <a href="/legal/terms.html" style="color: var(--text-muted); margin: 0 10px;">Termos de Uso</a>
+    </p>
   </footer>
 
-  <script>
-    // Simulación de Generación de API Key sin base de datos compleja
-    document.getElementById('trialForm').addEventListener('submit', function(e) {
-      e.preventDefault();
-      const email = document.getElementById('trialEmail').value;
-      if(email) {
-        // Generar un key simulado: trial_tmd_xxxx
-        const randomId = Math.floor(Math.random() * 10000).toString().padStart(4, '0');
-        const newKey = "trial_tmd_" + randomId;
-        
-        document.getElementById('generatedKey').innerText = newKey;
-        document.getElementById('trialForm').style.display = 'none';
-        document.getElementById('apiKeyResult').style.display = 'block';
-      }
-    });
-
-    // Simulación de envío de feedback
-    document.getElementById('feedbackForm').addEventListener('submit', function(e) {
-      e.preventDefault();
-      // Aquí iría el fetch() al backend real (Cloud Function submitFeedback)
-      // Por ahora simulamos éxito
-      document.getElementById('feedbackForm').style.display = 'none';
-      document.getElementById('feedbackResult').style.display = 'block';
-    });
-  </script>
 </body>
 </html>

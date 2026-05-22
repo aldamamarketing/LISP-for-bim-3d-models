@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>LC_BUILD - Documentação | LispCentral</title>
+  <link rel="stylesheet" href="../styles.css">
+</head>
+<body>
+
+  <header>
+    <div class="logo">Lisp<span>Central</span></div>
+    <nav>
+      <a href="/" class="btn btn-secondary" style="border:none;">Home</a>
+      <a href="/docs/index.html" class="btn btn-secondary" style="border:none; background:var(--bg-card);">Documentação</a>
+      <a href="/download.html" class="btn">Testar Grátis</a>
+    </nav>
+  </header>
+
+  <div class="docs-layout">
+    <!-- Sidebar -->
+    <aside class="docs-sidebar">
+      <h4>Guia de Início</h4>
+      <ul class="docs-nav">
+        <li><a href="/docs/index.html">Introdução</a></li>
+        <li><a href="/download.html">Instalação</a></li>
+      </ul>
+      
+      <h4 style="margin-top:20px;">Comandos (LC_)</h4>
+      <ul class="docs-nav">
+        <li><a href="/docs/lc-joints.html">LC_JOINTS</a></li>
+        <li><a href="/docs/lc-build.html" class="active">LC_BUILD</a></li>
+        <li><a href="/docs/lc-align.html">LC_ALIGN</a></li>
+        <li><a href="/docs/lc-bom.html">LC_TABLAS</a></li>
+        <li><a href="/docs/lc-sync.html">LC_SYNC</a></li>
+      </ul>
+    </aside>
+
+    <!-- Content -->
+    <main class="docs-content">
+      <div class="breadcrumbs">
+        <a href="/">Home</a> &gt; <a href="/docs/index.html">Documentação</a> &gt; <span>Comandos</span>
+      </div>
+
+      <h1>LC_BUILD</h1>
+      <p>O coração geométrico da Plataforma LispCentral. O comando <code>LC_BUILD</code> lê o ADN das entidades e reconstrói fisicamente as vigas 3D.</p>
+
+      <h2>Sintaxe</h2>
+      <div class="cmd-box">
+        Comando: LC_BUILD
+      </div>
+
+      <h2>Descrição</h2>
+      <p>A arquitetura V5 eliminou as linhas base (Wires). O <code>LC_BUILD</code> atua diretamente sobre dados LDATA injetados nos sólidos.</p>
+      <p>Se você tem um bloco, uma linha ou um antigo "Wire" com LDATA válido, este comando irá eliminá-lo e desenhar em seu lugar o <code>3DSOLID</code> correspondente, com a justificação e rotação exatas requeridas.</p>
+
+      <h2>Processo Interno</h2>
+      <ol>
+        <li>O usuário seleciona as entidades na tela.</li>
+        <li>A rotina lê propriedades como: <code>FORMA</code>, <code>DIM_X</code>, <code>DIM_Y</code>, <code>ESPESSURA</code>.</li>
+        <li>Extrai a geometria analítica (Ponto A e Ponto B).</li>
+        <li>Gera um sólido ou extrusão (Caixa ou Polilinha) com <code>vlax-invoke-method</code>.</li>
+        <li>Injeta a identidade UUID (<code>TMD_UUID</code>) no novo sólido para evitar clonagens acidentais.</li>
+      </ol>
+
+    </main>
+  </div>
+
+  <footer>
+    <p>&copy; 2026 LispCentral por TM Digital. Todos os direitos reservados.</p>
+  </footer>
+</body>
+</html>
