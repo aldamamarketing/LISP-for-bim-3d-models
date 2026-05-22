@@ -133,14 +133,40 @@
       
       ;; Identifica se tem ADN TMD ativo
       (if params
-        (setq adnActive 1)
+        (progn
+          (setq adnActive 1)
+          ;; Lógica de Sombra de Handle (Handle Shadowing) para detectar clones (COPY/MIRROR)
+          (setq tmd-uuid (vlax-ldata-get ent "TMD_UUID"))
+          (setq saved-handle (vlax-ldata-get ent "TMD_HOST_HANDLE"))
+          (if (and tmd-uuid saved-handle (/= handle saved-handle))
+            (progn
+              ;; ¡ES UN CLON NATIVO DE AUTOCAD!
+              (setq tmd-uuid (strcat "TMD-" (rtos (getvar "CDATE") 2 8) "-" (itoa (fix (* (rem (getvar "DATE") 1.0) 1000000)))))
+              (vlax-ldata-put ent "TMD_UUID" tmd-uuid)
+              (vlax-ldata-put ent "TMD_HOST_HANDLE" handle)
+              (vlax-ldata-put ent "TMD_MARK" nil) ;; Resetear marca
+              (setq marca nil cutters nil)
+              (princ (strcat "\n[TMD] Clon detectado. Nuevo UUID asignado: " tmd-uuid))
+            )
+            ;; Si es válido o apenas creado
+            (if (not tmd-uuid)
+              (progn
+                (setq tmd-uuid (strcat "TMD-" (rtos (getvar "CDATE") 2 8) "-" (itoa (fix (* (rem (getvar "DATE") 1.0) 1000000)))))
+                (vlax-ldata-put ent "TMD_UUID" tmd-uuid)
+                (vlax-ldata-put ent "TMD_HOST_HANDLE" handle)
+              )
+            )
+          )
+        )
         (progn
           (setq adnActive 0)
           ;; Valores padrões provisórios caso o Wire seja genérico
-          (setq params '(("SECCION" . "H100") ("ROTATION" . 0) ("JUSTIFICATION" . "Centro")))
+          (setq params '(("NOME" . "H100") ("ROTACAO" . 0) ("JUSTIFICACAO" . "Centro")))
+          (setq tmd-uuid nil)
         )
       )
       
+      (setq m_pta nil m_ptb nil)
       ;; Determina a descrição elegante do tipo de objeto nativo
       (setq tipoEnt (cdr (assoc 0 (entget origEnt))))
       (cond
@@ -160,14 +186,26 @@
         (setq largo (TMD:get-entity-length ent))
       )
       
+      (if (= tipoEnt "Solido Generico (3DSOLID)")
+        (progn
+          (if (not (type TMD:GetSolidMetrics)) (vl-catch-all-apply 'load (list "TMD_BOM.lsp")))
+          (if (type TMD:GetSolidMetrics)
+            (progn
+              (setq metrics (TMD:GetSolidMetrics (vlax-ename->vla-object ent)))
+              (setq m_pta (nth 3 metrics) m_ptb (nth 4 metrics))
+            )
+          )
+        )
+      )
+      
       ;; Parsers de segurança para cada campo do ADN
-      (setq seccion (cdr (assoc "SECCION" params)))
+      (setq seccion (cdr (assoc "NOME" params)))
       (if (not seccion) (setq seccion "H100"))
       
-      (setq rotacion (cdr (assoc "ROTATION" params)))
+      (setq rotacion (cdr (assoc "ROTACAO" params)))
       (if (not rotacion) (setq rotacion 0))
       
-      (setq justificacion (cdr (assoc "JUSTIFICATION" params)))
+      (setq justificacion (cdr (assoc "JUSTIFICACAO" params)))
       (if (not justificacion) (setq justificacion "Centro"))
       
       ;; Gravação do arquivo JS temporário em todas as rotas possíveis (CORS local safe)
@@ -297,9 +335,19 @@
               (write-line "  tmdUpdateInspectorData({" f)
               (write-line (strcat "    \"handle\": \"" handle "\",") f)
               (write-line (strcat "    \"seccion\": \"" seccion "\",") f)
-              (write-line (strcat "    \"rotacion\": " (itoa rotacion) ",") f)
+              (write-line (strcat "    \"rotacion\": " (vl-princ-to-string rotacion) ",") f)
               (write-line (strcat "    \"justificacion\": \"" justificacion "\",") f)
               (write-line (strcat "    \"largo_fisico\": " (rtos largo 2 4) ",") f)
+              (if tmd-uuid
+                (write-line (strcat "    \"uuid\": \"" tmd-uuid "\",") f)
+              )
+              
+              (if m_pta
+                (write-line (strcat "    \"pta\": \"" (rtos (car m_pta) 2 2) ", " (rtos (cadr m_pta) 2 2) ", " (rtos (caddr m_pta) 2 2) "\",") f)
+              )
+              (if m_ptb
+                (write-line (strcat "    \"ptb\": \"" (rtos (car m_ptb) 2 2) ", " (rtos (cadr m_ptb) 2 2) ", " (rtos (caddr m_ptb) 2 2) "\",") f)
+              )
               (write-line (strcat "    \"adn_active\": " (if (= adnActive 1) "true" "false") ",") f)
               (write-line (strcat "    \"tipo_objeto\": \"" tipoEnt "\",") f)
               
@@ -396,49 +444,173 @@
 ;;; ==========================================================================
 ;;; 5. ATUALIZADOR DE PARÂMETROS BIM (CHAMADO POR JS)
 ;;; ==========================================================================
-;;; Descrição: Recebe a ordem da paleta HTML, localiza a entidade pelo handle,
-;;;            atualiza seu LData TMD_PARAMS, limpa a Marca Frágil e dispara
-;;;            a regeneração física 3D do sólido.
-(defun TMD:palette-update-param (handle paramName val / ent params rotVal doc)
+(defun TMD:palette-update-param (handle paramName val / ent params rotVal doc catData catList foundItem p_nome p_forma p_x p_y p_e p_labio p_material just rot metrics m_pta m_ptb dist ent_name)
   (setq ent (handent handle))
   (if ent
     (progn
       (setq doc (vla-get-ActiveDocument (vlax-get-acad-object)))
       (vla-StartUndoMark doc)
       
-      ;; 1. Obtém e inyecta os parâmetros no ADN (LData)
       (setq params (vlax-ldata-get ent "TMD_PARAMS"))
-      (if (not params)
-        (setq params '(("SECCION" . "H100") ("ROTATION" . 0) ("JUSTIFICATION" . "Centro")))
-      )
+      (if (not params) (setq params '(("NOME" . "H100") ("ROTACAO" . 0) ("JUSTIFICACAO" . "Centro"))))
+      
+      ;; Obtener UUID actual o generar uno nuevo
+      (setq tmd_uuid (vlax-ldata-get ent "TMD_UUID"))
+      (if (not tmd_uuid) (setq tmd_uuid (strcat "TMD-" (rtos (getvar "CDATE") 2 8) "-" (itoa (fix (* (rem (getvar "DATE") 1.0) 1000000))))))
       
       (cond
         ((= paramName "SECCION")
-         (setq params (TMD:subst-assoc "SECCION" val params))
+         (setq params (TMD:subst-assoc "NOME" val params))
+         ;; Buscar dimensiones en el catalogo
+         (if TMD:viga-load-catalog
+           (progn
+             (setq catData (TMD:viga-load-catalog))
+             (if (cadr catData)
+               (progn
+                 (setq catList (cadr catData) foundItem nil)
+                 (foreach item catList (if (= (nth 0 item) val) (setq foundItem item)))
+                 (if foundItem
+                   (progn
+                     (setq params (TMD:subst-assoc "FORMA" (nth 1 foundItem) params))
+                     (setq params (TMD:subst-assoc "DIM_X" (nth 2 foundItem) params))
+                     (setq params (TMD:subst-assoc "DIM_Y" (nth 3 foundItem) params))
+                     (setq params (TMD:subst-assoc "ESPESSURA" (nth 4 foundItem) params))
+                   )
+                 )
+               )
+             )
+           )
+         )
         )
         ((= paramName "ROTACION")
-         (setq rotVal (atoi val))
-         (setq params (TMD:subst-assoc "ROTATION" rotVal params))
+         (setq rotVal (atof val))
+         (setq params (TMD:subst-assoc "ROTACAO" rotVal params))
         )
         ((= paramName "JUSTIFICACION")
-         (setq params (TMD:subst-assoc "JUSTIFICATION" val params))
+         (setq params (TMD:subst-assoc "JUSTIFICACAO" val params))
         )
       )
       
       (vlax-ldata-put ent "TMD_PARAMS" params)
-      
-      ;; 2. Protocolo de Trazabilidade Frágil (Invalidar marcas)
       (vlax-ldata-put ent "TMD_MARK" nil)
       (vlax-ldata-put ent "TMD_LEN_PHYS" nil)
       
-      ;; 3. Regeneração Física do Sólido 3D
-      (TMD:build-single-wire ent)
+      ;; Si es un 3DSOLID V5 reconstruir directamente con TMD:viga-build-geom
+      (if (= (cdr (assoc 0 (entget ent))) "3DSOLID")
+        (progn
+          (if (not (type TMD:GetSolidMetrics)) (vl-catch-all-apply 'load (list "TMD_BOM.lsp")))
+          (setq metrics (if (type TMD:GetSolidMetrics) (TMD:GetSolidMetrics (vlax-ename->vla-object ent)) nil))
+          (if metrics
+            (progn
+              (setq m_pta (nth 3 metrics) m_ptb (nth 4 metrics) dist (nth 0 metrics))
+              (setq p_nome (cdr (assoc "NOME" params))
+                    p_forma (cdr (assoc "FORMA" params))
+                    p_x (atof (vl-princ-to-string (cdr (assoc "DIM_X" params))))
+                    p_y (atof (vl-princ-to-string (cdr (assoc "DIM_Y" params))))
+                    p_e (atof (vl-princ-to-string (cdr (assoc "ESPESSURA" params))))
+                    p_labio (cdr (assoc "LABIO" params))
+                    p_material (cdr (assoc "MATERIAL" params))
+                    just (cdr (assoc "JUSTIFICACAO" params))
+                    rot (atof (vl-princ-to-string (cdr (assoc "ROTACAO" params)))))
+              (if (not p_labio) (setq p_labio 0.0) (setq p_labio (atof (vl-princ-to-string p_labio))))
+              (if (not p_material) (setq p_material "ACO"))
+              
+              (setq ent_name (TMD:viga-build-geom ent m_pta m_ptb just rot p_nome p_forma p_x p_y p_e p_labio p_material dist))
+              (if ent_name
+                (progn
+                  (vlax-ldata-put ent_name "TMD_CLASSE" "ESTRUTURA")
+                  (vlax-ldata-put ent_name "TMD_TIPO" (vlax-ldata-get ent "TMD_TIPO"))
+                  (vlax-ldata-put ent_name "TMD_SELF_HANDLE" (vla-get-handle (vlax-ename->vla-object ent_name)))
+                  (vlax-ldata-put ent_name "TMD_UUID" tmd_uuid)
+                  (vlax-ldata-put ent_name "TMD_HOST_HANDLE" (vla-get-handle (vlax-ename->vla-object ent_name)))
+                )
+              )
+            )
+          )
+        )
+        (TMD:build-single-wire ent)
+      )
       
       (vla-EndUndoMark doc)
-      
-      ;; 4. Re-sincroniza a paleta regravando o arquivo JS com o novo estado
+      (if ent_name (sssetfirst nil (ssadd ent_name)))
       (TMD:query-active-selection nil)
       (princ (strcat "\n[✔] " paramName " actualizado a " val " en la viga <" handle ">."))
+    )
+  )
+  (princ)
+)
+
+(defun c:TMD_DO_PICK ()
+  (if (and *tmd-pick-handle* *tmd-pick-type*)
+    (progn
+      (TMD:palette-pick-point *tmd-pick-handle* *tmd-pick-type*)
+      (setq *tmd-pick-handle* nil *tmd-pick-type* nil)
+    )
+  )
+  (princ)
+)
+
+(defun TMD:palette-pick-point (handle ptType / ent doc pt_val params metrics m_pta m_ptb dist p_nome p_forma p_x p_y p_e p_labio p_material just rot ent_name tmd_uuid)
+  (setq ent (handent handle))
+  (if ent
+    (progn
+      (setq params (vlax-ldata-get ent "TMD_PARAMS"))
+      
+      ;; Extraer Puntos Reales ANTES de preguntar, para la línea elástica (rubber-band)
+      (if (not (type TMD:GetSolidMetrics)) (vl-catch-all-apply 'load (list "TMD_BOM.lsp")))
+      (setq metrics (if (type TMD:GetSolidMetrics) (TMD:GetSolidMetrics (vlax-ename->vla-object ent)) nil))
+      (if metrics
+        (progn
+          (setq m_pta (nth 3 metrics) m_ptb (nth 4 metrics))
+          
+          (if (= ptType "PT_A")
+            (setq pt_val (getpoint m_ptb "\n[TMD] Selecione nova coordenada para PT_A (Inicio): "))
+            (setq pt_val (getpoint m_pta "\n[TMD] Selecione nova coordenada para PT_B (Fim): "))
+          )
+          
+          (if pt_val
+            (progn
+              (setq doc (vla-get-ActiveDocument (vlax-get-acad-object)))
+              (vla-StartUndoMark doc)
+              
+              ;; Obtener UUID actual o generar uno nuevo
+              (setq tmd_uuid (vlax-ldata-get ent "TMD_UUID"))
+              (if (not tmd_uuid) (setq tmd_uuid (strcat "TMD-" (rtos (getvar "CDATE") 2 8) "-" (itoa (fix (* (rem (getvar "DATE") 1.0) 1000000))))))
+          
+              (if (= ptType "PT_A") (setq m_pta pt_val) (setq m_ptb pt_val))
+              (setq dist (distance m_pta m_ptb))
+              
+              (setq p_nome (cdr (assoc "NOME" params))
+                    p_forma (cdr (assoc "FORMA" params))
+                    p_x (atof (vl-princ-to-string (cdr (assoc "DIM_X" params))))
+                    p_y (atof (vl-princ-to-string (cdr (assoc "DIM_Y" params))))
+                    p_e (atof (vl-princ-to-string (cdr (assoc "ESPESSURA" params))))
+                    p_labio (cdr (assoc "LABIO" params))
+                    p_material (cdr (assoc "MATERIAL" params))
+                    just (cdr (assoc "JUSTIFICACAO" params))
+                    rot (atof (vl-princ-to-string (cdr (assoc "ROTACAO" params)))))
+                    
+              (if (not p_labio) (setq p_labio 0.0) (setq p_labio (atof (vl-princ-to-string p_labio))))
+              (if (not p_material) (setq p_material "ACO"))
+              
+              (setq ent_name (TMD:viga-build-geom ent m_pta m_ptb just rot p_nome p_forma p_x p_y p_e p_labio p_material dist))
+              (if ent_name
+                (progn
+                  (vlax-ldata-put ent_name "TMD_CLASSE" "ESTRUTURA")
+                  (vlax-ldata-put ent_name "TMD_TIPO" (vlax-ldata-get ent "TMD_TIPO"))
+                  (vlax-ldata-put ent_name "TMD_SELF_HANDLE" (vla-get-handle (vlax-ename->vla-object ent_name)))
+                  (vlax-ldata-put ent_name "TMD_UUID" tmd_uuid)
+                  (vlax-ldata-put ent_name "TMD_HOST_HANDLE" (vla-get-handle (vlax-ename->vla-object ent_name)))
+                )
+              )
+            )
+          )
+          
+          (if doc (vla-EndUndoMark doc))
+          (if ent_name (sssetfirst nil (ssadd ent_name)))
+          (TMD:query-active-selection nil)
+        )
+      )
     )
   )
   (princ)

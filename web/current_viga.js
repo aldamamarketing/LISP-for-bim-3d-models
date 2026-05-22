@@ -1,5 +1,19 @@
 if (typeof tmdUpdateInspectorData === 'function') {
-  tmdUpdateInspectorData(null);
+  tmdUpdateInspectorData({
+    "handle": "1A14",
+    "seccion": "H100",
+    "rotacion": 0.0,
+    "justificacion": "Centro",
+    "largo_fisico": 896.0903,
+    "uuid": "TMD-20260522.09262200-393310",
+    "pta": "20.00, -760.20, 0.00",
+    "ptb": "20.00, 135.89, 0.00",
+    "adn_active": true,
+    "tipo_objeto": "Solido Generico (3DSOLID)",
+    "marca": null,
+    "cutters": [
+    ]
+  });
 }
 window.tmdCatalog = [
   {"nome": "Tubo Red. Ø50.8x1.5 ACO_CARBONO", "forma": "CIRC_VAZIO", "x": 50.8, "y": 50.8, "e": 1.5}

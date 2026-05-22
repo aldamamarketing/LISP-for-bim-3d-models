@@ -123,7 +123,7 @@
         .content-scrollable {
             flex: 1;
             overflow-y: auto;
-            padding-bottom: 120px; /* Space for the floating actions */
+            padding-bottom: 20px;
         }
 
         /* Revit Properties Grid */
@@ -560,6 +560,20 @@
                         </td>
                     </tr>
                     <tr class="prop-row">
+                        <td class="prop-label">PT_A (Inicio)</td>
+                        <td class="prop-value" style="display:flex; justify-content:space-between; align-items:center; padding:0 6px;">
+                            <div id="disp-pta" class="prop-read-only" style="width: 80%;">-</div>
+                            <button class="revit-btn" style="padding: 2px 4px; border:none; background:transparent;" onclick="pickPoint('A')" disabled id="btn-pta">🎯</button>
+                        </td>
+                    </tr>
+                    <tr class="prop-row">
+                        <td class="prop-label">PT_B (Fin)</td>
+                        <td class="prop-value" style="display:flex; justify-content:space-between; align-items:center; padding:0 6px;">
+                            <div id="disp-ptb" class="prop-read-only" style="width: 80%;">-</div>
+                            <button class="revit-btn" style="padding: 2px 4px; border:none; background:transparent;" onclick="pickPoint('B')" disabled id="btn-ptb">🎯</button>
+                        </td>
+                    </tr>
+                    <tr class="prop-row">
                         <td class="prop-label">Justificación</td>
                         <td class="prop-value">
                             <select id="sel-just" class="prop-select" onchange="modificarPropiedad('justificacion', this.value)" disabled>
@@ -605,22 +619,7 @@
 
     </div>
 
-    <!-- Action panel: Modeless controls at bottom -->
-    <div class="action-panel">
-        <div class="btn-row">
-            <button class="revit-btn revit-btn-accent" onclick="recargarDatos()" style="grid-column: span 2; font-size: 11.5px; height: 26px;">
-                🎯 Seleccionar del Dibujo
-            </button>
-        </div>
-        <div class="btn-row">
-            <button class="revit-btn" id="btn-build" onclick="ejecutarComandoLisp('(c:TMD_BUILD)')" disabled>
-                🏗️ Compilar Todo
-            </button>
-            <button class="revit-btn" id="btn-flush" onclick="ejecutarComandoLisp('(c:TMD_JOINTS_FLUSH)')" disabled>
-                🪓 Corte Flush
-            </button>
-        </div>
-    </div>
+    <!-- Panel Inferior Removido a Petición del Usuario -->
 
     <script>
         // Collapsible category handler
@@ -703,12 +702,21 @@
             setTimeout(leerJsDatos, 150);
         }
 
-        // Profile Catalog Custom Dropdown controls
-        let activeCatalog = [];
-        let activeCatalogHash = '';
-        let lastDataHash = '';
-        let currentWireHandle = null; // Track the active wire for cutter commands
+        var isLisp = false;
+        var activeCatalog = [];
+        var activeCatalogHash = "";
+        var currentWireHandle = null;
+        var lastDataHash = "";
+        var isPicking = false; // Flag para pausar el polling durante getpoint
 
+        document.body.addEventListener('mouseenter', function() {
+            if (isPicking) {
+                isPicking = false; // Reanudar polling al volver a la paleta
+                leerJsDatos();
+            }
+        });
+
+        // Profile Catalog Custom Dropdown controls
         function toggleProfileDropdown(event) {
             event.stopPropagation();
             
@@ -852,11 +860,13 @@
             
             // 3. Geometry Properties Table
             document.getElementById('disp-len').innerText = (data.largo_fisico ? data.largo_fisico.toFixed(1) : "0.0") + " mm";
+            document.getElementById('disp-pta').innerText = data.pta ? data.pta : "-";
+            document.getElementById('disp-ptb').innerText = data.ptb ? data.ptb : "-";
             
             document.getElementById('sel-just').disabled = false;
             document.getElementById('sel-rotacion').disabled = false;
-            document.getElementById('btn-build').disabled = false;
-            document.getElementById('btn-flush').disabled = false;
+            document.getElementById('btn-pta').disabled = false;
+            document.getElementById('btn-ptb').disabled = false;
             
             document.getElementById('sel-just').value = data.justificacion ? data.justificacion : "Centro";
             document.getElementById('sel-rotacion').value = data.rotacion !== undefined ? data.rotacion : "0";
@@ -905,6 +915,29 @@
             setTimeout(leerJsDatos, 300);
         }
 
+        // Trigger manual point picking for PT_A or PT_B
+        function pickPoint(ptType) {
+            var handle = document.getElementById('disp-handle').innerText;
+            if (!handle || handle === "-") return;
+            
+            isPicking = true; // PAUSAR POLLING
+            
+            // Usamos evaluateLisp solo para setear variables globales
+            var setVarsCmd = '(setq *tmd-pick-handle* "' + handle + '" *tmd-pick-type* "PT_' + ptType + '")';
+            if (typeof Acad.Editor.evaluateLisp === 'function') {
+                Acad.Editor.evaluateLisp(setVarsCmd);
+            } else {
+                Acad.Editor.executeCommandAsync(setVarsCmd + "\n");
+            }
+            
+            // Luego ejecutamos el comando interactivo para que getpoint no aborte
+            Acad.Editor.executeCommandAsync("TMD_DO_PICK");
+            
+            marcarModificado();
+            // No usamos setTimeout aquí; se reanudará al hacer mouseenter o se puede reanudar con un timer largo
+            setTimeout(function() { isPicking = false; }, 30000); // Failsafe 30s
+        }
+
         // Mark local visual state as modified while LISP regenerates drawing
         function marcarModificado() {
             const fragileBadge = document.getElementById('fragile-badge');
@@ -934,11 +967,13 @@
             fragileBadge.className = "row-badge badge-yellow-soft";
             
             document.getElementById('disp-len').innerText = "- mm";
+            document.getElementById('disp-pta').innerText = "-";
+            document.getElementById('disp-ptb').innerText = "-";
             
             document.getElementById('sel-just').disabled = true;
             document.getElementById('sel-rotacion').disabled = true;
-            document.getElementById('btn-build').disabled = true;
-            document.getElementById('btn-flush').disabled = true;
+            document.getElementById('btn-pta').disabled = true;
+            document.getElementById('btn-ptb').disabled = true;
             
             document.getElementById('disp-cutters').innerHTML = '<span class="cutters-empty">Sin juntas activas</span>';
             
@@ -948,6 +983,8 @@
 
         // Dynamic JSONP CORS-safe refresh loop
         function leerJsDatos() {
+            if (isPicking) return; // No interrumpir comandos interactivos de AutoCAD
+            
             const oldScript = document.getElementById('tmd-query-script');
             if (oldScript) {
                 oldScript.parentNode.removeChild(oldScript);
