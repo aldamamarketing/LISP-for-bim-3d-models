@@ -1,0 +1,186 @@
+/* LispCentral - Estilos Centralizados (AutoCAD Theme) */
+
+:root {
+  --bg-dark: #1e1e1e;
+  --bg-darker: #121212;
+  --bg-card: #2d2d2d;
+  --text-main: #f0f0f0;
+  --text-muted: #aaaaaa;
+  --tmd-orange: #f26d21; /* Naranja corporativo */
+  --tmd-orange-hover: #d95d18;
+  --border-color: #3e3e3e;
+  --font-family: 'Segoe UI', 'Roboto', 'Arial', sans-serif;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  background-color: var(--bg-darker);
+  color: var(--text-main);
+  font-family: var(--font-family);
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+
+header {
+  background-color: var(--bg-dark);
+  padding: 20px 40px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid var(--border-color);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.logo {
+  font-size: 1.5rem;
+  font-weight: bold;
+  letter-spacing: 1px;
+}
+
+.logo span {
+  color: var(--tmd-orange);
+}
+
+.hero {
+  text-align: center;
+  padding: 80px 20px;
+  background: linear-gradient(180deg, var(--bg-darker) 0%, var(--bg-dark) 100%);
+}
+
+.hero h1 {
+  font-size: 3rem;
+  margin-bottom: 20px;
+  font-weight: 300;
+}
+
+.hero p {
+  font-size: 1.2rem;
+  color: var(--text-muted);
+  max-width: 600px;
+  margin: 0 auto 40px;
+}
+
+.btn {
+  display: inline-block;
+  padding: 12px 24px;
+  background-color: var(--tmd-orange);
+  color: #fff;
+  text-decoration: none;
+  font-weight: 600;
+  border-radius: 4px;
+  border: none;
+  cursor: pointer;
+  transition: background-color 0.2s ease, transform 0.1s ease;
+  font-size: 1rem;
+}
+
+.btn:hover {
+  background-color: var(--tmd-orange-hover);
+}
+
+.btn:active {
+  transform: translateY(2px);
+}
+
+.btn-secondary {
+  background-color: transparent;
+  border: 1px solid var(--border-color);
+  color: var(--text-main);
+  margin-left: 10px;
+}
+
+.btn-secondary:hover {
+  background-color: var(--bg-card);
+}
+
+.section {
+  padding: 60px 20px;
+  max-width: 1000px;
+  margin: 0 auto;
+}
+
+.section-title {
+  font-size: 2rem;
+  font-weight: 300;
+  margin-bottom: 40px;
+  text-align: center;
+  border-bottom: 1px solid var(--border-color);
+  padding-bottom: 10px;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 30px;
+}
+
+.card {
+  background-color: var(--bg-card);
+  padding: 30px;
+  border-radius: 6px;
+  border: 1px solid var(--border-color);
+  box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+}
+
+.card h3 {
+  margin-top: 0;
+  color: var(--tmd-orange);
+}
+
+.form-group {
+  margin-bottom: 20px;
+  text-align: left;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 8px;
+  font-weight: 600;
+}
+
+.form-control {
+  width: 100%;
+  padding: 10px;
+  background-color: var(--bg-darker);
+  border: 1px solid var(--border-color);
+  color: var(--text-main);
+  border-radius: 4px;
+  font-family: var(--font-family);
+  box-sizing: border-box;
+}
+
+.form-control:focus {
+  outline: none;
+  border-color: var(--tmd-orange);
+}
+
+#apiKeyResult {
+  margin-top: 20px;
+  padding: 15px;
+  background-color: rgba(242, 109, 33, 0.1);
+  border: 1px dashed var(--tmd-orange);
+  border-radius: 4px;
+  display: none;
+}
+
+.code-snippet {
+  font-family: 'Consolas', 'Courier New', monospace;
+  background-color: var(--bg-darker);
+  padding: 15px;
+  border-radius: 4px;
+  border: 1px solid var(--border-color);
+  color: #a6e22e;
+  overflow-x: auto;
+}
+
+footer {
+  text-align: center;
+  padding: 30px;
+  background-color: var(--bg-dark);
+  border-top: 1px solid var(--border-color);
+  color: var(--text-muted);
+  font-size: 0.9rem;
+}

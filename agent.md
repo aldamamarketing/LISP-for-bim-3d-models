@@ -36,3 +36,7 @@ Para solucionar el parpadeo/cierre abrupto de los dropdowns y la correcta justif
    - Sincronización del rubber-band en `TMD:palette-pick-point` para usar el punto analítico opuesto exacto.
    - Inyección redundante de `"TMD_JUSTIFICACAO"` y `"TMD_ROTACAO"` en LDATA.
 
+## Estado Comercial SaaS (LispCentral MVP)
+- **Infraestructura:** Firebase Functions v2 (Node 20) sirve el LISP en memoria. El cargador AutoCAD (`TMD_Loader.lsp`) ejecuta código en RAM y previene guardado físico local.
+- **Frontend / Landing Page:** Firebase Hosting. Diseño inspirado en el ecosistema Autodesk (oscuro, profesional, fuentes sans-serif limpias) acentuado con el naranja de la paleta TMD. CSS centralizado. Las imágenes de interfaz se alojan en Hosting.
+- **Piloto Automático Actual:** Simular el aprovisionamiento de API Keys para facilitar el testeo de usuarios externos sin frenarse por seguridad IAM estricta. La prioridad es la disponibilidad, la presentación del producto y recibir feedback.

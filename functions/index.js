@@ -17,8 +17,8 @@ exports.getRoutine = onRequest({ cors: true }, async (req, res) => {
     return res.status(400).send("Error: API Key faltante.");
   }
 
-  // MVP: Chave de teste estática
-  if (apiKey !== "lispcentral_test_key") {
+  // MVP: Chave de teste estática ou chaves de Trial simuladas geradas no site
+  if (apiKey !== "lispcentral_test_key" && !apiKey.startsWith("trial_tmd_")) {
     return res.status(401).send("Error: API Key no autorizada.");
   }
 
