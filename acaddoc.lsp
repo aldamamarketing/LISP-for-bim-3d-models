@@ -60,7 +60,6 @@
 (TMD:sys-load "TMD_BUILD.lsp")
 (TMD:sys-load "TMD_JOINTS.lsp")
 (TMD:sys-load "TMD_MATCH.lsp")
-(TMD:sys-load "TMD_Properties.lsp") ; Inspector
 (TMD:sys-load "TMD_Palette_Bridge.lsp")
 (TMD:sys-load "TMD_Tablas.lsp")
 (TMD:sys-load "TMD_Align.lsp")
