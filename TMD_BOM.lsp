@@ -214,10 +214,11 @@
   (while (< i (sslength ss))
     (setq ent (ssname ss i))
     (if (not (member ent wires))
-      (setq wires (append wires (list ent)))
+      (setq wires (cons ent wires))
     )
     (setq i (1+ i))
   )
+  (setq wires (reverse wires))
   
   (setq counter 1)
   (foreach ent wires
@@ -254,10 +255,11 @@
   (while (< i (sslength ss))
     (setq ent (ssname ss i))
     (if (not (member ent wires))
-      (setq wires (append wires (list ent)))
+      (setq wires (cons ent wires))
     )
     (setq i (1+ i))
   )
+  (setq wires (reverse wires))
   
   (foreach ent wires
     (setq pos (vlax-ldata-get ent "TMD_POS"))
@@ -366,7 +368,8 @@
         
         (setq p_list nil)
         ;; Expandir cantidad
-        (repeat qtd (setq p_list (append p_list (list (cons comp pos)))))
+        (repeat qtd (setq p_list (cons (cons comp pos) p_list)))
+        (setq p_list (reverse p_list))
         
         (setq perfilData (assoc perfil dict))
         (if perfilData

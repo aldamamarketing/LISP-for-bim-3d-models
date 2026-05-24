@@ -1,0 +1,3 @@
+## 2024-05-24 - [AutoLISP List Operations: Avoid append in loops]
+**Learning:** Using `(append lst (list item))` inside a loop is an $O(N^2)$ operation, which becomes a significant performance bottleneck for large datasets (e.g., when iterating over many solids in a selection set or iterating over many items in `TMD_BOM.lsp` and `TMD_Align.lsp`).
+**Action:** Always build lists in AutoLISP by prepending elements with `cons` inside loops, which is $O(1)$, and then use `reverse` at the end if order preservation is necessary. This converts an $O(N^2)$ algorithm to $O(N)$ with no loss of readability.
