@@ -1,0 +1,3 @@
+## 2024-05-25 - O(N^2) Performance Anti-Pattern in AutoLISP List Building
+**Learning:** Found a severe performance bottleneck specific to this codebase's architecture where `(append lst (list item))` was used inside loops to build lists (e.g., in `TMD_Align.lsp`). AutoLISP lists are linked lists, so `append` must traverse the entire first list to attach the new element. When done in a loop, this creates an O(N^2) operation which can hang the application for large selection sets (like big alignments).
+**Action:** Always avoid `append` for building lists in loops. Instead, traverse the selection set backwards and build the list using `(cons item lst)` (which is O(1) per step, overall O(N)), or use `(reverse lst)` at the end if forward iteration is necessary.

@@ -112,8 +112,8 @@
 )
 
 (defun TMD:align-execute-ss (ss mode last_count / i ent_list)
-  (setq i 0 ent_list nil)
-  (repeat (sslength ss) (setq ent_list (append ent_list (list (ssname ss i)))) (setq i (1+ i)))
+  (setq i (sslength ss) ent_list nil)
+  (while (> i 0) (setq i (1- i)) (setq ent_list (cons (ssname ss i) ent_list)))
   (cond
     ((member mode '("DIST_H" "DIST_V" "DIST_Z")) (TMD:distribute-execute ent_list mode))
     ((member mode '("GAPH" "GAPV" "GAPZ"))       (TMD:distribute-gap-execute ent_list mode))
@@ -320,8 +320,8 @@
                     (if sub
                       (progn
                         (vla-StartUndoMark doc)
-                        (setq ent_list nil i 0)
-                        (repeat (sslength ss) (setq ent_list (append ent_list (list (ssname ss i)))) (setq i (1+ i)))
+                        (setq i (sslength ss) ent_list nil)
+                        (while (> i 0) (setq i (1- i)) (setq ent_list (cons (ssname ss i) ent_list)))
                         (TMD:distribute-fixed-execute ent_list (strcat "FIX" sub) d)
                         (vla-EndUndoMark doc) (sssetfirst nil ss)))))
                 (princ "\n--- ALIGN ativo. Pressione tecla ou ENTER ---"))
@@ -410,8 +410,8 @@
                 (if sub
                   (progn
                     (vla-StartUndoMark doc)
-                    (setq ent_list nil i 0)
-                    (repeat (sslength ss_final) (setq ent_list (append ent_list (list (ssname ss_final i)))) (setq i (1+ i)))
+                    (setq i (sslength ss_final) ent_list nil)
+                    (while (> i 0) (setq i (1- i)) (setq ent_list (cons (ssname ss_final i) ent_list)))
                     (TMD:distribute-fixed-execute ent_list (strcat "FIX" sub) d)
                     (vla-EndUndoMark doc) (sssetfirst nil ss_final))))))
 
@@ -482,8 +482,8 @@
         (progn
           (setq doc (vla-get-ActiveDocument (vlax-get-acad-object)))
           (vla-StartUndoMark doc)
-          (setq ent_list nil i 0)
-          (repeat (sslength ss) (setq ent_list (append ent_list (list (ssname ss i)))) (setq i (1+ i)))
+          (setq i (sslength ss) ent_list nil)
+          (while (> i 0) (setq i (1- i)) (setq ent_list (cons (ssname ss i) ent_list)))
           (TMD:distribute-fixed-execute ent_list mode d)
           (vla-EndUndoMark doc)
           (sssetfirst nil ss)
