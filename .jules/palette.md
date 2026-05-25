@@ -1,0 +1,3 @@
+## 2026-05-25 - Keyboard and Screen Reader Accessibility in AutoLISP/HTML UIs
+**Learning:** Adding custom div-based UI elements like collapsible headers (`.prop-category-header`) and dropdowns (`.custom-select-trigger`) requires explicit role attributes (`role="button"`), keyboard-tabbing support (`tabindex="0"`), `:focus-visible` states in CSS, and key handlers mapping Space/Enter keys to their click handlers to be properly usable without a mouse. Also, dynamically rendered icon-only buttons need explicit `aria-label` assignments for screen readers, as the title property is not always consistently read natively.
+**Action:** Always add keyboard mapping, focus-visible outlines, roles, and aria-labels when constructing non-native interactive UI elements.

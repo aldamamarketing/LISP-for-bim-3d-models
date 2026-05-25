@@ -147,6 +147,11 @@
             user-select: none;
         }
 
+        .prop-category-header:focus-visible {
+            outline: 2px solid var(--accent-color);
+            outline-offset: -2px;
+        }
+
         .prop-category-header::after {
             content: "▼";
             font-size: 7px;
@@ -254,6 +259,11 @@
 
         .custom-select-trigger:hover {
             border-color: #55556a;
+        }
+
+        .custom-select-trigger:focus-visible {
+            outline: 2px solid var(--accent-color);
+            outline-offset: -2px;
         }
 
         .custom-select-text {
@@ -400,6 +410,11 @@
             gap: 4px;
         }
 
+        .revit-btn:focus-visible {
+            outline: 2px solid var(--accent-color);
+            outline-offset: -2px;
+        }
+
         .revit-btn:hover:not(:disabled) {
             background-color: #3b3b4f;
             border-color: #5d5d78;
@@ -468,6 +483,10 @@
             opacity: 0.6;
             transition: opacity 0.15s, background-color 0.15s;
         }
+        .cutter-btn:focus-visible {
+            outline: 2px solid var(--accent-color);
+            outline-offset: -2px;
+        }
         .cutter-btn:hover {
             opacity: 1;
             background: rgba(255,255,255,0.08);
@@ -491,7 +510,7 @@
     <div class="type-selector-container">
         <div class="type-selector-label">Selector de Tipo / Sección de Viga</div>
         <div class="custom-select-wrapper" id="custom-perfil-container">
-            <div class="custom-select-trigger" id="custom-perfil-trigger" onclick="toggleProfileDropdown(event)">
+            <div class="custom-select-trigger" id="custom-perfil-trigger" role="button" tabindex="0" onclick="toggleProfileDropdown(event)" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();toggleProfileDropdown(event);}">
                 <span class="custom-select-text" id="custom-perfil-text">Selecciona un elemento...</span>
                 <span class="custom-select-arrow">▼</span>
             </div>
@@ -513,7 +532,7 @@
         
         <!-- Category 1: Datos de Identidad -->
         <div class="prop-category" id="cat-identity">
-            <div class="prop-category-header" onclick="toggleCategory('cat-identity')">
+            <div class="prop-category-header" role="button" tabindex="0" aria-expanded="true" onclick="toggleCategory('cat-identity')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();toggleCategory('cat-identity');}">
                 Datos de Identidad
             </div>
             <div class="prop-category-content">
@@ -548,7 +567,7 @@
 
         <!-- Category 2: Geometría y Dimensiones -->
         <div class="prop-category" id="cat-geometry">
-            <div class="prop-category-header" onclick="toggleCategory('cat-geometry')">
+            <div class="prop-category-header" role="button" tabindex="0" aria-expanded="true" onclick="toggleCategory('cat-geometry')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();toggleCategory('cat-geometry');}">
                 Geometría y Dimensiones
             </div>
             <div class="prop-category-content">
@@ -588,7 +607,7 @@
 
         <!-- Category 3: Operaciones BIM -->
         <div class="prop-category" id="cat-construction">
-            <div class="prop-category-header" onclick="toggleCategory('cat-construction')">
+            <div class="prop-category-header" role="button" tabindex="0" aria-expanded="true" onclick="toggleCategory('cat-construction')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();toggleCategory('cat-construction');}">
                 Uniones y Conectores
             </div>
             <div class="prop-category-content">
@@ -626,7 +645,11 @@
         // Collapsible category handler
         function toggleCategory(catId) {
             const cat = document.getElementById(catId);
-            cat.classList.toggle('collapsed');
+            const header = cat.querySelector('.prop-category-header');
+            const isCollapsed = cat.classList.toggle('collapsed');
+            if (header) {
+                header.setAttribute('aria-expanded', !isCollapsed);
+            }
         }
 
         // ────────────────────────────────────────────────────
@@ -886,8 +909,8 @@
                 item.innerHTML = `
                     <span class="cutter-label">${cutTipo} &lt;${cutHandle}&gt;</span>
                     <span class="cutter-actions">
-                        <button class="cutter-btn" title="Localizar junta" onclick="zoomCutter('${wireHandle}','${cutHandle}')">👁️</button>
-                        <button class="cutter-btn cutter-btn-danger" title="Eliminar junta" onclick="removeCutter('${wireHandle}','${cutHandle}')">🗑️</button>
+                        <button class="cutter-btn" title="Localizar junta" aria-label="Localizar junta" onclick="zoomCutter('${wireHandle}','${cutHandle}')">👁️</button>
+                        <button class="cutter-btn cutter-btn-danger" title="Eliminar junta" aria-label="Eliminar junta" onclick="removeCutter('${wireHandle}','${cutHandle}')">🗑️</button>
                     </span>
                 `;
                 container.appendChild(item);
