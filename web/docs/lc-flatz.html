@@ -3,11 +3,11 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Documentação - LispCentral</title>
+  <title>LC_FLATZ - Documentação | LispCentral</title>
   <link rel="stylesheet" href="../styles.css">
+  <meta name="description" content="Zera a coordenada Z de objetos selecionados.">
 </head>
 <body>
-
   <header>
     <div class="logo">Lisp<span>Central</span></div>
     <nav>
@@ -49,34 +49,22 @@
         <li><a href="/docs/lc-autonum.html">AUTONUM</a></li>
       </ul>
     </aside>
-
-    <!-- Content -->
     <main class="docs-content">
       <div class="breadcrumbs">
-        <a href="/">Home</a> &gt; <span>Documentação</span>
+        <a href="/">Home</a> &gt; <a href="/docs/index.html">Documentação</a> &gt; <span>Comandos</span>
       </div>
 
-      <h1>Bem-vindo à Documentação Oficial</h1>
-      <p>A suíte LispCentral (anteriormente TMD) revoluciona a automação no AutoCAD transformando-o num verdadeiro software BIM/3D paramétrico para estruturas metálicas.</p>
+      <h1>LC_FLATZ</h1>
+      <p>Zera a coordenada Z de objetos selecionados.</p>
 
-      <h2>O Novo Paradigma (V5)</h2>
-      <p>Nesta versão 5.0, abandonamos as "linhas base" e polilinhas construtivas. Agora cada sólido 3D (<code>3DSOLID</code>) contém o seu próprio ADN embutido internamente via LDATA.</p>
-      
-      <div class="card" style="margin-top: 30px;">
-        <h3 style="color:var(--tmd-orange);">Vantagens do Novo Sistema</h3>
-        <ul style="line-height:1.8;">
-          <li><b>Edição Direta:</b> Você pode esticar a viga usando os Grips nativos do AutoCAD e os metadados se adaptam automaticamente.</li>
-          <li><b>Nuvem:</b> Os comandos (como <code>LC_JOINTS</code> ou <code>LC_BUILD</code>) não instalam arquivos `.fas` ou `.vlx` no seu HD, eles rodam injetados diretamente na RAM.</li>
-        </ul>
+      <h2>Sintaxe</h2>
+      <div class="cmd-box">
+        Comando: LC_FLATZ
       </div>
 
-      <h2>Navegação</h2>
-      <p>Utilize o menu lateral para explorar a referência completa de comandos disponíveis.</p>
+      <h2>Descrição Detalhada</h2>
+      <p>Move os objetos selecionados para a elevação Z=0. Fundamental para resolver erros de linhas não coplanares ('not coplanar') em plantas baixas 2D.</p>
     </main>
   </div>
-
-  <footer>
-    <p>&copy; 2026 LispCentral. Todos os direitos reservados.</p>
-  </footer>
 </body>
 </html>

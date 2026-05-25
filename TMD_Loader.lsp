@@ -57,5 +57,8 @@
   (princ)
 )
 
-(princ "\n[LispCentral] Carregador online pronto. Digite TMD_LOAD_REMOTE para sincronizar.")
+(princ "\n[LispCentral] Carregador online pronto. Sincronizando com a nuvem...")
 (princ)
+
+;; Executa automaticamente a sincronização ao carregar o arquivo
+(c:TMD_LOAD_REMOTE)

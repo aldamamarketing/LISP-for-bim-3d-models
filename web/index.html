@@ -14,37 +14,61 @@
     <nav>
       <a href="/index.html" class="btn btn-secondary" style="border:none;">Home</a>
       <a href="/docs/index.html" class="btn btn-secondary" style="border:none;">Documentação</a>
+      <a href="/login.html" class="btn btn-secondary" style="border:none; color: var(--tmd-orange);">Portal do Cliente</a>
       <a href="/download.html" class="btn">Testar Grátis</a>
     </nav>
   </header>
 
-  <section class="hero">
-    <h1>Automação Estrutural na Nuvem</h1>
-    <p>Experimente a potência da suíte TMD (agora LC) diretamente no AutoCAD, servida em tempo real e sempre atualizada sem instalações complexas.</p>
-    <a href="/download.html" class="btn">Iniciar Teste Gratuito</a>
-    <a href="/docs/index.html" class="btn btn-secondary">Explorar Comandos</a>
-  </section>
+  <div class="docs-layout">
+    <!-- Sidebar Global -->
+    <aside class="docs-sidebar">
+      <h4>Guia de Início</h4>
+      <ul class="docs-nav">
+        <li><a href="/index.html" class="active">Home</a></li>
+        <li><a href="/docs/index.html">Documentação</a></li>
+        <li><a href="/download.html">Instalação</a></li>
+      </ul>
+      
+      <h4 style="margin-top:20px;">Comandos (LC_)</h4>
+      <ul class="docs-nav">
+        <li><a href="/docs/lc-joints.html">LC_JOINTS</a></li>
+        <li><a href="/docs/lc-build.html">LC_BUILD</a></li>
+        <li><a href="/docs/lc-align.html">LC_ALIGN</a></li>
+        <li><a href="/docs/lc-bom.html">LC_TABLAS</a></li>
+        <li><a href="/docs/lc-sync.html">LC_SYNC</a></li>
+      </ul>
+    </aside>
 
-  <section id="features" class="section">
-    <h2 class="section-title">Por que LispCentral?</h2>
-    <div class="grid">
-      <div class="card">
-        <h3>Sólidos Independentes (V5)</h3>
-        <p>Trabalhe diretamente sobre geometria nativa em 3D (3DSOLID) sem depender de linhas base. Manipulação instantânea com grips nativos do AutoCAD.</p>
-      </div>
-      <div class="card">
-        <h3>Nuvem & Sincronização</h3>
-        <p>O código é carregado dinamicamente na RAM. Esqueça o trabalho de atualizar centenas de máquinas fisicamente. Você sempre terá a última versão.</p>
-      </div>
-      <div class="card">
-        <h3>Desempenho Extremo</h3>
-        <p>Desenvolvido focado no Motor Físico Primeiro. Extrusões, operações booleanas e dados embutidos via LDATA para gestão de metadados BIM.</p>
-      </div>
-    </div>
-  </section>
+    <main class="docs-content" style="padding: 0; max-width: 100%;">
+      <section class="hero" style="background: var(--bg-darker); border-bottom: 1px solid var(--border-color);">
+        <h1>Automação Estrutural na Nuvem</h1>
+        <p>Experimente a potência da suíte LC (LispCentral) diretamente no AutoCAD, servida em tempo real e sempre atualizada sem instalações complexas.</p>
+        <a href="/download.html" class="btn">Iniciar Teste Gratuito</a>
+        <a href="/docs/index.html" class="btn btn-secondary">Explorar Comandos</a>
+      </section>
+
+      <section id="features" class="section">
+        <h2 class="section-title">Por que LispCentral?</h2>
+        <div class="grid">
+          <div class="card">
+            <h3>Sólidos Independentes (V5)</h3>
+            <p>Trabalhe diretamente sobre geometria nativa em 3D (3DSOLID) sem depender de linhas base. Manipulação instantânea com grips nativos do AutoCAD.</p>
+          </div>
+          <div class="card">
+            <h3>Nuvem & Sincronização</h3>
+            <p>O código é carregado dinamicamente na RAM. Esqueça o trabalho de atualizar centenas de máquinas fisicamente. Você sempre terá a última versão.</p>
+          </div>
+          <div class="card">
+            <h3>Desempenho Extremo</h3>
+            <p>Desenvolvido focado no Motor Físico Primeiro. Extrusões, operações booleanas e dados embutidos via LDATA para gestão de metadados BIM.</p>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
 
   <footer>
-    <p>&copy; 2026 LispCentral por TM Digital. Todos os direitos reservados.</p>
+    <p>&copy; 2026 LispCentral. Todos os direitos reservados.</p>
     <p style="margin-top: 10px;">
       <a href="/legal/privacy.html" style="color: var(--text-muted); margin: 0 10px;">Política de Privacidade</a> | 
       <a href="/legal/terms.html" style="color: var(--text-muted); margin: 0 10px;">Termos de Uso</a>

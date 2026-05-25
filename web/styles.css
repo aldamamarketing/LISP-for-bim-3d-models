@@ -286,3 +286,78 @@ footer {
   font-size: 1.1rem;
 }
 
+/* Lista compacta de Suites */
+.suite-details {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.suite-summary {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 15px;
+  cursor: pointer;
+  list-style: none;
+  background: var(--bg-dark);
+  transition: background-color 0.2s;
+}
+
+.suite-summary::-webkit-details-marker {
+  display: none;
+}
+
+.suite-summary:hover {
+  background-color: #333;
+}
+
+.suite-commands {
+  background: var(--bg-card);
+  border-top: 1px solid var(--border-color);
+  display: flex;
+  flex-direction: column;
+}
+
+.cmd-item {
+  display: flex;
+  align-items: baseline;
+  text-decoration: none;
+  padding: 8px 15px;
+  border-bottom: 1px solid var(--bg-darker);
+  color: var(--text-main);
+  transition: background-color 0.2s;
+}
+
+.cmd-item:last-child {
+  border-bottom: none;
+}
+
+.cmd-item:hover {
+  background-color: var(--tmd-orange);
+  color: #fff;
+}
+
+.cmd-item:hover span {
+  color: #fff;
+}
+
+.cmd-item strong {
+  min-width: 100px;
+  color: var(--tmd-orange);
+  font-size: 0.95rem;
+}
+
+.cmd-item:hover strong {
+  color: #fff;
+}
+
+.cmd-item span {
+  color: var(--text-muted);
+  font-size: 0.85rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
