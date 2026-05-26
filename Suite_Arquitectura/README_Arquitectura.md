@@ -1,28 +1,53 @@
-# 🏠 LispCentral - Suite Arquitectura 2D (Blueprint)
+# 🏠 LispCentral - Suite Arquitectura (ARQ)
 
-## 1. Visión del Producto
-Una suite de comandos LISP, controlada por una paleta HTML5 en la nube, diseñada para **acelerar drásticamente el dibujo de planos arquitectónicos 2D** en AutoCAD. Se inspira en plugins masivamente populares como YQArch, pero con esteroides BIM (inyectando LDATA) y sin instalaciones complejas.
+Este directorio alberga las rutinas, stubs y recursos LISP de la **Suite de Arquitectura** de LispCentral. 
 
-## 2. Mapa de Comandos y Herramientas
+---
 
-### A. Muros y Cerramientos Paramétricos
-*   **`LC_WALL_DRAW`**: Dibuja polilíneas dobles (muros) de manera interactiva.
-    *   *SaaS UI:* Selector de espesor (10cm, 15cm, 20cm), material (Ladrillo, Drywall) y justificación (Centro, Izquierda, Derecha).
-    *   *LDATA Inyectado:* `{"Tipo":"Muro", "Espesor": 150, "Material": "Drywall", "Altura_Defecto": 2800}`.
-*   **`LC_WALL_JOIN`**: Limpia automáticamente las intersecciones (T y L) entre muros `LC_WALL` seleccionados.
-*   **`LC_WALL_TO_3D`**: (Bonus) Un botón en la web que lee el LDATA de todos los muros 2D y los extruye a su "Altura_Defecto", generando un borrador 3D al instante.
+## 1. Visión y Fundamentos (Sala Blanca YQArch)
+Nuestra suite de arquitectura se basa en una **sala blanca (clean room)** de las funcionalidades más potentes del plugin **YQArch**, adaptándolas al estándar de la industria y al motor SaaS de LispCentral:
 
-### B. Esquadrías (Puertas y Ventanas)
-*   **`LC_DOOR_INSERT`**: Inserta un bloque dinámico de puerta y **corta/ajusta automáticamente el muro (polilínea doble)** en el que se inserta.
-    *   *SaaS UI:* Selector de ancho de hoja (70cm, 80cm, 90cm) y sentido de apertura.
-*   **`LC_WIN_INSERT`**: Inserta ventana, cortando muro y dibujando el antepecho.
+* **Comandos de la Mano Izquierda**: Diseñados para que el usuario opere el teclado de manera ágil, pero utilizando **nombres descriptivos y semánticos** en lugar de atajos ultracortos difíciles de recordar.
+* **Organización Semántica**: Todo el código se modulariza bajo la convención:
+  `ARQ-[Sistema]-[ComandoDescriptivo]`
+  Cada archivo `.lsp` de esta carpeta corresponde exactamente a un comando cargado bajo demanda (**JIT Loading**), permitiendo actualizaciones transparentes desde la nube.
+* **Sin Reactores Complejos**: La automatización geométrica (como el corte y reparación de muros al mover vanos) se realiza mediante comandos interactivos síncronos en LISP, descartando reactores de eventos (`vlr-...`) que suelen corromper dibujos o ralentizar el motor de AutoCAD.
+* **Integración Contextual de Paletas**: La interacción se compone de dos interfaces web:
+  1. **Paleta de Comandos**: Listado y búsqueda Spotlight de herramientas.
+  2. **Paleta de Propiedades Contextual**: Se actualiza automáticamente mostrando parámetros del comando en ejecución.
 
-### C. Anotación y Áreas (Rotulación Inteligente)
-*   **`LC_ROOM_TAG`**: El usuario hace clic dentro de un espacio cerrado (ej. un dormitorio delimitado por muros). El comando hace un *Boundary* automático, calcula el área, y coloca un texto (ej. "Dormitorio - 12.50 m²").
-    *   *LDATA:* El texto guarda el link al Boundary. Si el usuario mueve un muro y re-ejecuta el comando, el área se actualiza.
+---
 
-## 3. Arquitectura LISP + UI
-- En lugar de reescribir rutinas DCL de miles de líneas (como hace YQArch), la lógica UI vive en React o Vanilla JS en el servidor LispCentral.
-- Las macros pesadas de AutoCAD se envían usando `Acad.Editor.executeCommand`.
+## 2. Estado Actual (Fase 1: Stubs & Conexión Contextual)
+Actualmente, el proyecto se encuentra en la **Fase 1**:
+- Se ha reestructurado por completo el repositorio, moviendo todas las rutinas de arquitectura a este directorio.
+- Se han creado **15 archivos de stubs JIT** para los comandos core. Al invocarse en AutoCAD, imprimen el inicio de ejecución y envían el ID a la Paleta de Propiedades para actualizar el formulario del usuario.
 
-*(Revisa el código en esta carpeta para ver la implementación conceptual)*
+### Mapa de Comandos y Archivos en esta Carpeta:
+* **`ARQ-SYS-Config.lsp`**: Configuración global de dibujo (unidades, capas automáticas y escalas).
+* **`ARQ-GRID-Axes.lsp`**: Generación de rejillas de ejes paramétricos.
+* **`ARQ-GRID-Line.lsp`**: Trazado y etiquetado de ejes individuales.
+* **`ARQ-WALL-Draw.lsp`**: Dibujo de muros paralelos interactivos.
+* **`ARQ-WALL-FromAxis.lsp`**: Conversión instantánea de ejes seleccionados a muros.
+* **`ARQ-WALL-Thickness.lsp`**: Cambio rápido del grosor de las paredes seleccionadas.
+* **`ARQ-WALL-Trim.lsp`**: Limpieza de solapes en esquinas e intersecciones (T, L, Cruz).
+* **`ARQ-COL-Insert.lsp`**: Inserción de columnas en cruces de ejes o puntos.
+* **`ARQ-DOOR-Insert.lsp`**: Inserción de puertas con corte automático de muros.
+* **`ARQ-WIN-Insert.lsp`**: Inserción de ventanas con corte automático de muros.
+* **`ARQ-WALL-MoveOpening.lsp`**: Mover puertas/ventanas sanando la pared anterior de forma interactiva.
+* **`ARQ-WALL-ResizeOpening.lsp`**: Modificar dimensiones de vanos existentes.
+* **`ARQ-DIM-Opening.lsp`**: Acotado secuencial continuo de muros y vanos.
+* **`ARQ-DIM-Quick.lsp`**: Acotación interior automática de cuartos.
+* **`ARQ-SYM-Level.lsp`**: Simbología de niveles de piso dinámica.
+
+---
+
+## 3. Plan de Desarrollo Futuro para esta Suite
+El desarrollo de las funcionalidades geométricas se realizará en fases secuenciales:
+
+* **Fase 2: Geometría de Ejes y Muros**:
+  Implementar la lógica real para dibujar el grid de ejes (`ARQ-GRID-Axes`) a partir de distancias y levantar muros dobles (`ARQ-WALL-Draw`) autolimpiables.
+* **Fase 3: Algoritmos de Vanos**:
+  Implementar la inserción de puertas y ventanas paramétricas, y la rutina interactiva de movimiento (`ARQ-WALL-MoveOpening`) encargada de soldar las polilíneas de la pared vieja y cortar el vano en la nueva coordenada.
+* **Fase 4: Anotación y Cotas**:
+  Desarrollar el acotado continuo inteligente de muros y vanos (`ARQ-DIM-Opening`) leyendo las coordenadas de inserción de los bloques dentro de los vectores del muro.
