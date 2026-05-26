@@ -3,18 +3,19 @@ let modulesData = []; // Caché de módulos cargados
 let favorites = JSON.parse(localStorage.getItem('lisp_central_favorites') || '[]');
 let searchTags = [];
 
-const GROUP_EMOJIS = {
-  "Estruturas (Pro)": "🏗️",
-  "BIM / Coordenação": "📐",
-  "BIM / Anotação": "🏷️",
-  "BIM / Propriedades": "📋",
-  "Quantidades": "📊",
-  "Fabricação (Pro)": "⚙️",
-  "Arquitetura": "🏠",
-  "Topografia": "🗺️",
-  "Sistema / Core": "💻",
-  "Comando Geral": "⚡",
-  "Outros": "🔧"
+const GROUP_ICONS = {
+  "Estruturas (Pro)": `<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="2" width="12" height="12" rx="1"/><line x1="2" y1="6" x2="14" y2="6"/><line x1="2" y1="10" x2="14" y2="10"/><line x1="6" y1="2" x2="6" y2="14"/><line x1="10" y1="2" x2="10" y2="14"/></svg>`,
+  "BIM / Coordenação": `<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M14 4.5L8 1.5L2 4.5L8 7.5L14 4.5Z"/><path d="M2 11.5L8 14.5L14 11.5"/><path d="M2 8L8 11L14 8"/></svg>`,
+  "BIM / Anotação": `<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M14 4.5L8 1.5L2 4.5L8 7.5L14 4.5Z"/><path d="M2 11.5L8 14.5L14 11.5"/><path d="M2 8L8 11L14 8"/></svg>`,
+  "BIM / Propriedades": `<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M14 4.5L8 1.5L2 4.5L8 7.5L14 4.5Z"/><path d="M2 11.5L8 14.5L14 11.5"/><path d="M2 8L8 11L14 8"/></svg>`,
+  "Quantidades": `<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><line x1="3" y1="13" x2="3" y2="3"/><line x1="3" y1="13" x2="13" y2="13"/><rect x="5" y="7" width="2" height="6" fill="currentColor"/><rect x="9" y="4" width="2" height="9" fill="currentColor"/></svg>`,
+  "Fabricação (Pro)": `<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="8" cy="8" r="2.5"/><path d="M8 1v2M8 13v2M1 8h2M13 8h2M3.05 3.05l1.41 1.41M11.54 11.54l1.41 1.41M3.05 12.95l1.41-1.41M11.54 4.46l1.41-1.41"/></svg>`,
+  "Arquitetura": `<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 14V7l6-4 6 4v7H2z"/><path d="M6 14V10h4v4h-4z"/></svg>`,
+  "Arquitetura 2D": `<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 14V7l6-4 6 4v7H2z"/><path d="M6 14V10h4v4h-4z"/></svg>`,
+  "Topografia": `<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="8" cy="8" r="6"/><path d="M8 2v12M2 8h12"/></svg>`,
+  "Sistema / Core": `<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M5 13l-3-3 3-3M11 13l3-3-3-3M8 4l-2 8"/></svg>`,
+  "Comando Geral": `<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M5 13l-3-3 3-3M11 13l3-3-3-3M8 4l-2 8"/></svg>`,
+  "Outros": `<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="8" cy="8" r="7"/><path d="M8 4v4l2.5 1.5"/></svg>`
 };
 
 
@@ -28,6 +29,98 @@ const BASE_ENDPOINT = "https://getroutine-wgpjjgorxa-uc.a.run.app/getRoutine";
 
 // Mapeo detallado de metadatos para visualización y documentación
 const METADATA_MAP = {
+  // Arquitetura 2D (Suite Semántica)
+  "ARQ-SYS-Config": {
+    friendly: "Configurar Suite",
+    desc: "Ajuste de capas, unidades, colores y escalas del sistema.",
+    group: "Arquitetura 2D",
+    doc: "#"
+  },
+  "ARQ-GRID-Axes": {
+    friendly: "Ejes de Rejilla",
+    desc: "Crea una rejilla de ejes paramétrica con distancias X/Y.",
+    group: "Arquitetura 2D",
+    doc: "#"
+  },
+  "ARQ-GRID-Line": {
+    friendly: "Trazar Eje",
+    desc: "Dibuja una línea de eje individual y le asocia burbuja.",
+    group: "Arquitetura 2D",
+    doc: "#"
+  },
+  "ARQ-WALL-Draw": {
+    friendly: "Diseñar Muros",
+    desc: "Dibuja muros dobles paralelos con grosor interactivo.",
+    group: "Arquitetura 2D",
+    doc: "#"
+  },
+  "ARQ-WALL-FromAxis": {
+    friendly: "Muros desde Ejes",
+    desc: "Convierte automáticamente líneas de ejes seleccionadas a muros.",
+    group: "Arquitetura 2D",
+    doc: "#"
+  },
+  "ARQ-WALL-Thickness": {
+    friendly: "Grosor de Muro",
+    desc: "Permite cambiar el grosor de las paredes seleccionadas.",
+    group: "Arquitetura 2D",
+    doc: "#"
+  },
+  "ARQ-WALL-Trim": {
+    friendly: "Limpieza de Muros",
+    desc: "Resuelve y limpia intersecciones de muros en T, L o Cruz.",
+    group: "Arquitetura 2D",
+    doc: "#"
+  },
+  "ARQ-COL-Insert": {
+    friendly: "Insertar Columnas",
+    desc: "Coloca columnas en cruces de ejes o de manera libre.",
+    group: "Arquitetura 2D",
+    doc: "#"
+  },
+  "ARQ-DOOR-Insert": {
+    friendly: "Insertar Puertas",
+    desc: "Añade una puerta en un muro rompiendo la pared automáticamente.",
+    group: "Arquitetura 2D",
+    doc: "#"
+  },
+  "ARQ-WIN-Insert": {
+    friendly: "Insertar Ventanas",
+    desc: "Añade una ventana en un muro rompiendo la pared automáticamente.",
+    group: "Arquitetura 2D",
+    doc: "#"
+  },
+  "ARQ-WALL-MoveOpening": {
+    friendly: "Mover Vanos",
+    desc: "Mueve una puerta o ventana reparando la pared atrás de forma interactiva.",
+    group: "Arquitetura 2D",
+    doc: "#"
+  },
+  "ARQ-WALL-ResizeOpening": {
+    friendly: "Redimensionar Vanos",
+    desc: "Permite modificar el ancho de vanos y regenera el corte de muro.",
+    group: "Arquitetura 2D",
+    doc: "#"
+  },
+  "ARQ-DIM-Opening": {
+    friendly: "Acotado de Vanos",
+    desc: "Acota de forma lineal y secuencial muros y vanos indicados.",
+    group: "Arquitetura 2D",
+    doc: "#"
+  },
+  "ARQ-DIM-Quick": {
+    friendly: "Cota de Habitación",
+    desc: "Acotación automática de las distancias interiores de un cuarto.",
+    group: "Arquitetura 2D",
+    doc: "#"
+  },
+  "ARQ-SYM-Level": {
+    friendly: "Simbología de Nivel",
+    desc: "Inserta marcas de nivel de piso con altura editable.",
+    group: "Arquitetura 2D",
+    doc: "#"
+  },
+
   // Estruturas (Pro)
   "TMD_JOINTS": {
     friendly: "Ligações Metálicas",
@@ -273,6 +366,7 @@ const METADATA_MAP = {
 
 // Orden de visualización de los grupos
 const GROUP_ORDER = [
+  "Arquitetura 2D",
   "Estruturas (Pro)",
   "BIM / Coordenação",
   "BIM / Anotação",
@@ -395,7 +489,7 @@ function renderFavorites() {
     item.id = `fav-${mod.name}`;
     item.title = mod.desc;
     
-    const emoji = GROUP_EMOJIS[mod.group] || "🔧";
+    const icon = GROUP_ICONS[mod.group] || "🔧";
     const docsBtnHtml = mod.doc && mod.doc !== "#" 
       ? `<a class="docs-btn" href="https://lispcentral.web.app/docs/${mod.doc}" target="_blank" onclick="event.stopPropagation();" title="Ver documentação">?</a>`
       : "";
@@ -403,22 +497,16 @@ function renderFavorites() {
     const pinBtnHtml = `<button class="pin-btn pinned" onclick="event.stopPropagation(); togglePin('${mod.name}');" title="Desafixar">📌</button>`;
     
     item.innerHTML = `
-      <div class="module-header-row">
-        <div class="module-title-wrapper">
-          <span class="module-emoji">${emoji}</span>
+      <div class="module-info-col">
+        <div class="module-name-wrapper">
+          <span class="module-icon-container">${icon}</span>
           <span class="module-name">${mod.name}</span>
         </div>
-        <div class="module-actions">
-          ${docsBtnHtml}
-          ${pinBtnHtml}
-          <div class="module-status">
-            <span class="status-dot"></span>
-          </div>
-        </div>
-      </div>
-      <div class="module-details">
         <span class="module-friendly-name">${mod.friendly}</span>
-        <span class="module-desc">${mod.desc}</span>
+      </div>
+      <div class="module-actions-col">
+        ${pinBtnHtml}
+        ${docsBtnHtml}
       </div>
     `;
     
@@ -529,7 +617,7 @@ function renderModules() {
       item.title = mod.desc;
       
       const isPinned = favorites.includes(mod.name);
-      const emoji = GROUP_EMOJIS[mod.group] || "🔧";
+      const icon = GROUP_ICONS[mod.group] || "🔧";
       const docsBtnHtml = mod.doc && mod.doc !== "#" 
         ? `<a class="docs-btn" href="https://lispcentral.web.app/docs/${mod.doc}" target="_blank" onclick="event.stopPropagation();" title="Ver documentação">?</a>`
         : "";
@@ -537,22 +625,16 @@ function renderModules() {
       const pinBtnHtml = `<button class="pin-btn ${isPinned ? 'pinned' : ''}" onclick="event.stopPropagation(); togglePin('${mod.name}');" title="${isPinned ? 'Desafixar' : 'Fixar no topo'}">📌</button>`;
       
       item.innerHTML = `
-        <div class="module-header-row">
-          <div class="module-title-wrapper">
-            <span class="module-emoji">${emoji}</span>
+        <div class="module-info-col">
+          <div class="module-name-wrapper">
+            <span class="module-icon-container">${icon}</span>
             <span class="module-name">${mod.name}</span>
           </div>
-          <div class="module-actions">
-            ${docsBtnHtml}
-            ${pinBtnHtml}
-            <div class="module-status">
-              <span class="status-dot"></span>
-            </div>
-          </div>
-        </div>
-        <div class="module-details">
           <span class="module-friendly-name">${mod.friendly}</span>
-          <span class="module-desc">${mod.desc}</span>
+        </div>
+        <div class="module-actions-col">
+          ${pinBtnHtml}
+          ${docsBtnHtml}
         </div>
       `;
       
