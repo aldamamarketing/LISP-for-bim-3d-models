@@ -87,12 +87,30 @@
   (princ)
 )
 
+;; Mapeamento de nome de arquivo para o comando real definido em LISP
+(defun LC:get-command-name (routine_name / r-upper)
+  (setq r-upper (strcase routine_name))
+  (cond
+    ((= r-upper "ABAPARAM") "ABA_PARAM")
+    ((= r-upper "ABAPERFIL") "ABA_PERFIL")
+    ((= r-upper "ACMMVP") "ACM")
+    ((= r-upper "ACMTOOLS") "ABA_CRIAR")
+    ((= r-upper "CORTARPAREDES") "CORTARPAREDE")
+    ((= r-upper "ESTRUTURAMVP") "VIGA")
+    ((= r-upper "PAREDEMVP") "PAREDE")
+    ((= r-upper "PORTAMVP") "PORTA")
+    ((= r-upper "TEJADOMVP") "TELHADO")
+    (t routine_name)
+  )
+)
+
 ;; Funcao para rodar um comando garantindo que esteja carregado
-(defun LC:run-or-load (routine_name / cmd-sym)
-  (setq cmd-sym (read (strcat "c:" routine_name)))
+(defun LC:run-or-load (routine_name / cmd-name cmd-sym)
+  (setq cmd-name (LC:get-command-name routine_name))
+  (setq cmd-sym (read (strcat "c:" cmd-name)))
   (if (not (eval (list 'type cmd-sym)))
     (progn
-      (princ (strcat "\n[LispCentral] Comando '" routine_name "' nao esta na RAM. Carregando..."))
+      (princ (strcat "\n[LispCentral] Comando '" cmd-name "' nao esta na RAM. Carregando..."))
       (LC:load-remote-routine routine_name)
     )
   )
@@ -100,7 +118,7 @@
     (progn
       (eval (list cmd-sym))
     )
-    (alert (strcat "\n[❌] Erro: Nao foi possivel carregar o comando: " routine_name))
+    (alert (strcat "\n[❌] Erro: Nao foi possivel carregar o comando: " cmd-name))
   )
   (princ)
 )

@@ -398,10 +398,8 @@ function renderModules() {
         
       item.innerHTML = `
         <div class="module-info">
-          <div class="module-name-row">
-            <span class="module-name">${mod.name}</span>
-            <span class="module-friendly-name">${mod.friendly}</span>
-          </div>
+          <span class="module-name">${mod.name}</span>
+          <span class="module-friendly-name">${mod.friendly}</span>
           <span class="module-desc">${mod.desc}</span>
         </div>
         <div class="module-actions">
@@ -480,14 +478,14 @@ function filterModules(query) {
 // Inter-Process Communication (IPC): Carga una rutina en AutoCAD mediante LISP y sondea USERS1
 function loadRoutineViaLisp(name) {
   return new Promise((resolve, reject) => {
-    if (typeof Acad === 'undefined' || !Acad.SystemVariableCollection) {
+    if (typeof Acad === 'undefined' || !Acad.Editor || !Acad.Editor.getSystemVariable) {
       // Simulación de carga asíncrona fuera de AutoCAD (entorno web)
       setTimeout(resolve, 150);
       return;
     }
     
     // 1. Limpiar la variable USERS1
-    Acad.SystemVariableCollection.set("USERS1", "").then(() => {
+    Acad.Editor.setSystemVariable("USERS1", "").then(() => {
       // 2. Invocar la función nativa LISP de descarga y evaluación en RAM
       Acad.Editor.executeCommand(`(LC:load-remote-routine "${name}")`);
       
@@ -497,7 +495,7 @@ function loadRoutineViaLisp(name) {
       const interval = setInterval(() => {
         attempts++;
         
-        Acad.SystemVariableCollection.get("USERS1").then((val) => {
+        Acad.Editor.getSystemVariable("USERS1").then((val) => {
           if (val === `${name}:success`) {
             clearInterval(interval);
             resolve();

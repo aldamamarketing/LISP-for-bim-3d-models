@@ -27,15 +27,19 @@
       padding: 0;
     }
 
+    html, body {
+      height: 100vh;
+      overflow: hidden;
+    }
+
     body {
       font-family: 'Outfit', sans-serif;
       background: var(--bg-gradient);
       color: var(--text-main);
-      min-height: 100vh;
       display: flex;
       flex-direction: column;
-      padding: 16px;
-      overflow-x: hidden;
+      padding: 12px;
+      box-sizing: border-box;
     }
 
     /* Estilo de la Barra de Búsqueda Premium (Spotlight Style) */
@@ -144,15 +148,9 @@
       display: flex;
       flex-direction: column;
       gap: 6px;
-      flex-grow: 1;
+      flex: 1;
       overflow-y: auto;
-      max-height: calc(100vh - 120px);
       padding-right: 4px;
-      transition: max-height 0.6s cubic-bezier(0.4, 0, 0.2, 1);
-    }
-
-    .status-panel.hidden ~ .modules-list {
-      max-height: calc(100vh - 80px);
     }
 
     /* Scrollbar Personalizado */
