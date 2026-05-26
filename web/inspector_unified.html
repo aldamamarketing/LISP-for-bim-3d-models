@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>LispCentral Command Palette</title>
+  <!-- Google Fonts Outfit -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;700&display=swap" rel="stylesheet">
+  
+  <style>
+    :root {
+      --bg-gradient: linear-gradient(135deg, #111424 0%, #060814 100%);
+      --panel-bg: rgba(255, 255, 255, 0.03);
+      --panel-border: rgba(255, 255, 255, 0.06);
+      --accent-color: #ffd700; /* Dorado Premium */
+      --accent-glow: rgba(255, 215, 0, 0.2);
+      --text-main: #f3f4f6;
+      --text-muted: #9ca3af;
+      --success-color: #10b981;
+      --error-color: #ef4444;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Outfit', sans-serif;
+      background: var(--bg-gradient);
+      color: var(--text-main);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      padding: 16px;
+      overflow-x: hidden;
+    }
+
+    /* Estilo de la Barra de Búsqueda Premium (Spotlight Style) */
+    .search-container {
+      position: relative;
+      margin-bottom: 20px;
+    }
+
+    .search-input {
+      width: 100%;
+      padding: 12px 16px 12px 42px;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--panel-border);
+      border-radius: 12px;
+      color: var(--text-main);
+      font-family: 'Outfit', sans-serif;
+      font-size: 15px;
+      outline: none;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.3);
+    }
+
+    .search-input:focus {
+      border-color: var(--accent-color);
+      background: rgba(255, 255, 255, 0.08);
+      box-shadow: 0 0 15px var(--accent-glow), inset 0 2px 4px rgba(0, 0, 0, 0.2);
+    }
+
+    .search-icon {
+      position: absolute;
+      left: 14px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 18px;
+      height: 18px;
+      fill: var(--text-muted);
+      transition: fill 0.3s ease;
+      pointer-events: none;
+    }
+
+    .search-input:focus + .search-icon {
+      fill: var(--accent-color);
+    }
+
+    /* Estatus de la Carga Asíncrona */
+    .status-panel {
+      background: var(--panel-bg);
+      border: 1px solid var(--panel-border);
+      border-radius: 14px;
+      padding: 16px;
+      margin-bottom: 20px;
+      backdrop-filter: blur(10px);
+      transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+      max-height: 100px;
+      opacity: 1;
+      overflow: hidden;
+    }
+
+    .status-panel.hidden {
+      max-height: 0;
+      opacity: 0;
+      padding: 0;
+      margin-bottom: 0;
+      border: none;
+    }
+
+    .status-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+    }
+
+    .status-title {
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .status-value {
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--accent-color);
+    }
+
+    .progress-bar-container {
+      width: 100%;
+      height: 6px;
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 3px;
+      overflow: hidden;
+    }
+
+    .progress-bar-fill {
+      width: 0%;
+      height: 100%;
+      background: linear-gradient(90deg, var(--accent-color) 0%, #ff8c00 100%);
+      box-shadow: 0 0 10px var(--accent-glow);
+      transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    /* Módulos en la Lista */
+    .modules-list {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      flex-grow: 1;
+      overflow-y: auto;
+      max-height: calc(100vh - 120px);
+      padding-right: 4px;
+      transition: max-height 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .status-panel.hidden ~ .modules-list {
+      max-height: calc(100vh - 80px);
+    }
+
+    /* Scrollbar Personalizado */
+    .modules-list::-webkit-scrollbar {
+      width: 6px;
+    }
+    .modules-list::-webkit-scrollbar-track {
+      background: transparent;
+    }
+    .modules-list::-webkit-scrollbar-thumb {
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 3px;
+    }
+
+    /* Cabeceras de Agrupamiento */
+    .group-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 12px 4px 4px 4px;
+      margin-top: 10px;
+    }
+
+    .group-header span:first-child {
+      font-size: 10px;
+      font-weight: 700;
+      color: var(--accent-color);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      border-left: 2px solid var(--accent-color);
+      padding-left: 6px;
+    }
+
+    .group-count {
+      font-size: 9px;
+      font-weight: 700;
+      background: rgba(255, 215, 0, 0.08);
+      color: var(--accent-color);
+      border: 1px solid rgba(255, 215, 0, 0.15);
+      padding: 1px 5px;
+      border-radius: 6px;
+    }
+
+    .group-container {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      margin-top: 4px;
+    }
+
+    .module-item {
+      background: rgba(255, 255, 255, 0.02);
+      border: 1px solid var(--panel-border);
+      border-radius: 8px;
+      padding: 6px 10px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      transition: all 0.2s ease;
+      cursor: pointer;
+    }
+
+    .module-item:hover {
+      background: rgba(255, 255, 255, 0.05);
+      border-color: rgba(255, 215, 0, 0.3);
+      transform: translateY(-1px);
+    }
+
+    .module-info {
+      display: flex;
+      flex-direction: column;
+      gap: 1px;
+      flex-grow: 1;
+    }
+
+    .module-name-row {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .module-name {
+      font-family: monospace;
+      font-size: 11px;
+      font-weight: bold;
+      color: var(--text-main);
+    }
+
+    .module-friendly-name {
+      font-size: 11px;
+      color: var(--accent-color);
+      font-weight: 500;
+    }
+
+    .module-desc {
+      font-size: 10px;
+      color: var(--text-muted);
+      line-height: 1.25;
+    }
+
+    .module-actions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .docs-btn {
+      background: transparent;
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      color: var(--text-muted);
+      font-family: 'Outfit', sans-serif;
+      font-size: 10px;
+      padding: 4px 8px;
+      border-radius: 6px;
+      cursor: pointer;
+      text-transform: uppercase;
+      transition: all 0.2s ease;
+    }
+
+    .docs-btn:hover {
+      border-color: var(--accent-color);
+      color: var(--accent-color);
+      background: rgba(255, 215, 0, 0.05);
+    }
+
+    .module-status {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .status-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: var(--text-muted);
+      box-shadow: 0 0 5px rgba(255, 255, 255, 0.2);
+    }
+
+    /* Estados de Carga */
+    .module-item.loading .status-dot {
+      background: var(--accent-color);
+      box-shadow: 0 0 10px var(--accent-color);
+      animation: pulse 1.2s infinite ease-in-out;
+    }
+
+    .module-item.success .status-dot {
+      background: var(--success-color);
+      box-shadow: 0 0 10px var(--success-color);
+    }
+
+    .module-item.error .status-dot {
+      background: var(--error-color);
+      box-shadow: 0 0 10px var(--error-color);
+    }
+
+    @keyframes pulse {
+      0%, 100% { transform: scale(1); opacity: 0.6; }
+      50% { transform: scale(1.3); opacity: 1; }
+    }
+
+    /* Reset/Footer */
+    .palette-footer {
+      margin-top: auto;
+      padding-top: 16px;
+      font-size: 11px;
+      color: var(--text-muted);
+      text-align: center;
+      border-top: 1px solid var(--panel-border);
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Spotlight Search -->
+  <div class="search-container">
+    <input type="text" class="search-input" id="searchInput" placeholder="Buscar comando ou ferramenta...">
+    <svg class="search-icon" viewBox="0 0 24 24">
+      <path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/>
+    </svg>
+  </div>
+
+  <!-- Estatus del Sincronizador -->
+  <div class="status-panel">
+    <div class="status-header">
+      <span class="status-title">Sincronizando RAM</span>
+      <span class="status-value" id="progressVal">0%</span>
+    </div>
+    <div class="progress-bar-container">
+      <div class="progress-bar-fill" id="progressBar"></div>
+    </div>
+  </div>
+
+  <!-- Lista de Comandos -->
+  <div class="modules-list" id="modulesList">
+    <!-- Carga inicial dinámica vía JavaScript -->
+  </div>
+
+  <div class="palette-footer">
+    LISPCENTRAL CLOUD COMMAND PALETTE v3.4
+  </div>
+
+  <!-- Carga del Puente JavaScript -->
+  <script src="palette_unified.js"></script>
+</body>
+</html>

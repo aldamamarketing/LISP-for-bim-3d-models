@@ -17,26 +17,21 @@ Se ha abandonado el concepto de `TMD_PARENT_WIRE` y polilíneas base ("Wires"). 
    - **Reconstrucciones de Código:** Cuando el código destruye y recrea la viga para cambiar el perfil o la longitud, el código arrastra el `TMD_UUID` original al nuevo sólido y sobreescribe deliberadamente el `TMD_HOST_HANDLE` para que la entidad no sea tratada como un clon.
 5. **Simplificación:** Para evitar bloqueos, las rutinas de dibujo interactivo deben asegurar que el sistema no intente crear geometrías con distancia 0.
 
-## Módulos Afectados Recientemente
-- `TMD_Wires.lsp`: Controla el trazado interactivo (`c:TMD_WIRES`). Se actualizó para delegar la reconstrucción directamente en el motor sin reciclar bounding boxes (previniendo así derivas en rotación y justificación). Se aisló del sistema de niveles temporalmente para evitar fallos.
-- `TMD_Vigas.lsp`: Contiene el motor `TMD:viga-build-geom` que interpreta el "ADN" y dibuja las extrusiones y cajas (`j2:bx`, `j2:cyl`, `j2:pline`).
-- `TMD_Palette_Bridge.lsp`: Modificado para integrar el sistema de identidad persistente UUID y Handle Shadowing. Ahora listo para incorporar el cálculo preciso de la línea analítica y re-normalización de justificación.
-- `web/inspector.html`: Actualizado con el deduplicador de datos para evitar repoblaciones innecesarias del catálogo, reduciendo el parpadeo.
+## Arquitectura de Carga y Sincronización SaaS (Versión 3.5)
+Para lograr un arranque "Zero Friction" en AutoCAD y garantizar máxima seguridad y velocidad de red, el flujo se migró a un modelo **Index-Driven asíncrono gestionado por Chromium**:
 
-## Estado de la Refactorización Planeada (Menús y Justificación)
-Para solucionar el parpadeo/cierre abrupto de los dropdowns y la correcta justificación del sólido (LDATA y movimiento físico), se han diseñado las siguientes estrategias que quedan listas para ejecución:
+1. **Arranque instantáneo:** El cargador LISP local (`LC_Loader.lsp`) no realiza descargas de red al iniciar AutoCAD. Únicamente registra y ejecuta el comando `CP1` (Command Palette), liberando la consola inmediatamente.
+2. **Command Palette (`web/inspector_unified.html`):** Es una paleta lateral unificada premium (glassmorphism oscuro, estilo "Spotlight" de búsqueda) que corre sobre el motor Chromium nativo de AutoCAD.
+3. **Carga en segundo plano asíncrona:** 
+   - Al cargarse la paleta, esta lee los parámetros seguros de la URL (`apiKey` y `hwId`) y realiza una única petición HTTP a `/getRoutine?routine=INDEX` para obtener la lista de comandos disponibles.
+   - Usando `fetch` asíncrono y en paralelo (`Promise.all`), la paleta descarga cada rutina directamente del servidor y las evalúa en la RAM usando el objeto de AutoCAD: `Acad.Editor.executeCommand(lispCode)`.
+   - Se muestra un feedback visual interactivo del porcentaje de carga y los comandos disponibles.
+4. **Inmunidad a Fallos en RAM:** La evaluación del código en AutoCAD se encapsula de forma aislada dentro de un bloque `(vl-catch-all-apply '(lambda () (eval (read ...))))`. Si un archivo específico tiene un error de balance de paréntesis en su sintaxis (como ocurría en `AbaParam`), el cargador lo reporta en consola pero continúa cargando los demás módulos de forma transparente.
 
-1. **Inspector Web (`web/inspector.html`):**
-   - Pausa de `leerJsDatos()` cuando el usuario tiene el catálogo abierto o campos `SELECT`/`INPUT` enfocados.
-   - Alineación de los valores de justificación a los códigos nativos estructurales (`"MC"`, `"TC"`, `"BC"`, `"ML"`, `"MR"`).
-2. **Puente y Geometría (`TMD_Palette_Bridge.lsp` & `TMD_Vigas.lsp`):**
-   - Función `TMD:normalize-just` para normalizar strings legacy.
-   - Función `TMD:get-analytical-line` para extraer con exactitud el eje de inserción original desde el sólido 3D de forma local (deshaciendo el desfase de la justificación anterior).
-   - Reconstrucción de la viga en `TMD:palette-update-param` usando la línea analítica, lo que permite que el sólido se desplace físicamente al cambiar la justificación, y crezca simétricamente al cambiar de perfil.
-   - Sincronización del rubber-band en `TMD:palette-pick-point` para usar el punto analítico opuesto exacto.
-   - Inyección redundante de `"TMD_JUSTIFICACAO"` y `"TMD_ROTACAO"` en LDATA.
-
-## Estado Comercial SaaS (LispCentral MVP)
-- **Infraestructura:** Firebase Functions v2 (Node 20) sirve el LISP en memoria. El cargador AutoCAD (`TMD_Loader.lsp`) ejecuta código en RAM y previene guardado físico local.
-- **Frontend / Landing Page:** Firebase Hosting. Diseño inspirado en el ecosistema Autodesk (oscuro, profesional, fuentes sans-serif limpias) acentuado con el naranja de la paleta TMD. CSS centralizado. Las imágenes de interfaz se alojan en Hosting.
-- **Piloto Automático Actual:** Simular el aprovisionamiento de API Keys para facilitar el testeo de usuarios externos sin frenarse por seguridad IAM estricta. La prioridad es la disponibilidad, la presentación del producto y recibir feedback.
+## Infraestructura y Despliegues en Producción
+* **Despliegues en Google Cloud CLI (`gcloud`):** Debido al límite rígido de 10s de timeout del Spec Parser de Firebase CLI local (que tarda en resolver la carga síncrona en entornos de desarrollo lentos), el deploy se realiza de forma directa en Cloud Run saltándose a Firebase:
+  ```powershell
+  gcloud functions deploy getRoutine --gen2 --runtime=nodejs22 --region=us-central1 --source=./functions --entry-point=getRoutine --trigger-http --allow-unauthenticated --project=lispcentral
+  ```
+* **Lazy Loading:** Las importaciones en `functions/index.js` (como `firebase-admin`) se realizan de forma diferida (dentro de las funciones que las requieren) para mantener la inicialización de Node en menos de 100ms.
+* **Respaldo:** Las funciones adicionales de IA y Telemetría están comentadas en `index.js` para aliviar el bundle de producción y se respaldan en `functions/index_backup.js`.
