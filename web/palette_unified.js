@@ -1,5 +1,22 @@
 // LISPCENTRAL - PALETTE CONTROLLER (palette_unified.js)
 let modulesData = []; // Caché de módulos cargados
+let favorites = JSON.parse(localStorage.getItem('lisp_central_favorites') || '[]');
+let searchTags = [];
+
+const GROUP_EMOJIS = {
+  "Estruturas (Pro)": "🏗️",
+  "BIM / Coordenação": "📐",
+  "BIM / Anotação": "🏷️",
+  "BIM / Propriedades": "📋",
+  "Quantidades": "📊",
+  "Fabricação (Pro)": "⚙️",
+  "Arquitetura": "🏠",
+  "Topografia": "🗺️",
+  "Sistema / Core": "💻",
+  "Comando Geral": "⚡",
+  "Outros": "🔧"
+};
+
 
 // Obtener parámetros de la URL
 const urlParams = new URLSearchParams(window.location.search);
@@ -296,12 +313,122 @@ function getMetadata(cmdName) {
 document.addEventListener("DOMContentLoaded", () => {
   initPalette();
   
-  // Buscador Spotlight
+  // Buscador Spotlight con Chips estilo Google Ads
   const searchInput = document.getElementById("searchInput");
-  searchInput.addEventListener("input", (e) => {
-    filterModules(e.target.value);
+  
+  searchInput.addEventListener("input", () => {
+    filterModules();
+  });
+  
+  searchInput.addEventListener("keydown", (e) => {
+    if (e.key === "Enter" || e.key === " " || e.key === ",") {
+      e.preventDefault();
+      const val = searchInput.value.trim().replace(/,/g, "");
+      if (val !== "") {
+        if (!searchTags.includes(val.toLowerCase())) {
+          searchTags.push(val.toLowerCase());
+          renderChips();
+          searchInput.value = "";
+          filterModules();
+        }
+      }
+    } else if (e.key === "Backspace" && searchInput.value === "" && searchTags.length > 0) {
+      searchTags.pop();
+      renderChips();
+      filterModules();
+    }
   });
 });
+
+function renderChips() {
+  const container = document.getElementById("chipsContainer");
+  if (!container) return;
+  container.innerHTML = "";
+  searchTags.forEach(tag => {
+    const chip = document.createElement("div");
+    chip.className = "search-chip";
+    chip.onclick = () => removeTag(tag);
+    chip.innerHTML = `
+      <span>${tag}</span>
+      <span class="search-chip-close">&times;</span>
+    `;
+    container.appendChild(chip);
+  });
+}
+
+function removeTag(tag) {
+  searchTags = searchTags.filter(t => t !== tag);
+  renderChips();
+  filterModules();
+}
+
+function togglePin(cmdName) {
+  const index = favorites.indexOf(cmdName);
+  if (index === -1) {
+    favorites.push(cmdName);
+  } else {
+    favorites.splice(index, 1);
+  }
+  localStorage.setItem('lisp_central_favorites', JSON.stringify(favorites));
+  renderFavorites();
+  renderModules();
+}
+
+function renderFavorites() {
+  const section = document.getElementById("favoritesSection");
+  const listContainer = document.getElementById("favoritesList");
+  if (!listContainer || !section) return;
+  
+  listContainer.innerHTML = "";
+  const pinnedMods = modulesData.filter(mod => favorites.includes(mod.name));
+  
+  if (pinnedMods.length === 0) {
+    section.style.display = "none";
+    return;
+  }
+  
+  section.style.display = "block";
+  
+  pinnedMods.forEach(mod => {
+    const item = document.createElement("div");
+    item.className = `module-item ${mod.status}`;
+    item.id = `fav-${mod.name}`;
+    item.title = mod.desc;
+    
+    const emoji = GROUP_EMOJIS[mod.group] || "🔧";
+    const docsBtnHtml = mod.doc && mod.doc !== "#" 
+      ? `<a class="docs-btn" href="https://lispcentral.web.app/docs/${mod.doc}" target="_blank" onclick="event.stopPropagation();" title="Ver documentação">?</a>`
+      : "";
+      
+    const pinBtnHtml = `<button class="pin-btn pinned" onclick="event.stopPropagation(); togglePin('${mod.name}');" title="Desafixar">📌</button>`;
+    
+    item.innerHTML = `
+      <div class="module-header-row">
+        <div class="module-title-wrapper">
+          <span class="module-emoji">${emoji}</span>
+          <span class="module-name">${mod.name}</span>
+        </div>
+        <div class="module-actions">
+          ${docsBtnHtml}
+          ${pinBtnHtml}
+          <div class="module-status">
+            <span class="status-dot"></span>
+          </div>
+        </div>
+      </div>
+      <div class="module-details">
+        <span class="module-friendly-name">${mod.friendly}</span>
+        <span class="module-desc">${mod.desc}</span>
+      </div>
+    `;
+    
+    item.addEventListener("click", () => {
+      runAutoCADCommand(mod.name);
+    });
+    listContainer.appendChild(item);
+  });
+}
+
 
 async function initPalette() {
   try {
@@ -332,6 +459,7 @@ async function initPalette() {
     });
     
     renderModules();
+    renderFavorites();
     
     // 2. Comandos Fantasmas ja foram injetados nativamente.
     // O download agora é feito sob demanda (JIT) via LC:run-or-load.
@@ -400,21 +528,31 @@ function renderModules() {
       item.id = `mod-${mod.name}`;
       item.title = mod.desc;
       
+      const isPinned = favorites.includes(mod.name);
+      const emoji = GROUP_EMOJIS[mod.group] || "🔧";
       const docsBtnHtml = mod.doc && mod.doc !== "#" 
         ? `<a class="docs-btn" href="https://lispcentral.web.app/docs/${mod.doc}" target="_blank" onclick="event.stopPropagation();" title="Ver documentação">?</a>`
         : "";
         
+      const pinBtnHtml = `<button class="pin-btn ${isPinned ? 'pinned' : ''}" onclick="event.stopPropagation(); togglePin('${mod.name}');" title="${isPinned ? 'Desafixar' : 'Fixar no topo'}">📌</button>`;
+      
       item.innerHTML = `
-        <div class="module-info">
-          <span class="module-name">${mod.name}</span>
+        <div class="module-header-row">
+          <div class="module-title-wrapper">
+            <span class="module-emoji">${emoji}</span>
+            <span class="module-name">${mod.name}</span>
+          </div>
+          <div class="module-actions">
+            ${docsBtnHtml}
+            ${pinBtnHtml}
+            <div class="module-status">
+              <span class="status-dot"></span>
+            </div>
+          </div>
+        </div>
+        <div class="module-details">
           <span class="module-friendly-name">${mod.friendly}</span>
           <span class="module-desc">${mod.desc}</span>
-        </div>
-        <div class="module-actions">
-          ${docsBtnHtml}
-          <div class="module-status">
-            <span class="status-dot"></span>
-          </div>
         </div>
       `;
       
@@ -431,8 +569,13 @@ function renderModules() {
 }
 
 // Filtrado de comandos Spotlight
-function filterModules(query) {
-  const cleanQuery = query.toLowerCase().trim();
+function filterModules() {
+  const searchInput = document.getElementById("searchInput");
+  const currentInputText = searchInput ? searchInput.value.toLowerCase().trim() : "";
+  
+  // Consolidar palabras clave: chips activos + palabras en el input
+  const inputKeywords = currentInputText.split(/\s+/).filter(k => k !== "");
+  const activeKeywords = [...searchTags, ...inputKeywords];
   
   // Agrupamos módulos para verificar visibilidad por grupos
   const groups = {};
@@ -455,12 +598,22 @@ function filterModules(query) {
       const item = document.getElementById(`mod-${mod.name}`);
       if (!item) return;
       
-      const nameMatch = mod.name.toLowerCase().includes(cleanQuery);
-      const friendlyMatch = mod.friendly.toLowerCase().includes(cleanQuery);
-      const descMatch = mod.desc.toLowerCase().includes(cleanQuery);
-      const groupMatch = mod.group.toLowerCase().includes(cleanQuery);
+      // Comprobar que coincida con TODAS las palabras clave (AND)
+      let matchesAll = true;
       
-      if (nameMatch || friendlyMatch || descMatch || groupMatch) {
+      for (const kw of activeKeywords) {
+        const nameMatch = mod.name.toLowerCase().includes(kw);
+        const friendlyMatch = mod.friendly.toLowerCase().includes(kw);
+        const descMatch = mod.desc.toLowerCase().includes(kw);
+        const groupMatch = mod.group.toLowerCase().includes(kw);
+        
+        if (!(nameMatch || friendlyMatch || descMatch || groupMatch)) {
+          matchesAll = false;
+          break;
+        }
+      }
+      
+      if (matchesAll) {
         item.style.display = "flex";
         visibleCount++;
       } else {
@@ -478,10 +631,11 @@ function filterModules(query) {
         const countBadge = document.getElementById(`group-count-${groupId}`);
         if (countBadge) countBadge.innerText = visibleCount;
       }
-      if (container) container.style.display = "block";
+      if (container) container.style.display = "grid";
     }
   });
 }
+
 
 // Inter-Process Communication (IPC): Carga una rutina en AutoCAD mediante LISP y sondea USERS1
 function loadRoutineViaLisp(name) {
@@ -555,10 +709,15 @@ function updateModuleStatus(name, status) {
   const mod = modulesData.find(m => m.name === name);
   if (mod) {
     mod.status = status;
-    const item = document.getElementById(`mod-${name}`);
-    if (item) {
-      item.className = `module-item ${status}`;
-    }
+    const elements = [
+      document.getElementById(`mod-${name}`),
+      document.getElementById(`fav-${name}`)
+    ];
+    elements.forEach(item => {
+      if (item) {
+        item.className = `module-item ${status}`;
+      }
+    });
   }
 }
 
