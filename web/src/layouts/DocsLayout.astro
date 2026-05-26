@@ -3,7 +3,12 @@ import '../styles/styles.css';
 import Logo from '../components/Logo.astro';
 import Footer from '../components/Footer.astro';
 
-const { title = "LispCentral Docs" } = Astro.props;
+const { 
+  title = "LispCentral Docs — Superpoderes para seu AutoCAD",
+  description = "Documentação oficial de rotinas AutoLISP e plugins JIT para AutoCAD. Baixe rotinas LISP prontas para aumentar sua produtividade.",
+  keywords = "lisp autocad, autolisp, rotinas lisp, autocad lisp download, autocad lt lisp, lisp viga, lisp civil 3d",
+  canonicalUrl = Astro.url.href
+} = Astro.props;
 ---
 <!DOCTYPE html>
 <html lang="pt-BR">
@@ -11,6 +16,21 @@ const { title = "LispCentral Docs" } = Astro.props;
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>{title}</title>
+  <meta name="description" content={description} />
+  <meta name="keywords" content={keywords} />
+  <link rel="canonical" href={canonicalUrl} />
+  
+  <!-- OpenGraph Metadata -->
+  <meta property="og:title" content={title} />
+  <meta property="og:description" content={description} />
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content={canonicalUrl} />
+  <meta property="og:site_name" content="LispCentral" />
+  
+  <!-- Twitter Card Metadata -->
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content={title} />
+  <meta name="twitter:description" content={description} />
 </head>
 <body>
   <header class="topbar">
@@ -54,6 +74,11 @@ const { title = "LispCentral Docs" } = Astro.props;
         <ul>
           <li><a href="/pt/docs/lc-clean">LC_CLEAN</a></li>
           <li><a href="/pt/docs/lc-flatz">LC_FLATZ</a></li>
+        </ul>
+
+        <h4>Ferramentas Web</h4>
+        <ul>
+          <li><a href="/pt/tools/calc-viga" style="color: var(--tmd-orange); font-weight: 600;">Calculadora de Vigas</a></li>
         </ul>
 
         <h4>Estruturas Metálicas</h4>

@@ -1,0 +1,234 @@
+{
+  "standards": [
+    {
+      "id": "gerdau",
+      "name": "Perfis Gerdau / Padrão ABNT",
+      "profiles": [
+        {
+          "name": "W150 x 13.0",
+          "shape": "PERFIL_I",
+          "h": 148,
+          "b": 100,
+          "tw": 4.3,
+          "tf": 4.9,
+          "area": 16.6,
+          "weight": 13.0,
+          "ix": 635,
+          "iy": 82
+        },
+        {
+          "name": "W150 x 18.0",
+          "shape": "PERFIL_I",
+          "h": 153,
+          "b": 102,
+          "tw": 5.8,
+          "tf": 7.1,
+          "area": 23.0,
+          "weight": 18.0,
+          "ix": 939,
+          "iy": 126
+        },
+        {
+          "name": "W200 x 15.0",
+          "shape": "PERFIL_I",
+          "h": 200,
+          "b": 100,
+          "tw": 4.3,
+          "tf": 5.2,
+          "area": 19.1,
+          "weight": 15.0,
+          "ix": 1305,
+          "iy": 87
+        },
+        {
+          "name": "W200 x 22.5",
+          "shape": "PERFIL_I",
+          "h": 206,
+          "b": 102,
+          "tw": 6.2,
+          "tf": 8.0,
+          "area": 28.6,
+          "weight": 22.5,
+          "ix": 2029,
+          "iy": 142
+        },
+        {
+          "name": "W250 x 17.9",
+          "shape": "PERFIL_I",
+          "h": 251,
+          "b": 101,
+          "tw": 4.8,
+          "tf": 5.3,
+          "area": 22.8,
+          "weight": 17.9,
+          "ix": 2291,
+          "iy": 91
+        },
+        {
+          "name": "W310 x 21.0",
+          "shape": "PERFIL_I",
+          "h": 303,
+          "b": 101,
+          "tw": 5.1,
+          "tf": 5.7,
+          "area": 27.2,
+          "weight": 21.0,
+          "ix": 3762,
+          "iy": 98
+        },
+        {
+          "name": "U Enrijecido 75 x 40 x 2.0",
+          "shape": "PERFIL_C",
+          "h": 75,
+          "b": 40,
+          "tw": 2.0,
+          "tf": 2.0,
+          "lip": 15,
+          "area": 3.24,
+          "weight": 2.54,
+          "ix": 27.5,
+          "iy": 6.8
+        },
+        {
+          "name": "U Enrijecido 100 x 50 x 3.0",
+          "shape": "PERFIL_C",
+          "h": 100,
+          "b": 50,
+          "tw": 3.0,
+          "tf": 3.0,
+          "lip": 17,
+          "area": 6.24,
+          "weight": 4.90,
+          "ix": 92.4,
+          "iy": 20.8
+        },
+        {
+          "name": "U Simples 75 x 40 x 2.5",
+          "shape": "PERFIL_U",
+          "h": 75,
+          "b": 40,
+          "tw": 2.5,
+          "tf": 2.5,
+          "area": 3.55,
+          "weight": 2.79,
+          "ix": 28.9,
+          "iy": 5.3
+        },
+        {
+          "name": "U Simples 100 x 50 x 3.0",
+          "shape": "PERFIL_U",
+          "h": 100,
+          "b": 50,
+          "tw": 3.0,
+          "tf": 3.0,
+          "area": 5.76,
+          "weight": 4.52,
+          "ix": 82.1,
+          "iy": 13.9
+        }
+      ]
+    },
+    {
+      "id": "metalon_tubos",
+      "name": "Tubos & Metalon Estruturais",
+      "profiles": [
+        {
+          "name": "Metalon 20 x 20 x 1.5",
+          "shape": "RECT_VAZIO",
+          "h": 20,
+          "b": 20,
+          "tw": 1.5,
+          "tf": 1.5,
+          "area": 1.11,
+          "weight": 0.85,
+          "ix": 0.63,
+          "iy": 0.63
+        },
+        {
+          "name": "Metalon 40 x 40 x 2.0",
+          "shape": "RECT_VAZIO",
+          "h": 40,
+          "b": 40,
+          "tw": 2.0,
+          "tf": 2.0,
+          "area": 3.04,
+          "weight": 2.39,
+          "ix": 7.37,
+          "iy": 7.37
+        },
+        {
+          "name": "Metalon 50 x 50 x 2.0",
+          "shape": "RECT_VAZIO",
+          "h": 50,
+          "b": 50,
+          "tw": 2.0,
+          "tf": 2.0,
+          "area": 3.84,
+          "weight": 3.01,
+          "ix": 14.98,
+          "iy": 14.98
+        },
+        {
+          "name": "Metalon 80 x 40 x 2.5",
+          "shape": "RECT_VAZIO",
+          "h": 80,
+          "b": 40,
+          "tw": 2.5,
+          "tf": 2.5,
+          "area": 5.75,
+          "weight": 4.51,
+          "ix": 47.92,
+          "iy": 15.34
+        },
+        {
+          "name": "Metalon 100 x 50 x 3.0",
+          "shape": "RECT_VAZIO",
+          "h": 100,
+          "b": 50,
+          "tw": 3.0,
+          "tf": 3.0,
+          "area": 8.64,
+          "weight": 6.78,
+          "ix": 110.15,
+          "iy": 35.88
+        },
+        {
+          "name": "Tubo 1\" Sch40 (33.4 x 3.38)",
+          "shape": "CIRC_VAZIO",
+          "h": 33.4,
+          "b": 33.4,
+          "tw": 3.38,
+          "tf": 3.38,
+          "area": 3.19,
+          "weight": 2.50,
+          "ix": 3.69,
+          "iy": 3.69
+        },
+        {
+          "name": "Tubo 2\" Sch40 (60.3 x 3.91)",
+          "shape": "CIRC_VAZIO",
+          "h": 60.3,
+          "b": 60.3,
+          "tw": 3.91,
+          "tf": 3.91,
+          "area": 6.93,
+          "weight": 5.44,
+          "ix": 27.65,
+          "iy": 27.65
+        },
+        {
+          "name": "Tubo 3\" Sch40 (88.9 x 5.49)",
+          "shape": "CIRC_VAZIO",
+          "h": 88.9,
+          "b": 88.9,
+          "tw": 5.49,
+          "tf": 5.49,
+          "area": 14.38,
+          "weight": 11.29,
+          "ix": 128.8,
+          "iy": 128.8
+        }
+      ]
+    }
+  ]
+}

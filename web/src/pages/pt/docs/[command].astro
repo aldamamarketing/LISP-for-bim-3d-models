@@ -184,7 +184,11 @@ export async function getStaticPaths() {
 const { cmd } = Astro.props;
 ---
 
-<DocsLayout title={cmd.title}>
+<DocsLayout 
+  title={`${cmd.title} — Comando AutoLISP JIT para AutoCAD`}
+  description={`${cmd.desc} Aprenda como usar a sintaxe, os parâmetros e a documentação técnica do comando AutoLISP ${cmd.title}.`}
+  keywords={`lisp autocad, autolisp download, ${cmd.title.toLowerCase()}, comando ${cmd.title.toLowerCase()} autocad, rotinas lisp gratis, lisp desenho`}
+>
   <div class="doc-content">
     <h1>{cmd.title}</h1>
     <p style="font-size: 1.1rem; color: var(--tmd-orange); margin-bottom: 20px;">
