@@ -532,13 +532,7 @@ async function initPalette() {
     
     const text = await response.text();
     const cmdList = text.split(",").filter(c => c.trim() !== "");
-    
-    // Inyección local de comandos de la suite ARQ para pruebas y desarrollo
-    Object.keys(METADATA_MAP).filter(k => k.startsWith("ARQ-")).forEach(cmd => {
-      if (!cmdList.includes(cmd)) {
-        cmdList.push(cmd);
-      }
-    });
+
     
     // Crear base de datos de módulos con metadatos estructurados
     modulesData = cmdList.map(cmd => {

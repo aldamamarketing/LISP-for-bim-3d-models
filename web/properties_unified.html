@@ -1,0 +1,557 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>Propriedades de Arquitetura 2D</title>
+  <!-- Google Fonts Outfit -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;700&display=swap" rel="stylesheet">
+  
+  <!-- AutoCAD Native JSAPI -->
+  <script type="text/javascript" src="https://df-prod.autocad360.com/jsapi/v4/Autodesk.AutoCAD.js"></script>
+  
+  <style>
+    :root {
+      --bg-color: #121212;
+      --header-bg: #1e1e1e;
+      --panel-bg: #1e1e1e;
+      --panel-border: rgba(255, 255, 255, 0.05);
+      --accent-color: #f26d21; /* TMD Orange */
+      --accent-glow: rgba(242, 109, 33, 0.2);
+      --text-main: #f0f0f0;
+      --text-muted: #aaaaaa;
+      --success-color: #10b981;
+      --input-bg: rgba(255, 255, 255, 0.04);
+      --input-border: rgba(255, 255, 255, 0.08);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Outfit', sans-serif;
+      background: var(--bg-color);
+      color: var(--text-main);
+      padding: 12px;
+      height: 100vh;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Scrollbar Personalizado */
+    ::-webkit-scrollbar {
+      width: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: transparent;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 3px;
+    }
+
+    /* Cabecera del Panel */
+    .panel-header {
+      padding-bottom: 12px;
+      margin-bottom: 16px;
+      border-bottom: 1px solid var(--panel-border);
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .panel-title {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--accent-color);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+
+    .panel-subtitle {
+      font-size: 11px;
+      color: var(--text-muted);
+    }
+
+    /* Selector de Comando Principal */
+    .control-group {
+      margin-bottom: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .control-label {
+      font-size: 11px;
+      font-weight: 500;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .select-input, .text-input {
+      width: 100%;
+      background: var(--input-bg);
+      border: 1px solid var(--input-border);
+      border-radius: 8px;
+      color: var(--text-main);
+      padding: 10px 12px;
+      font-family: 'Outfit', sans-serif;
+      font-size: 13px;
+      outline: none;
+      transition: all 0.3s ease;
+    }
+
+    .select-input:focus, .text-input:focus {
+      border-color: var(--accent-color);
+      box-shadow: 0 0 10px var(--accent-glow);
+      background: rgba(255, 255, 255, 0.06);
+    }
+
+    .checkbox-container {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      cursor: pointer;
+      font-size: 12px;
+      user-select: none;
+      margin-top: 4px;
+    }
+
+    .checkbox-container input {
+      accent-color: var(--accent-color);
+      width: 15px;
+      height: 15px;
+    }
+
+    /* Formularios Dinámicos */
+    .form-container {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .cmd-form {
+      display: none;
+      flex-direction: column;
+      gap: 14px;
+      animation: fadeIn 0.3s ease;
+    }
+
+    .cmd-form.active {
+      display: flex;
+    }
+
+    /* Estructura de Formularios */
+    .form-section-title {
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--accent-color);
+      border-bottom: 1px dashed rgba(255, 255, 255, 0.08);
+      padding-bottom: 4px;
+      margin-top: 8px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .input-row {
+      display: flex;
+      gap: 10px;
+    }
+
+    .input-row .control-group {
+      flex: 1;
+      margin-bottom: 0;
+    }
+
+    /* Mensaje de espera */
+    .empty-state {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 40px 20px;
+      text-align: center;
+      color: var(--text-muted);
+      gap: 12px;
+      border: 1px dashed var(--panel-border);
+      border-radius: 12px;
+      margin-top: 10px;
+    }
+
+    .empty-state svg {
+      width: 32px;
+      height: 32px;
+      color: var(--text-muted);
+      opacity: 0.5;
+    }
+
+    .empty-state-text {
+      font-size: 12px;
+      line-height: 1.5;
+    }
+
+    /* Toast de confirmación de sincronización */
+    .toast {
+      position: fixed;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%) translateY(100px);
+      background: var(--success-color);
+      color: white;
+      padding: 8px 16px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 500;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+      transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      pointer-events: none;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      z-index: 100;
+    }
+
+    .toast.show {
+      transform: translateX(-50%) translateY(0);
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(4px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="panel-header">
+    <span class="panel-title">Propriedades Dinâmicas</span>
+    <span class="panel-subtitle">Painel de controle contextual do LispCentral</span>
+  </div>
+
+  <!-- Selector Manual y Auto-detección -->
+  <div class="control-group">
+    <label class="control-label" for="commandSelector">Ferramenta Selecionada</label>
+    <select class="select-input" id="commandSelector">
+      <option value="">-- Selecione uma Ferramenta --</option>
+      <option value="ARQ-SYS-Config">ARQ-SYS-Config (Configurar Suite)</option>
+      <option value="ARQ-GRID-Axes">ARQ-GRID-Axes (Ejes de Rejilla)</option>
+      <option value="ARQ-GRID-Line">ARQ-GRID-Line (Trazar Eje)</option>
+      <option value="ARQ-WALL-Draw">ARQ-WALL-Draw (Diseñar Muros)</option>
+      <option value="ARQ-WALL-FromAxis">ARQ-WALL-FromAxis (Muros desde Ejes)</option>
+      <option value="ARQ-WALL-Thickness">ARQ-WALL-Thickness (Grosor de Muro)</option>
+      <option value="ARQ-WALL-Trim">ARQ-WALL-Trim (Limpieza de Muros)</option>
+      <option value="ARQ-COL-Insert">ARQ-COL-Insert (Insertar Columnas)</option>
+      <option value="ARQ-DOOR-Insert">ARQ-DOOR-Insert (Insertar Puertas)</option>
+      <option value="ARQ-WIN-Insert">ARQ-WIN-Insert (Insertar Ventanas)</option>
+      <option value="ARQ-WALL-MoveOpening">ARQ-WALL-MoveOpening (Mover Vanos)</option>
+      <option value="ARQ-WALL-ResizeOpening">ARQ-WALL-ResizeOpening (Redimensionar Vanos)</option>
+      <option value="ARQ-DIM-Opening">ARQ-DIM-Opening (Acotado de Vanos)</option>
+      <option value="ARQ-DIM-Quick">ARQ-DIM-Quick (Cota de Habitación)</option>
+      <option value="ARQ-SYM-Level">ARQ-SYM-Level (Simbología de Nivel)</option>
+    </select>
+    
+    <label class="checkbox-container">
+      <input type="checkbox" id="autoDetectCheckbox" checked>
+      <span>Auto-detectar comando ativo do AutoCAD</span>
+    </label>
+  </div>
+
+  <div class="form-container">
+    
+    <!-- Empty State / Espera -->
+    <div class="empty-state" id="emptyState">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+        <circle cx="12" cy="12" r="9"/>
+        <path d="M12 8v4M12 16h.01"/>
+      </svg>
+      <div class="empty-state-text">
+        Nenhum comando ativo no AutoCAD.<br>
+        Selecione uma ferramenta acima ou execute uma no AutoCAD para editar suas propriedades.
+      </div>
+    </div>
+
+    <!-- 1. ARQ-SYS-Config -->
+    <div class="cmd-form" id="form-ARQ-SYS-Config">
+      <div class="form-section-title">Parâmetros Globais</div>
+      <div class="control-group">
+        <label class="control-label" for="cfg_scale">Escala de Trabalho</label>
+        <select class="select-input" id="cfg_scale">
+          <option value="1:1">1:1</option>
+          <option value="1:10">1:10</option>
+          <option value="1:20">1:20</option>
+          <option value="1:50" selected>1:50</option>
+          <option value="1:100">1:100</option>
+          <option value="1:200">1:200</option>
+        </select>
+      </div>
+      <div class="control-group">
+        <label class="control-label" for="cfg_units">Unidades do Desenho</label>
+        <select class="select-input" id="cfg_units">
+          <option value="m" selected>Metros (m)</option>
+          <option value="cm">Centímetros (cm)</option>
+          <option value="mm">Milímetros (mm)</option>
+        </select>
+      </div>
+      <div class="form-section-title">Camadas Operacionais (Layers)</div>
+      <div class="control-group">
+        <label class="control-label" for="cfg_layer_wall">Layer dos Muros</label>
+        <input type="text" class="text-input" id="cfg_layer_wall" value="ARQ-PAREDE">
+      </div>
+      <div class="control-group">
+        <label class="control-label" for="cfg_layer_opening">Layer de Portas/Janelas</label>
+        <input type="text" class="text-input" id="cfg_layer_opening" value="ARQ-ESQUADRIA">
+      </div>
+    </div>
+
+    <!-- 2. ARQ-GRID-Axes -->
+    <div class="cmd-form" id="form-ARQ-GRID-Axes">
+      <div class="form-section-title">Espaçamentos de Grid</div>
+      <div class="control-group">
+        <label class="control-label" for="grid_dist_x">Espaçamentos X (Separados por vírgula)</label>
+        <input type="text" class="text-input" id="grid_dist_x" value="4.00, 3.50, 4.50">
+      </div>
+      <div class="control-group">
+        <label class="control-label" for="grid_dist_y">Espaçamentos Y (Separados por vírgula)</label>
+        <input type="text" class="text-input" id="grid_dist_y" value="3.00, 4.00, 3.00">
+      </div>
+      <div class="form-section-title">Geometria da Bolha</div>
+      <div class="input-row">
+        <div class="control-group">
+          <label class="control-label" for="grid_bubble_radius">Raio (mm)</label>
+          <input type="text" class="text-input" id="grid_bubble_radius" value="6.0">
+        </div>
+        <div class="control-group">
+          <label class="control-label" for="grid_text_height">Alt. Texto (mm)</label>
+          <input type="text" class="text-input" id="grid_text_height" value="2.5">
+        </div>
+      </div>
+    </div>
+
+    <!-- 3. ARQ-GRID-Line -->
+    <div class="cmd-form" id="form-ARQ-GRID-Line">
+      <div class="form-section-title">Eixo Único</div>
+      <div class="control-group">
+        <label class="control-label" for="grid_line_label">Etiqueta/Identificador</label>
+        <input type="text" class="text-input" id="grid_line_label" value="A">
+      </div>
+      <div class="control-group">
+        <label class="control-label" for="grid_line_side">Posição da Bolha</label>
+        <select class="select-input" id="grid_line_side">
+          <option value="both" selected>Ambas as extremidades</option>
+          <option value="start">Início da linha</option>
+          <option value="end">Fim da linha</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- 4. ARQ-WALL-Draw -->
+    <div class="cmd-form" id="form-ARQ-WALL-Draw">
+      <div class="form-section-title">Configurações de Desenho</div>
+      <div class="control-group">
+        <label class="control-label" for="wall_draw_thickness">Espessura do Muro (mm)</label>
+        <input type="text" class="text-input" id="wall_draw_thickness" value="150">
+      </div>
+      <div class="control-group">
+        <label class="control-label" for="wall_draw_justify">Alinhamento / Justificar</label>
+        <select class="select-input" id="wall_draw_justify">
+          <option value="center" selected>Eixo (Centro)</option>
+          <option value="left">Face Esquerda</option>
+          <option value="right">Face Direita</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- 5. ARQ-WALL-FromAxis -->
+    <div class="cmd-form" id="form-ARQ-WALL-FromAxis">
+      <div class="form-section-title">Conversão Automática</div>
+      <div class="control-group">
+        <label class="control-label" for="wall_axis_thickness">Espessura do Muro (mm)</label>
+        <input type="text" class="text-input" id="wall_axis_thickness" value="150">
+      </div>
+      <label class="checkbox-container">
+        <input type="checkbox" id="wall_axis_delete_source" checked>
+        <span>Apagar linhas de eixos originais</span>
+      </label>
+    </div>
+
+    <!-- 6. ARQ-WALL-Thickness -->
+    <div class="cmd-form" id="form-ARQ-WALL-Thickness">
+      <div class="form-section-title">Alteração Global</div>
+      <div class="control-group">
+        <label class="control-label" for="wall_mod_thickness">Nova Espessura (mm)</label>
+        <input type="text" class="text-input" id="wall_mod_thickness" value="200">
+      </div>
+    </div>
+
+    <!-- 7. ARQ-WALL-Trim -->
+    <div class="cmd-form" id="form-ARQ-WALL-Trim">
+      <div class="form-section-title">Limpeza e Junção</div>
+      <div class="control-group">
+        <label class="control-label" for="wall_trim_mode">Modo de Interseção</label>
+        <select class="select-input" id="wall_trim_mode">
+          <option value="auto" selected>Automático (T, L ou Cruz)</option>
+          <option value="t">Forçar Interseção em T</option>
+          <option value="l">Forçar Canto em L</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- 8. ARQ-COL-Insert -->
+    <div class="cmd-form" id="form-ARQ-COL-Insert">
+      <div class="form-section-title">Geometria da Coluna</div>
+      <div class="control-group">
+        <label class="control-label" for="col_section_type">Seção do Pilar</label>
+        <select class="select-input" id="col_section_type">
+          <option value="rect" selected>Retangular / Quadrado</option>
+          <option value="circle">Circular (Redondo)</option>
+        </select>
+      </div>
+      <div class="input-row">
+        <div class="control-group">
+          <label class="control-label" for="col_dim_x">Ancho (X / Diâmetro)</label>
+          <input type="text" class="text-input" id="col_dim_x" value="300">
+        </div>
+        <div class="control-group" id="col_dim_y_group">
+          <label class="control-label" for="col_dim_y">Largo (Y)</label>
+          <input type="text" class="text-input" id="col_dim_y" value="300">
+        </div>
+      </div>
+      <div class="control-group">
+        <label class="control-label" for="col_rotation">Ângulo de Rotação (°)</label>
+        <input type="text" class="text-input" id="col_rotation" value="0.0">
+      </div>
+    </div>
+
+    <!-- 9. ARQ-DOOR-Insert -->
+    <div class="cmd-form" id="form-ARQ-DOOR-Insert">
+      <div class="form-section-title">Parâmetros da Porta</div>
+      <div class="input-row">
+        <div class="control-group">
+          <label class="control-label" for="door_width">Largura (mm)</label>
+          <input type="text" class="text-input" id="door_width" value="800">
+        </div>
+        <div class="control-group">
+          <label class="control-label" for="door_height">Altura (mm)</label>
+          <input type="text" class="text-input" id="door_height" value="2100">
+        </div>
+      </div>
+      <div class="control-group">
+        <label class="control-label" for="door_type">Tipo de Abertura</label>
+        <select class="select-input" id="door_type">
+          <option value="swing" selected>Batente Simples (Giro)</option>
+          <option value="sliding">Correr em Embutir</option>
+          <option value="double">Batente Duplo</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- 10. ARQ-WIN-Insert -->
+    <div class="cmd-form" id="form-ARQ-WIN-Insert">
+      <div class="form-section-title">Parâmetros da Janela</div>
+      <div class="input-row">
+        <div class="control-group">
+          <label class="control-label" for="win_width">Largura (mm)</label>
+          <input type="text" class="text-input" id="win_width" value="1200">
+        </div>
+        <div class="control-group">
+          <label class="control-label" for="win_height">Altura (mm)</label>
+          <input type="text" class="text-input" id="win_height" value="1000">
+        </div>
+      </div>
+      <div class="control-group">
+        <label class="control-label" for="win_sill">Altura do Peitoril (mm)</label>
+        <input type="text" class="text-input" id="win_sill" value="1100">
+      </div>
+    </div>
+
+    <!-- 11. ARQ-WALL-MoveOpening -->
+    <div class="cmd-form" id="form-ARQ-WALL-MoveOpening">
+      <div class="form-section-title">Deslocamento de Esquadria</div>
+      <div class="control-group">
+        <label class="control-label" for="move_offset_mode">Modo de Movimento</label>
+        <select class="select-input" id="move_offset_mode">
+          <option value="free" selected>Livre (Arrastar Dinâmico)</option>
+          <option value="distance">Distância Exata do Canto</option>
+        </select>
+      </div>
+      <div class="control-group" id="move_distance_group" style="display: none;">
+        <label class="control-label" for="move_distance">Distância (mm)</label>
+        <input type="text" class="text-input" id="move_distance" value="100">
+      </div>
+    </div>
+
+    <!-- 12. ARQ-WALL-ResizeOpening -->
+    <div class="cmd-form" id="form-ARQ-WALL-ResizeOpening">
+      <div class="form-section-title">Redimensionamento</div>
+      <div class="control-group">
+        <label class="control-label" for="resize_new_width">Nova Largura do Vão (mm)</label>
+        <input type="text" class="text-input" id="resize_new_width" value="900">
+      </div>
+    </div>
+
+    <!-- 13. ARQ-DIM-Opening -->
+    <div class="cmd-form" id="form-ARQ-DIM-Opening">
+      <div class="form-section-title">Acotamento de Vãos</div>
+      <div class="control-group">
+        <label class="control-label" for="dim_open_style">Estilo de Cota</label>
+        <select class="select-input" id="dim_open_style">
+          <option value="ISO-25" selected>Standard ISO-25</option>
+          <option value="TMD-ARQ">TMD Arquitetura (Traço)</option>
+        </select>
+      </div>
+      <div class="control-group">
+        <label class="control-label" for="dim_open_offset">Afastamento do Muro (mm)</label>
+        <input type="text" class="text-input" id="dim_open_offset" value="500">
+      </div>
+    </div>
+
+    <!-- 14. ARQ-DIM-Quick -->
+    <div class="cmd-form" id="form-ARQ-DIM-Quick">
+      <div class="form-section-title">Cota Rápida de Ambientes</div>
+      <div class="control-group">
+        <label class="control-label" for="dim_quick_style">Estilo de Cota</label>
+        <select class="select-input" id="dim_quick_style">
+          <option value="ISO-25" selected>Standard ISO-25</option>
+          <option value="TMD-ARQ">TMD Arquitetura (Traço)</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- 15. ARQ-SYM-Level -->
+    <div class="cmd-form" id="form-ARQ-SYM-Level">
+      <div class="form-section-title">Marcador de Nível</div>
+      <div class="control-group">
+        <label class="control-label" for="level_value">Valor do Nível (m)</label>
+        <input type="text" class="text-input" id="level_value" value="+0.15">
+      </div>
+      <div class="control-group">
+        <label class="control-label" for="level_symbol_type">Desenho do Símbolo</label>
+        <select class="select-input" id="level_symbol_type">
+          <option value="classic" selected>TMD Padrão (Círculo Hachurado)</option>
+          <option value="triangle">Triângulo Superior</option>
+        </select>
+      </div>
+      <div class="control-group">
+        <label class="control-label" for="level_scale">Escala do Bloco</label>
+        <input type="text" class="text-input" id="level_scale" value="1.0">
+      </div>
+    </div>
+
+  </div>
+
+  <div class="toast" id="syncToast">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="flex-shrink:0;">
+      <polyline points="20 6 9 17 4 12"></polyline>
+    </svg>
+    <span>Sincronizado no AutoCAD</span>
+  </div>
+
+  <script src="properties_unified.js"></script>
+</body>
+</html>

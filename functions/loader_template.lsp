@@ -139,7 +139,12 @@
                ("TAGS" "TMD_Tags") ("MATCH" "TMD_MATCH") ("ALIGN" "TMD_Align") ("GROUPS" "TMD_Groups")
                ("FACECUT" "TMD_FACE_CUT") ("TABLAS" "TMD_Tablas") ("CNC" "TMD_CNC")
                ("TR25" "TMD_Teja_TR25") ("UTILS" "TMD_Utils") ("LC_CLEAN" "LC_CLEAN") 
-               ("LC_FLATZ" "LC_FLATZ") ("LC_ZLABEL" "LC_ZLABEL")))
+               ("LC_FLATZ" "LC_FLATZ") ("LC_ZLABEL" "LC_ZLABEL")
+               ("ARQ-SYS-Config" "ARQ-SYS-Config") ("ARQ-GRID-Axes" "ARQ-GRID-Axes") ("ARQ-GRID-Line" "ARQ-GRID-Line")
+               ("ARQ-WALL-Draw" "ARQ-WALL-Draw") ("ARQ-WALL-FromAxis" "ARQ-WALL-FromAxis") ("ARQ-WALL-Thickness" "ARQ-WALL-Thickness")
+               ("ARQ-WALL-Trim" "ARQ-WALL-Trim") ("ARQ-COL-Insert" "ARQ-COL-Insert") ("ARQ-DOOR-Insert" "ARQ-DOOR-Insert")
+               ("ARQ-WIN-Insert" "ARQ-WIN-Insert") ("ARQ-WALL-MoveOpening" "ARQ-WALL-MoveOpening") ("ARQ-WALL-ResizeOpening" "ARQ-WALL-ResizeOpening")
+               ("ARQ-DIM-Opening" "ARQ-DIM-Opening") ("ARQ-DIM-Quick" "ARQ-DIM-Quick") ("ARQ-SYM-Level" "ARQ-SYM-Level")))
   (foreach item cmds
     (eval (list 'defun (read (strcat "c:" (car item))) '()
                 (list 'LC:run-or-load (cadr item))

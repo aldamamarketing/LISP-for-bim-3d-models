@@ -5,68 +5,84 @@ El proyecto se encuentra en plena transición a la arquitectura de **Sólidos In
 Se ha abandonado el concepto de `TMD_PARENT_WIRE` y polilíneas base ("Wires"). Ahora, cada viga o columna es un Sólido 3D (`3DSOLID`) independiente que contiene todo su "ADN" inyectado en la estructura de LDATA.
 
 ### Reglas de Arquitectura V5:
-1. **No hay líneas base (Wires):** La geometría se genera directamente extrudiendo perfiles o usando operaciones booleanas (por ejemplo, cajas restadas) en el motor geométrico.
+1. **No hay líneas base (Wires):** La geometría se genera directamente extrudiendo perfiles o usando operaciones booleanas en el motor geométrico.
 2. **Generación al vuelo:** Si un sólido necesita ser justificado, alineado o reconstruido, se elimina el sólido existente y se dibuja uno nuevo usando el LDATA guardado.
 3. **LDATA (El ADN):** 
-   - **SE DEBE EVITAR** almacenar el punto de inicio (`PT_A`), el punto final (`PT_B`) o la longitud fija en el LDATA. Esto permite que el usuario modifique la longitud del sólido manualmente en AutoCAD (usando grips) sin que los datos se corrompan o desincronicen.
-   - Todo cálculo de longitud y orientación ("al vuelo") debe hacerse leyendo la geometría real del sólido o calculando el bounding box y ajustándolo.
+   - **SE DEBE EVITAR** almacenar el punto de inicio (`PT_A`), el punto final (`PT_B`) o la longitud fija en el LDATA. Esto permite que el usuario modifique la longitud del sólido manualmente en AutoCAD (usando grips) sin que los datos se corrompan.
    - Campos Clave Inyectados: `FORMA`, `DIM_X`, `DIM_Y`, `ESPESSURA`, `LABIO`, `MATERIAL`, `JUSTIFICACAO`, `ROTACAO`.
 4. **Identidad Persistente (TMD_UUID / Handle Shadowing):**
-   - Para mantener una identidad persistente en los sólidos (para bases de datos, BOM) incluso si se reconstruyen o se copian, se utiliza `TMD_UUID`.
-   - **Clones de AutoCAD:** Al copiar nativamente (`COPY`, `MIRROR`), AutoCAD preserva el LDATA pero asigna un nuevo "Handle". Se guarda una propiedad "sombra" llamada `TMD_HOST_HANDLE`. Al inspeccionar un sólido, si el Handle nativo de AutoCAD es distinto a su `TMD_HOST_HANDLE` interno, se detecta como un clon, se resetean sus marcas y se le asigna un `TMD_UUID` nuevo automáticamente.
-   - **Reconstrucciones de Código:** Cuando el código destruye y recrea la viga para cambiar el perfil o la longitud, el código arrastra el `TMD_UUID` original al nuevo sólido y sobreescribe deliberadamente el `TMD_HOST_HANDLE` para que la entidad no sea tratada como un clon.
-5. **Simplificación:** Para evitar bloqueos, las rutinas de dibujo interactivo deben asegurar que el sistema no intente crear geometrías con distancia 0.
+   - Se usa `TMD_UUID` para rastrear sólidos idénticos en la base de datos de BOM.
+   - **Manejo de Clones:** Si al inspeccionar un sólido, su Handle de AutoCAD es diferente al `TMD_HOST_HANDLE` almacenado en LDATA, se considera un clon (copiado nativamente). Se le genera automáticamente un `TMD_UUID` nuevo.
+
+---
+
+## Organización del Repositorio (Reestructuración Física)
+El código AutoLISP corporativo está organizado estrictamente por disciplinas bajo las siguientes carpetas:
+
+* **`Suite_Sistema_Core/`**: Configuración de inicio, utilidades globales, cargadores dinámicos y puentes de paleta (`TM_SetupCore.lsp`, `TM_Setup.lsp`, `TMD_Utils.lsp`, `TMD_Palette_Bridge.lsp`).
+* **`Suite_Arquitectura/`**: Comandos y herramientas para modelado arquitectónico 2D/3D (`ParedeMVP.lsp`, `PortaMVP.lsp`, stubs de la suite `ARQ-`, etc.).
+* **`Suite_Estructura/`**: Perfiles metálicos, abas paramétricas, cálculo de grelhas, vigas y compiladores (`TMD_Vigas.lsp`, `TMD_Abas.lsp`, `TMD_BUILD.lsp`, `TMD_JOINTS.lsp`, etc.).
+* **`Suite_Topografia/`**: Cuadros de rumbos, etiquetas de nivel Z y herramientas de topografía (`LC_CUADRO_RUMBOS.lsp`, `LC_ZLABEL.lsp`).
+* **`Suite_Instalaciones_MEP/`**: Carpeta destinada para futuros desarrollos de redes hidráulicas, eléctricas y climatización.
+* **`Suite_Documentacion_BOM/`**: Generación de tablas de materiales, marcas dinámicas de nivel y sincronizadores (`TMD_BOM.lsp`, `TMD_Tablas.lsp`, `TMD_Tags.lsp`, `TMD_Niveis.lsp`, `TMD_MATCH.lsp`, `TMD_SYNC.lsp`).
+
+---
 
 ## Arquitectura de Carga SaaS — Stubs + JIT Loading (v3.5)
 
-El sistema usa un modelo **JIT (Just-In-Time)** donde el código LISP se descarga bajo demanda, no al inicio.
+El sistema usa un modelo **JIT (Just-In-Time)** donde el código LISP se descarga bajo demanda del servidor en la nube de forma transparente y sin almacenamiento físico en el disco del usuario (Zero-Disk).
 
-### Flujo de Arranque
-```
-Cliente descarga LC_Loader.lsp de internet (una sola vez)
-  └─> AutoCAD lo carga (manual o via soporte)
-      └─> Define funciones core: LC:load-remote-routine, LC:run-or-load, LC:get-command-name
-      └─> Auto-ejecuta c:CP1
-          └─> WEBLOAD crea paleta lateral (inspector_unified.html)
-              └─> palette_unified.js
-                  └─> Fetch INDEX del servidor → lista de comandos disponibles
-                  └─> Renderiza Command Palette con metadatos (METADATA_MAP)
-                  └─> Click en comando → evaluateLisp/executeCommand → LC:run-or-load
-```
+### Flujo de Ejecución de Comandos JIT:
+1. El usuario hace click en una tarjeta de la paleta HTML o escribe un comando fantasma en el AutoCAD (ej: `ARQ-WALL-Draw`).
+2. AutoCAD intercepta el comando y ejecuta `(LC:run-or-load "ARQ-WALL-Draw")`.
+3. Si el comando no se encuentra cargado en memoria, hace un fetch GET al servidor Cloud Run: `https://getroutine-wgpjjgorxa-uc.a.run.app/getRoutine?apiKey=...&routine=ARQ-WALL-Draw`
+4. El servidor procesa el archivo `.lsp` de `functions/lisp/`, remueve comentarios, envuelve el código en un bloque `(progn ...)` y lo retorna como texto plano.
+5. AutoCAD evalúa el código de forma segura en RAM (`eval`), registrando el comando real e invocándolo.
 
-### Archivos Clave del Sistema de Carga
-| Archivo | Rol | Ubicación |
-|---|---|---|
-| `LC_Loader.lsp` | Bootstrap del cliente: define funciones de red + lanza CP1 | PC del cliente (descarga) |
-| `web/palette_unified.js` | Lógica JS. Contiene función puente robusta `ejecutarComandoLisp` que usa nativamente `evaluateLisp`. | Servido local desde directorio del loader |
-| `web/inspector_unified.html` | HTML de la paleta. Diseñada con colores de `manual_marca.md` (modo oscuro, hover naranja, diseño minimalista). | Servido local desde directorio del loader |
-| `acaddoc.lsp` | **Solo desarrollo local** — carga directa desde Z: | Repositorio (no va al cliente) |
+---
 
-### Carga JIT (Just-In-Time)
-- **`LC:run-or-load`**: Verifica si el comando existe en RAM (`type cmd-sym`). Si no, llama a `LC:load-remote-routine` para descargarlo y luego lo ejecuta.
-- **`LC:load-remote-routine`**: Usa `MSXML2.XMLHTTP.6.0` (COM nativo de Windows) para HTTP síncrono. Evalúa el código en RAM con `eval (read ...)` envuelto en `vl-catch-all-apply`.
-- **IPC via `USERS1`**: La función LISP escribe `"nombre:success"` o `"nombre:error"` en `USERS1` para feedback a la paleta JS.
-- **Sin carga masiva al inicio**: `syncModulesSequentially()` está comentado. Solo se muestra "JIT PRONTO" en la paleta.
+## Suite de Arquitectura 2D (Comandos ARQ-)
+Los comandos de arquitectura 2D utilizan una firma semántica bajo el formato: `ARQ-[Sistema]-[Descriptivo]`. 
 
-### Mapeo de Nombres
-`LC:get-command-name` traduce nombres de archivo a comandos AutoCAD reales:
-- `AcmMVP` → `ACM`, `EstruturaMVP` → `VIGA`, `TejadoMVP` → `TELHADO`, etc.
-- Los nombres que no tienen mapeo se usan tal cual.
+### Listado de Comandos de la Suite:
+- **`ARQ-SYS-Config`**: Configuración de capas, unidades de dibujo y escalas operativas.
+- **`ARQ-GRID-Axes`**: Generación de rejillas de ejes paramétricas (X e Y).
+- **`ARQ-GRID-Line`**: Trazado y etiquetado individual de un eje de referencia.
+- **`ARQ-WALL-Draw`**: Dibujo interactivo de muros paralelos con espesor dinámico.
+- **`ARQ-WALL-FromAxis`**: Conversión instantánea de ejes seleccionados en muros 2D.
+- **`ARQ-WALL-Thickness`**: Cambio de espesor global para muros existentes seleccionados.
+- **`ARQ-WALL-Trim`**: Limpieza de encuentros y esquinas de muros en L, T o Cruz.
+- **`ARQ-COL-Insert`**: Colocación paramétrica de pilares redondos o rectangulares.
+- **`ARQ-DOOR-Insert`**: Inserción de puertas batientes o correderas con rotura automática de muro.
+- **`ARQ-WIN-Insert`**: Inserción de ventanas con antepecho y corte automático de muro.
+- **`ARQ-WALL-MoveOpening`**: Desplazamiento interactivo de vanos de puertas/ventanas reconstruyendo el muro.
+- **`ARQ-WALL-ResizeOpening`**: Cambio de dimensión de vanos de esquadria recalculando la apertura en muros.
+- **`ARQ-DIM-Opening`**: Acotado lineal automático y secuencial de muros y esquadrias.
+- **`ARQ-DIM-Quick`**: Acotado rápido y acaparador de las cotas internas de un ambiente.
+- **`ARQ-SYM-Level`**: Inserción de simbología de nivel de piso con textos editables.
 
-### Paradigma de Localización y Alias en la Nube (v5.5)
-- **Localización al vuelo (Backend JIT)**: Para evitar tablas hash de traducción en AutoCAD o archivos locales pesados en disco, la traducción de prompts LISP se realiza en el servidor Cloud Run al vuelo. El backend procesa las solicitudes LISP reemplazando marcadores de traducción (ej: `%SELECT_POINT%`) con los valores correspondientes del idioma del cliente (`lang=es` / `lang=pt`) antes de enviar el código.
-- **Inyección JIT de Alias**: Los atajos de teclado del usuario (como `WW` apuntando a `ARQ-WALL-Draw`) se almacenan en su perfil en la nube. Al iniciar la paleta web o iniciar sesión, el JS del frontend evalúa dinámicamente las definiciones en la memoria de AutoCAD mediante `evaluateLisp` (ej: `(defun c:WW () (c:ARQ-WALL-Draw)(princ))`). Esto elimina archivos de alias locales y permite la portabilidad de configuraciones.
+---
 
-### Limitaciones Conocidas (Beta)
-- **HTTP síncrono bloquea UI** durante descarga individual (~100-500ms por módulo). Aceptable para JIT.
-- **Sin persistencia**: Funciones cargadas desaparecen al cerrar AutoCAD. Cada sesión re-descarga bajo demanda.
-- **Código en texto plano**: HTTPS cifra en tránsito, pero no hay firma digital ni ofuscación. Pendiente para producción.
-- **Namespace global**: AutoLISP no tiene módulos. Colisiones posibles si dos módulos definen la misma función.
+## Paleta de Propiedades Contextuales Dinámicas
+El sistema cuenta con un panel de propiedades dinámico lateral (`web/properties_unified.html` y `web/properties_unified.js`) diseñado para operar en paralelo a la paleta de comandos.
+
+### Sincronización Bidireccional (IPC):
+1. **AutoCAD -> Web (Detección de Comando)**:
+   - Cuando un comando LISP `ARQ-...` se ejecuta, escribe su estado en la variable de sistema `USERS1` en el formato `[Comando]:active` (ej: `ARQ-WALL-Draw:active`).
+   - El JavaScript de la paleta realiza un sondeo continuo (polling de 250ms) de la variable `USERS1`. Al detectar el comando, activa automáticamente el formulario HTML correspondiente.
+   - Al terminar el comando LISP, escribe `[Comando]:success` o limpia la variable, lo cual retorna la paleta al estado de espera.
+2. **Web -> AutoCAD (Envío de Propiedades)**:
+   - Cada formulario web almacena los valores de sus parámetros de forma persistente en el `localStorage` del navegador.
+   - Cuando un usuario edita un parámetro en la web, el JavaScript evalúa dinámicamente una expresión de definición de variables globales en la memoria del AutoCAD utilizando `Acad.Editor.evaluateLisp` (ej: `(setq ARQ_WALL_Draw_thickness 150.0)`).
+   - Los stubs LISP de los comandos leen directamente estas variables globales para tomar los datos geométricos del formulario en tiempo de ejecución.
+
+---
 
 ## Infraestructura y Despliegues en Producción
-* **Despliegues en Google Cloud CLI (`gcloud`):** Debido al límite rígido de 10s de timeout del Spec Parser de Firebase CLI local (que tarda en resolver la carga síncrona en entornos de desarrollo lentos), el deploy se realiza de forma directa en Cloud Run saltándose a Firebase:
+* **Despliegues en Google Cloud CLI (`gcloud`):**
+  Debido al timeout estricto del firebase cli local, los deploys de las Cloud Run functions gen2 se realizan mediante gcloud cli:
   ```powershell
   gcloud functions deploy getRoutine --gen2 --runtime=nodejs22 --region=us-central1 --source=./functions --entry-point=getRoutine --trigger-http --allow-unauthenticated --project=lispcentral
   ```
-* **Lazy Loading:** Las importaciones en `functions/index.js` (como `firebase-admin`) se realizan de forma diferida (dentro de las funciones que las requieren) para mantener la inicialización de Node en menos de 100ms.
-* **Respaldo:** Las funciones adicionales de IA y Telemetría están comentadas en `index.js` para aliviar el bundle de producción y se respaldan en `functions/index_backup.js`.
+* **Enrutamiento del Backend:**
+  El enrutamiento del backend (`functions/index.js`) ha sido modificado en su regex de saneamiento para admitir guiones medios (`-`), lo que permite que las peticiones a comandos de formato `ARQ-...` se validen y entreguen correctamente.

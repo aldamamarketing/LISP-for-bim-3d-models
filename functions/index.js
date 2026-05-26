@@ -111,7 +111,7 @@ exports.getRoutine = onRequest({ cors: true }, async (req, res) => {
       return res.status(200).send(header + responseCode);
 
     } else {
-      const safeRoutineId = routineId.replace(/[^a-zA-Z0-9_]/g, "");
+      const safeRoutineId = routineId.replace(/[^a-zA-Z0-9_-]/g, "");
       let filename = `${safeRoutineId}.lsp`;
       let isLC = safeRoutineId.startsWith("LC_");
       let originalName = safeRoutineId;
