@@ -90,6 +90,24 @@
 (TMD:sys-load "Suite_Arquitectura/TMD_Groups.lsp")
 (TMD:sys-load "Suite_Arquitectura/LC_WALL_DRAW.lsp")
 
+;; Stubs locales Suite Arquitectura 2D (Pruebas Offline)
+(TMD:sys-load "Suite_Arquitectura/ARQ-SYS-Config.lsp")
+(TMD:sys-load "Suite_Arquitectura/ARQ-GRID-Axes.lsp")
+(TMD:sys-load "Suite_Arquitectura/ARQ-GRID-Line.lsp")
+(TMD:sys-load "Suite_Arquitectura/ARQ-WALL-Draw.lsp")
+(TMD:sys-load "Suite_Arquitectura/ARQ-WALL-FromAxis.lsp")
+(TMD:sys-load "Suite_Arquitectura/ARQ-WALL-Thickness.lsp")
+(TMD:sys-load "Suite_Arquitectura/ARQ-WALL-Trim.lsp")
+(TMD:sys-load "Suite_Arquitectura/ARQ-COL-Insert.lsp")
+(TMD:sys-load "Suite_Arquitectura/ARQ-DOOR-Insert.lsp")
+(TMD:sys-load "Suite_Arquitectura/ARQ-WIN-Insert.lsp")
+(TMD:sys-load "Suite_Arquitectura/ARQ-WALL-MoveOpening.lsp")
+(TMD:sys-load "Suite_Arquitectura/ARQ-WALL-ResizeOpening.lsp")
+(TMD:sys-load "Suite_Arquitectura/ARQ-DIM-Opening.lsp")
+(TMD:sys-load "Suite_Arquitectura/ARQ-DIM-Quick.lsp")
+(TMD:sys-load "Suite_Arquitectura/ARQ-SYM-Level.lsp")
+
+
 ;; 6.5 MÓDULOS DE TOPOGRAFIA E DOCUMENTAÇÃO/BOM
 (TMD:sys-load "Suite_Topografia/LC_CUADRO_RUMBOS.lsp")
 (TMD:sys-load "Suite_Documentacion_BOM/TMD_BOM.lsp")
