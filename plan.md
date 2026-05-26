@@ -1,0 +1,3 @@
+
+1. **Observation:** In `web/inspector.html`, there are two sets of icon-only buttons (`🎯` for pickPoint, `👁️` for zoomCutter, `🗑️` for removeCutter). These buttons have `title` attributes (some do, `🎯` don't), but no `aria-label`s. Also, looking at `web/styles.css`, there are no `:focus-visible` outlines defined to aid keyboard navigation for any buttons.
+2. **Action:** I will add `aria-label` attributes to the icon-only buttons in `web/inspector.html`. `🎯` buttons don't even have titles, so I will add `title` and `aria-label` to them. I will also add `aria-label` to the `👁️` and `🗑️` buttons.

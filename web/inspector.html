@@ -405,6 +405,11 @@
             border-color: #5d5d78;
         }
 
+        .revit-btn:focus-visible {
+            outline: 2px solid var(--accent-color);
+            outline-offset: -1px;
+        }
+
         .revit-btn-accent {
             background-color: var(--accent-color);
             color: #ffffff;
@@ -472,6 +477,11 @@
             opacity: 1;
             background: rgba(255,255,255,0.08);
             border-color: rgba(255,255,255,0.1);
+        }
+        .cutter-btn:focus-visible {
+            opacity: 1;
+            outline: 2px solid var(--accent-color);
+            outline-offset: -1px;
         }
         .cutter-btn-danger:hover {
             background: rgba(244,67,54,0.15);
@@ -563,14 +573,14 @@
                         <td class="prop-label">PT_A (Inicio)</td>
                         <td class="prop-value" style="display:flex; justify-content:space-between; align-items:center; padding:0 6px;">
                             <div id="disp-pta" class="prop-read-only" style="width: 80%;">-</div>
-                            <button class="revit-btn" style="padding: 2px 4px; border:none; background:transparent;" onclick="pickPoint('A')" disabled id="btn-pta">🎯</button>
+                            <button class="revit-btn" style="padding: 2px 4px; border:none; background:transparent;" onclick="pickPoint('A')" disabled id="btn-pta" title="Seleccionar punto A" aria-label="Seleccionar punto de inicio (A)">🎯</button>
                         </td>
                     </tr>
                     <tr class="prop-row">
                         <td class="prop-label">PT_B (Fin)</td>
                         <td class="prop-value" style="display:flex; justify-content:space-between; align-items:center; padding:0 6px;">
                             <div id="disp-ptb" class="prop-read-only" style="width: 80%;">-</div>
-                            <button class="revit-btn" style="padding: 2px 4px; border:none; background:transparent;" onclick="pickPoint('B')" disabled id="btn-ptb">🎯</button>
+                            <button class="revit-btn" style="padding: 2px 4px; border:none; background:transparent;" onclick="pickPoint('B')" disabled id="btn-ptb" title="Seleccionar punto B" aria-label="Seleccionar punto de fin (B)">🎯</button>
                         </td>
                     </tr>
                     <tr class="prop-row">
@@ -924,8 +934,8 @@
                 item.innerHTML = `
                     <span class="cutter-label">${cutTipo} &lt;${cutHandle}&gt;</span>
                     <span class="cutter-actions">
-                        <button class="cutter-btn" title="Localizar junta" onclick="zoomCutter('${wireHandle}','${cutHandle}')">👁️</button>
-                        <button class="cutter-btn cutter-btn-danger" title="Eliminar junta" onclick="removeCutter('${wireHandle}','${cutHandle}')">🗑️</button>
+                        <button class="cutter-btn" title="Localizar junta" aria-label="Localizar junta ${cutHandle}" onclick="zoomCutter('${wireHandle}','${cutHandle}')">👁️</button>
+                        <button class="cutter-btn cutter-btn-danger" title="Eliminar junta" aria-label="Eliminar junta ${cutHandle}" onclick="removeCutter('${wireHandle}','${cutHandle}')">🗑️</button>
                     </span>
                 `;
                 container.appendChild(item);

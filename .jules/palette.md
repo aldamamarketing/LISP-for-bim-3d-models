@@ -1,0 +1,3 @@
+## 2024-05-26 - Missing accessible labels and focus styles on custom icon buttons
+**Learning:** Custom icon-only buttons (`🎯`, `👁️`, `🗑️`) used across the inspector application were lacking basic accessibility indicators. They did not have `aria-label`s, which makes them essentially invisible or confusing to screen readers. In addition, their focus styles were completely undefined, meaning users navigating via keyboard could not tell when they were focused on these interactive elements.
+**Action:** When implementing or reviewing new custom icon buttons (especially those defined in local scoped styles like `.revit-btn` and `.cutter-btn`), always ensure `aria-label` is populated and that a prominent `:focus-visible` outline is added to the component's CSS.
