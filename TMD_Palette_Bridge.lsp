@@ -23,25 +23,10 @@
     (setq bridge-dir "Z:/Autocad Config/LISP") ; Fallback para rede corporativa
   )
   
-  ;; 2. Construir o caminho para o arquivo HTML da paleta
-  (setq html-path (strcat bridge-dir "/web/inspector.html"))
-  ;; Substituir contra-barras por barras para compatibilidade JavaScript
-  (setq html-path (vl-string-translate "\\" "/" html-path))
+  ;; 2. Construir el camino para el archivo HTML de la paleta apuntando a la NUBE (SaaS)
+  (setq html-path "https://lispcentral.web.app/palette/inspector.html")
   
-  ;; Garantir formato file:/// e codificar espaços como %20 para Chromium
-  (if (not (vl-string-search "file:///" html-path))
-    (if (= (substr html-path 1 1) "/")
-      (setq html-path (strcat "file://" html-path))
-      (setq html-path (strcat "file:///" html-path))
-    )
-  )
-  
-  ;; Codificar espaços para URL válido do navegador
-  (while (vl-string-search " " html-path)
-    (setq html-path (vl-string-subst "%20" " " html-path))
-  )
-  
-  ;; Forçar bypass de cache no Chromium adicionando um timestamp único
+  ;; Forzar bypass de caché en el navegador Chromium añadiendo un timestamp único
   (setq html-path (strcat html-path "?v=" (rtos (getvar "CDATE") 2 6)))
   
   ;; 3. Criar arquivo JavaScript de inicialização (WEBLOAD) na pasta 'web' (seguro com TRUSTEDPATHS)
