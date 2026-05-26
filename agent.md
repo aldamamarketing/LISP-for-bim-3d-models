@@ -18,15 +18,19 @@ Se ha abandonado el concepto de `TMD_PARENT_WIRE` y polilíneas base ("Wires"). 
 5. **Simplificación:** Para evitar bloqueos, las rutinas de dibujo interactivo deben asegurar que el sistema no intente crear geometrías con distancia 0.
 
 ## Arquitectura de Carga y Sincronización SaaS (Versión 3.5)
-Para lograr un arranque "Zero Friction" en AutoCAD y garantizar máxima seguridad y velocidad de red, el flujo se migró a un modelo **Index-Driven asíncrono gestionado por Chromium**:
+Para lograr un arranque "Zero Friction" en AutoCAD y garantizar máxima seguridad y velocidad de red, el flujo se migró a un modelo **Index-Driven asíncrono gestionado por Chromium con delegación de red nativa LISP (IPC)**:
 
 1. **Arranque instantáneo:** El cargador LISP local (`LC_Loader.lsp`) no realiza descargas de red al iniciar AutoCAD. Únicamente registra y ejecuta el comando `CP1` (Command Palette), liberando la consola inmediatamente.
-2. **Command Palette (`web/inspector_unified.html`):** Es una paleta lateral unificada premium (glassmorphism oscuro, estilo "Spotlight" de búsqueda) que corre sobre el motor Chromium nativo de AutoCAD.
-3. **Carga en segundo plano asíncrona:** 
-   - Al cargarse la paleta, esta lee los parámetros seguros de la URL (`apiKey` y `hwId`) y realiza una única petición HTTP a `/getRoutine?routine=INDEX` para obtener la lista de comandos disponibles.
-   - Usando `fetch` asíncrono y en paralelo (`Promise.all`), la paleta descarga cada rutina directamente del servidor y las evalúa en la RAM usando el objeto de AutoCAD: `Acad.Editor.executeCommand(lispCode)`.
-   - Se muestra un feedback visual interactivo del porcentaje de carga y los comandos disponibles.
-4. **Inmunidad a Fallos en RAM:** La evaluación del código en AutoCAD se encapsula de forma aislada dentro de un bloque `(vl-catch-all-apply '(lambda () (eval (read ...))))`. Si un archivo específico tiene un error de balance de paréntesis en su sintaxis (como ocurría en `AbaParam`), el cargador lo reporta en consola pero continúa cargando los demás módulos de forma transparente.
+2. **Command Palette (`web/inspector_unified.html`):** Es una paleta lateral unificada premium (glassmorphism oscuro, estilo "Spotlight" de búsqueda) que corre sobre el motor Chromium nativo de AutoCAD. Se rediseñó para ocultar la barra de desplazamiento predeterminada de Windows y organizar los comandos agrupados por categorías con contadores de comandos en tiempo real.
+3. **Carga en segundo plano asíncrona delegada (IPC via USERS1):**
+   - Al cargarse la paleta, esta lee los parámetros seguros de la URL y solicita al backend la lista indexada de rutinas.
+   - En lugar de descargar el código en JavaScript (lo cual fallaba por límites de búfer y salto de línea en la consola de AutoCAD), la paleta JS delega secuencialmente la descarga a AutoCAD ejecutando la función LISP nativa `(LC:load-remote-routine "NOM_ROUTINE")` que usa `MSXML2.XMLHTTP.6.0`.
+   - **Comunicación IPC:** La paleta JS realiza sondeos (polling) periódicos usando `Acad.Editor.getSystemVariable("USERS1")` para detectar cuando AutoCAD finaliza la carga de la rutina (`success` o `error`).
+   - Al alcanzar el 100% de la carga, la barra de progreso se oculta automáticamente tras 1.5 segundos.
+4. **Mapeo de Comandos e Inyección en RAM:**
+   - La función LISP `LC:get-command-name` mapea los nombres de archivos de rutinas a los comandos AutoCAD correspondientes (ej: `AcmMVP` -> `ACM`, `EstruturaMVP` -> `VIGA`, `TejadoMVP` -> `TELHADO`).
+   - `LC:run-or-load` verifica si el comando está cargado en RAM; si no, lo descarga bajo demanda y lo ejecuta inmediatamente.
+5. **Inmunidad a Fallos en RAM:** La evaluación del código en AutoCAD se encapsula de forma aislada dentro de un bloque `(vl-catch-all-apply '(lambda () (eval (read ...))))`. Si un archivo específico tiene un error de balance de paréntesis en su sintaxis (como ocurría en `AbaParam`), el cargador lo reporta en consola pero continúa cargando los demás módulos de forma transparente.
 
 ## Infraestructura y Despliegues en Producción
 * **Despliegues en Google Cloud CLI (`gcloud`):** Debido al límite rígido de 10s de timeout del Spec Parser de Firebase CLI local (que tarda en resolver la carga síncrona en entornos de desarrollo lentos), el deploy se realiza de forma directa en Cloud Run saltándose a Firebase:

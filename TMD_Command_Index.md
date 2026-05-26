@@ -17,6 +17,7 @@ Este documento es la **Fuente de Verdad** del proyecto. Antes de crear una nueva
 | **TMD_FORENSIC** | `TMD_Forensic.lsp` | **Inspector Forense v3.0**. Diagnóstico total: Realidad física vs ADN LData. Rastreo automático de parejas. | Investigación de errores o inconsistencias. |
 | **TMD_ALIGN** | `TMD_Align.lsp` | **Alineación Industrial**. Motor estilo Corel (L, R, T, B, C, E). | Organización de grupos. |
 | **TMD_NIVEIS** | `TMD_Niveis.lsp` | **Sincronizador de Niveles**: Edición global de alturas y nombres. | Cambios globales de Z. |
+| **CP1** / **TMD_INSPECT** | `LC_Loader.lsp` | **Command Palette SaaS**: Panel Chromium unificado de búsqueda y ejecución de comandos en RAM. | Lanzamiento de interfaz. |
 
 ---
 
