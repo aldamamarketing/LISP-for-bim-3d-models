@@ -1,0 +1,216 @@
+---
+import DocsLayout from '../../../layouts/DocsLayout.astro';
+
+export async function getStaticPaths() {
+  const commands = [
+    {
+      command: "arq-sys-config",
+      title: "ARQ-SYS-Config",
+      friendly: "Configurar Suite de Arquitetura",
+      syntax: "ARQ-SYS-Config",
+      desc: "Configura os parâmetros globais da suite de arquitetura 2D, como layers de trabalho, unidades e escala do desenho.",
+      details: [
+        "Escala de Trabalho: Altera a escala de plotagem global para ajustar textos e símbolos.",
+        "Unidades de Desenho: Configura unidades em Metros (m), Centímetros (cm) ou Milímetros (mm).",
+        "Camadas Operacionais (Layers): Define os layers padrão para muros (ARQ-PAREDE) e esquadrias (ARQ-ESQUADRIA)."
+      ]
+    },
+    {
+      command: "arq-grid-axes",
+      title: "ARQ-GRID-Axes",
+      friendly: "Gerador Paramétrico de Eixos",
+      syntax: "ARQ-GRID-Axes",
+      desc: "Gera automaticamente um grid ortogonal completo de linhas de eixo a partir de espaçamentos definidos.",
+      details: [
+        "Espaçamentos X: Insira sequências separadas por vírgula para eixos horizontais (ex: 4.0, 3.5, 5.0).",
+        "Espaçamentos Y: Insira sequências separadas por vírgula para eixos verticais (ex: 3.0, 4.0, 3.0).",
+        "Geometria da Bolha: Diâmetro da bolha de identificação ajustável na paleta.",
+        "Altura do Texto: Tamanho do texto interno para referências de eixo (A, B, C / 1, 2, 3)."
+      ]
+    },
+    {
+      command: "arq-grid-line",
+      title: "ARQ-GRID-Line",
+      friendly: "Trazar Eixo Único",
+      syntax: "ARQ-GRID-Line",
+      desc: "Cria uma linha de eixo de referência individual com identificação alfanumérica e bolhas configuráveis nas pontas.",
+      details: [
+        "Etiqueta Personalizada: Insira a letra ou número de identificação do eixo.",
+        "Posição da Bolha: Opção para exibir a bolha no início da linha, no fim ou em ambas as extremidades."
+      ]
+    },
+    {
+      command: "arq-wall-draw",
+      title: "ARQ-WALL-Draw",
+      friendly: "Desenho de Muros Duplos",
+      syntax: "ARQ-WALL-Draw",
+      desc: "Desenha paredes paralelas de forma contínua e interativa diretamente no AutoCAD.",
+      details: [
+        "Espessura do Muro: Espessura total da parede dupla (ex: 150mm ou 200mm).",
+        "Alinhamento (Justificação): Escolha desenhar a partir do eixo do muro (Centro), face esquerda ou face direita."
+      ]
+    },
+    {
+      command: "arq-wall-fromaxis",
+      title: "ARQ-WALL-FromAxis",
+      friendly: "Muros a partir de Eixos",
+      syntax: "ARQ-WALL-FromAxis",
+      desc: "Converte de forma instantânea linhas de eixo selecionadas na tela em paredes duplas utilizando a espessura configurada.",
+      details: [
+        "Espessura de Conversão: Define a espessura que os muros convertidos adotarão.",
+        "Limpeza de Origem: Opção para deletar automaticamente as linhas de eixo originais após a geração dos muros."
+      ]
+    },
+    {
+      command: "arq-wall-thickness",
+      title: "ARQ-WALL-Thickness",
+      friendly: "Alterar Espessura de Muros",
+      syntax: "ARQ-WALL-Thickness",
+      desc: "Modifica a espessura de muros duplos existentes selecionados na tela mantendo seu alinhamento.",
+      details: [
+        "Nova Espessura: Insira o novo valor de espessura de parede desejado.",
+        "Ajuste Simétrico: O comando recalcula as duas linhas paralelas radialmente a partir do eixo geométrico original."
+      ]
+    },
+    {
+      command: "arq-wall-trim",
+      title: "ARQ-WALL-Trim",
+      friendly: "Limpeza de Interseções de Muros",
+      syntax: "ARQ-WALL-Trim",
+      desc: "Limpa e resolve automaticamente cruzamentos de linhas e encontros de paredes duplas.",
+      details: [
+        "Modo Automático: O sistema identifica de forma inteligente junções em L, encontros em T ou cruzamentos em Cruz.",
+        "Limpeza Limpa: Une as faces internas do muro de forma síncrona."
+      ]
+    },
+    {
+      command: "arq-col-insert",
+      title: "ARQ-COL-Insert",
+      friendly: "Inserção de Pilares Paramétricos",
+      syntax: "ARQ-COL-Insert",
+      desc: "Insere pilares estruturais de formato circular ou retangular nos cruzamentos de eixos ou em cliques livres.",
+      details: [
+        "Tipo de Seção: Escolha entre seções retangulares/quadradas ou circulares (redondas).",
+        "Dimensões do Pilar: Defina largura (X/Diâmetro) e comprimento (Y) da coluna.",
+        "Rotação: Ângulo de rotação da coluna em graus."
+      ]
+    },
+    {
+      command: "arq-door-insert",
+      title: "ARQ-DOOR-Insert",
+      friendly: "Inserção de Porta Inteligente",
+      syntax: "ARQ-DOOR-Insert",
+      desc: "Insere uma porta paramétrica 2D no muro selecionado, realizando o corte e cura (trim) do muro automaticamente.",
+      details: [
+        "Dimensões da Porta: Insira largura (ex: 800mm) e altura da folha da porta.",
+        "Tipo de Abertura: Escolha entre giro simples (batente), correr embutida na parede ou porta dupla."
+      ]
+    },
+    {
+      command: "arq-win-insert",
+      title: "ARQ-WIN-Insert",
+      friendly: "Inserção de Janela Inteligente",
+      syntax: "ARQ-WIN-Insert",
+      desc: "Insere uma janela paramétrica em paredes 2D, quebrando as linhas de muro e desenhando soleiras de forma automática.",
+      details: [
+        "Dimensões da Janela: Defina largura e altura do caixilho/vidro.",
+        "Peitoril: Configura a altura do peitoril da janela em relação ao nível do piso."
+      ]
+    },
+    {
+      command: "arq-wall-moveopening",
+      title: "ARQ-WALL-MoveOpening",
+      friendly: "Mover Esquadria com Reparo",
+      syntax: "ARQ-WALL-MoveOpening",
+      desc: "Move uma porta ou janela ao longo da parede, fechando o furo antigo e gerando a nova abertura dinamicamente.",
+      details: [
+        "Modo Livre: Desloque a abertura arrastando dinamicamente na tela.",
+        "Modo por Distância: Afaste o vão por uma distância fixa a partir de uma quina de parede."
+      ]
+    },
+    {
+      command: "arq-wall-resizeopening",
+      title: "ARQ-WALL-ResizeOpening",
+      friendly: "Redimensionar Vão de Parede",
+      syntax: "ARQ-WALL-ResizeOpening",
+      desc: "Altera a largura de uma porta ou janela existente na tela, adaptando o corte do muro instantaneamente.",
+      details: [
+        "Nova Largura: Insira o novo vão desejado para a esquadria.",
+        "Regeneração Automática: O comando refaz as linhas internas de fechamento do muro."
+      ]
+    },
+    {
+      command: "arq-dim-opening",
+      title: "ARQ-DIM-Opening",
+      friendly: "Acotamento de Paredes e Vãos",
+      syntax: "ARQ-DIM-Opening",
+      desc: "Gera cotas lineares contínuas automáticas nas aberturas e espessuras de paredes selecionadas.",
+      details: [
+        "Estilo de Cota: Escolha entre estilos padrão (ISO-25) ou TMD personalizado.",
+        "Distância de Afastamento: Define o espaçamento em relação à parede para criação das cotas."
+      ]
+    },
+    {
+      command: "arq-dim-quick",
+      title: "ARQ-DIM-Quick",
+      friendly: "Cota Rápida de Ambientes",
+      syntax: "ARQ-DIM-Quick",
+      desc: "Insere cotas internas completas em um cômodo fechado a partir de um clique interno de referência.",
+      details: [
+        "Detecção Automática: Reconhece as paredes limitantes da sala ou ambiente.",
+        "Cotas Internas: Desenha as linhas de cotas ortogonais horizontais e verticais."
+      ]
+    },
+    {
+      command: "arq-sym-level",
+      title: "ARQ-SYM-Level",
+      friendly: "Marcador de Nível de Piso",
+      syntax: "ARQ-SYM-Level",
+      desc: "Insere o bloco técnico dinâmico de nível de piso com valor editável na paleta.",
+      details: [
+        "Valor de Nível: Texto representativo do nível (ex: +0.15, -1.20).",
+        "Desenho do Símbolo: Escolha entre o símbolo clássico de círculo hachurado ou triângulo.",
+        "Escala: Tamanho de escala do marcador para plotagem."
+      ]
+    }
+  ];
+
+  return commands.map(cmd => ({
+    params: { command: cmd.command },
+    props: { cmd }
+  }));
+}
+
+const { cmd } = Astro.props;
+---
+
+<DocsLayout title={cmd.title}>
+  <div class="doc-content">
+    <h1>{cmd.title}</h1>
+    <p style="font-size: 1.1rem; color: var(--tmd-orange); margin-bottom: 20px;">
+      <strong>Função:</strong> {cmd.friendly}
+    </p>
+
+    <h2>Sintaxe</h2>
+    <div class="cmd-box">
+      Comando: {cmd.syntax}
+    </div>
+
+    <h2>Descrição</h2>
+    <p>{cmd.desc}</p>
+
+    <h2>Parâmetros Sincronizados</h2>
+    <p>Este comando conecta-se com a <strong>Paleta de Propriedades</strong>. As configurações abaixo são salvas localmente e enviadas ao AutoCAD ao executar:</p>
+    <ul style="margin-left: 20px; margin-bottom: 20px; line-height: 1.8;">
+      {cmd.details.map(detail => (
+        <li>{detail}</li>
+      ))}
+    </ul>
+
+    <h2>Paradigma JIT (Zero-Disk)</h2>
+    <p>
+      Como parte da suite <strong>SaaS do LispCentral</strong>, o comando <code>{cmd.syntax}</code> não é instalado localmente. 
+      Ao executá-lo via CLI ou paleta, o AutoCAD busca a versão mais recente diretamente na nuvem e a executa diretamente na memória RAM da sessão do documento.
+    </p>
+  </div>
+</DocsLayout>
