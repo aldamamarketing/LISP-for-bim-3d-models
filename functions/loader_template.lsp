@@ -56,8 +56,8 @@
       (if (= status 200)
         (progn
           (setq response (vlax-get-property xmlhttp 'responseText))
-          ;; Executa o codigo em RAM de forma isolada
-          (if (vl-catch-all-error-p (vl-catch-all-apply 'eval (list (read (strcat "(progn\n" response "\n(princ)\n)")))))
+          ;; Executa o codigo em RAM de forma isolada (backend ja entrega minificado e com progn)
+          (if (vl-catch-all-error-p (vl-catch-all-apply 'eval (list (read response))))
             (progn
               (princ (strcat "\n[❌] Erro de sintaxe na rotina: " routine_id))
               (setvar "USERS1" (strcat routine_id ":error"))
@@ -104,24 +104,51 @@
   )
 )
 
-;; Funcao para rodar um comando garantindo que esteja carregado
+;; Lista global de rotinas JIT carregadas na RAM
+(if (not *LC-LOADED-ROUTINES*) (setq *LC-LOADED-ROUTINES* nil))
+
+;; Funcao para rodar um comando com JIT Loading
 (defun LC:run-or-load (routine_name / cmd-name cmd-sym)
   (setq cmd-name (LC:get-command-name routine_name))
   (setq cmd-sym (read (strcat "c:" cmd-name)))
-  (if (not (eval (list 'type cmd-sym)))
+  
+  (if (not (member routine_name *LC-LOADED-ROUTINES*))
     (progn
-      (princ (strcat "\n[LispCentral] Comando '" cmd-name "' nao esta na RAM. Carregando..."))
+      (princ (strcat "\n[LispCentral] Comando '" cmd-name "' nao esta na RAM. Fazendo JIT Load..."))
       (LC:load-remote-routine routine_name)
+      (setq *LC-LOADED-ROUTINES* (cons routine_name *LC-LOADED-ROUTINES*))
     )
   )
-  (if (eval (list 'type cmd-sym))
+  
+  (if (member routine_name *LC-LOADED-ROUTINES*)
     (progn
       (eval (list cmd-sym))
     )
-    (alert (strcat "\n[❌] Erro: Nao foi possivel carregar o comando: " cmd-name))
+    (alert (strcat "\n[❌] Erro: Nao foi possivel carregar o comando JIT: " cmd-name))
   )
   (princ)
 )
+
+;; Registro instantaneo de Ghost Commands (Stubs) para JIT Loading Zero-Disk
+(defun LC:register-ghosts (/ cmds)
+  (princ "\n[LispCentral] Injetando Ghost Commands (JIT)...")
+  (setq cmds '(("ABA_PARAM" "AbaParam") ("ABA_PERFIL" "AbaPerfil") ("ACM" "AcmMVP") ("ABA_CRIAR" "AcmTools")
+               ("CORTARPAREDE" "CortarParedes") ("VIGA" "EstruturaMVP") ("PAREDE" "ParedeMVP")
+               ("PORTA" "PortaMVP") ("TELHADO" "TejadoMVP") ("BOM" "TMD_BOM") ("JOINTS" "TMD_JOINTS")
+               ("BUILD" "TMD_BUILD") ("WIRES" "TMD_Wires") ("NIVEIS" "TMD_Niveis") ("SYNC" "TMD_SYNC")
+               ("TAGS" "TMD_Tags") ("MATCH" "TMD_MATCH") ("ALIGN" "TMD_Align") ("GROUPS" "TMD_Groups")
+               ("FACECUT" "TMD_FACE_CUT") ("TABLAS" "TMD_Tablas") ("CNC" "TMD_CNC")
+               ("TR25" "TMD_Teja_TR25") ("UTILS" "TMD_Utils") ("LC_CLEAN" "LC_CLEAN") 
+               ("LC_FLATZ" "LC_FLATZ") ("LC_ZLABEL" "LC_ZLABEL")))
+  (foreach item cmds
+    (eval (list 'defun (read (strcat "c:" (car item))) '()
+                (list 'LC:run-or-load (cadr item))
+          ))
+  )
+  (princ " OK.")
+)
+(LC:register-ghosts)
+
 
 ;; Comando Principal de la Paleta Unificada (CP1)
 (defun c:CP1 (/ doc find-path bridge-dir html-path loader-js f-js)

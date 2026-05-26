@@ -133,8 +133,12 @@ exports.getRoutine = onRequest({ cors: true }, async (req, res) => {
         code = code.replace(/\(TMD_/gi, "(LC_");
       }
 
-      code = code.replace(/;+.*$/gm, ""); 
-      code = code.replace(/^\s*[\r\n]/gm, ""); 
+      // Minificación LISP estricta para inyección en RAM (Zero-Disk)
+      code = code.replace(/;.*$/gm, ""); // Remover todos los comentarios
+      code = code.replace(/\r\n/g, "\n"); // Normalizar saltos de línea
+      // Envolvemos en progn en el backend para entregar una S-Expression perfecta
+      code = `(progn\n${code}\n(princ)\n)`;
+
 
       const header = `;;; =====================================================================================\n` +
                      `;;; SERVIDO POR LISPCENTRAL CLOUD PLATFORM v2.0 (SaaS)\n` +

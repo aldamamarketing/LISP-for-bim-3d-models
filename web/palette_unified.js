@@ -333,9 +333,17 @@ async function initPalette() {
     
     renderModules();
     
-    // 2. Iniciar descarga secuencial controlada a través de LISP (IPC via USERS1)
-    syncModulesSequentially();
+    // 2. Comandos Fantasmas ja foram injetados nativamente.
+    // O download agora é feito sob demanda (JIT) via LC:run-or-load.
+    // syncModulesSequentially();
     
+    // Atualiza a interface visualmente para "Pronto" instantaneamente
+    document.getElementById("progressVal").innerText = "JIT PRONTO";
+    document.getElementById("progressBar").style.width = "100%";
+    setTimeout(() => {
+      const statusPanel = document.querySelector(".status-panel");
+      if (statusPanel) statusPanel.classList.add("hidden");
+    }, 1500);
   } catch (err) {
     console.error("Erro ao inicializar paleta:", err);
     writeConsoleMessage(`\n[❌] LispCentral: Erro de conexao: ${err.message}`);

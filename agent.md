@@ -17,20 +17,47 @@ Se ha abandonado el concepto de `TMD_PARENT_WIRE` y polilíneas base ("Wires"). 
    - **Reconstrucciones de Código:** Cuando el código destruye y recrea la viga para cambiar el perfil o la longitud, el código arrastra el `TMD_UUID` original al nuevo sólido y sobreescribe deliberadamente el `TMD_HOST_HANDLE` para que la entidad no sea tratada como un clon.
 5. **Simplificación:** Para evitar bloqueos, las rutinas de dibujo interactivo deben asegurar que el sistema no intente crear geometrías con distancia 0.
 
-## Arquitectura de Carga y Sincronización SaaS (Versión 3.5)
-Para lograr un arranque "Zero Friction" en AutoCAD y garantizar máxima seguridad y velocidad de red, el flujo se migró a un modelo **Index-Driven asíncrono gestionado por Chromium con delegación de red nativa LISP (IPC)**:
+## Arquitectura de Carga SaaS — Stubs + JIT Loading (v3.5)
 
-1. **Arranque instantáneo:** El cargador LISP local (`LC_Loader.lsp`) no realiza descargas de red al iniciar AutoCAD. Únicamente registra y ejecuta el comando `CP1` (Command Palette), liberando la consola inmediatamente.
-2. **Command Palette (`web/inspector_unified.html`):** Es una paleta lateral unificada premium (glassmorphism oscuro, estilo "Spotlight" de búsqueda) que corre sobre el motor Chromium nativo de AutoCAD. Se rediseñó para ocultar la barra de desplazamiento predeterminada de Windows y organizar los comandos agrupados por categorías con contadores de comandos en tiempo real.
-3. **Carga en segundo plano asíncrona delegada (IPC via USERS1):**
-   - Al cargarse la paleta, esta lee los parámetros seguros de la URL y solicita al backend la lista indexada de rutinas.
-   - En lugar de descargar el código en JavaScript (lo cual fallaba por límites de búfer y salto de línea en la consola de AutoCAD), la paleta JS delega secuencialmente la descarga a AutoCAD ejecutando la función LISP nativa `(LC:load-remote-routine "NOM_ROUTINE")` que usa `MSXML2.XMLHTTP.6.0`.
-   - **Comunicación IPC:** La paleta JS realiza sondeos (polling) periódicos usando `Acad.Editor.getSystemVariable("USERS1")` para detectar cuando AutoCAD finaliza la carga de la rutina (`success` o `error`).
-   - Al alcanzar el 100% de la carga, la barra de progreso se oculta automáticamente tras 1.5 segundos.
-4. **Mapeo de Comandos e Inyección en RAM:**
-   - La función LISP `LC:get-command-name` mapea los nombres de archivos de rutinas a los comandos AutoCAD correspondientes (ej: `AcmMVP` -> `ACM`, `EstruturaMVP` -> `VIGA`, `TejadoMVP` -> `TELHADO`).
-   - `LC:run-or-load` verifica si el comando está cargado en RAM; si no, lo descarga bajo demanda y lo ejecuta inmediatamente.
-5. **Inmunidad a Fallos en RAM:** La evaluación del código en AutoCAD se encapsula de forma aislada dentro de un bloque `(vl-catch-all-apply '(lambda () (eval (read ...))))`. Si un archivo específico tiene un error de balance de paréntesis en su sintaxis (como ocurría en `AbaParam`), el cargador lo reporta en consola pero continúa cargando los demás módulos de forma transparente.
+El sistema usa un modelo **JIT (Just-In-Time)** donde el código LISP se descarga bajo demanda, no al inicio.
+
+### Flujo de Arranque
+```
+Cliente descarga LC_Loader.lsp de internet (una sola vez)
+  └─> AutoCAD lo carga (manual o via soporte)
+      └─> Define funciones core: LC:load-remote-routine, LC:run-or-load, LC:get-command-name
+      └─> Auto-ejecuta c:CP1
+          └─> WEBLOAD crea paleta lateral (inspector_unified.html)
+              └─> palette_unified.js
+                  └─> Fetch INDEX del servidor → lista de comandos disponibles
+                  └─> Renderiza Command Palette con metadatos (METADATA_MAP)
+                  └─> Click en comando → Acad.Editor.executeCommand → LC:run-or-load
+```
+
+### Archivos Clave del Sistema de Carga
+| Archivo | Rol | Ubicación |
+|---|---|---|
+| `LC_Loader.lsp` | Bootstrap del cliente: define funciones de red + lanza CP1 | PC del cliente (descarga) |
+| `web/palette_unified.js` | UI de la Command Palette + lógica de renderizado | Servido local desde directorio del loader |
+| `web/inspector_unified.html` | HTML de la paleta (glassmorphism oscuro, spotlight search) | Servido local desde directorio del loader |
+| `acaddoc.lsp` | **Solo desarrollo local** — carga directa desde Z: | Repositorio (no va al cliente) |
+
+### Carga JIT (Just-In-Time)
+- **`LC:run-or-load`**: Verifica si el comando existe en RAM (`type cmd-sym`). Si no, llama a `LC:load-remote-routine` para descargarlo y luego lo ejecuta.
+- **`LC:load-remote-routine`**: Usa `MSXML2.XMLHTTP.6.0` (COM nativo de Windows) para HTTP síncrono. Evalúa el código en RAM con `eval (read ...)` envuelto en `vl-catch-all-apply`.
+- **IPC via `USERS1`**: La función LISP escribe `"nombre:success"` o `"nombre:error"` en `USERS1` para feedback a la paleta JS.
+- **Sin carga masiva al inicio**: `syncModulesSequentially()` está comentado. Solo se muestra "JIT PRONTO" en la paleta.
+
+### Mapeo de Nombres
+`LC:get-command-name` traduce nombres de archivo a comandos AutoCAD reales:
+- `AcmMVP` → `ACM`, `EstruturaMVP` → `VIGA`, `TejadoMVP` → `TELHADO`, etc.
+- Los nombres que no tienen mapeo se usan tal cual.
+
+### Limitaciones Conocidas (Beta)
+- **HTTP síncrono bloquea UI** durante descarga individual (~100-500ms por módulo). Aceptable para JIT.
+- **Sin persistencia**: Funciones cargadas desaparecen al cerrar AutoCAD. Cada sesión re-descarga bajo demanda.
+- **Código en texto plano**: HTTPS cifra en tránsito, pero no hay firma digital ni ofuscación. Pendiente para producción.
+- **Namespace global**: AutoLISP no tiene módulos. Colisiones posibles si dos módulos definen la misma función.
 
 ## Infraestructura y Despliegues en Producción
 * **Despliegues en Google Cloud CLI (`gcloud`):** Debido al límite rígido de 10s de timeout del Spec Parser de Firebase CLI local (que tarda en resolver la carga síncrona en entornos de desarrollo lentos), el deploy se realiza de forma directa en Cloud Run saltándose a Firebase:
