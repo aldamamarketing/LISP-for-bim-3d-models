@@ -53,6 +53,10 @@ Cliente descarga LC_Loader.lsp de internet (una sola vez)
 - `AcmMVP` → `ACM`, `EstruturaMVP` → `VIGA`, `TejadoMVP` → `TELHADO`, etc.
 - Los nombres que no tienen mapeo se usan tal cual.
 
+### Paradigma de Localización y Alias en la Nube (v5.5)
+- **Localización al vuelo (Backend JIT)**: Para evitar tablas hash de traducción en AutoCAD o archivos locales pesados en disco, la traducción de prompts LISP se realiza en el servidor Cloud Run al vuelo. El backend procesa las solicitudes LISP reemplazando marcadores de traducción (ej: `%SELECT_POINT%`) con los valores correspondientes del idioma del cliente (`lang=es` / `lang=pt`) antes de enviar el código.
+- **Inyección JIT de Alias**: Los atajos de teclado del usuario (como `WW` apuntando a `ARQ-WALL-Draw`) se almacenan en su perfil en la nube. Al iniciar la paleta web o iniciar sesión, el JS del frontend evalúa dinámicamente las definiciones en la memoria de AutoCAD mediante `evaluateLisp` (ej: `(defun c:WW () (c:ARQ-WALL-Draw)(princ))`). Esto elimina archivos de alias locales y permite la portabilidad de configuraciones.
+
 ### Limitaciones Conocidas (Beta)
 - **HTTP síncrono bloquea UI** durante descarga individual (~100-500ms por módulo). Aceptable para JIT.
 - **Sin persistencia**: Funciones cargadas desaparecen al cerrar AutoCAD. Cada sesión re-descarga bajo demanda.
