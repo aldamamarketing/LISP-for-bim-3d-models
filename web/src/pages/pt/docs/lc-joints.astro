@@ -1,0 +1,28 @@
+---
+import DocsLayout from '../../../layouts/DocsLayout.astro';
+---
+
+<DocsLayout title="LC_JOINTS">
+  <div class="doc-content">
+    <h1>LC_JOINTS</h1>
+      <p>Ferramenta avançada para resolver conexões e recortes (copes) entre sólidos 3D estruturais (vigas e colunas) no AutoCAD.</p>
+
+      <h2>Sintaxe</h2>
+      <div class="cmd-box">
+        Comando: LC_JOINTS
+      </div>
+
+      <h2>Descrição</h2>
+      <p>O <code>LC_JOINTS</code> substitui os antigos comandos <code>TMD_JOINTS</code>. Ele permite realizar automaticamente operações de subtração e junção entre vigas que se cruzam.</p>
+      <p>Como trabalhamos nativamente com <code>3DSOLID</code>, o sistema lê o Bounding Box e a direção de extrusão para gerar recortes limpos e alinhados, preservando a inteligência LDATA.</p>
+
+      <h2>Modos de Operação</h2>
+      <ul>
+        <li><b>Flush:</b> Recorta a viga secundária rentando exatamente pela face interior da aba da primária.</li>
+        <li><b>Miter (Meia-esquadria):</b> Conexão a 45 graus para esquinas de tubos quadrados ou vigas do mesmo perfil.</li>
+        <li><b>Crossing:</b> Furo passante. Subtrai a geometria exata da viga passante na viga alvo.</li>
+        <li><b>Auto:</b> Detecta cruzamentos numa seleção múltipla e resolve usando Flush.</li>
+        <li><b>Clear:</b> Limpa todas as operações booleanas e restaura o sólido original.</li>
+      </ul>
+  </div>
+</DocsLayout>

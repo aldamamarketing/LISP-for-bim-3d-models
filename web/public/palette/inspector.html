@@ -1023,21 +1023,27 @@
                 return;
             }
             
-            const oldScript = document.getElementById('tmd-query-script');
-            if (oldScript) {
-                oldScript.parentNode.removeChild(oldScript);
-            }
+            // Limpiar scripts anteriores para evitar fugas de memoria
+            const oldScripts = document.querySelectorAll('.tmd-query-script');
+            oldScripts.forEach(s => s.parentNode.removeChild(s));
             
-            const script = document.createElement('script');
-            script.id = 'tmd-query-script';
-            script.type = 'text/javascript';
-            script.src = 'current_viga.js?t=' + new Date().getTime();
+            const timestamp = new Date().getTime();
             
-            script.onerror = function() {
-                resetUi();
-            };
+            // Ruta 1: Rede Corporativa (Z:)
+            const script1 = document.createElement('script');
+            script1.className = 'tmd-query-script';
+            script1.type = 'text/javascript';
+            script1.src = 'file:///Z:/Autocad%20Config/LISP/web/current_viga.js?t=' + timestamp;
+            script1.onerror = function() { /* Falla silenciosa, intentará la ruta 2 */ };
+            document.body.appendChild(script1);
             
-            document.body.appendChild(script);
+            // Ruta 2: C:\Users local
+            const script2 = document.createElement('script');
+            script2.className = 'tmd-query-script';
+            script2.type = 'text/javascript';
+            script2.src = 'file:///C:/Users/TM%20PROJETOS/3D%20Objects/Projetos/AutoCadTools/web/current_viga.js?t=' + timestamp;
+            script2.onerror = function() { /* Falló también. No hacer resetUi() automático para evitar flasheos si hay lag */ };
+            document.body.appendChild(script2);
         }
 
         // Initial setup and regular loop

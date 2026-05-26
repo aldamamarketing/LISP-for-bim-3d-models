@@ -1,0 +1,12 @@
+---
+import DocsLayout from '../layouts/DocsLayout.astro';
+import Dashboard from '../components/Dashboard.jsx';
+---
+
+<DocsLayout title="LispCentral - Portal do Cliente">
+  <!-- 
+    Usamos client:load para hidratar el componente de React 
+    en el cliente de inmediato, ya que es la vista principal del usuario.
+  -->
+  <Dashboard client:load mode="login" />
+</DocsLayout>

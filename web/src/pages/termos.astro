@@ -1,0 +1,83 @@
+---
+import '../styles/styles.css';
+import Logo from '../components/Logo.astro';
+---
+
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Termos de Uso — LispCentral</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+  <style>
+    body { font-family: 'Inter', sans-serif; background: #0a0a0a; color: #ddd; line-height: 1.8; margin: 0; }
+    .legal-header { padding: 20px 40px; border-bottom: 1px solid #1a1a1a; }
+    .legal-content { max-width: 760px; margin: 60px auto; padding: 0 20px; }
+    .legal-content h1 { color: var(--tmd-orange); font-size: 2rem; margin-bottom: 30px; }
+    .legal-content h2 { color: #f0f0f0; font-size: 1.2rem; margin-top: 40px; margin-bottom: 10px; }
+    .legal-content p, .legal-content li { color: #aaa; font-size: 0.95rem; }
+    .legal-content ul { padding-left: 20px; }
+    .legal-content a { color: var(--tmd-orange); }
+    .back-link { display: inline-block; margin-bottom: 30px; color: var(--tmd-orange); text-decoration: none; font-size: 0.9rem; }
+  </style>
+</head>
+<body>
+  <div class="legal-header"><a href="/" style="text-decoration:none;"><Logo /></a></div>
+  <div class="legal-content">
+    <a href="/" class="back-link">← Voltar ao início</a>
+    <h1>Termos de Uso</h1>
+    <p><strong>Última atualização:</strong> 25 de maio de 2026</p>
+
+    <h2>1. Aceitação dos Termos</h2>
+    <p>Ao criar uma conta e utilizar o serviço LispCentral, você concorda com os presentes Termos de Uso. Caso não concorde, não utilize o serviço.</p>
+
+    <h2>2. Descrição do Serviço</h2>
+    <p>O LispCentral é uma plataforma SaaS (Software as a Service) que fornece ferramentas e automações para o software Autodesk AutoCAD. Os módulos são entregues pela nuvem e executados localmente no ambiente do AutoCAD do usuário.</p>
+
+    <h2>3. Conta e Licenciamento</h2>
+    <ul>
+      <li>Cada conta é pessoal e intransferível.</li>
+      <li>A licença é vinculada a um único equipamento por vez. Para trocar de máquina, o usuário deve desvincular o equipamento anterior pelo Portal do Cliente.</li>
+      <li>Compartilhar credenciais de acesso ou tentar burlar o sistema de licenciamento resultará em suspensão imediata da conta.</li>
+    </ul>
+
+    <h2>4. Fase Beta</h2>
+    <p>Atualmente, o LispCentral encontra-se em <strong>fase Beta</strong>. Durante este período:</p>
+    <ul>
+      <li>O acesso a todas as funcionalidades é <strong>gratuito</strong>.</li>
+      <li>O serviço é fornecido "como está" (as-is), sem garantias de disponibilidade ininterrupta.</li>
+      <li>Funcionalidades podem ser adicionadas, alteradas ou removidas sem aviso prévio.</li>
+      <li>Ao final do período Beta, será necessário assinar um plano pago para continuar utilizando o serviço.</li>
+    </ul>
+
+    <h2>5. Uso Aceitável</h2>
+    <p>Você concorda em:</p>
+    <ul>
+      <li>Não realizar engenharia reversa, descompilar ou tentar extrair o código-fonte dos módulos fornecidos.</li>
+      <li>Não redistribuir, sublicenciar ou comercializar os módulos do LispCentral.</li>
+      <li>Não utilizar o serviço para fins ilegais ou que violem direitos de terceiros.</li>
+    </ul>
+
+    <h2>6. Propriedade Intelectual</h2>
+    <p>Todo o código, design, documentação e marca do LispCentral são propriedade exclusiva dos seus desenvolvedores. O uso da plataforma não concede ao usuário qualquer direito de propriedade sobre o software.</p>
+
+    <h2>7. Limitação de Responsabilidade</h2>
+    <p>O LispCentral não se responsabiliza por:</p>
+    <ul>
+      <li>Perdas de dados causadas por mau uso dos comandos no AutoCAD.</li>
+      <li>Incompatibilidades com versões específicas do AutoCAD ou plugins de terceiros.</li>
+      <li>Interrupções no serviço causadas por fatores externos (internet, servidores de terceiros, etc.).</li>
+    </ul>
+
+    <h2>8. Rescisão</h2>
+    <p>Reservamo-nos o direito de suspender ou cancelar contas que violem estes termos. O usuário pode encerrar sua conta a qualquer momento pelo Portal do Cliente ou solicitando via e-mail.</p>
+
+    <h2>9. Foro</h2>
+    <p>Este contrato é regido pelas leis da República Federativa do Brasil. Fica eleito o foro da comarca de São Paulo/SP para dirimir quaisquer controvérsias.</p>
+
+    <h2>10. Contato</h2>
+    <p>Para dúvidas sobre estes termos: <a href="mailto:contato@lispcentral.com">contato@lispcentral.com</a></p>
+  </div>
+</body>
+</html>

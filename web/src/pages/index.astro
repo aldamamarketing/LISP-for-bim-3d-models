@@ -1,0 +1,455 @@
+---
+import '../styles/styles.css';
+import Logo from '../components/Logo.astro';
+---
+
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>LispCentral — Superpoderes para o seu AutoCAD</title>
+  <meta name="description" content="Automatize tarefas repetitivas, gere tabelas em um clique e produza documentação profissional direto no AutoCAD. Teste grátis na fase Beta.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    
+    body {
+      font-family: 'Inter', -apple-system, sans-serif;
+      background: #0a0a0a;
+      color: #f0f0f0;
+      line-height: 1.7;
+      overflow-x: hidden;
+    }
+
+    /* --- NAVBAR --- */
+    .navbar {
+      position: fixed; top: 0; width: 100%; z-index: 1000;
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 18px 40px;
+      background: rgba(10,10,10,0.85);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid rgba(255,255,255,0.06);
+    }
+    .navbar-links { display: flex; gap: 25px; align-items: center; }
+    .navbar-links a {
+      color: #aaa; text-decoration: none; font-size: 0.9rem;
+      transition: color 0.2s;
+    }
+    .navbar-links a:hover { color: #f0f0f0; }
+    .btn-cta-sm {
+      background: var(--tmd-orange); color: #fff !important; padding: 8px 20px;
+      border-radius: 6px; font-weight: 600; font-size: 0.9rem;
+      transition: background 0.2s, transform 0.1s;
+    }
+    .btn-cta-sm:hover { background: #d95d18; transform: translateY(-1px); }
+
+    /* --- HERO --- */
+    .hero {
+      min-height: 100vh; display: flex; flex-direction: column;
+      justify-content: center; align-items: center; text-align: center;
+      padding: 120px 20px 80px;
+      background: radial-gradient(ellipse at 50% 0%, rgba(242,109,33,0.12) 0%, transparent 60%);
+    }
+    .hero-badge {
+      display: inline-block; padding: 6px 16px; border-radius: 20px;
+      background: rgba(242,109,33,0.15); color: var(--tmd-orange);
+      font-size: 0.85rem; font-weight: 600; margin-bottom: 30px;
+      border: 1px solid rgba(242,109,33,0.3);
+      animation: pulse-glow 3s ease-in-out infinite;
+    }
+    @keyframes pulse-glow {
+      0%, 100% { box-shadow: 0 0 8px rgba(242,109,33,0.2); }
+      50% { box-shadow: 0 0 20px rgba(242,109,33,0.4); }
+    }
+    .hero h1 {
+      font-size: clamp(2.5rem, 5vw, 4rem); font-weight: 800;
+      line-height: 1.15; max-width: 800px; margin-bottom: 24px;
+    }
+    .hero h1 span { color: var(--tmd-orange); }
+    .hero p {
+      font-size: 1.2rem; color: #999; max-width: 580px; margin-bottom: 40px;
+    }
+    .hero-cta {
+      display: flex; gap: 15px; flex-wrap: wrap; justify-content: center;
+    }
+    .btn-primary {
+      display: inline-block; padding: 16px 36px;
+      background: var(--tmd-orange); color: #fff; border: none; border-radius: 8px;
+      font-size: 1.1rem; font-weight: 700; cursor: pointer;
+      text-decoration: none;
+      transition: background 0.2s, transform 0.15s, box-shadow 0.2s;
+      box-shadow: 0 4px 20px rgba(242,109,33,0.3);
+    }
+    .btn-primary:hover {
+      background: #d95d18; transform: translateY(-2px);
+      box-shadow: 0 6px 30px rgba(242,109,33,0.45);
+    }
+    .btn-ghost {
+      display: inline-block; padding: 16px 36px;
+      background: transparent; color: #f0f0f0; border: 1px solid #333;
+      border-radius: 8px; font-size: 1.1rem; font-weight: 600;
+      cursor: pointer; text-decoration: none; transition: all 0.2s;
+    }
+    .btn-ghost:hover { border-color: #666; background: rgba(255,255,255,0.04); }
+
+    /* --- PAIN SECTION --- */
+    .pain-section {
+      padding: 100px 20px; max-width: 1100px; margin: 0 auto;
+    }
+    .pain-section h2 {
+      text-align: center; font-size: 2.2rem; font-weight: 700; margin-bottom: 16px;
+    }
+    .pain-subtitle {
+      text-align: center; color: #888; font-size: 1.1rem; max-width: 600px;
+      margin: 0 auto 60px;
+    }
+    .pain-grid {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 24px;
+    }
+    .pain-card {
+      background: #141414; border: 1px solid #1f1f1f; border-radius: 12px;
+      padding: 32px; transition: border-color 0.3s, transform 0.2s;
+    }
+    .pain-card:hover { border-color: rgba(242,109,33,0.4); transform: translateY(-4px); }
+    .pain-card .icon { font-size: 2rem; margin-bottom: 16px; }
+    .pain-card h3 { font-size: 1.15rem; margin-bottom: 10px; font-weight: 700; }
+    .pain-card .before {
+      color: #ef4444; font-size: 0.9rem; margin-bottom: 8px;
+    }
+    .pain-card .after {
+      color: #22c55e; font-size: 0.9rem;
+    }
+
+    /* --- HOW IT WORKS --- */
+    .how-section {
+      padding: 100px 20px;
+      background: linear-gradient(180deg, transparent 0%, rgba(242,109,33,0.04) 50%, transparent 100%);
+    }
+    .how-inner { max-width: 900px; margin: 0 auto; }
+    .how-section h2 {
+      text-align: center; font-size: 2.2rem; font-weight: 700; margin-bottom: 60px;
+    }
+    .steps {
+      display: grid; grid-template-columns: repeat(3, 1fr); gap: 40px;
+    }
+    .step { text-align: center; }
+    .step-number {
+      width: 56px; height: 56px; border-radius: 50%; margin: 0 auto 20px;
+      display: flex; align-items: center; justify-content: center;
+      background: rgba(242,109,33,0.15); color: var(--tmd-orange);
+      font-size: 1.3rem; font-weight: 800;
+      border: 2px solid rgba(242,109,33,0.3);
+    }
+    .step h3 { font-size: 1.1rem; margin-bottom: 8px; }
+    .step p { color: #888; font-size: 0.95rem; }
+
+    /* --- FEATURES --- */
+    .features-section {
+      padding: 100px 20px; max-width: 1100px; margin: 0 auto;
+    }
+    .features-section h2 {
+      text-align: center; font-size: 2.2rem; font-weight: 700; margin-bottom: 16px;
+    }
+    .features-subtitle {
+      text-align: center; color: #888; font-size: 1.1rem; max-width: 600px;
+      margin: 0 auto 60px;
+    }
+    .features-grid {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 20px;
+    }
+    .feature-item {
+      background: #111; border: 1px solid #1a1a1a; border-radius: 10px;
+      padding: 24px; transition: border-color 0.3s;
+    }
+    .feature-item:hover { border-color: rgba(242,109,33,0.3); }
+    .feature-item .feat-icon { font-size: 1.5rem; margin-bottom: 12px; }
+    .feature-item h4 { font-size: 1rem; margin-bottom: 6px; }
+    .feature-item p { color: #777; font-size: 0.9rem; }
+
+    /* --- SOCIAL PROOF --- */
+    .proof-section {
+      padding: 100px 20px; text-align: center;
+    }
+    .proof-section h2 { font-size: 2.2rem; font-weight: 700; margin-bottom: 50px; }
+    .testimonials {
+      display: flex; gap: 24px; justify-content: center; flex-wrap: wrap;
+      max-width: 1000px; margin: 0 auto;
+    }
+    .testimonial {
+      background: #141414; border: 1px solid #1f1f1f; border-radius: 12px;
+      padding: 28px; max-width: 320px; text-align: left;
+    }
+    .testimonial p { color: #ccc; font-size: 0.95rem; font-style: italic; margin-bottom: 16px; }
+    .testimonial .author { color: var(--tmd-orange); font-weight: 600; font-size: 0.9rem; }
+    .testimonial .role { color: #666; font-size: 0.8rem; }
+
+    /* --- BETA CTA --- */
+    .beta-section {
+      padding: 100px 20px; text-align: center;
+      background: radial-gradient(ellipse at 50% 100%, rgba(242,109,33,0.1) 0%, transparent 60%);
+    }
+    .beta-section h2 { font-size: 2.5rem; font-weight: 800; margin-bottom: 16px; }
+    .beta-section h2 span { color: var(--tmd-orange); }
+    .beta-section p {
+      color: #999; font-size: 1.15rem; max-width: 550px; margin: 0 auto 40px;
+    }
+
+    /* --- FOOTER --- */
+    .footer {
+      padding: 40px 20px; text-align: center;
+      border-top: 1px solid #1a1a1a; color: #555; font-size: 0.85rem;
+    }
+    .footer-links { display: flex; gap: 20px; justify-content: center; margin-bottom: 16px; }
+    .footer-links a { color: #777; text-decoration: none; transition: color 0.2s; }
+    .footer-links a:hover { color: var(--tmd-orange); }
+
+    /* --- FAQ --- */
+    .faq-section {
+      padding: 100px 20px; max-width: 800px; margin: 0 auto;
+    }
+    .faq-section h2 {
+      text-align: center; font-size: 2.2rem; font-weight: 700; margin-bottom: 16px;
+    }
+    .faq-subtitle {
+      text-align: center; color: #888; font-size: 1.1rem; margin-bottom: 50px;
+    }
+    .faq-grid { display: flex; flex-direction: column; gap: 12px; }
+    .faq-item {
+      background: #141414; border: 1px solid #1f1f1f; border-radius: 10px;
+      overflow: hidden; transition: border-color 0.3s;
+    }
+    .faq-item[open] { border-color: rgba(242,109,33,0.4); }
+    .faq-item summary {
+      padding: 20px 24px; cursor: pointer; font-weight: 600; font-size: 1rem;
+      list-style: none; display: flex; justify-content: space-between; align-items: center;
+      transition: color 0.2s;
+    }
+    .faq-item summary::-webkit-details-marker { display: none; }
+    .faq-item summary::after {
+      content: '+'; font-size: 1.4rem; color: var(--tmd-orange); font-weight: 300;
+      transition: transform 0.3s;
+    }
+    .faq-item[open] summary::after { content: '−'; }
+    .faq-item summary:hover { color: var(--tmd-orange); }
+    .faq-item p {
+      padding: 0 24px 20px; color: #aaa; font-size: 0.95rem; line-height: 1.7;
+    }
+    .faq-item a { color: var(--tmd-orange); }
+
+    /* --- RESPONSIVE --- */
+    @media (max-width: 768px) {
+      .navbar { padding: 14px 20px; }
+      .navbar-links { gap: 12px; }
+      .steps { grid-template-columns: 1fr; gap: 30px; }
+      .hero h1 { font-size: 2rem; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- NAVBAR -->
+  <nav class="navbar">
+    <Logo />
+    <div class="navbar-links">
+      <a href="#funcionalidades">Funcionalidades</a>
+      <a href="/pt/docs">Documentação</a>
+      <a href="/login" class="btn-cta-sm">Acessar Portal</a>
+    </div>
+  </nav>
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="hero-badge">🚀 Fase Beta — Acesso Gratuito e Ilimitado</div>
+    <h1>Seus projetos em <span>metade do tempo</span></h1>
+    <p>Tabelas automáticas, comandos inteligentes e documentação profissional — tudo direto na linha de comando do AutoCAD que você já conhece.</p>
+    <div class="hero-cta">
+      <a href="/login" class="btn-primary">Testar Grátis — Sem Cartão</a>
+      <a href="#como-funciona" class="btn-ghost">Como funciona?</a>
+    </div>
+  </section>
+
+  <!-- PAIN POINTS — ANTES / DEPOIS -->
+  <section class="pain-section">
+    <h2>Você reconhece esses problemas?</h2>
+    <p class="pain-subtitle">São horas perdidas toda semana que podem ser eliminadas com um único comando.</p>
+    <div class="pain-grid">
+      <div class="pain-card">
+        <div class="icon">📐</div>
+        <h3>Documentação Manual</h3>
+        <p class="before">❌ Antes: Medir, anotar, montar tabelas no Excel. Copiar e colar de volta no CAD.</p>
+        <p class="after">✅ Depois: Um comando. Tabela de quantitativos gerada direto no desenho, formatada e pronta.</p>
+      </div>
+      <div class="pain-card">
+        <div class="icon">🔄</div>
+        <h3>Tarefas Repetitivas</h3>
+        <p class="before">❌ Antes: Renumerar peças, limpar layers, nivelar cotas — tudo manual, item por item.</p>
+        <p class="after">✅ Depois: Comandos especializados que executam em lote. O que levava 40 minutos leva 10 segundos.</p>
+      </div>
+      <div class="pain-card">
+        <div class="icon">☁️</div>
+        <h3>Rotinas Desatualizadas</h3>
+        <p class="before">❌ Antes: Copiar arquivos .LSP em pendrives. Atualizar máquina por máquina. Versões diferentes em cada PC.</p>
+        <p class="after">✅ Depois: Tudo sincronizado pela nuvem. Abriu o AutoCAD? Já está na última versão.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- COMO FUNCIONA -->
+  <section id="como-funciona" class="how-section">
+    <div class="how-inner">
+      <h2>Funciona em 3 passos simples</h2>
+      <div class="steps">
+        <div class="step">
+          <div class="step-number">1</div>
+          <h3>Crie sua conta</h3>
+          <p>Cadastro rápido, sem burocracia. Não pedimos cartão de crédito.</p>
+        </div>
+        <div class="step">
+          <div class="step-number">2</div>
+          <h3>Baixe o conector</h3>
+          <p>Um único arquivo leve. Coloque na pasta de suporte do AutoCAD e pronto.</p>
+        </div>
+        <div class="step">
+          <div class="step-number">3</div>
+          <h3>Use normalmente</h3>
+          <p>Novos comandos aparecem na sua linha de comando. Zero curva de aprendizado.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FUNCIONALIDADES DESTACADAS -->
+  <section id="funcionalidades" class="features-section">
+    <h2>Ferramentas que fazem diferença real</h2>
+    <p class="features-subtitle">Suítes especializadas para arquitetos, engenheiros, topógrafos e projetistas.</p>
+    <div class="features-grid">
+      <div class="feature-item">
+        <div class="feat-icon">📊</div>
+        <h4>Tabelas em 1 clique</h4>
+        <p>Gere quantitativos de comprimento, área e volume selecionando os objetos.</p>
+      </div>
+      <div class="feature-item">
+        <div class="feat-icon">🔢</div>
+        <h4>Numeração automática</h4>
+        <p>Numere peças, eixos e elementos sequencialmente com um único comando.</p>
+      </div>
+      <div class="feature-item">
+        <div class="feat-icon">🧹</div>
+        <h4>Limpeza inteligente</h4>
+        <p>Remova layers vazios, blocos não usados e entidades corrompidas em lote.</p>
+      </div>
+      <div class="feature-item">
+        <div class="feat-icon">📏</div>
+        <h4>Nivelamento Z</h4>
+        <p>Corrija a elevação Z indesejada de todos os objetos com um clique.</p>
+      </div>
+      <div class="feature-item">
+        <div class="feat-icon">🏗️</div>
+        <h4>Modelagem 3D paramétrica</h4>
+        <p>Crie perfis metálicos reais a partir de catálogos normatizados na nuvem.</p>
+      </div>
+      <div class="feature-item">
+        <div class="feat-icon">🔗</div>
+        <h4>Catálogos sempre atualizados</h4>
+        <p>Tabelas de perfis, pesos e normas técnicas sincronizadas automaticamente.</p>
+      </div>
+      <div class="feature-item">
+        <div class="feat-icon">🏷️</div>
+        <h4>Etiquetas e cotas automáticas</h4>
+        <p>Insira labels com dados técnicos dos sólidos automaticamente no modelo.</p>
+      </div>
+      <div class="feature-item">
+        <div class="feat-icon">🖥️</div>
+        <h4>Paletas interativas</h4>
+        <p>Painéis visuais dentro do AutoCAD para inspecionar e editar propriedades.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- SOCIAL PROOF -->
+  <section class="proof-section">
+    <h2>O que dizem os primeiros usuários</h2>
+    <div class="testimonials">
+      <div class="testimonial">
+        <p>"Eu perdia 2 horas por dia montando tabelas de comprimento. Agora faço em 5 segundos. Literalmente."</p>
+        <div class="author">Eng. Carlos M.</div>
+        <div class="role">Projetista Estrutural — São Paulo</div>
+      </div>
+      <div class="testimonial">
+        <p>"O melhor é que não precisei aprender nada novo. Abri o AutoCAD e os comandos já estavam lá."</p>
+        <div class="author">Arq. Fernanda L.</div>
+        <div class="role">Arquiteta — Porto Alegre</div>
+      </div>
+      <div class="testimonial">
+        <p>"Finalmente não preciso ficar copiando scripts em pendrives. Todos os PCs da empresa sincronizam sozinhos."</p>
+        <div class="author">Téc. Ricardo S.</div>
+        <div class="role">Coordenador BIM — Belo Horizonte</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FAQ — VENCER OBJECIONES -->
+  <section id="faq" class="faq-section">
+    <h2>Perguntas Frequentes</h2>
+    <p class="faq-subtitle">Tudo o que você precisa saber antes de experimentar.</p>
+    <div class="faq-grid">
+      <details class="faq-item">
+        <summary>O que é o LispCentral exatamente?</summary>
+        <p>É um serviço na nuvem que adiciona novos comandos ao seu AutoCAD. Você continua trabalhando normalmente na linha de comando — só que agora com ferramentas muito mais poderosas para documentação, modelagem e automação. Não é um software separado: são extensões que aparecem dentro do AutoCAD que você já usa.</p>
+      </details>
+      <details class="faq-item">
+        <summary>É seguro para os meus desenhos? Vai modificar meus arquivos?</summary>
+        <p>Totalmente seguro. Nossos comandos operam sobre os objetos que <strong>você seleciona</strong>, da mesma forma que qualquer comando nativo do AutoCAD. Nenhum arquivo é alterado sem sua ação direta. Além disso, o código roda 100% local na sua máquina — a nuvem só entrega e atualiza os módulos.</p>
+      </details>
+      <details class="faq-item">
+        <summary>Quanto custa? Preciso de cartão de crédito?</summary>
+        <p><strong>Agora? Nada.</strong> Estamos em fase Beta e o acesso é totalmente gratuito. Não pedimos cartão de crédito. Futuramente teremos planos pagos acessíveis, mas todos os usuários Beta terão condições especiais como agradecimento por nos ajudarem a melhorar.</p>
+      </details>
+      <details class="faq-item">
+        <summary>E a minha privacidade? Que dados vocês coletam?</summary>
+        <p>Coletamos apenas o mínimo necessário: seu e-mail de cadastro e o nome do computador (para vincular a licença). Não temos acesso ao conteúdo dos seus desenhos. Seus dados são armazenados com criptografia no Google Cloud e nunca compartilhados com terceiros. Consulte nossa <a href="/privacidade">Política de Privacidade</a> completa.</p>
+      </details>
+      <details class="faq-item">
+        <summary>Funciona com a minha versão do AutoCAD?</summary>
+        <p>Sim. O LispCentral é compatível com AutoCAD 2018 e superior (qualquer versão que suporte Visual LISP e conexões HTTP). Funciona também com variantes como AutoCAD Architecture, MEP e Civil 3D.</p>
+      </details>
+      <details class="faq-item">
+        <summary>E se a internet cair? Perco o acesso aos comandos?</summary>
+        <p>Os módulos são carregados na memória do AutoCAD no momento da conexão. Uma vez carregados, funcionam normalmente mesmo sem internet até você fechar o programa. Na próxima abertura, basta estar online para sincronizar novamente.</p>
+      </details>
+      <details class="faq-item">
+        <summary>Preciso instalar algo complexo?</summary>
+        <p>Não. É um único arquivo leve (menos de 10 KB) que você coloca na pasta de suporte do AutoCAD. Sem instaladores, sem DLLs, sem privilégios de administrador. E para desinstalar? É só apagar o arquivo.</p>
+      </details>
+      <details class="faq-item">
+        <summary>Posso usar em mais de um computador?</summary>
+        <p>Sua licença é vinculada a um equipamento por vez. Precisa trocar de máquina? Basta desvincular pelo Portal do Cliente e vincular a nova. O processo leva segundos e pode ser feito quantas vezes quiser.</p>
+      </details>
+    </div>
+  </section>
+
+  <!-- BETA CTA -->
+  <section id="beta" class="beta-section">
+    <h2>Estamos em <span>fase Beta</span></h2>
+    <p>Teste todas as funcionalidades sem custo algum. Em troca, só pedimos sua opinião para melhorar a plataforma.</p>
+    <a href="/login" class="btn-primary" style="font-size: 1.2rem; padding: 18px 42px;">Criar Conta Gratuita</a>
+  </section>
+
+  <!-- FOOTER -->
+  <footer class="footer">
+    <div class="footer-links">
+      <a href="/pt/docs">Documentação</a>
+      <a href="/privacidade">Política de Privacidade</a>
+      <a href="/termos">Termos de Uso</a>
+      <a href="mailto:contato@lispcentral.com">Contato</a>
+    </div>
+    <p>&copy; 2026 LispCentral. Todos os direitos reservados.</p>
+  </footer>
+
+</body>
+</html>
