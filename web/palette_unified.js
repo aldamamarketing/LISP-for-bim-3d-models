@@ -401,7 +401,7 @@ function renderModules() {
       item.title = mod.desc;
       
       const docsBtnHtml = mod.doc && mod.doc !== "#" 
-        ? `<a class="docs-btn" href="https://lispcentral.web.app/docs/${mod.doc}" target="_blank" onclick="event.stopPropagation();">DOCS</a>`
+        ? `<a class="docs-btn" href="https://lispcentral.web.app/docs/${mod.doc}" target="_blank" onclick="event.stopPropagation();" title="Ver documentação">?</a>`
         : "";
         
       item.innerHTML = `
@@ -582,18 +582,35 @@ function updateProgressBar(loaded, total) {
 }
 
 function runAutoCADCommand(cmdName) {
-  if (typeof Acad !== 'undefined' && Acad.Editor) {
-    // Usar run-or-load para asegurar que se cargue si no está listo
-    Acad.Editor.executeCommand(`(LC:run-or-load "${cmdName}")\n`);
+  const lispCmd = `(LC:run-or-load "${cmdName}")`;
+  
+  if (typeof Acad === 'undefined' || !Acad.Editor) {
+    console.log(`[AutoCAD Command Sim] Executando: ${lispCmd}`);
+    return;
+  }
+
+  // RUTA LISP: usar evaluateLisp (API nativa para expresiones AutoLISP)
+  if (typeof Acad.Editor.evaluateLisp === 'function') {
+    Acad.Editor.evaluateLisp(lispCmd);
+  } else if (typeof Acad.Editor.executeCommand === 'function') {
+    // Fallback: envolver en LISP command-line invocation
+    Acad.Editor.executeCommand(lispCmd + "\n");
   } else {
-    console.log(`[AutoCAD Command Sim] Executando: ${cmdName}`);
+    console.error("[TMD Palette] No hay método disponible para ejecutar LISP");
   }
 }
 
 function writeConsoleMessage(msg) {
+  console.log(msg);
   if (typeof Acad !== 'undefined' && Acad.Editor) {
-    Acad.Editor.writeMessage(msg);
-  } else {
-    console.log(msg);
+    // Acad.Editor.writeMessage DOES NOT EXIST in JS API.
+    // To print to AutoCAD console, we execute a LISP princ.
+    // Escaping newlines and quotes to prevent LISP syntax errors.
+    const safeMsg = msg.replace(/\n/g, "\\n").replace(/"/g, '\\"');
+    if (typeof Acad.Editor.evaluateLisp === 'function') {
+      Acad.Editor.evaluateLisp(`(princ "${safeMsg}")(princ)`);
+    } else if (typeof Acad.Editor.executeCommand === 'function') {
+      Acad.Editor.executeCommand(`(princ "${safeMsg}")(princ)\n`);
+    }
   }
 }

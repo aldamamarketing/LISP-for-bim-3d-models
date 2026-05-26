@@ -31,15 +31,15 @@ Cliente descarga LC_Loader.lsp de internet (una sola vez)
               └─> palette_unified.js
                   └─> Fetch INDEX del servidor → lista de comandos disponibles
                   └─> Renderiza Command Palette con metadatos (METADATA_MAP)
-                  └─> Click en comando → Acad.Editor.executeCommand → LC:run-or-load
+                  └─> Click en comando → evaluateLisp/executeCommand → LC:run-or-load
 ```
 
 ### Archivos Clave del Sistema de Carga
 | Archivo | Rol | Ubicación |
 |---|---|---|
 | `LC_Loader.lsp` | Bootstrap del cliente: define funciones de red + lanza CP1 | PC del cliente (descarga) |
-| `web/palette_unified.js` | UI de la Command Palette + lógica de renderizado | Servido local desde directorio del loader |
-| `web/inspector_unified.html` | HTML de la paleta (glassmorphism oscuro, spotlight search) | Servido local desde directorio del loader |
+| `web/palette_unified.js` | Lógica JS. Contiene función puente robusta `ejecutarComandoLisp` que usa nativamente `evaluateLisp`. | Servido local desde directorio del loader |
+| `web/inspector_unified.html` | HTML de la paleta. Diseñada con colores de `manual_marca.md` (modo oscuro, hover naranja, diseño minimalista). | Servido local desde directorio del loader |
 | `acaddoc.lsp` | **Solo desarrollo local** — carga directa desde Z: | Repositorio (no va al cliente) |
 
 ### Carga JIT (Just-In-Time)

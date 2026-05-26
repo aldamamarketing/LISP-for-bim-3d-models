@@ -13,13 +13,14 @@
   
   <style>
     :root {
-      --bg-gradient: linear-gradient(135deg, #111424 0%, #060814 100%);
-      --panel-bg: rgba(255, 255, 255, 0.03);
-      --panel-border: rgba(255, 255, 255, 0.06);
-      --accent-color: #ffd700; /* Dorado Premium */
-      --accent-glow: rgba(255, 215, 0, 0.2);
-      --text-main: #f3f4f6;
-      --text-muted: #9ca3af;
+      --bg-color: #121212;
+      --header-bg: #1e1e1e;
+      --panel-bg: #2d2d2d;
+      --panel-border: rgba(255, 255, 255, 0.05);
+      --accent-color: #f26d21; /* TMD Orange */
+      --accent-glow: rgba(242, 109, 33, 0.2);
+      --text-main: #f0f0f0;
+      --text-muted: #aaaaaa;
       --success-color: #10b981;
       --error-color: #ef4444;
     }
@@ -37,7 +38,7 @@
 
     body {
       font-family: 'Outfit', sans-serif;
-      background: var(--bg-gradient);
+      background: var(--bg-color);
       color: var(--text-main);
       display: flex;
       flex-direction: column;
@@ -205,10 +206,10 @@
     }
 
     .module-item {
-      background: rgba(255, 255, 255, 0.02);
+      background: var(--panel-bg);
       border: 1px solid var(--panel-border);
-      border-radius: 8px;
-      padding: 6px 10px;
+      border-radius: 4px; /* More angular, technical look */
+      padding: 8px 10px;
       display: flex;
       justify-content: space-between;
       align-items: center;
@@ -217,9 +218,8 @@
     }
 
     .module-item:hover {
-      background: rgba(255, 255, 255, 0.05);
-      border-color: rgba(255, 215, 0, 0.3);
-      transform: translateY(-1px);
+      background: #3b3b3b;
+      border-color: var(--accent-color);
     }
 
     .module-info {
@@ -237,21 +237,27 @@
 
     .module-name {
       font-family: monospace;
-      font-size: 11px;
+      font-size: 13px;
       font-weight: bold;
       color: var(--text-main);
     }
 
     .module-friendly-name {
-      font-size: 11px;
+      font-size: 13px;
       color: var(--accent-color);
       font-weight: 500;
     }
 
     .module-desc {
-      font-size: 10px;
+      font-size: 11px;
       color: var(--text-muted);
-      line-height: 1.25;
+      line-height: 1.3;
+      display: none; /* Oculto por defecto */
+      margin-top: 4px;
+    }
+
+    .module-item:hover .module-desc {
+      display: block; /* Visible al hacer hover */
     }
 
     .module-actions {
@@ -262,21 +268,26 @@
 
     .docs-btn {
       background: transparent;
-      border: 1px solid rgba(255, 255, 255, 0.15);
+      border: 1px solid rgba(255, 255, 255, 0.1);
       color: var(--text-muted);
       font-family: 'Outfit', sans-serif;
-      font-size: 10px;
-      padding: 4px 8px;
-      border-radius: 6px;
+      font-size: 12px;
+      font-weight: bold;
+      width: 22px;
+      height: 22px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 4px;
       cursor: pointer;
-      text-transform: uppercase;
       transition: all 0.2s ease;
+      text-decoration: none;
     }
 
     .docs-btn:hover {
       border-color: var(--accent-color);
       color: var(--accent-color);
-      background: rgba(255, 215, 0, 0.05);
+      background: var(--accent-glow);
     }
 
     .module-status {
