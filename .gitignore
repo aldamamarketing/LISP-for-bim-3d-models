@@ -31,3 +31,7 @@ ui-debug.log*
 .gemini/
 agent.md
 
+# Search/research files
+autolisp lisp global search.csv
+autolisp lisp portugues search.csv
+
