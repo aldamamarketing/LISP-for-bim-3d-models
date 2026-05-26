@@ -30,12 +30,10 @@ A continuación, presento una crítica constructiva como Ingeniero de Software y
 
 Para que LispCentral sea el estándar de la industria (tipo Revit/Tekla pero en CAD web), propongo el siguiente enfoque arquitectónico estricto:
 
-### A. Paradigma "Headless LISP" (Backend Puro)
-El código AutoLISP (`TMD_`) debe convertirse en una API RESTful local dentro de la RAM de AutoCAD.
-*   **Nada de Consola:** Remover todos los `getstring`, `getreal`.
-*   **Entrada JSON:** Las funciones maestras recibirán un string JSON desde el JavaScript de la paleta.
-    *   *Ejemplo de flujo:* `Acad.Editor.executeCommand("LC_API_BUILD '{\"cmd\": \"viga\", \"perfil\": \"W12x26\", \"p1\": [0,0,0], \"p2\": [1000,0,0]}' ")`
-*   El LISP parsea el JSON (existe código LISP para leer JSON), dibuja el sólido 3D y devuelve un JSON de éxito o error.
+### A. Enriquecimiento del Flujo Natural (Cloud Delivery)
+El código AutoLISP (`TMD_`) seguirá interactuando orgánicamente con el usuario a través de la CLI nativa de AutoCAD, porque esa es la fuente principal de interacción del usuario.
+*   **Entrega Transparente:** La nube (Firebase) sirve comandos, rutinas completas, bloques dinámicos y paletas. El usuario final usa la consola de AutoCAD normalmente sin preocuparse de instalaciones.
+*   **Múltiples Interfaces:** No estamos limitados a una sola paleta web. Podemos generar Ribbons y Paletas especializadas para cada suite, integrándose al ecosistema sin reemplazar la consola.
 
 ### B. Catálogos Vivos (Cloud-First)
 *   Eliminar `catalogo_metal.csv` de los archivos LISP.
@@ -47,14 +45,13 @@ El código AutoLISP (`TMD_`) debe convertirse en una API RESTful local dentro de
 *   Si ocurre un error (ej. intersección booleana fallida), el LISP devuelve un JSON de error al JavaScript: `{"status":"error", "code": 501, "msg": "Boolean Subtraction Failed"}`.
 *   El JavaScript atrapa esto y lo envía silenciosamente a **Sentry** o **Google Analytics/Firebase Crashlytics**. Tú como administrador verás: *"15 usuarios fallaron al intentar cortar vigas W12 en ángulo de 45°"*. Podrás arreglar el LISP y empujarlo a la nube al instante.
 
-### D. Firmas Criptográficas en LDATA (Anti-Piratería y Anti-Corrupción)
-*   Cuando `TMD_Vigas` inyecte el LDATA al 3DSOLID, el JS de la paleta web generará un *Hash MD5/SHA* de los parámetros usando el *User Token* temporal del usuario.
-*   Ese *Hash* se guarda en el LDATA.
-*   Cuando se ejecuta `TMD_SYNC` o `TMD_BOM`, el LISP verifica el *Hash*. Si el usuario copió el sólido de otro dibujo o manipuló el LDATA a mano, el *Hash* no coincidirá y el sólido se marca como "No Verificado" o en color rojo. Esto protege el modelo BIM.
+### D. Protección y Gestión de LDATA
+*   El LDATA seguirá en **texto plano** en esta etapa del MVP. Su propósito principal es permitir que nuestras propias funciones reconstruyan, editen e identifiquen las geometrías.
+*   En etapas muy avanzadas se evaluará ofuscación o encriptación, pero por ahora se prioriza la facilidad de inspección forense local (`TMD_PROPERTIES` y `TMD_FORENSIC`).
 
 ---
 
 ## 3. Resumen del Flujo Enterprise
-1. **Astrid (Compilador Cloud):** Ofusca los `.lsp`, les inyecta un *Token de Sesión* dinámico y los sirve a la RAM.
-2. **Paleta Web (Frontend):** Controla UI, descarga catálogos de Firebase, emite métricas y manda JSON estructurado.
-3. **LispCentral Core (Backend LISP):** Recibe JSON, calcula geometría matemática O(N), dibuja sólidos 3D con API nativa, y asegura LDATA con firmas hash.
+1. **Astrid (Compilador Cloud):** Ofusca los `.lsp`, les inyecta credenciales y los sirve a la RAM.
+2. **Interfaces Web (Paletas/Ribbons):** Controlan UI rica, descargan catálogos de Firebase y complementan la CLI de AutoCAD.
+3. **LispCentral Core:** Ejecuta comandos nativamente (CLI interactiva), calcula geometría, y guarda LDATA para persistencia BIM.
