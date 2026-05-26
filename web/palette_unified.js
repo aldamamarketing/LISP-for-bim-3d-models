@@ -584,7 +584,7 @@ function updateProgressBar(loaded, total) {
 function runAutoCADCommand(cmdName) {
   if (typeof Acad !== 'undefined' && Acad.Editor) {
     // Usar run-or-load para asegurar que se cargue si no está listo
-    Acad.Editor.executeCommand(`(LC:run-or-load "${cmdName}")`);
+    Acad.Editor.executeCommand(`(LC:run-or-load "${cmdName}")\n`);
   } else {
     console.log(`[AutoCAD Command Sim] Executando: ${cmdName}`);
   }
