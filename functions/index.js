@@ -19,8 +19,11 @@ function getDb() {
 
 exports.getRoutine = onRequest({ cors: true }, async (req, res) => {
   const { fs, path } = getDeps();
-  const apiKey = Array.isArray(req.query.apiKey) ? req.query.apiKey[0] : req.query.apiKey;
-  const routineId = Array.isArray(req.query.routine) ? req.query.routine[0] : req.query.routine;
+  // Soporte de compatibilidad y arquitectura SaaS: token/lispId (Nuevo) o apiKey/routine (Legacy)
+  const rawToken = req.query.token || req.query.apiKey;
+  const rawLispId = req.query.lispId || req.query.routine;
+  const apiKey = Array.isArray(rawToken) ? rawToken[0] : rawToken;
+  const routineId = Array.isArray(rawLispId) ? rawLispId[0] : rawLispId;
   const rawHwId = Array.isArray(req.query.hwId) ? req.query.hwId[0] : req.query.hwId;
   
   // Decodifica espacios y caracteres especiales de URL en el hardware ID
@@ -43,23 +46,32 @@ exports.getRoutine = onRequest({ cors: true }, async (req, res) => {
     let userEmail = "Trial User";
     let userDocRef = null;
     let registeredDevice = null;
+    let userData = null;
 
     if (!snapshot.empty) {
       const userDoc = snapshot.docs[0];
       userDocRef = userDoc.ref;
-      const userData = userDoc.data();
+      userData = userDoc.data();
       userEmail = userData.email || "Cliente Registrado";
       registeredDevice = userData.registeredDevice || null;
     }
 
-    if (hwId && userDocRef) {
-      if (!registeredDevice) {
-        await userDocRef.update({ registeredDevice: hwId });
-        registeredDevice = hwId;
-      } else if (registeredDevice !== hwId) {
-        const drmAlert = `(alert "\\n[LispCentral] PROTECAO ATIVADA:\\nEsta licenca ja esta em uso no computador: ${registeredDevice}.\\nVoce esta tentando usar a partir de: ${hwId}.\\n\\nAcesse o Portal do Cliente para desvincular seu equipamento antigo se necessario.")\n(princ)`;
-        res.setHeader("Content-Type", "text/plain; charset=utf-8");
-        return res.status(200).send(drmAlert);
+    if (hwId && userDocRef && userData) {
+      const maxSeats = userData.maxSeats || 1;
+      const registeredDevices = userData.registeredDevices || [];
+
+      if (!registeredDevices.includes(hwId)) {
+        if (registeredDevices.length < maxSeats) {
+          registeredDevices.push(hwId);
+          await userDocRef.update({ 
+            registeredDevices: registeredDevices,
+            registeredDevice: hwId // Mantenemos compatibilidad con el Dashboard actual
+          });
+        } else {
+          const drmAlert = `(alert "\\n[TM Digital] PROTECAO ATIVADA:\\nLimite de assentos atingido (${maxSeats}).\\n\\nAcesse o Painel Web para desvincular um equipamento antigo ou adquirir mais assentos.")\n(princ)`;
+          res.setHeader("Content-Type", "text/plain; charset=utf-8");
+          return res.status(200).send(drmAlert);
+        }
       }
     }
 
@@ -68,13 +80,28 @@ exports.getRoutine = onRequest({ cors: true }, async (req, res) => {
     let routinesLoaded = [];
 
     if (routineId && routineId.toUpperCase() === "INDEX") {
-      const files = fs.readdirSync(lispDir);
-      const list = files
-        .filter(file => file.endsWith(".lsp") && file !== "acaddoc.lsp" && file !== "TMD_Loader.lsp" && file !== "TM_Setup.lsp" && file !== "TM_SetupCore.lsp")
-        .map(file => file.replace(".lsp", ""));
+      // Si el usuario es antiguo y no tiene activeSuites, le damos acceso a las básicas de la beta
+      const activeSuites = userData.activeSuites || ["core", "structures_pro", "architecture", "quantities"];
+      const lispsRef = db.collection("lispFiles").where("tenantId", "==", userDocRef.id);
+      const snapshotLisps = await lispsRef.get();
       
-      res.setHeader("Content-Type", "text/plain; charset=utf-8");
-      return res.status(200).send(list.join(","));
+      const commands = [];
+      snapshotLisps.forEach(docSnap => {
+        const data = docSnap.data();
+        if (activeSuites.includes(data.suite) || data.suite === "core" || !data.suite) {
+          commands.push({
+            name: data.lispId,
+            friendly: data.friendlyName || data.lispId,
+            desc: data.description || "Comando Cloud",
+            group: data.group || "Custom Tools",
+            doc: "#",
+            svgIcon: data.svgIcon || ""
+          });
+        }
+      });
+      
+      res.setHeader("Content-Type", "application/json; charset=utf-8");
+      return res.status(200).send(JSON.stringify(commands));
     }
 
     if (!routineId || routineId.toUpperCase() === "ALL") {
@@ -123,11 +150,40 @@ exports.getRoutine = onRequest({ cors: true }, async (req, res) => {
         filepath = path.join(lispDir, filename);
       }
 
+      let code = "";
+
       if (!fs.existsSync(filepath)) {
-        return res.status(404).send(`Error: Rutina ${originalName} no encontrada en el servidor.`);
+        // Fallback: Buscar en el Workspace del Tenant (Firebase Storage)
+        if (!userDocRef) {
+          return res.status(404).send(`Error: Rutina ${originalName} no encontrada.`);
+        }
+
+        const lispsSnapshot = await db.collection("lispFiles")
+          .where("tenantId", "==", userDocRef.id)
+          .where("lispId", "==", safeRoutineId)
+          .limit(1)
+          .get();
+
+        if (lispsSnapshot.empty) {
+          return res.status(404).send(`Error: Rutina ${originalName} no encontrada en el servidor ni en tu Workspace.`);
+        }
+
+        const lispData = lispsSnapshot.docs[0].data();
+        const { admin } = getDeps();
+        const bucket = admin.storage().bucket("lispcentral.firebasestorage.app");
+        const file = bucket.file(lispData.storagePath);
+        
+        try {
+          const [content] = await file.download();
+          code = content.toString("utf8");
+        } catch (e) {
+          return res.status(500).send(`Error: Fallo al descargar rutina del Workspace.`);
+        }
+      } else {
+        // Leer localmente del Core
+        code = fs.readFileSync(filepath, "utf8");
       }
 
-      let code = fs.readFileSync(filepath, "utf8");
       if (isLC) {
         code = code.replace(/c:TMD_/gi, "c:LC_");
         code = code.replace(/\(TMD_/gi, "(LC_");
@@ -153,4 +209,220 @@ exports.getRoutine = onRequest({ cors: true }, async (req, res) => {
     console.error("Erro ao ler rotina:", err);
     return res.status(500).send("Error interno al leer la rutina.");
   }
+});
+
+exports.generateLoader = onRequest({ cors: true }, async (req, res) => {
+  const { admin } = getDeps();
+  const token = req.query.token || req.query.apiKey;
+  if (!token) return res.status(400).send("Falta Token.");
+
+  const db = getDb();
+  const snapshot = await db.collection("users").where("apiKey", "==", token).limit(1).get();
+  if (snapshot.empty) return res.status(404).send("Token invalido.");
+
+  const tenantName = snapshot.docs[0].data().name || "Cliente";
+
+  const loaderCode = `;;; ==========================================================================
+;;; LISPCENTRAL CLOUD LOADER (SaaS Multi-Tenant)
+;;; Licenciado para: ${tenantName}
+;;; Não modifique o Seat Token abaixo. Ele vincula seu assento e empresa.
+;;; ==========================================================================
+
+(setq *LC-SEAT-TOKEN* "${token}")
+(setq *LC-API-ENDPOINT* "https://getroutine-wgpjjgorxa-uc.a.run.app/getRoutine")
+
+;; Gerando Hash de Hardware (Machine ID) e Versão do AutoCAD
+(setq *LC-HWID* (strcat (getenv "COMPUTERNAME") "@" (getenv "USERNAME")))
+(setq *LC-ACADVER* (getvar "ACADVER"))
+
+;; Funcao profesional para Dialog Box (Yes/No)
+(defun LC:MsgBox (title msg type / wsh res)
+  (if (setq wsh (vlax-create-object "WScript.Shell"))
+    (progn
+      (setq res (vlax-invoke-method wsh 'Popup msg 0 title type))
+      (vlax-release-object wsh)
+      res
+    )
+    (progn (alert msg) 0)
+  )
+)
+
+;; Funcao utilitaria para codificar espacos na URL
+(defun LC:url-encode (str / res i len char)
+  (setq res "")
+  (setq i 1)
+  (setq len (strlen str))
+  (while (<= i len)
+    (setq char (substr str i 1))
+    (if (= char " ")
+      (setq res (strcat res "%20"))
+      (setq res (strcat res char))
+    )
+    (setq i (1+ i))
+  )
+  res
+)
+
+;; Funcao para baixar e avaliar codigo na memoria do AutoCAD sem gravar arquivos fisicos (Online-Only)
+(defun LC:load-remote-routine (lisp_id / xmlhttp url status response)
+  (princ (strcat "\\n[LispCentral] Baixando pacote '" lisp_id "'..."))
+  ;; Usamos token y lispId como parametros semanticos
+  (setq url (strcat *LC-API-ENDPOINT* "?token=" *LC-SEAT-TOKEN* "&hwId=" (LC:url-encode *LC-HWID*) "&lispId=" lisp_id))
+  (setq xmlhttp (vlax-create-object "MSXML2.XMLHTTP.6.0"))
+  (if xmlhttp
+    (progn
+      (vl-catch-all-apply
+        '(lambda ()
+           (vlax-invoke-method xmlhttp 'open "GET" url :vlax-false)
+           (vlax-invoke-method xmlhttp 'send)
+         )
+      )
+      (setq status (vl-catch-all-apply 'vlax-get-property (list xmlhttp 'status)))
+      (if (= status 200)
+        (progn
+          (setq response (vlax-get-property xmlhttp 'responseText))
+          ;; Executa o codigo em RAM de forma isolada
+          (if (vl-catch-all-error-p (vl-catch-all-apply 'eval (list (read (strcat "(progn\\n" response "\\n(princ)\\n)")))))
+            (progn
+              (princ (strcat "\\n[❌] Erro de sintaxe na rotina: " lisp_id))
+              (setvar "USERS1" (strcat lisp_id ":error"))
+              nil
+            )
+            (progn
+              (setvar "USERS1" (strcat lisp_id ":success"))
+              (princ) ;; Silent success
+              t
+            )
+          )
+        )
+        (progn
+          (princ (strcat "\\n[❌] Falha ao baixar '" lisp_id "' (Status: " (vl-princ-to-string status) ")."))
+          (setvar "USERS1" (strcat lisp_id ":error"))
+          nil
+        )
+      )
+      (vlax-release-object xmlhttp)
+    )
+    (progn
+      (princ "\\n[❌] Falha ao instanciar o objeto XMLHTTP.")
+      (setvar "USERS1" (strcat lisp_id ":error"))
+      nil
+    )
+  )
+  (princ)
+)
+
+;; Mapeamento de nome de arquivo para o comando real definido em LISP
+(defun LC:get-command-name (lisp_id / r-upper)
+  (setq r-upper (strcase lisp_id))
+  (cond
+    ((= r-upper "ABAPARAM") "ABA_PARAM")
+    ((= r-upper "ABAPERFIL") "ABA_PERFIL")
+    ((= r-upper "ACMMVP") "ACM")
+    ((= r-upper "ACMTOOLS") "ABA_CRIAR")
+    ((= r-upper "CORTARPAREDES") "CORTARPAREDE")
+    ((= r-upper "ESTRUTURAMVP") "VIGA")
+    ((= r-upper "PAREDEMVP") "PAREDE")
+    ((= r-upper "PORTAMVP") "PORTA")
+    ((= r-upper "TEJADOMVP") "TELHADO")
+    (t lisp_id)
+  )
+)
+
+;; Funcao para rodar um comando garantindo que esteja carregado
+(defun LC:run-or-load (lisp_id / cmd-name cmd-sym)
+  (setq cmd-name (LC:get-command-name lisp_id))
+  (setq cmd-sym (read (strcat "c:" cmd-name)))
+  (if (not (eval (list 'type cmd-sym)))
+    (progn
+      (princ) ;; Silent redirection
+      (LC:load-remote-routine lisp_id)
+    )
+  )
+  (if (eval (list 'type cmd-sym))
+    (progn
+      (eval (list cmd-sym))
+    )
+    (alert (strcat "\\n[❌] Erro: Nao foi possivel carregar o comando: " cmd-name))
+  )
+  (princ)
+)
+
+;; Comando Principal de la Paleta Unificada (CP1)
+(defun c:CP1 (/ doc find-path bridge-dir html-path loader-js f-js)
+  (vl-load-com)
+  (setq doc (vla-get-ActiveDocument (vlax-get-acad-object)))
+  (vla-StartUndoMark doc)
+  
+  (princ "\\n[⚙] Carregando LispCentral Command Palette...")
+  
+  ;; 1. Localizar o diretório do LISP dinamicamente de forma segura
+  (setq find-path (findfile "LC_Loader.lsp"))
+  (if find-path
+    (setq bridge-dir (vl-filename-directory find-path))
+    (progn
+      ;; Fallbacks seguros
+      (if (vl-file-directory-p "Z:/Autocad Config/LISP")
+        (setq bridge-dir "Z:/Autocad Config/LISP")
+        (setq bridge-dir "C:/Users/TM PROJETOS/Downloads")
+      )
+    )
+  )
+  
+  ;; 2. Construir o caminho para o arquivo HTML de la paleta unificada
+  (setq html-path (strcat bridge-dir "/web/inspector_unified.html"))
+  (setq html-path (vl-string-translate "\\\\" "/" html-path))
+  
+  (if (not (vl-string-search "file:///" html-path))
+    (if (= (substr html-path 1 1) "/")
+      (setq html-path (strcat "file://" html-path))
+      (setq html-path (strcat "file:///" html-path))
+    )
+  )
+  
+  ;; Codificar espacios
+  (while (vl-string-search " " html-path)
+    (setq html-path (vl-string-subst "%20" " " html-path))
+  )
+  
+  ;; Añadir parámetros de Seat Token y HWID de forma segura
+  (setq html-path (strcat html-path "?token=" *LC-SEAT-TOKEN* "&hwid=" *LC-HWID*))
+  
+  ;; 3. Criar arquivo JavaScript de inicialização (WEBLOAD)
+  (setq loader-js (strcat bridge-dir "/web/LC_Palette_Loader.js"))
+  (setq loader-js (vl-string-translate "\\\\" "/" loader-js))
+  
+  (setq f-js (open loader-js "w"))
+  (if f-js
+    (progn
+      (write-line "if (typeof Acad !== 'undefined') {" f-js)
+      (write-line (strcat "    Acad.Application.addPalette(\\"Command Palette\\", \\"" html-path "\\");") f-js)
+      (write-line "    Acad.Editor.writeMessage(\\"\\\\n[✔] LispCentral Palette carregada com sucesso.\\\\n\\");" f-js)
+      (write-line "} else {" f-js)
+      (write-line "    console.error(\\"[❌] Error: API de JavaScript de AutoCAD no detectada.\\");" f-js)
+      (write-line "}" f-js)
+      (close f-js)
+      
+      ;; Carrega o script que executa e compila na hora
+      (vl-cmdf "_.WEBLOAD" "_L" (strcat "\\"" loader-js "\\""))
+    )
+    (princ "\\n[❌] Error: Não foi possível carregar a interface da paleta.")
+  )
+  
+  (vla-EndUndoMark doc)
+  (princ)
+)
+
+;; Alias de compatibilidad para comando de inspección
+(defun c:LC_INSPECT () (c:CP1))
+
+;; Arranque Automático: Carga la paleta de forma asíncrona de inmediato al abrir AutoCAD
+(princ "\\n[LispCentral] Inicializando Command Palette asíncrona...")
+(c:CP1)
+(princ)
+`;
+
+  res.setHeader("Content-Disposition", 'attachment; filename="LC_Loader.lsp"');
+  res.setHeader("Content-Type", "text/plain; charset=utf-8");
+  return res.status(200).send(loaderCode);
 });

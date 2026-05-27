@@ -55,3 +55,21 @@ El código AutoLISP (`TMD_`) seguirá interactuando orgánicamente con el usuari
 1. **Astrid (Compilador Cloud):** Ofusca los `.lsp`, les inyecta credenciales y los sirve a la RAM.
 2. **Interfaces Web (Paletas/Ribbons):** Controlan UI rica, descargan catálogos de Firebase y complementan la CLI de AutoCAD.
 3. **LispCentral Core:** Ejecuta comandos nativamente (CLI interactiva), calcula geometría, y guarda LDATA para persistencia BIM.
+
+---
+
+## 🏢 4. El Pivote Estratégico: Arquitectura Multi-Tenant (B2C a B2B)
+La plataforma ha evolucionado para no solo servir nuestras propias herramientas (TM Digital), sino convertirse en la infraestructura en la nube para cualquier empresa de ingeniería.
+
+### Qué haremos:
+1.  **Fase 1 (Dogfooding B2C):** Lanzaremos usando la infraestructura Multi-Tenant, pero nosotros ("TM Digital") seremos el único Tenant. Las rutinas se descargarán desde nuestro bucket protegido en Firebase y validaremos la suscripción.
+2.  **Fase 2 (Apertura B2B):** Abriremos el panel para que CAD Managers creen sus cuentas, suban sus propios LISPs a su bucket privado y generen "Seat Tokens" para sus dibujantes.
+
+### Cómo lo haremos (Directrices Técnicas):
+*   **Firebase Firestore como Core:** Reemplazará la lógica estática. Cada petición de LISP valida: *¿El token es válido? ¿Pertenece a un usuario activo? ¿Qué Tenant_ID tiene? ¿Tiene permiso de acceder a este lisp_id?*
+*   **Identificadores Semánticos:** Usaremos siempre slugs legibles en Firestore (`tenant_tmdigital`, `lisp_viga_mvp`, `user_carlos`). Nada de strings aleatorios inmanejables.
+*   **Cloud Storage Encriptado:** Los LISPs de las empresas se suben a Firebase Storage.
+
+### Por qué lo haremos (Decisiones Críticas):
+*   **Seguridad Online-Only (Zero-Offline):** Hemos descartado el acceso Offline mediante JWT locales para la fase inicial. **¿Por qué?** El riesgo de fuga de código (IP) es inaceptable en esta etapa temprana. Todo comando exigirá ping al servidor para asegurar control total de vida/muerte sobre la llave de acceso.
+*   **Base de datos Multi-Tenant desde el inicio:** **¿Por qué?** Previene tener que reescribir toda la aplicación (Back y Front) cuando pasemos de vender nuestro LISP a vender la Plataforma. Un dibujante independiente simplemente es un Tenant con un solo asiento.

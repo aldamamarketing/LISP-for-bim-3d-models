@@ -27,344 +27,7 @@ const hwId = urlParams.get('hwid') || 'unknown';
 // Endpoints del Servidor
 const BASE_ENDPOINT = "https://getroutine-wgpjjgorxa-uc.a.run.app/getRoutine";
 
-// Mapeo detallado de metadatos para visualización y documentación
-const METADATA_MAP = {
-  // Arquitetura 2D (Suite Semántica)
-  "ARQ-SYS-Config": {
-    friendly: "Configurar Suite",
-    desc: "Ajuste de capas, unidades, colores y escalas del sistema.",
-    group: "Arquitetura 2D",
-    doc: "#"
-  },
-  "ARQ-GRID-Axes": {
-    friendly: "Ejes de Rejilla",
-    desc: "Crea una rejilla de ejes paramétrica con distancias X/Y.",
-    group: "Arquitetura 2D",
-    doc: "#"
-  },
-  "ARQ-GRID-Line": {
-    friendly: "Trazar Eje",
-    desc: "Dibuja una línea de eje individual y le asocia burbuja.",
-    group: "Arquitetura 2D",
-    doc: "#"
-  },
-  "ARQ-WALL-Draw": {
-    friendly: "Diseñar Muros",
-    desc: "Dibuja muros dobles paralelos con grosor interactivo.",
-    group: "Arquitetura 2D",
-    doc: "#"
-  },
-  "ARQ-WALL-FromAxis": {
-    friendly: "Muros desde Ejes",
-    desc: "Convierte automáticamente líneas de ejes seleccionadas a muros.",
-    group: "Arquitetura 2D",
-    doc: "#"
-  },
-  "ARQ-WALL-Thickness": {
-    friendly: "Grosor de Muro",
-    desc: "Permite cambiar el grosor de las paredes seleccionadas.",
-    group: "Arquitetura 2D",
-    doc: "#"
-  },
-  "ARQ-WALL-Trim": {
-    friendly: "Limpieza de Muros",
-    desc: "Resuelve y limpia intersecciones de muros en T, L o Cruz.",
-    group: "Arquitetura 2D",
-    doc: "#"
-  },
-  "ARQ-COL-Insert": {
-    friendly: "Insertar Columnas",
-    desc: "Coloca columnas en cruces de ejes o de manera libre.",
-    group: "Arquitetura 2D",
-    doc: "#"
-  },
-  "ARQ-DOOR-Insert": {
-    friendly: "Insertar Puertas",
-    desc: "Añade una puerta en un muro rompiendo la pared automáticamente.",
-    group: "Arquitetura 2D",
-    doc: "#"
-  },
-  "ARQ-WIN-Insert": {
-    friendly: "Insertar Ventanas",
-    desc: "Añade una ventana en un muro rompiendo la pared automáticamente.",
-    group: "Arquitetura 2D",
-    doc: "#"
-  },
-  "ARQ-WALL-MoveOpening": {
-    friendly: "Mover Vanos",
-    desc: "Mueve una puerta o ventana reparando la pared atrás de forma interactiva.",
-    group: "Arquitetura 2D",
-    doc: "#"
-  },
-  "ARQ-WALL-ResizeOpening": {
-    friendly: "Redimensionar Vanos",
-    desc: "Permite modificar el ancho de vanos y regenera el corte de muro.",
-    group: "Arquitetura 2D",
-    doc: "#"
-  },
-  "ARQ-DIM-Opening": {
-    friendly: "Acotado de Vanos",
-    desc: "Acota de forma lineal y secuencial muros y vanos indicados.",
-    group: "Arquitetura 2D",
-    doc: "#"
-  },
-  "ARQ-DIM-Quick": {
-    friendly: "Cota de Habitación",
-    desc: "Acotación automática de las distancias interiores de un cuarto.",
-    group: "Arquitetura 2D",
-    doc: "#"
-  },
-  "ARQ-SYM-Level": {
-    friendly: "Simbología de Nivel",
-    desc: "Inserta marcas de nivel de piso con altura editable.",
-    group: "Arquitetura 2D",
-    doc: "#"
-  },
-
-  // Estruturas (Pro)
-  "TMD_JOINTS": {
-    friendly: "Ligações Metálicas",
-    desc: "Gera conexões, soldas e juntas estruturais entre sólidos 3D.",
-    group: "Estruturas (Pro)",
-    doc: "lc-joints"
-  },
-  "TMD_BUILD": {
-    friendly: "Compilador 3D",
-    desc: "Converte linhas-guia (Wires) em sólidos 3D parametrizados.",
-    group: "Estruturas (Pro)",
-    doc: "lc-build"
-  },
-  "TMD_Vigas": {
-    friendly: "Vigas 3D",
-    desc: "Cria e edita vigas estruturais com LDATA parametrizado.",
-    group: "Estruturas (Pro)",
-    doc: "tmd-vigas"
-  },
-  "TMD_Wires": {
-    friendly: "Linhas Guia (Wires)",
-    desc: "Modo livre 3D: traçado contínuo de linhas de referência (eixos).",
-    group: "Estruturas (Pro)",
-    doc: "tmd-wires"
-  },
-  "TMD_Teja_TR25": {
-    friendly: "Telhas Trapezoidais TR25",
-    desc: "Desenha coberturas parametrizadas com telhas TR25.",
-    group: "Estruturas (Pro)",
-    doc: "tmd-teja-tr25"
-  },
-  "TejadoMVP": {
-    friendly: "Telhados Metálicos",
-    desc: "Geração simplificada de telhados e inclinações estruturais.",
-    group: "Estruturas (Pro)",
-    doc: "tejado-mvp"
-  },
-  "TMD_Abas": {
-    friendly: "Abas Paramétricas",
-    desc: "Cria abas metálicas parametrizadas nos perfis estruturais.",
-    group: "Estruturas (Pro)",
-    doc: "tmd-abas"
-  },
-  "AbaParam": {
-    friendly: "Parâmetros de Aba",
-    desc: "Definição de parâmetros estruturais das abas de vigas.",
-    group: "Estruturas (Pro)",
-    doc: "aba-param"
-  },
-  "AbaPerfil": {
-    friendly: "Perfil de Aba",
-    desc: "Configuração geométrica detalhada do perfil das abas.",
-    group: "Estruturas (Pro)",
-    doc: "aba-perfil"
-  },
-  "EstruturaMVP": {
-    friendly: "Estruturas MVP",
-    desc: "Gerador de pórticos e coberturas de galpão.",
-    group: "Estruturas (Pro)",
-    doc: "estructura-mvp"
-  },
-  "Gerar_Grelha": {
-    friendly: "Gerador de Grelhas",
-    desc: "Criação de grelhas estruturais bidirecionais automáticas.",
-    group: "Estruturas (Pro)",
-    doc: "gerar-grelha"
-  },
-  "LC_STEEL_DRAW": {
-    friendly: "Detalhamento de Aço",
-    desc: "Desenho parametrizado de vergalhões e estribos 2D.",
-    group: "Estruturas (Pro)",
-    doc: "lc-steel-draw"
-  },
-
-  // BIM / Coordenação e Edição
-  "TMD_Niveis": {
-    friendly: "Níveis BIM",
-    desc: "Sincronizador e editor global de alturas e referências Z.",
-    group: "BIM / Coordenação",
-    doc: "tmd-niveis"
-  },
-  "TMD_Tags": {
-    friendly: "Etiquetas BIM",
-    desc: "Inserção e controle de tags/metadados nos elementos 3D.",
-    group: "BIM / Anotação",
-    doc: "tmd-tags"
-  },
-  "TMD_MATCH": {
-    friendly: "Propriedades BIM (Match)",
-    desc: "Copia propriedades de LDATA completo de um sólido para outros.",
-    group: "BIM / Propriedades",
-    doc: "tmd-match"
-  },
-  "TMD_Align": {
-    friendly: "Alinhamento Corel",
-    desc: "Alinhamento industrial de elementos estilo Corel.",
-    group: "Edição / Layout",
-    doc: "tmd-align"
-  },
-  "TMD_Groups": {
-    friendly: "Grupos Estruturais",
-    desc: "Organização e agrupamento lógico de vigas e pilares.",
-    group: "Edição / Layout",
-    doc: "tmd-groups"
-  },
-  "TMD_FACE_CUT": {
-    friendly: "Corte por Face",
-    desc: "Corte preciso e chanfro de vigas baseado em planos/faces 3D.",
-    group: "Edição / Layout",
-    doc: "tmd-face-cut"
-  },
-  "TMD_SYNC": {
-    friendly: "Sincronizador BIM",
-    desc: "Saneia ADN, resolve conflitos colineares e reconecta órfãos.",
-    group: "Sistema / Core",
-    doc: "tmd-sync"
-  },
-
-  // Quantidades
-  "TMD_BOM": {
-    friendly: "Lista de Materiais (BOM)",
-    desc: "Gera e exporta listas estruturadas de quantitativos.",
-    group: "Quantidades",
-    doc: "tmd-bom"
-  },
-  "TMD_Tablas": {
-    friendly: "Tabelas Dinâmicas",
-    desc: "Geração automática de tabelas e quantitativos no AutoCAD.",
-    group: "Quantidades",
-    doc: "tmd-tablas"
-  },
-  "LC_BOM_EXPORT": {
-    friendly: "Exportador BOM",
-    desc: "Mapeamento rápido de sólidos para arquivo CSV.",
-    group: "Quantidades",
-    doc: "lc-bom-export"
-  },
-  "LC_TAREA": {
-    friendly: "Somar Áreas",
-    desc: "Cálculo e soma acumulada de áreas de polígonos fechados.",
-    group: "Quantidades",
-    doc: "lc-tarea"
-  },
-  "LC_TLEN": {
-    friendly: "Somar Comprimentos",
-    desc: "Soma rápida de comprimentos de linhas, arcos e polilinhas.",
-    group: "Quantidades",
-    doc: "lc-tlen"
-  },
-
-  // Fabricação
-  "TMD_CNC": {
-    friendly: "Exportador CNC",
-    desc: "Geração de arquivos de corte/furação CNC para fabricação.",
-    group: "Fabricação (Pro)",
-    doc: "tmd-cnc"
-  },
-
-  // Arquitetura
-  "AcmMVP": {
-    friendly: "Colunas ACM MVP",
-    desc: "Modelagem MVP de revestimentos e pilares em ACM.",
-    group: "Arquitetura",
-    doc: "acm-mvp"
-  },
-  "AcmTools": {
-    friendly: "Ferramentas ACM",
-    desc: "Utilitários adicionais para modulação de chapas ACM.",
-    group: "Arquitetura",
-    doc: "acm-tools"
-  },
-  "ColumnaACM": {
-    friendly: "Colunas ACM",
-    desc: "Modelador avançado de colunas redondas e quadradas em ACM.",
-    group: "Arquitetura",
-    doc: "columna-acm"
-  },
-  "ColumnaCorintia": {
-    friendly: "Coluna Coríntia",
-    desc: "Gerador clássico parametrizado de colunas coríntias 3D.",
-    group: "Arquitetura",
-    doc: "columna-corintia"
-  },
-  "CortarParedes": {
-    friendly: "Cortar Paredes",
-    desc: "Ferramenta para abertura de vãos de portas e janelas.",
-    group: "Arquitetura",
-    doc: "cortar-paredes"
-  },
-  "ParedeMVP": {
-    friendly: "Paredes 3D",
-    desc: "Modelador rápido de paredes sólidas parametrizadas.",
-    group: "Arquitetura",
-    doc: "parede-mvp"
-  },
-  "PortaMVP": {
-    friendly: "Portas 3D",
-    desc: "Inserção parametrizada de blocos inteligentes de portas.",
-    group: "Arquitetura",
-    doc: "porta-mvp"
-  },
-  "LC_WALL_DRAW": {
-    friendly: "Desenho de Paredes",
-    desc: "Desenho interativo 2D de paredes com espessura ajustável.",
-    group: "Arquitetura",
-    doc: "lc-wall-draw"
-  },
-
-  // Topografia
-  "LC_CUADRO_RUMBOS": {
-    friendly: "Quadro de Rumos",
-    desc: "Memorial descritivo e tabelas de rumos e azimutes.",
-    group: "Topografia",
-    doc: "lc-cuadro-rumbos"
-  },
-  "LC_ZLABEL": {
-    friendly: "Etiqueta Z (Cotas)",
-    desc: "Identificador dinâmico de coordenadas Z (elevação).",
-    group: "Topografia",
-    doc: "lc-zlabel"
-  },
-
-  // Sistema / Core
-  "TMD_Utils": {
-    friendly: "Utilitários Core",
-    desc: "Funções básicas e utilitários auxiliares de sistema.",
-    group: "Sistema / Core",
-    doc: "tmd-utils"
-  },
-  "LC_CLEAN": {
-    friendly: "Super Limpeza (Clean)",
-    desc: "Auditoria profunda de banco de dados do desenho AutoCAD.",
-    group: "Sistema / Core",
-    doc: "lc-clean"
-  },
-  "LC_FLATZ": {
-    friendly: "Aplanar Desenho (Flatten)",
-    desc: "Projeta todas as entidades selecionadas para elevação Z=0.",
-    group: "Sistema / Core",
-    doc: "lc-flat-z"
-  }
-};
-
-// Orden de visualización de los grupos
+// (Metadatos antiguos eliminados. Ahora todo viene de Firestore)
 const GROUP_ORDER = [
   "Arquitetura 2D",
   "Estruturas (Pro)",
@@ -377,31 +40,9 @@ const GROUP_ORDER = [
   "Topografia",
   "Sistema / Core",
   "Comando Geral",
+  "Custom Tools",
   "Outros"
 ];
-
-function getMetadata(cmdName) {
-  let data = METADATA_MAP[cmdName];
-  if (!data) {
-    let cleanName = cmdName;
-    if (cmdName.startsWith("LC_")) {
-      cleanName = cmdName.replace("LC_", "TMD_");
-    } else if (cmdName.startsWith("TMD_")) {
-      cleanName = cmdName.replace("TMD_", "LC_");
-    }
-    data = METADATA_MAP[cleanName];
-  }
-  
-  if (data) return data;
-  
-  // Fallback seguro
-  return {
-    friendly: cmdName,
-    desc: "Comando LispCentral",
-    group: cmdName.startsWith("LC_") || cmdName.startsWith("TMD_") ? "Comando Geral" : "Outros",
-    doc: "#"
-  };
-}
 
 // Inicialización
 document.addEventListener("DOMContentLoaded", () => {
@@ -489,7 +130,7 @@ function renderFavorites() {
     item.id = `fav-${mod.name}`;
     item.title = mod.desc;
     
-    const icon = GROUP_ICONS[mod.group] || "🔧";
+    const icon = mod.svgIcon ? mod.svgIcon : (GROUP_ICONS[mod.group] || "🔧");
     const docsBtnHtml = mod.doc && mod.doc !== "#" 
       ? `<a class="docs-btn" href="https://lispcentral.web.app/docs/${mod.doc}" target="_blank" onclick="event.stopPropagation();" title="Ver documentação">?</a>`
       : "";
@@ -522,27 +163,25 @@ async function initPalette() {
   try {
     writeConsoleMessage("\n[LispCentral] Inicializando Command Palette asíncrona...");
     
-    // 1. Obtener Índice de comandos desde el servidor
-    const indexUrl = `${BASE_ENDPOINT}?apiKey=${apiKey}&hwId=${hwId}&routine=INDEX`;
-    const response = await fetch(indexUrl);
+    // 1. Obtener Índice dinámico de comandos desde el servidor SaaS (con cache busting)
+    const indexUrl = `${BASE_ENDPOINT}?apiKey=${apiKey}&hwId=${hwId}&routine=INDEX&t=${Date.now()}`;
+    const response = await fetch(indexUrl, { cache: "no-store" });
     
     if (!response.ok) {
       throw new Error(`HTTP ${response.status}`);
     }
     
-    const text = await response.text();
-    const cmdList = text.split(",").filter(c => c.trim() !== "");
-
+    const cmdList = await response.json();
     
     // Crear base de datos de módulos con metadatos estructurados
     modulesData = cmdList.map(cmd => {
-      const meta = getMetadata(cmd);
       return {
-        name: cmd,
-        friendly: meta.friendly,
-        desc: meta.desc,
-        group: meta.group,
-        doc: meta.doc,
+        name: cmd.name,
+        friendly: cmd.friendly,
+        desc: cmd.desc,
+        group: cmd.group,
+        doc: cmd.doc || "#",
+        svgIcon: cmd.svgIcon || "",
         status: "pending" // pending, loading, success, error
       };
     });
@@ -618,7 +257,7 @@ function renderModules() {
       item.title = mod.desc;
       
       const isPinned = favorites.includes(mod.name);
-      const icon = GROUP_ICONS[mod.group] || "🔧";
+      const icon = mod.svgIcon ? mod.svgIcon : (GROUP_ICONS[mod.group] || "🔧");
       const docsBtnHtml = mod.doc && mod.doc !== "#" 
         ? `<a class="docs-btn" href="https://lispcentral.web.app/docs/${mod.doc}" target="_blank" onclick="event.stopPropagation();" title="Ver documentação">?</a>`
         : "";

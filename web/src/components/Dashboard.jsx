@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { auth, db, loginWithGoogle, logout } from '../firebase';
 import { onAuthStateChanged, signInWithEmailAndPassword, createUserWithEmailAndPassword } from 'firebase/auth';
-import { collection, doc, getDocs, setDoc, query, where, updateDoc } from 'firebase/firestore';
+import { collection, doc, getDocs, setDoc, query, where, updateDoc, addDoc, deleteDoc } from 'firebase/firestore';
+import { ref, uploadBytes, getDownloadURL, deleteObject } from 'firebase/storage';
 
 export default function Dashboard({ mode = 'dashboard' }) {
   const [firebaseUser, setFirebaseUser] = useState(null);
@@ -15,6 +16,19 @@ export default function Dashboard({ mode = 'dashboard' }) {
   const [isRegistering, setIsRegistering] = useState(false);
   const [editName, setEditName] = useState('');
   const [editRole, setEditRole] = useState('');
+  
+  // Workspace LISPs
+  const [tenantLisps, setTenantLisps] = useState([]);
+  const [isUploading, setIsUploading] = useState(false);
+  const [showUploadForm, setShowUploadForm] = useState(false);
+  const [uploadFile, setUploadFile] = useState(null);
+  const [uploadData, setUploadData] = useState({
+    friendlyName: '',
+    description: '',
+    group: 'Custom Tools',
+    suite: 'core',
+    svgIcon: '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M5 13l-3-3 3-3M11 13l3-3-3-3M8 4l-2 8"/></svg>'
+  });
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
@@ -23,6 +37,7 @@ export default function Dashboard({ mode = 'dashboard' }) {
         await loadOrInitializeUser(user);
       } else {
         setUserData(null);
+        setTenantLisps([]);
         setLoading(false);
       }
     });
@@ -117,7 +132,9 @@ export default function Dashboard({ mode = 'dashboard' }) {
 
       if (!querySnapshot.empty) {
         const docSnap = querySnapshot.docs[0];
-        setUserData({ id: docSnap.id, ...docSnap.data() });
+        const loadedData = { id: docSnap.id, ...docSnap.data() };
+        setUserData(loadedData);
+        await loadTenantLisps(loadedData.id);
       } else {
         const { uid, apiKey } = generateSemanticIds(user.email, user.displayName);
         const expires = new Date();
@@ -138,11 +155,88 @@ export default function Dashboard({ mode = 'dashboard' }) {
 
         await setDoc(doc(db, 'users', uid), newUser);
         setUserData({ id: uid, ...newUser });
+        await loadTenantLisps(uid);
       }
     } catch (error) {
       console.error("Erro ao carregar dados do usuário:", error);
     }
     setLoading(false);
+  };
+
+  const loadTenantLisps = async (tenantId) => {
+    try {
+      const lispsRef = collection(db, 'lispFiles');
+      const q = query(lispsRef, where('tenantId', '==', tenantId));
+      const snap = await getDocs(q);
+      const lisps = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+      setTenantLisps(lisps);
+    } catch (err) {
+      console.error('Erro ao carregar LISPs:', err);
+    }
+  };
+
+  const handleFileSelect = (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    if (!file.name.toLowerCase().endsWith('.lsp')) {
+      alert("Apenas arquivos .lsp são permitidos.");
+      return;
+    }
+    setUploadFile(file);
+    setUploadData({ ...uploadData, friendlyName: file.name.replace('.lsp', '') });
+    setShowUploadForm(true);
+  };
+
+  const submitUpload = async () => {
+    if (!uploadFile) return;
+    setIsUploading(true);
+    
+    try {
+      const { storage } = await import('../firebase');
+      const lispId = uploadFile.name.replace('.lsp', '').replace(/[^a-zA-Z0-9_-]/g, '_');
+      const storagePath = `tenants/${userData.id}/lisps/${uploadFile.name}`;
+      const fileRef = ref(storage, storagePath);
+      
+      await uploadBytes(fileRef, uploadFile);
+      
+      const fileMeta = {
+        lispId: lispId,
+        tenantId: userData.id,
+        originalName: uploadFile.name,
+        storagePath: storagePath,
+        friendlyName: uploadData.friendlyName,
+        description: uploadData.description,
+        group: uploadData.group,
+        suite: uploadData.suite,
+        svgIcon: uploadData.svgIcon,
+        uploadedAt: new Date().toISOString()
+      };
+      
+      const docRef = await addDoc(collection(db, 'lispFiles'), fileMeta);
+      setTenantLisps([...tenantLisps, { id: docRef.id, ...fileMeta }]);
+      alert('LISP enviado e configurado com sucesso!');
+      
+      setShowUploadForm(false);
+      setUploadFile(null);
+    } catch(err) {
+      console.error('Erro no upload:', err);
+      alert('Erro ao enviar o LISP.');
+    }
+    setIsUploading(false);
+  };
+
+  const handleDeleteLisp = async (lisp) => {
+    if(!confirm(`Excluir o LISP '${lisp.originalName}'?`)) return;
+    try {
+      const { storage } = await import('../firebase');
+      const fileRef = ref(storage, lisp.storagePath);
+      await deleteObject(fileRef).catch(e => console.warn('File not found in storage', e));
+      await deleteDoc(doc(db, 'lispFiles', lisp.id));
+      setTenantLisps(tenantLisps.filter(l => l.id !== lisp.id));
+    } catch(err) {
+      console.error('Erro ao deletar LISP:', err);
+      alert('Erro ao excluir o arquivo.');
+    }
   };
 
   const handleUnlink = async () => {
@@ -160,7 +254,8 @@ export default function Dashboard({ mode = 'dashboard' }) {
 
   const handleDownload = () => {
     if (!userData?.apiKey) return;
-    const loaderUrl = `https://us-central1-lispcentral.cloudfunctions.net/generateLoader?apiKey=${userData.apiKey}`;
+    // Debes reemplazar esta URL con la que te devuelva Google Cloud al desplegar 'generateLoader'
+    const loaderUrl = `https://generateloader-wgpjjgorxa-uc.a.run.app/?token=${userData.apiKey}`;
     window.location.href = loaderUrl;
   };
 
@@ -262,6 +357,109 @@ export default function Dashboard({ mode = 'dashboard' }) {
           </div>
         </div>
 
+      </div>
+
+      {/* Workspace (Mis LISPs) */}
+      <div className="card" style={{ marginBottom: '20px' }}>
+        <h3 style={{ marginTop: 0 }}>Meu Workspace (LISPs)</h3>
+        <p style={{ fontSize: '0.9rem', color: 'var(--text-muted)' }}>Faça upload de suas rotinas .LSP para usá-las na nuvem.</p>
+        
+        <div style={{ margin: '15px 0' }}>
+          {!showUploadForm ? (
+            <>
+              <input 
+                type="file" 
+                accept=".lsp" 
+                id="lispUploadInput" 
+                style={{ display: 'none' }} 
+                onChange={handleFileSelect} 
+              />
+              <button 
+                className="btn" 
+                onClick={() => document.getElementById('lispUploadInput').click()}
+              >
+                + Adicionar Nova Rotina (.LSP)
+              </button>
+            </>
+          ) : (
+            <div style={{ padding: '15px', background: 'var(--bg-darker)', borderRadius: '8px', border: '1px solid var(--panel-border)' }}>
+              <h4 style={{ marginTop: 0 }}>Configurar Rotina: {uploadFile?.name}</h4>
+              
+              <div className="form-group">
+                <label>Nome Amigável (Aparece no botão)</label>
+                <input type="text" value={uploadData.friendlyName} onChange={e => setUploadData({...uploadData, friendlyName: e.target.value})} placeholder="Ex: Vigas 3D" />
+              </div>
+              
+              <div className="form-group">
+                <label>Descrição</label>
+                <input type="text" value={uploadData.description} onChange={e => setUploadData({...uploadData, description: e.target.value})} placeholder="Ex: Cria vigas estruturais..." />
+              </div>
+              
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '15px' }}>
+                <div className="form-group">
+                  <label>Grupo na Paleta</label>
+                  <input type="text" value={uploadData.group} onChange={e => setUploadData({...uploadData, group: e.target.value})} placeholder="Ex: Estruturas" />
+                </div>
+                
+                <div className="form-group">
+                  <label>Suite (Permissão)</label>
+                  <select value={uploadData.suite} onChange={e => setUploadData({...uploadData, suite: e.target.value})} style={{ width: '100%', padding: '8px', borderRadius: '4px', border: '1px solid var(--border-color)', background: 'var(--bg-darker)', color: 'var(--text-color)' }}>
+                    <option value="core">Core (Todos acessam)</option>
+                    <option value="structures_pro">Estruturas Pro</option>
+                    <option value="architecture">Arquitetura</option>
+                    <option value="quantities">Quantidades</option>
+                  </select>
+                </div>
+              </div>
+
+              <div className="form-group">
+                <label>Ícone (Código SVG)</label>
+                <textarea 
+                  value={uploadData.svgIcon} 
+                  onChange={e => setUploadData({...uploadData, svgIcon: e.target.value})}
+                  rows="3"
+                  style={{ width: '100%', padding: '8px', borderRadius: '4px', border: '1px solid var(--border-color)', background: 'var(--bg-darker)', color: 'var(--text-color)', fontFamily: 'monospace' }}
+                />
+              </div>
+              
+              <div style={{ display: 'flex', gap: '10px', marginTop: '15px' }}>
+                <button className="btn" onClick={submitUpload} disabled={isUploading}>
+                  {isUploading ? 'Enviando...' : 'Salvar e Fazer Upload'}
+                </button>
+                <button className="btn btn-secondary" onClick={() => setShowUploadForm(false)} disabled={isUploading}>Cancelar</button>
+              </div>
+            </div>
+          )}
+        </div>
+
+        {tenantLisps.length > 0 ? (
+          <table style={{ width: '100%', borderCollapse: 'collapse', marginTop: '15px', fontSize: '0.9rem' }}>
+            <thead>
+              <tr style={{ borderBottom: '1px solid var(--border-color)', textAlign: 'left', color: 'var(--text-muted)' }}>
+                <th style={{ padding: '8px 4px' }}>Arquivo</th>
+                <th style={{ padding: '8px 4px' }}>Lisp ID</th>
+                <th style={{ padding: '8px 4px' }}>Data</th>
+                <th style={{ padding: '8px 4px', textAlign: 'right' }}>Ações</th>
+              </tr>
+            </thead>
+            <tbody>
+              {tenantLisps.map(lisp => (
+                <tr key={lisp.id} style={{ borderBottom: '1px solid var(--panel-border)' }}>
+                  <td style={{ padding: '8px 4px', color: '#fff' }}>{lisp.originalName}</td>
+                  <td style={{ padding: '8px 4px', fontFamily: 'monospace', color: 'var(--tmd-orange)' }}>{lisp.lispId}</td>
+                  <td style={{ padding: '8px 4px', color: 'var(--text-muted)' }}>{new Date(lisp.uploadedAt).toLocaleDateString()}</td>
+                  <td style={{ padding: '8px 4px', textAlign: 'right' }}>
+                    <button className="btn btn-secondary" style={{ padding: '4px 8px', fontSize: '0.8rem' }} onClick={() => handleDeleteLisp(lisp)}>Excluir</button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        ) : (
+          <div style={{ padding: '20px', textAlign: 'center', background: 'var(--bg-darker)', borderRadius: '8px', border: '1px dashed var(--panel-border)', marginTop: '15px' }}>
+            <span style={{ color: 'var(--text-muted)', fontSize: '0.9rem' }}>Nenhum LISP no seu workspace. Faça upload para começar.</span>
+          </div>
+        )}
       </div>
 
       {/* Full width Card for the Key */}

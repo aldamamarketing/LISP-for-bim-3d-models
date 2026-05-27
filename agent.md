@@ -86,3 +86,16 @@ El sistema cuenta con un panel de propiedades dinámico lateral (`web/properties
   ```
 * **Enrutamiento del Backend:**
   El enrutamiento del backend (`functions/index.js`) ha sido modificado en su regex de saneamiento para admitir guiones medios (`-`), lo que permite que las peticiones a comandos de formato `ARQ-...` se validen y entreguen correctamente.
+
+---
+
+## 🚀 Evolución a Plataforma SaaS Multi-Tenant (B2C a B2B)
+El proyecto ha pivotado hacia un modelo Híbrido:
+*   **Fase 1 (B2C):** TM Digital actúa como "Tenant 0", ofreciendo sus LISPs por suscripción a dibujantes individuales.
+*   **Fase 2 (B2B SaaS):** La plataforma se abre para que empresas (Tenants corporativos) alojen sus propios códigos LISP, gestionen llaves de acceso para sus dibujantes y protejan su IP.
+
+### Reglas Técnicas Obligatorias (Qué haremos y Cómo):
+1.  **Multi-Tenant desde el Día 1:** Toda la base de datos (Firebase) y lógica de backend asume que existen múltiples empresas. Todo está ligado a un `tenant_id`. No hay refactorización futura.
+2.  **IDs Semánticos:** Queda estrictamente prohibido usar UUIDs aleatorios (ej. `a1b2c3d4`) para identificar tenants, usuarios o rutinas en Firestore. Se usarán IDs descriptivos (ej. `tenant_tmdigital`, `lisp_viga_mvp`). **¿Por qué?** Facilita la depuración manual y mantiene la legibilidad semántica del diseño.
+3.  **Seguridad Online-Only:** Durante la Fase Beta, la plataforma funcionará 100% online. Cada comando consulta al servidor. **No** se implementarán tokens JWT offline temporales. **¿Por qué?** Para garantizar la protección total de la Propiedad Intelectual hasta implementar un cifrado cliente-servidor nativo sólido.
+4.  **Cifrado SaaS Estándar:** Usamos encriptación en tránsito (HTTPS) y en reposo (Firebase/GCP). La ofuscación profunda queda de lado de la empresa (pueden subir `.fas` o `.vlx` a su bucket si desconfían del texto plano).

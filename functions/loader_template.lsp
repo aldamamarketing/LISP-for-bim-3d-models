@@ -1,15 +1,14 @@
 ;;; ==========================================================================
-;;; LISPCENTRAL CLOUD LOADER v3.5 (SaaS)
-;;; Não modifique a chave abaixo. Ela vincula sua assinatura.
+;;; TM DIGITAL CLOUD LOADER (SaaS Multi-Tenant)
+;;; Não modifique o Seat Token abaixo. Ele vincula seu assento e empresa.
 ;;; ==========================================================================
 
-(setq *LISPCENTRAL-KEY* "{{API_KEY}}")
-(setq *LISPCENTRAL-ENDPOINT* "https://getroutine-wgpjjgorxa-uc.a.run.app/getRoutine")
-(setq *LISPCENTRAL-TELEMETRY* "https://telemetry-wgpjjgorxa-uc.a.run.app/telemetry")
+(setq *TMD-SEAT-TOKEN* "{{SEAT_TOKEN}}")
+(setq *TMD-API-ENDPOINT* "https://getroutine-wgpjjgorxa-uc.a.run.app/getRoutine")
 
 ;; Gerando Hash de Hardware (Machine ID) e Versão do AutoCAD
-(setq *LISPCENTRAL-HWID* (strcat (getenv "COMPUTERNAME") "@" (getenv "USERNAME")))
-(setq *LISPCENTRAL-ACADVER* (getvar "ACADVER"))
+(setq *TMD-HWID* (strcat (getenv "COMPUTERNAME") "@" (getenv "USERNAME")))
+(setq *TMD-ACADVER* (getvar "ACADVER"))
 
 ;; Funcao profissional para Dialog Box (Yes/No)
 (defun TMD:MsgBox (title msg type / wsh res)
@@ -39,10 +38,11 @@
   res
 )
 
-;; Funcao para baixar e avaliar codigo na memoria do AutoCAD sem gravar arquivos fisicos
-(defun LC:load-remote-routine (routine_id / xmlhttp url status response)
-  (princ (strcat "\n[LispCentral] Baixando rotina '" routine_id "'..."))
-  (setq url (strcat *LISPCENTRAL-ENDPOINT* "?apiKey=" *LISPCENTRAL-KEY* "&hwId=" (LC:url-encode *LISPCENTRAL-HWID*) "&routine=" routine_id))
+;; Funcao para baixar e avaliar codigo na memoria do AutoCAD sem gravar arquivos fisicos (Online-Only)
+(defun LC:load-remote-routine (lisp_id / xmlhttp url status response)
+  (princ (strcat "\n[TM Digital] Baixando pacote '" lisp_id "'..."))
+  ;; Usamos token y lispId como parametros semanticos
+  (setq url (strcat *TMD-API-ENDPOINT* "?token=" *TMD-SEAT-TOKEN* "&hwId=" (LC:url-encode *TMD-HWID*) "&lispId=" lisp_id))
   (setq xmlhttp (vlax-create-object "MSXML2.XMLHTTP.6.0"))
   (if xmlhttp
     (progn
@@ -59,20 +59,20 @@
           ;; Executa o codigo em RAM de forma isolada (backend ja entrega minificado e com progn)
           (if (vl-catch-all-error-p (vl-catch-all-apply 'eval (list (read response))))
             (progn
-              (princ (strcat "\n[❌] Erro de sintaxe na rotina: " routine_id))
-              (setvar "USERS1" (strcat routine_id ":error"))
+              (princ (strcat "\n[❌] Erro de sintaxe na rotina: " lisp_id))
+              (setvar "USERS1" (strcat lisp_id ":error"))
               nil
             )
             (progn
-              (setvar "USERS1" (strcat routine_id ":success"))
-              (princ (strcat "\n[✔] Rotina '" routine_id "' carregada na RAM."))
+              (setvar "USERS1" (strcat lisp_id ":success"))
+              (princ (strcat "\n[✔] Rotina '" lisp_id "' carregada na RAM."))
               t
             )
           )
         )
         (progn
-          (princ (strcat "\n[❌] Falha ao baixar '" routine_id "' (Status: " (vl-princ-to-string status) ")."))
-          (setvar "USERS1" (strcat routine_id ":error"))
+          (princ (strcat "\n[❌] Falha ao baixar '" lisp_id "' (Status: " (vl-princ-to-string status) ")."))
+          (setvar "USERS1" (strcat lisp_id ":error"))
           nil
         )
       )
@@ -80,7 +80,7 @@
     )
     (progn
       (princ "\n[❌] Falha ao instanciar o objeto XMLHTTP.")
-      (setvar "USERS1" (strcat routine_id ":error"))
+      (setvar "USERS1" (strcat lisp_id ":error"))
       nil
     )
   )
@@ -108,19 +108,19 @@
 (if (not *LC-LOADED-ROUTINES*) (setq *LC-LOADED-ROUTINES* nil))
 
 ;; Funcao para rodar um comando com JIT Loading
-(defun LC:run-or-load (routine_name / cmd-name cmd-sym)
-  (setq cmd-name (LC:get-command-name routine_name))
+(defun LC:run-or-load (lisp_id / cmd-name cmd-sym)
+  (setq cmd-name (LC:get-command-name lisp_id))
   (setq cmd-sym (read (strcat "c:" cmd-name)))
   
-  (if (not (member routine_name *LC-LOADED-ROUTINES*))
+  (if (not (member lisp_id *LC-LOADED-ROUTINES*))
     (progn
-      (princ (strcat "\n[LispCentral] Comando '" cmd-name "' nao esta na RAM. Fazendo JIT Load..."))
-      (LC:load-remote-routine routine_name)
-      (setq *LC-LOADED-ROUTINES* (cons routine_name *LC-LOADED-ROUTINES*))
+      (princ (strcat "\n[TM Digital] Comando '" cmd-name "' nao esta na RAM. Fazendo JIT Load..."))
+      (LC:load-remote-routine lisp_id)
+      (setq *LC-LOADED-ROUTINES* (cons lisp_id *LC-LOADED-ROUTINES*))
     )
   )
   
-  (if (member routine_name *LC-LOADED-ROUTINES*)
+  (if (member lisp_id *LC-LOADED-ROUTINES*)
     (progn
       (eval (list cmd-sym))
     )
@@ -192,8 +192,8 @@
     (setq html-path (vl-string-subst "%20" " " html-path))
   )
   
-  ;; Añadir parámetros de API Key y HWID de forma segura
-  (setq html-path (strcat html-path "?key=" *LISPCENTRAL-KEY* "&hwid=" *LISPCENTRAL-HWID*))
+  ;; Añadir parámetros de Seat Token y HWID de forma segura
+  (setq html-path (strcat html-path "?token=" *TMD-SEAT-TOKEN* "&hwid=" *TMD-HWID*))
   
   ;; 3. Criar arquivo JavaScript de inicialização (WEBLOAD)
   (setq loader-js (strcat bridge-dir "/web/TMD_Palette_Loader.js"))
