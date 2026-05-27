@@ -88,16 +88,14 @@ exports.getRoutine = onRequest({ cors: true }, async (req, res) => {
       const commands = [];
       snapshotLisps.forEach(docSnap => {
         const data = docSnap.data();
-        if (activeSuites.includes(data.suite) || data.suite === "core" || !data.suite) {
-          commands.push({
-            name: data.lispId,
-            friendly: data.friendlyName || data.lispId,
-            desc: data.description || "Comando Cloud",
-            group: data.group || "Custom Tools",
-            doc: "#",
-            svgIcon: data.svgIcon || ""
-          });
-        }
+        commands.push({
+          name: data.lispId,
+          friendly: data.friendlyName || data.lispId,
+          desc: data.description || "Comando Cloud",
+          group: data.group || "Custom Tools",
+          doc: "#",
+          svgIcon: data.svgIcon || ""
+        });
       });
       
       res.setHeader("Content-Type", "application/json; charset=utf-8");

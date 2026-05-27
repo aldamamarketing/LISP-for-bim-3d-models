@@ -234,8 +234,9 @@ export default function Dashboard({ mode = 'dashboard' }) {
           uploadedAt: new Date().toISOString()
         };
         
-        const docRef = await addDoc(collection(db, 'lispFiles'), fileMeta);
-        newUploaded.push({ id: docRef.id, ...fileMeta });
+        const semanticId = `lisp_${userData.id}_${draft.lispId}`;
+        await setDoc(doc(db, 'lispFiles', semanticId), fileMeta);
+        newUploaded.push({ id: semanticId, ...fileMeta });
       }
       
       setTenantLisps([...tenantLisps, ...newUploaded]);
