@@ -488,13 +488,16 @@ function renderFavorites() {
     item.className = `module-item ${mod.status}`;
     item.id = `fav-${mod.name}`;
     item.title = mod.desc;
+    item.tabIndex = 0;
+    item.setAttribute("role", "button");
+    item.setAttribute("aria-label", `Executar ${mod.friendly}`);
     
     const icon = GROUP_ICONS[mod.group] || "🔧";
     const docsBtnHtml = mod.doc && mod.doc !== "#" 
-      ? `<a class="docs-btn" href="https://lispcentral.web.app/docs/${mod.doc}" target="_blank" onclick="event.stopPropagation();" title="Ver documentação">?</a>`
+      ? `<a class="docs-btn" href="https://lispcentral.web.app/docs/${mod.doc}" target="_blank" onclick="event.stopPropagation();" title="Ver documentação" aria-label="Ver documentação">?</a>`
       : "";
       
-    const pinBtnHtml = `<button class="pin-btn pinned" onclick="event.stopPropagation(); togglePin('${mod.name}');" title="Desafixar">📌</button>`;
+    const pinBtnHtml = `<button class="pin-btn pinned" onclick="event.stopPropagation(); togglePin('${mod.name}');" title="Desafixar" aria-label="Desafixar ${mod.friendly}">📌</button>`;
     
     item.innerHTML = `
       <div class="module-info-col">
@@ -512,6 +515,14 @@ function renderFavorites() {
     
     item.addEventListener("click", () => {
       runAutoCADCommand(mod.name);
+    });
+    item.addEventListener("keydown", (e) => {
+      if (e.key === "Enter" || e.key === " ") {
+        if (e.target === item) {
+          e.preventDefault();
+          runAutoCADCommand(mod.name);
+        }
+      }
     });
     listContainer.appendChild(item);
   });
@@ -616,14 +627,17 @@ function renderModules() {
       item.className = `module-item ${mod.status}`;
       item.id = `mod-${mod.name}`;
       item.title = mod.desc;
+      item.tabIndex = 0;
+      item.setAttribute("role", "button");
+      item.setAttribute("aria-label", `Executar ${mod.friendly}`);
       
       const isPinned = favorites.includes(mod.name);
       const icon = GROUP_ICONS[mod.group] || "🔧";
       const docsBtnHtml = mod.doc && mod.doc !== "#" 
-        ? `<a class="docs-btn" href="https://lispcentral.web.app/docs/${mod.doc}" target="_blank" onclick="event.stopPropagation();" title="Ver documentação">?</a>`
+        ? `<a class="docs-btn" href="https://lispcentral.web.app/docs/${mod.doc}" target="_blank" onclick="event.stopPropagation();" title="Ver documentação" aria-label="Ver documentação">?</a>`
         : "";
         
-      const pinBtnHtml = `<button class="pin-btn ${isPinned ? 'pinned' : ''}" onclick="event.stopPropagation(); togglePin('${mod.name}');" title="${isPinned ? 'Desafixar' : 'Fixar no topo'}">📌</button>`;
+      const pinBtnHtml = `<button class="pin-btn ${isPinned ? 'pinned' : ''}" onclick="event.stopPropagation(); togglePin('${mod.name}');" title="${isPinned ? 'Desafixar' : 'Fixar no topo'}" aria-label="${isPinned ? 'Desafixar' : 'Fixar'} ${mod.friendly}">📌</button>`;
       
       item.innerHTML = `
         <div class="module-info-col">
@@ -642,6 +656,14 @@ function renderModules() {
       // Al hacer clic, se ejecuta c:run-or-load que asegura la carga en RAM y ejecuta
       item.addEventListener("click", () => {
         runAutoCADCommand(mod.name);
+      });
+      item.addEventListener("keydown", (e) => {
+        if (e.key === "Enter" || e.key === " ") {
+          if (e.target === item) {
+            e.preventDefault();
+            runAutoCADCommand(mod.name);
+          }
+        }
       });
       
       groupContainer.appendChild(item);
