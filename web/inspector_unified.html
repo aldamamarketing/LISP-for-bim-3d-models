@@ -245,21 +245,27 @@
       width: 100%;
     }
 
-    /* Icono SVG de 16x16 exacto */
+    /* Icono SVG visible como un cuadrado/rectángulo */
     .module-icon-container {
-      width: 16px;
-      height: 16px;
+      width: 28px;
+      height: 28px;
+      background: rgba(255, 255, 255, 0.08); /* Rectángulo claro */
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      border-radius: 4px;
       display: flex;
       align-items: center;
       justify-content: center;
       flex-shrink: 0;
       color: var(--accent-color);
+      padding: 4px;
     }
     
     .module-icon-container svg {
-      width: 16px;
-      height: 16px;
+      width: 100%;
+      height: 100%;
       display: block;
+      fill: currentColor;
+      stroke: currentColor;
     }
 
     .module-name {

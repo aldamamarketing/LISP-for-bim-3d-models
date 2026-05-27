@@ -97,5 +97,13 @@ El proyecto ha pivotado hacia un modelo Híbrido:
 ### Reglas Técnicas Obligatorias (Qué haremos y Cómo):
 1.  **Multi-Tenant desde el Día 1:** Toda la base de datos (Firebase) y lógica de backend asume que existen múltiples empresas. Todo está ligado a un `tenant_id`. No hay refactorización futura.
 2.  **IDs Semánticos:** Queda estrictamente prohibido usar UUIDs aleatorios (ej. `a1b2c3d4`) para identificar tenants, usuarios o rutinas en Firestore. Se usarán IDs descriptivos (ej. `tenant_tmdigital`, `lisp_viga_mvp`). **¿Por qué?** Facilita la depuración manual y mantiene la legibilidad semántica del diseño.
-3.  **Seguridad Online-Only:** Durante la Fase Beta, la plataforma funcionará 100% online. Cada comando consulta al servidor. **No** se implementarán tokens JWT offline temporales. **¿Por qué?** Para garantizar la protección total de la Propiedad Intelectual hasta implementar un cifrado cliente-servidor nativo sólido.
+3.  **Seguridad Online-Only:** Durante la Fase Beta, la plataforma funcionará online. Cada comando consulta al servidor. **No** se implementarán tokens JWT offline temporales. **¿Por qué?** Para garantizar la protección total de la Propiedad Intelectual hasta implementar un cifrado cliente-servidor nativo sólido.
 4.  **Cifrado SaaS Estándar:** Usamos encriptación en tránsito (HTTPS) y en reposo (Firebase/GCP). La ofuscación profunda queda de lado de la empresa (pueden subir `.fas` o `.vlx` a su bucket si desconfían del texto plano).
+
+### Estado Actual del Dashboard Web (SaaS Console)
+El Dashboard web (React + Firebase) se ha reestructurado para operar como una consola SaaS profesional y "Mobile Friendly":
+*   **Jerarquía Visual:** Priorización de *Assinatura & Licenças* y *Equipamentos Vinculados* en la parte superior, seguido del *Workspace LISPs*.
+*   **God Mode (Beta):** Los Beta Testers pueden incrementar sus asientos (`seats`) directamente desde el dashboard sin pasar por la pasarela de Stripe. Esta acción actualiza `maxSeats` en la base de datos instantáneamente.
+*   **Workspace Inteligente:** Los archivos cargados en la nube se ordenan automáticamente de forma alfabética por *Suite*, luego por *Grupo* y finalmente por *Nombre Amigable*. Soporta carga masiva y vinculación de iconos SVG dinámicos.
+*   **Centro de Soporte:** Incluye un menú interactivo en la cabecera para "Reportar Bug" (conectado directamente a la colección `feedback` de Firestore) y una sección de FAQ desplegable al final de la página.
+*   **Notificaciones:** Sistema de campana interactiva (Dropdown) con contador de mensajes no leídos y capacidad de cambiar el estado de lectura en tiempo real.
