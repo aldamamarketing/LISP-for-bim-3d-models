@@ -78,6 +78,21 @@ El sistema cuenta con un panel de propiedades dinámico lateral (`web/properties
 
 ---
 
+## Arquitectura de Paletas Web: Singleton + Event Hub
+Para manejar mltiples paletas (Comandos, Propiedades, IA) sin problemas de duplicacin o superposicin de estado al cambiar de pestaa en AutoCAD (Zero Doc State / Context Switching), el sistema utiliza una arquitectura basada en **Singleton y Event Hub**:
+
+### 1. Inicializacin Singleton (LISP Blackboard)
+* El loader local evala `(vl-bb-ref 'LC_PALETTE_LOADED)` al arrancar.
+* **AutoStart Silencioso:** Si un dibujo nuevo se abre y la sesin ya existe, el LISP no hace llamadas a `Acad.Application.addPalette()`. Evita duplicacin de pestaas.
+* **Arranque Manual:** El comando explcito `LC_INSPECT` evade la restriccin del Blackboard para permitir al usuario **volver a abrir o enfocar** la paleta si la cierra manualmente (con la 'X'), pasando la misma URL constante.
+
+### 2. Event Hub (Reactores y Mensajera)
+* LISP inicializa un `vlr-docmanager-reactor` que escucha `:vlr-documentBecameCurrent` (cambio de dibujo).
+* Al cambiar de dibujo, LISP inyecta dinmicamente un pequeo script (`WEBLOAD`) que despacha el evento global de JavaScript: `window.dispatchEvent(new CustomEvent('lc_context_changed'))`.
+* Las paletas estn subscritas a este evento y lo utilizan para vaciar y refrescar su estado (ej: limpiando las propiedades mostradas del dibujo anterior o refrescando el contexto del agente IA) de forma segura y sin recargar el panel entero.
+
+---
+
 ## Infraestructura y Despliegues en Producción
 * **Despliegues en Google Cloud CLI (`gcloud`):**
   Debido al timeout estricto del firebase cli local, los deploys de las Cloud Run functions gen2 se realizan mediante gcloud cli:

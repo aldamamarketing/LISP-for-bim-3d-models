@@ -346,20 +346,63 @@ exports.generateLoader = onRequest({ cors: true }, async (req, res) => {
   (princ)
 )
 
-;; Comando Principal de la Paleta Unificada (CP1)
+;; --------------------------------------------------------------------------
+;; EVENT HUB: Reactor de Cambio de Documento para Paletas Web (LC_SESSION_HUB)
+;; --------------------------------------------------------------------------
+(defun LC:DocChanged-Callback (reactorObj eventList / activeDoc f-js event-js bridge-dir find-path)
+  (vl-catch-all-apply
+    '(lambda ()
+       (setq find-path (findfile "LC_Loader.lsp"))
+       (if find-path
+         (setq bridge-dir (vl-filename-directory find-path))
+         (setq bridge-dir "Z:/Autocad Config/LISP")
+       )
+       
+       (setq event-js (strcat bridge-dir "/web/LC_DocEvent.js"))
+       (setq event-js (vl-string-translate "\\\\" "/" event-js))
+       
+       (setq f-js (open event-js "w"))
+       (if f-js
+         (progn
+           (write-line "if (typeof window !== 'undefined') {" f-js)
+           (write-line "    window.dispatchEvent(new CustomEvent('lc_context_changed'));" f-js)
+           (write-line "    console.log('[LC Event Hub] Cambio de documento activo notificado a las paletas.');" f-js)
+           (write-line "}" f-js)
+           (close f-js)
+           (vl-cmdf "_.WEBLOAD" "_L" (strcat "\\"" event-js "\\""))
+         )
+       )
+     )
+  )
+  (princ)
+)
+
+(defun LC:Init-EventHub ()
+  (vl-load-com)
+  (if (and (boundp '*LC-DOC-REACTOR*) *LC-DOC-REACTOR*)
+    (vlr-remove *LC-DOC-REACTOR*)
+  )
+  (setq *LC-DOC-REACTOR*
+    (vlr-docmanager-reactor 
+      nil 
+      (list (cons :vlr-documentBecameCurrent 'LC:DocChanged-Callback))
+    )
+  )
+  (princ "\\n[LC Event Hub] Reactor Global de Sesión Inicializado.")
+)
+
+;; Comando Principal Manual de la Paleta Unificada (Fuerza la reapertura o el foco)
 (defun c:CP1 (/ doc find-path bridge-dir html-path loader-js f-js)
   (vl-load-com)
   (setq doc (vla-get-ActiveDocument (vlax-get-acad-object)))
   (vla-StartUndoMark doc)
   
-  (princ "\\n[⚙] Carregando LispCentral Command Palette...")
+  (princ "\\n[⚙] Abriendo/Enfocando LispCentral Command Palette...")
   
-  ;; 1. Localizar o diretório do LISP dinamicamente de forma segura
   (setq find-path (findfile "LC_Loader.lsp"))
   (if find-path
     (setq bridge-dir (vl-filename-directory find-path))
     (progn
-      ;; Fallbacks seguros
       (if (vl-file-directory-p "Z:/Autocad Config/LISP")
         (setq bridge-dir "Z:/Autocad Config/LISP")
         (setq bridge-dir "C:/Users/TM PROJETOS/Downloads")
@@ -367,7 +410,6 @@ exports.generateLoader = onRequest({ cors: true }, async (req, res) => {
     )
   )
   
-  ;; 2. Construir o caminho para o arquivo HTML de la paleta unificada
   (setq html-path (strcat bridge-dir "/web/inspector_unified.html"))
   (setq html-path (vl-string-translate "\\\\" "/" html-path))
   
@@ -378,15 +420,13 @@ exports.generateLoader = onRequest({ cors: true }, async (req, res) => {
     )
   )
   
-  ;; Codificar espacios
   (while (vl-string-search " " html-path)
     (setq html-path (vl-string-subst "%20" " " html-path))
   )
   
-  ;; Añadir parámetros de Seat Token y HWID de forma segura
+  ;; URL Constante: Esto evita duplicados reales en AutoCAD
   (setq html-path (strcat html-path "?token=" *LC-SEAT-TOKEN* "&hwid=" *LC-HWID*))
   
-  ;; 3. Criar arquivo JavaScript de inicialização (WEBLOAD)
   (setq loader-js (strcat bridge-dir "/web/LC_Palette_Loader.js"))
   (setq loader-js (vl-string-translate "\\\\" "/" loader-js))
   
@@ -394,15 +434,18 @@ exports.generateLoader = onRequest({ cors: true }, async (req, res) => {
   (if f-js
     (progn
       (write-line "if (typeof Acad !== 'undefined') {" f-js)
+      ;; addPalette con la misma URL y Nombre solo la enfoca si ya existe, o la reabre si fue cerrada.
       (write-line (strcat "    Acad.Application.addPalette(\\"Command Palette\\", \\"" html-path "\\");") f-js)
-      (write-line "    Acad.Editor.writeMessage(\\"\\\\n[✔] LispCentral Palette carregada com sucesso.\\\\n\\");" f-js)
+      (write-line "    Acad.Editor.writeMessage(\\"\\\\n[✔] LispCentral Palette lista.\\\\n\\");" f-js)
       (write-line "} else {" f-js)
       (write-line "    console.error(\\"[❌] Error: API de JavaScript de AutoCAD no detectada.\\");" f-js)
       (write-line "}" f-js)
       (close f-js)
       
-      ;; Carrega o script que executa e compila na hora
       (vl-cmdf "_.WEBLOAD" "_L" (strcat "\\"" loader-js "\\""))
+      
+      (LC:Init-EventHub)
+      (vl-bb-set 'LC_PALETTE_LOADED T)
     )
     (princ "\\n[❌] Error: Não foi possível carregar a interface da paleta.")
   )
@@ -411,12 +454,23 @@ exports.generateLoader = onRequest({ cors: true }, async (req, res) => {
   (princ)
 )
 
-;; Alias de compatibilidad para comando de inspección
-(defun c:LC_INSPECT () (c:CP1))
+;; Función de Arranque Automático Silencioso (Para nuevos dibujos)
+(defun LC:AutoStart ()
+  (if (not (vl-bb-ref 'LC_PALETTE_LOADED))
+    (progn
+      (princ "\\n[LispCentral] Inicializando Command Palette asíncrona...")
+      (c:CP1)
+    )
+  )
+  (princ)
+)
 
-;; Arranque Automático: Carga la paleta de forma asíncrona de inmediato al abrir AutoCAD
-(princ "\\n[LispCentral] Inicializando Command Palette asíncrona...")
-(c:CP1)
+;; Alias Oficiales
+(defun c:LC_INSPECT () (c:CP1))
+(defun c:TMD_INSPECT () (c:CP1))
+
+;; Arranque Automático del Loader (Solo la primera vez)
+(LC:AutoStart)
 (princ)
 `;
 

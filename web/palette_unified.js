@@ -48,6 +48,13 @@ const GROUP_ORDER = [
 document.addEventListener("DOMContentLoaded", () => {
   initPalette();
   
+  // Escuchar el evento global de Cambio de Documento (Event Hub IPC)
+  window.addEventListener("lc_context_changed", () => {
+    console.log("[LispCentral] Cambio de documento detectado. Refrescando contexto...");
+    // Aquí podemos añadir lógica para vaciar la selección o refrescar el estado
+    // de las propiedades para no mezclar datos del Dibujo A con el Dibujo B.
+  });
+  
   // Buscador Spotlight con Chips estilo Google Ads
   const searchInput = document.getElementById("searchInput");
   
@@ -470,12 +477,27 @@ function runAutoCADCommand(cmdName) {
     return;
   }
 
+  const handleError = (err) => {
+    // Código 2 de AutoCAD JS API suele significar "No Document" o estado inválido
+    if (err === 2 || err === "2") {
+      alert("⚠️ No hay ningún dibujo activo.\nPor favor, abre o crea un dibujo nuevo antes de ejecutar comandos.");
+    } else {
+      console.warn("[TMD Palette] Error ejecutando comando LISP:", err);
+    }
+  };
+
   // RUTA LISP: usar evaluateLisp (API nativa para expresiones AutoLISP)
   if (typeof Acad.Editor.evaluateLisp === 'function') {
-    Acad.Editor.evaluateLisp(lispCmd);
+    const res = Acad.Editor.evaluateLisp(lispCmd);
+    if (res && res.then) {
+      res.then(() => {}, handleError);
+    }
   } else if (typeof Acad.Editor.executeCommand === 'function') {
     // Fallback: envolver en LISP command-line invocation
-    Acad.Editor.executeCommand(lispCmd + "\n");
+    const res = Acad.Editor.executeCommand(lispCmd + "\n");
+    if (res && res.then) {
+      res.then(() => {}, handleError);
+    }
   } else {
     console.error("[TMD Palette] No hay método disponible para ejecutar LISP");
   }
