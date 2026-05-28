@@ -570,7 +570,8 @@ export default function Dashboard({ mode = 'dashboard' }) {
           {uniqueGroups.map(g => <option key={g} value={g} />)}
         </datalist>
 
-        <table style={{ width: '100%', minWidth: '850px', borderCollapse: 'collapse', fontSize: '0.9rem', textAlign: 'left' }}>
+        <div style={{ overflowX: 'auto', WebkitOverflowScrolling: 'touch', width: '100%', paddingBottom: '10px' }}>
+          <table style={{ width: '100%', minWidth: '850px', borderCollapse: 'collapse', fontSize: '0.9rem', textAlign: 'left' }}>
           <thead>
             <tr style={{ borderBottom: '1px solid var(--border-color)', color: 'var(--text-muted)' }}>
               <th style={{ padding: '8px', width: '90px' }}>Ícone SVG</th>
@@ -674,6 +675,7 @@ export default function Dashboard({ mode = 'dashboard' }) {
             })}
           </tbody>
         </table>
+        </div>
         
         {draftLisps.length > 0 && (
           <div style={{ marginTop: '15px', textAlign: 'right', padding: '10px', background: 'rgba(242, 109, 33, 0.05)', borderRadius: '6px' }}>

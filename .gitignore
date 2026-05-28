@@ -35,6 +35,3 @@ agent.md
 autolisp lisp global search.csv
 autolisp lisp portugues search.csv
 
-# Environment variables
-.env
-.env.*

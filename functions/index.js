@@ -1,6 +1,4 @@
 const { onRequest } = require("firebase-functions/v2/https");
-const logger = require("firebase-functions/logger");
-const OpenAI = require("openai");
 
 // Lazy imports de módulos nativos
 function getDeps() {
@@ -348,63 +346,20 @@ exports.generateLoader = onRequest({ cors: true }, async (req, res) => {
   (princ)
 )
 
-;; --------------------------------------------------------------------------
-;; EVENT HUB: Reactor de Cambio de Documento para Paletas Web (LC_SESSION_HUB)
-;; --------------------------------------------------------------------------
-(defun LC:DocChanged-Callback (reactorObj eventList / activeDoc f-js event-js bridge-dir find-path)
-  (vl-catch-all-apply
-    '(lambda ()
-       (setq find-path (findfile "LC_Loader.lsp"))
-       (if find-path
-         (setq bridge-dir (vl-filename-directory find-path))
-         (setq bridge-dir "Z:/Autocad Config/LISP")
-       )
-
-       (setq event-js (strcat bridge-dir "/web/LC_DocEvent.js"))
-       (setq event-js (vl-string-translate "\\\\" "/" event-js))
-
-       (setq f-js (open event-js "w"))
-       (if f-js
-         (progn
-           (write-line "if (typeof window !== 'undefined') {" f-js)
-           (write-line "    window.dispatchEvent(new CustomEvent('lc_context_changed'));" f-js)
-           (write-line "    console.log('[LC Event Hub] Cambio de documento activo notificado a las paletas.');" f-js)
-           (write-line "}" f-js)
-           (close f-js)
-           (vl-cmdf "_.WEBLOAD" "_L" (strcat "\\"" event-js "\\""))
-         )
-       )
-     )
-  )
-  (princ)
-)
-
-(defun LC:Init-EventHub ()
-  (vl-load-com)
-  (if (and (boundp '*LC-DOC-REACTOR*) *LC-DOC-REACTOR*)
-    (vlr-remove *LC-DOC-REACTOR*)
-  )
-  (setq *LC-DOC-REACTOR*
-    (vlr-docmanager-reactor
-      nil
-      (list (cons :vlr-documentBecameCurrent 'LC:DocChanged-Callback))
-    )
-  )
-  (princ "\\n[LC Event Hub] Reactor Global de Sesión Inicializado.")
-)
-
-;; Comando Principal Manual de la Paleta Unificada (Fuerza la reapertura o el foco)
+;; Comando Principal de la Paleta Unificada (CP1)
 (defun c:CP1 (/ doc find-path bridge-dir html-path loader-js f-js)
   (vl-load-com)
   (setq doc (vla-get-ActiveDocument (vlax-get-acad-object)))
   (vla-StartUndoMark doc)
   
-  (princ "\\n[⚙] Abriendo/Enfocando LispCentral Command Palette...")
+  (princ "\\n[⚙] Carregando LispCentral Command Palette...")
   
+  ;; 1. Localizar o diretório do LISP dinamicamente de forma segura
   (setq find-path (findfile "LC_Loader.lsp"))
   (if find-path
     (setq bridge-dir (vl-filename-directory find-path))
     (progn
+      ;; Fallbacks seguros
       (if (vl-file-directory-p "Z:/Autocad Config/LISP")
         (setq bridge-dir "Z:/Autocad Config/LISP")
         (setq bridge-dir "C:/Users/TM PROJETOS/Downloads")
@@ -412,6 +367,7 @@ exports.generateLoader = onRequest({ cors: true }, async (req, res) => {
     )
   )
   
+  ;; 2. Construir o caminho para o arquivo HTML de la paleta unificada
   (setq html-path (strcat bridge-dir "/web/inspector_unified.html"))
   (setq html-path (vl-string-translate "\\\\" "/" html-path))
   
@@ -422,13 +378,15 @@ exports.generateLoader = onRequest({ cors: true }, async (req, res) => {
     )
   )
   
+  ;; Codificar espacios
   (while (vl-string-search " " html-path)
     (setq html-path (vl-string-subst "%20" " " html-path))
   )
   
-  ;; URL Constante: Esto evita duplicados reales en AutoCAD
+  ;; Añadir parámetros de Seat Token y HWID de forma segura
   (setq html-path (strcat html-path "?token=" *LC-SEAT-TOKEN* "&hwid=" *LC-HWID*))
   
+  ;; 3. Criar arquivo JavaScript de inicialização (WEBLOAD)
   (setq loader-js (strcat bridge-dir "/web/LC_Palette_Loader.js"))
   (setq loader-js (vl-string-translate "\\\\" "/" loader-js))
   
@@ -436,18 +394,15 @@ exports.generateLoader = onRequest({ cors: true }, async (req, res) => {
   (if f-js
     (progn
       (write-line "if (typeof Acad !== 'undefined') {" f-js)
-      ;; addPalette con la misma URL y Nombre solo la enfoca si ya existe, o la reabre si fue cerrada.
       (write-line (strcat "    Acad.Application.addPalette(\\"Command Palette\\", \\"" html-path "\\");") f-js)
-      (write-line "    Acad.Editor.writeMessage(\\"\\\\n[✔] LispCentral Palette lista.\\\\n\\");" f-js)
+      (write-line "    Acad.Editor.writeMessage(\\"\\\\n[✔] LispCentral Palette carregada com sucesso.\\\\n\\");" f-js)
       (write-line "} else {" f-js)
       (write-line "    console.error(\\"[❌] Error: API de JavaScript de AutoCAD no detectada.\\");" f-js)
       (write-line "}" f-js)
       (close f-js)
       
+      ;; Carrega o script que executa e compila na hora
       (vl-cmdf "_.WEBLOAD" "_L" (strcat "\\"" loader-js "\\""))
-
-      (LC:Init-EventHub)
-      (vl-bb-set 'LC_PALETTE_LOADED T)
     )
     (princ "\\n[❌] Error: Não foi possível carregar a interface da paleta.")
   )
@@ -456,156 +411,16 @@ exports.generateLoader = onRequest({ cors: true }, async (req, res) => {
   (princ)
 )
 
-;; Función de Arranque Automático Silencioso (Para nuevos dibujos)
-(defun LC:AutoStart ()
-  (if (not (vl-bb-ref 'LC_PALETTE_LOADED))
-    (progn
-      (princ "\\n[LispCentral] Inicializando Command Palette asíncrona...")
-      (c:CP1)
-    )
-  )
-  (princ)
-)
-
-;; Alias Oficiales
+;; Alias de compatibilidad para comando de inspección
 (defun c:LC_INSPECT () (c:CP1))
-(defun c:TMD_INSPECT () (c:CP1))
 
-;; Arranque Automático del Loader (Solo la primera vez)
-(LC:AutoStart)
+;; Arranque Automático: Carga la paleta de forma asíncrona de inmediato al abrir AutoCAD
+(princ "\\n[LispCentral] Inicializando Command Palette asíncrona...")
+(c:CP1)
 (princ)
 `;
 
   res.setHeader("Content-Disposition", 'attachment; filename="LC_Loader.lsp"');
   res.setHeader("Content-Type", "text/plain; charset=utf-8");
   return res.status(200).send(loaderCode);
-});
-
-// Endpoint para el Generador de Iconos IA
-exports.generateIcons = onRequest({ cors: true, maxInstances: 10 }, async (req, res) => {
-  if (req.method !== "POST") {
-    return res.status(405).send("Method Not Allowed");
-  }
-
-  const { theme, styleOption, prompts } = req.body;
-
-  if (!prompts || !Array.isArray(prompts)) {
-    return res.status(400).send("Bad Request: prompts array required");
-  }
-
-  try {
-    const openai = new OpenAI({
-      baseURL: 'https://api.deepseek.com',
-      apiKey: process.env.DEEPSEEK_API_KEY
-    });
-
-    const systemPrompt = `Eres un diseñador experto de iconos SVG.
-Genera iconos limpios y profesionales basados en estos comandos o descripciones.
-
-Contexto / Industria: ${theme}
-El estilo visual que el usuario desea es: "${styleOption}". Usa esto como dirección de arte.
-
-REGLAS DE DISEÑO ESTRICTAS (Bicolor/Tricolor):
-1. Genera SIEMPRE 3 variaciones exactas para cada comando solicitado.
-2. No uses colores hex (como #000000 o #FFFFFF).
-3. Para las líneas y trazados principales estáticos, usa EXACTAMENTE \`currentColor\`.
-4. Para elementos dinámicos, flechas de acción o partes destacadas, usa EXACTAMENTE \`var(--icon-accent)\`.
-5. Para rellenos suaves, sombras, elementos secundarios o fondos de apoyo, usa EXACTAMENTE \`var(--icon-secondary)\`.
-6. Grosor de línea: Usa trazos finos y precisos (\`stroke-width="1.5"\` o \`1\`).
-7. Bordes y uniones: Usa bordes rectos/cuadrados, NO redondeados. Usa \`stroke-linecap="square"\` y \`stroke-linejoin="miter"\`. Nada de "round".
-8. El viewBox DEBE ser "0 0 32 32".
-9. El código debe ser SVG puro. No pongas etiquetas XML extra. No pongas markdown. Solo el \`<svg>...</svg>\`.
-
-INSTRUCCIONES DE FORMATO DE RESPUESTA:
-Debes responder ÚNICAMENTE con un objeto JSON (sin markdown, sin bloques de código) con esta estructura exacta:
-{
-  "results": [
-    { "id": "uuid1", "filename": "NOMBRE_CORTO_VAR_1", "description": "Breve desc", "svgCode": "<svg>...</svg>" },
-    { "id": "uuid2", "filename": "NOMBRE_CORTO_VAR_2", "description": "Breve desc", "svgCode": "<svg>...</svg>" },
-    { "id": "uuid3", "filename": "NOMBRE_CORTO_VAR_3", "description": "Breve desc", "svgCode": "<svg>...</svg>" }
-  ]
-}`;
-
-    const userPrompt = `Comandos solicitados:\n${prompts.join('\n')}`;
-
-    const completion = await openai.chat.completions.create({
-      messages: [
-        { role: "system", content: systemPrompt },
-        { role: "user", content: userPrompt }
-      ],
-      model: "deepseek-v4-flash",
-      response_format: { type: "json_object" }
-    });
-
-    const jsonResult = JSON.parse(completion.choices[0].message.content);
-    return res.status(200).json(jsonResult);
-  } catch (error) {
-    console.error("Error generando iconos:", error);
-    return res.status(500).send("Error: " + error.message + " - Stack: " + error.stack);
-  }
-});
-
-// Endpoint para generar Hatch Patterns (.pat)
-exports.generateHatch = onRequest({ cors: true, maxInstances: 10 }, async (req, res) => {
-  if (req.method !== "POST") return res.status(405).send("Method Not Allowed");
-  const { prompts, theme } = req.body;
-  if (!prompts || !Array.isArray(prompts)) return res.status(400).send("Bad Request");
-
-  try {
-    const openai = new OpenAI({ baseURL: 'https://api.deepseek.com', apiKey: process.env.DEEPSEEK_API_KEY });
-    const systemPrompt = `Eres un experto matemático y programador en AutoLISP.
-Genera patrones de sombreado (Hatch) de AutoCAD (.pat) basados en estas descripciones.
-Contexto: ${theme}
-
-REGLAS DE DISEÑO:
-1. El código PAT debe ser válido matemáticamente. Cada línea define: ángulo, x-origen, y-origen, delta-x, delta-y, y opcionalmente los dashes (trazo, espacio).
-2. Genera exactamente 1 patrón de alta calidad por cada descripción.
-3. Formato de salida: Objeto JSON con una propiedad "results" que sea un Array con objetos: { "id": "uuid", "filename": "NOMBRE_CORTO_SIN_ESPACIOS", "description": "Breve descripción", "patCode": "0, 0,0, 0,10..." }. No incluyas la línea del nombre en el patCode (el *Nombre, desc). Devuelve SOLO las líneas de números.`;
-
-    const userPrompt = `Descripciones:\n${prompts.join('\n')}`;
-
-    const completion = await openai.chat.completions.create({
-      messages: [{ role: "system", content: systemPrompt }, { role: "user", content: userPrompt }],
-      model: "deepseek-v4-flash",
-      response_format: { type: "json_object" }
-    });
-
-    const jsonResult = JSON.parse(completion.choices[0].message.content);
-    return res.status(200).json(jsonResult);
-  } catch (error) {
-    console.error("Error generando hatch:", error);
-    return res.status(500).send("Error: " + error.message);
-  }
-});
-
-// Endpoint para generar Linetypes (.lin)
-exports.generateLinetype = onRequest({ cors: true, maxInstances: 10 }, async (req, res) => {
-  if (req.method !== "POST") return res.status(405).send("Method Not Allowed");
-  const { prompts } = req.body;
-  if (!prompts || !Array.isArray(prompts)) return res.status(400).send("Bad Request");
-
-  try {
-    const openai = new OpenAI({ baseURL: 'https://api.deepseek.com', apiKey: process.env.DEEPSEEK_API_KEY });
-    const systemPrompt = `Eres un experto en AutoCAD.
-Genera definiciones de tipos de línea complejos (.lin) basados en estas descripciones.
-
-REGLAS DE DISEÑO:
-1. El código LIN define la secuencia de pluma: trazo (positivo), espacio (negativo), punto (0), y texto/formas.
-2. Formato de salida: Objeto JSON con una propiedad "results" que sea un Array con objetos: { "id": "uuid", "filename": "NOMBRE_CORTO", "description": "Breve", "linCode": "A,10,-5,[\"GAS\",STANDARD,S=2.5,R=0,X=-2.5,Y=-1.25],-5" }.
-3. Devuelve SOLO la definición de la línea (empieza por A, o la secuencia), NO incluyas la línea del asterisco (*Nombre).`;
-
-    const userPrompt = `Descripciones:\n${prompts.join('\n')}`;
-
-    const completion = await openai.chat.completions.create({
-      messages: [{ role: "system", content: systemPrompt }, { role: "user", content: userPrompt }],
-      model: "deepseek-v4-flash",
-      response_format: { type: "json_object" }
-    });
-
-    const jsonResult = JSON.parse(completion.choices[0].message.content);
-    return res.status(200).json(jsonResult);
-  } catch (error) {
-    console.error("Error generando linetype:", error);
-    return res.status(500).send("Error: " + error.message);
-  }
 });
