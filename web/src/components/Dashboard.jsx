@@ -415,10 +415,15 @@ export default function Dashboard({ mode = 'dashboard' }) {
           </button>
 
           <div style={{ position: 'relative' }}>
-            <div style={{ position: 'relative', cursor: 'pointer', fontSize: '1.2rem', display: 'inline-block' }} onClick={() => setShowNotifications(!showNotifications)} title="Notificações">
+            <button
+              style={{ position: 'relative', cursor: 'pointer', fontSize: '1.2rem', display: 'inline-block', background: 'none', border: 'none', padding: 0 }}
+              onClick={() => setShowNotifications(!showNotifications)}
+              title="Notificações"
+              aria-label="Notificações"
+            >
               🔔
               {unreadCount > 0 && <span style={{ position: 'absolute', top: '-5px', right: '-8px', background: 'var(--tmd-orange)', color: '#fff', fontSize: '0.65rem', padding: '2px 5px', borderRadius: '50%', fontWeight: 'bold' }}>{unreadCount}</span>}
-            </div>
+            </button>
             {showNotifications && (
               <div style={{ position: 'absolute', top: '100%', right: 0, background: 'var(--panel-bg)', border: '1px solid var(--panel-border)', borderRadius: '8px', width: '280px', padding: '10px', marginTop: '10px', zIndex: 100, boxShadow: '0 4px 12px rgba(0,0,0,0.5)' }}>
                 <h4 style={{ margin: '0 0 10px 0', borderBottom: '1px solid var(--border-color)', paddingBottom: '5px' }}>Notificações</h4>
