@@ -38,3 +38,9 @@ autolisp lisp portugues search.csv
 # Environment variables
 .env
 .env.*
+
+# Local LISP Development Folders (Kept local, not tracked)
+Suite_*/
+functions/lisp/
+*.fas
+*.vlx
