@@ -508,16 +508,18 @@ Eres un diseñador experto de iconos vectoriales SVG para AutoCAD.
 Genera iconos limpios y profesionales basados en estos comandos o descripciones.
 
 Contexto / Industria: ${theme}
-Estilo visual deseado: ${styleOption}
+El estilo visual que el usuario desea es: "${styleOption}". Usa esto como dirección de arte.
 
-Reglas de Diseño:
-1. Usa viewBox="0 0 32 32". Todo debe caber en una proporción cuadrada.
-2. Usa trazos finos (stroke-width="1" o "1.5").
-3. Evita estrictamente los bordes redondeados. Usa stroke-linecap="square" y stroke-linejoin="miter". Queremos un diseño técnico, definido y afilado.
-4. Color Base: Usa "currentColor" para los trazos principales (para que se adapte al Light/Dark mode).
-5. Color de Acento: Si la acción requiere un color de acento o foco (ej. una flecha), usa exactamente "var(--icon-accent)". NO uses colores hex fijos, debes usar esa variable CSS literal.
-6. Evita usar código SVG con <style> o dependencias externas complejas. Mantén paths simples y limpios.
-7. Genera exactamente 3 variaciones para cada comando proporcionado.
+REGLAS DE DISEÑO ESTRICTAS (Bicolor/Tricolor):
+1. Genera SIEMPRE 3 variaciones exactas para este comando.
+2. No uses colores hex (como #000000 o #FFFFFF). 
+3. Para las líneas y trazados principales estáticos, usa EXACTAMENTE \`currentColor\`.
+4. Para elementos dinámicos, flechas de acción o partes destacadas, usa EXACTAMENTE \`var(--icon-accent)\`.
+5. Para rellenos suaves, sombras, elementos secundarios o fondos de apoyo, usa EXACTAMENTE \`var(--icon-secondary)\`.
+6. Grosor de línea: Usa trazos finos y precisos (\`stroke-width="1.5"\` o \`1\`).
+7. Bordes y uniones: Usa bordes rectos/cuadrados, NO redondeados. Usa \`stroke-linecap="square"\` y \`stroke-linejoin="miter"\`. Nada de "round".
+8. El viewBox DEBE ser "0 0 32 32".
+9. El código debe ser SVG puro. No pongas etiquetas XML extra. No pongas markdown. Solo el \`<svg>...</svg>\`.
 
 Comandos solicitados:
 ${prompts.join('\\n')}
@@ -548,5 +550,78 @@ Debes responder ÚNICAMENTE con un JSON válido en este formato exacto:
   } catch (error) {
     console.error("Error generando iconos:", error);
     return res.status(500).send("Error: " + error.message + " - Stack: " + error.stack);
+  }
+});
+
+// Endpoint para generar Hatch Patterns (.pat)
+exports.generateHatch = onRequest({ cors: true, maxInstances: 10 }, async (req, res) => {
+  if (req.method !== "POST") return res.status(405).send("Method Not Allowed");
+  const { prompts, theme } = req.body;
+  if (!prompts || !Array.isArray(prompts)) return res.status(400).send("Bad Request");
+
+  try {
+    const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
+    const model = genAI.getGenerativeModel({ 
+      model: "gemini-flash-latest", 
+      generationConfig: { responseMimeType: "application/json" } 
+    });
+
+    const promptText = `Eres un experto matemático y programador en AutoLISP.
+Genera patrones de sombreado (Hatch) de AutoCAD (.pat) basados en estas descripciones.
+Contexto: ${theme}
+
+REGLAS DE DISEÑO:
+1. El código PAT debe ser válido matemáticamente. Cada línea define: ángulo, x-origen, y-origen, delta-x, delta-y, y opcionalmente los dashes (trazo, espacio).
+2. Genera exactamente 1 patrón de alta calidad por cada descripción.
+3. Formato de salida: Array de JSON con objetos: { id: "uuid", filename: "NOMBRE_CORTO_SIN_ESPACIOS", description: "Breve descripción", patCode: "0, 0,0, 0,10..." }. No incluyas la línea del nombre en el patCode (el *Nombre, desc). Devuelve SOLO las líneas de números.
+
+Descripciones:
+${prompts.join('\n')}
+`;
+
+    const result = await model.generateContent(promptText);
+    const text = result.response.text();
+    const jsonResult = JSON.parse(text);
+
+    return res.status(200).json({ results: jsonResult });
+  } catch (error) {
+    console.error("Error generando hatch:", error);
+    return res.status(500).send("Error: " + error.message);
+  }
+});
+
+// Endpoint para generar Linetypes (.lin)
+exports.generateLinetype = onRequest({ cors: true, maxInstances: 10 }, async (req, res) => {
+  if (req.method !== "POST") return res.status(405).send("Method Not Allowed");
+  const { prompts } = req.body;
+  if (!prompts || !Array.isArray(prompts)) return res.status(400).send("Bad Request");
+
+  try {
+    const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
+    const model = genAI.getGenerativeModel({ 
+      model: "gemini-flash-latest", 
+      generationConfig: { responseMimeType: "application/json" } 
+    });
+
+    const promptText = `Eres un experto en AutoCAD.
+Genera definiciones de tipos de línea complejos (.lin) basados en estas descripciones.
+
+REGLAS DE DISEÑO:
+1. El código LIN define la secuencia de pluma: trazo (positivo), espacio (negativo), punto (0), y texto/formas.
+2. Formato de salida: Array JSON con objetos: { id: "uuid", filename: "NOMBRE_CORTO", description: "Breve", linCode: "A,10,-5,[\"GAS\",STANDARD,S=2.5,R=0,X=-2.5,Y=-1.25],-5" }.
+3. Devuelve SOLO la definición de la línea (empieza por A, o la secuencia), NO incluyas la línea del asterisco (*Nombre).
+
+Descripciones:
+${prompts.join('\n')}
+`;
+
+    const result = await model.generateContent(promptText);
+    const text = result.response.text();
+    const jsonResult = JSON.parse(text);
+
+    return res.status(200).json({ results: jsonResult });
+  } catch (error) {
+    console.error("Error generando linetype:", error);
+    return res.status(500).send("Error: " + error.message);
   }
 });

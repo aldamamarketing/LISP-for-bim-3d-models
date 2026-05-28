@@ -14,8 +14,12 @@ const SvgPreview = ({ svgString }) => {
 
 export default function IconGenerator() {
   const [theme, setTheme] = useState('Arquitectura 2D');
+  const [customTheme, setCustomTheme] = useState('');
   const [styleOption, setStyleOption] = useState('Outline Minimalista');
+  const [customStyle, setCustomStyle] = useState('');
+  
   const [accentColor, setAccentColor] = useState('#f26d21');
+  const [secondaryColor, setSecondaryColor] = useState('#3b82f6');
   const [previewMode, setPreviewMode] = useState('dark');
   const [prompts, setPrompts] = useState('Alinear arriba\nLínea a pared\nAcotar muro');
   
@@ -28,9 +32,17 @@ export default function IconGenerator() {
     if (!prompts.trim()) return;
     setIsGenerating(true);
     
+    const lines = prompts.split('\n').filter(p => p.trim() !== '');
+    const finalTheme = theme === 'Personalizado' ? customTheme : theme;
+    const finalStyle = styleOption === 'Personalizado' ? customStyle : styleOption;
+
+    if (!finalTheme || !finalStyle) {
+      alert("Por favor define el tema y estilo personalizado.");
+      setIsGenerating(false);
+      return;
+    }
+    
     try {
-      const lines = prompts.split('\\n').filter(p => p.trim() !== '');
-      
       // La URL base puede venir de .env en producción
       const apiUrl = import.meta.env.PUBLIC_FUNCTIONS_URL 
         ? `${import.meta.env.PUBLIC_FUNCTIONS_URL}/generateIcons`
@@ -40,8 +52,8 @@ export default function IconGenerator() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          theme,
-          styleOption,
+          theme: finalTheme,
+          styleOption: finalStyle,
           prompts: lines
         })
       });
@@ -91,7 +103,7 @@ export default function IconGenerator() {
   const handleExport = async () => {
     setIsExporting(true);
     try {
-      await exportIconsToZip(selectedIcons, accentColor);
+      await exportIconsToZip(selectedIcons, accentColor, secondaryColor);
     } catch (error) {
       console.error("Error al exportar:", error);
       alert("Hubo un error al empaquetar los iconos.");
@@ -105,6 +117,7 @@ export default function IconGenerator() {
       className="icon-gen-container"
       style={{
         '--icon-accent': accentColor,
+        '--icon-secondary': secondaryColor,
         '--preview-bg': previewMode === 'dark' ? '#1a1a1a' : '#f4f4f5',
         '--preview-fg': previewMode === 'dark' ? '#ffffff' : '#1a1a1a'
       }}
@@ -118,36 +131,44 @@ export default function IconGenerator() {
         <div className="panel-body">
           <div className="form-group">
             <label>Contexto / Tema</label>
-            <select className="form-control" value={theme} onChange={e => setTheme(e.target.value)}>
-              <option value="Arquitectura 2D">Arquitetura 2D</option>
-              <option value="Modelado 3D">Modelagem 3D</option>
-              <option value="Topografía">Topografia / Civil</option>
-              <option value="Instalaciones">Instalações (MEP)</option>
-              <option value="Mecánica">Mecânica / Peças</option>
+            <select className="form-control" value={theme} onChange={(e) => setTheme(e.target.value)}>
+              <option value="Arquitectura 2D">Arquitectura 2D</option>
+              <option value="Modelado 3D">Modelado 3D</option>
+              <option value="Topografía y Civil">Topografía y Civil</option>
+              <option value="Instalaciones MEP">Instalaciones MEP</option>
+              <option value="Piezas Mecánicas">Piezas Mecánicas</option>
+              <option value="Personalizado">Personalizado...</option>
             </select>
+            {theme === 'Personalizado' && (
+              <input type="text" className="form-control" style={{ marginTop: '10px' }} placeholder="Escribe tu tema..." maxLength={30} value={customTheme} onChange={e => setCustomTheme(e.target.value)} />
+            )}
           </div>
 
           <div className="form-group">
             <label>Estilo Visual</label>
-            <select className="form-control" value={styleOption} onChange={e => setStyleOption(e.target.value)}>
+            <select className="form-control" value={styleOption} onChange={(e) => setStyleOption(e.target.value)}>
               <option value="Outline Minimalista">Outline Minimalista</option>
-              <option value="Flat Design">Flat Design (Sólido)</option>
-              <option value="Isométrico">Isométrico (3D falso)</option>
-              <option value="Blueprint">Blueprint</option>
+              <option value="Flat Design (Sólido)">Flat Design (Sólido)</option>
+              <option value="Isométrico (Volumétrico)">Isométrico (Volumétrico)</option>
+              <option value="Blueprint (Plano)">Blueprint (Plano)</option>
+              <option value="Personalizado">Personalizado...</option>
             </select>
+            {styleOption === 'Personalizado' && (
+              <input type="text" className="form-control" style={{ marginTop: '10px' }} placeholder="Escribe tu estilo..." maxLength={30} value={customStyle} onChange={e => setCustomStyle(e.target.value)} />
+            )}
           </div>
 
           <div className="form-group">
-            <label>Color de Acento</label>
-            <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
-              <input 
-                type="color" 
-                className="form-control" 
-                style={{ padding: '0', width: '50px', height: '40px', cursor: 'pointer' }}
-                value={accentColor} 
-                onChange={(e) => setAccentColor(e.target.value)} 
-              />
-              <span style={{ fontSize: '0.9rem', color: 'var(--text-muted)' }}>{accentColor.toUpperCase()}</span>
+            <label>Colores (Bicolor)</label>
+            <div style={{ display: 'flex', gap: '15px', alignItems: 'center', marginBottom: '10px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
+                <input type="color" className="form-control" style={{ padding: '0', width: '35px', height: '35px', cursor: 'pointer' }} value={accentColor} onChange={(e) => setAccentColor(e.target.value)} />
+                <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>Acento</span>
+              </div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
+                <input type="color" className="form-control" style={{ padding: '0', width: '35px', height: '35px', cursor: 'pointer' }} value={secondaryColor} onChange={(e) => setSecondaryColor(e.target.value)} />
+                <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>Secundario</span>
+              </div>
             </div>
           </div>
 
