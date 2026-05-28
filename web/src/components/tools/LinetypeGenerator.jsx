@@ -123,7 +123,7 @@ export default function LinetypeGenerator() {
                   style={{ height: 'auto', padding: '15px', alignItems: 'flex-start' }}
                 >
                   <strong style={{ color: 'var(--tmd-orange)', marginBottom: '10px' }}>*{line.filename}, {line.description}</strong>
-                  <pre style={{ margin: 0, fontSize: '0.8rem', color: 'var(--preview-fg)', whiteSpace: 'pre-wrap', fontFamily: 'monospace' }}>
+                  <pre style={{ margin: 0, fontSize: '0.8rem', color: 'var(--preview-fg)', whiteSpace: 'pre-wrap', wordBreak: 'break-all', fontFamily: 'monospace' }}>
                     {line.linCode}
                   </pre>
                 </div>

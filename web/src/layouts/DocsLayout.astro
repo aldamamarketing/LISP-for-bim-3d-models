@@ -20,7 +20,7 @@ const {
   <meta name="keywords" content={keywords} />
   <link rel="canonical" href={canonicalUrl} />
   <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-  
+  <meta name="google-site-verification" content="0QWLvps86pF-khU03U3Phucz_KyeIPXudO5Vll4xzaM" />
   <!-- OpenGraph Metadata -->
   <meta property="og:title" content={title} />
   <meta property="og:description" content={description} />
@@ -150,6 +150,40 @@ const {
         });
       }
     });
+  </script>
+
+  <!-- Firebase Analytics para Docs/Tools -->
+  <script type="module">
+    import { initPageTracking, trackDocView, trackCtaClick } from '../utils/analytics.js';
+
+    initPageTracking();
+
+    // Track doc/tool page view por slug
+    const path = window.location.pathname;
+    if (path.includes('/docs/')) {
+      const slug = path.split('/docs/').pop().replace(/\/$/, '');
+      if (slug) trackDocView(slug);
+    } else if (path.includes('/tools/')) {
+      const slug = path.split('/tools/').pop().replace(/\/$/, '');
+      if (slug) trackDocView('tool_' + slug);
+    }
+
+    // Track clicks en sidebar navigation
+    const sidebarLinks = document.querySelectorAll('.sidebar-nav a');
+    sidebarLinks.forEach(link => {
+      link.addEventListener('click', () => {
+        const href = link.getAttribute('href') || '';
+        trackCtaClick('sidebar_nav', href);
+      });
+    });
+
+    // Track click en "Portal do Cliente"
+    const portalBtn = document.getElementById('btn-login-portal');
+    if (portalBtn) {
+      portalBtn.addEventListener('click', () => {
+        trackCtaClick('portal_cliente', 'topbar');
+      });
+    }
   </script>
 
   <style>

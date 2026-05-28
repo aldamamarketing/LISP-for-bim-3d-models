@@ -1,0 +1,9 @@
+User-agent: *
+Allow: /
+
+# Sitemap gerado pelo Astro
+Sitemap: https://lispcentral.web.app/sitemap-index.xml
+
+# Bloquear rotas internas
+Disallow: /api/
+Disallow: /__/

@@ -20,6 +20,43 @@ import Logo from '../components/Logo.astro';
   <meta property="og:type" content="website" />
   <meta property="og:url" content={Astro.url.href} />
   <meta property="og:site_name" content="LispCentral" />
+
+  <!-- Google Search Console Verification -->
+  <meta name="google-site-verification" content="0QWLvps86pF-khU03U3Phucz_KyeIPXudO5Vll4xzaM" />
+
+  <!-- Schema.org Structured Data -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "SoftwareApplication",
+    "name": "LispCentral",
+    "applicationCategory": "BusinessApplication",
+    "operatingSystem": "Windows",
+    "description": "Plataforma SaaS na nuvem para gerenciamento, proteção e distribuição de rotinas AutoLISP para equipes de engenharia.",
+    "url": "https://lispcentral.web.app",
+    "offers": {
+      "@type": "Offer",
+      "price": "0",
+      "priceCurrency": "BRL",
+      "description": "Beta Gratuito"
+    },
+    "creator": {
+      "@type": "Organization",
+      "name": "LispCentral",
+      "url": "https://lispcentral.web.app"
+    },
+    "featureList": [
+      "Cloud LISP Management",
+      "JIT Compilation (Zero-Disk)",
+      "Intellectual Property Protection",
+      "Multi-Tenant B2B",
+      "Seat/License Management",
+      "AI-Powered Icon Generator",
+      "AI-Powered Hatch Generator",
+      "AI-Powered Linetype Generator"
+    ]
+  }
+  </script>
   
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -392,6 +429,59 @@ import Logo from '../components/Logo.astro';
     </div>
     <p>&copy; 2026 LispCentral SaaS Platform. Desenvolvido para escritórios de engenharia modernos.</p>
   </footer>
+
+  <!-- Firebase Analytics: tracking de CTAs e scroll -->
+  <script type="module">
+    import { initPageTracking, trackCtaClick, trackSectionView } from '../utils/analytics.js';
+
+    // Inicializa analytics + page_view automático
+    initPageTracking();
+
+    // Track CTA clicks
+    document.addEventListener('click', (e) => {
+      const link = e.target.closest('a');
+      if (!link) return;
+
+      const href = link.getAttribute('href');
+      const text = link.textContent.trim();
+
+      if (href === '/login' && link.classList.contains('btn-primary')) {
+        trackCtaClick('beta_signup', 'hero');
+      } else if (href === '/login' && link.classList.contains('btn-cta-sm')) {
+        trackCtaClick('portal_saas', 'navbar');
+      } else if (href === '#solucao') {
+        trackCtaClick('ver_como_funciona', 'hero');
+      } else if (link.closest('.cta-section')) {
+        trackCtaClick('beta_signup', 'bottom_cta');
+      }
+    });
+
+    // Track scroll hasta secciones clave con IntersectionObserver
+    const sectionsToTrack = [
+      { selector: '#solucao', name: 'pain_points' },
+      { selector: '#funcionalidades', name: 'features_jit' },
+      { selector: '.testimonials-section', name: 'testimonials' },
+      { selector: '.cta-section', name: 'bottom_cta' },
+    ];
+
+    const tracked = new Set();
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting && !tracked.has(entry.target)) {
+          tracked.add(entry.target);
+          const section = sectionsToTrack.find(
+            (s) => entry.target.matches(s.selector)
+          );
+          if (section) trackSectionView(section.name);
+        }
+      });
+    }, { threshold: 0.3 });
+
+    sectionsToTrack.forEach(({ selector }) => {
+      const el = document.querySelector(selector);
+      if (el) observer.observe(el);
+    });
+  </script>
 
 </body>
 </html>
