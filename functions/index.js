@@ -1,4 +1,6 @@
 const { onRequest } = require("firebase-functions/v2/https");
+const logger = require("firebase-functions/logger");
+const OpenAI = require("openai");
 
 // Lazy imports de módulos nativos
 function getDeps() {
@@ -480,38 +482,31 @@ exports.generateLoader = onRequest({ cors: true }, async (req, res) => {
 });
 
 // Endpoint para el Generador de Iconos IA
-exports.generateIcons = onRequest({ cors: true, secrets: ["GEMINI_API_KEY"] }, async (req, res) => {
+exports.generateIcons = onRequest({ cors: true, maxInstances: 10 }, async (req, res) => {
+  if (req.method !== "POST") {
+    return res.status(405).send("Method Not Allowed");
+  }
+
+  const { theme, styleOption, prompts } = req.body;
+
+  if (!prompts || !Array.isArray(prompts)) {
+    return res.status(400).send("Bad Request: prompts array required");
+  }
+
   try {
-    if (req.method !== 'POST') {
-      return res.status(405).send('Method Not Allowed');
-    }
-
-    const { theme, styleOption, prompts } = req.body;
-    if (!prompts) return res.status(400).send('Prompts array required');
-
-    const apiKey = process.env.GEMINI_API_KEY;
-    if (!apiKey) {
-      console.error("Missing GEMINI_API_KEY environment variable in Firebase");
-      return res.status(500).send('Server configuration error: Missing API Key');
-    }
-
-    const { GoogleGenerativeAI } = require("@google/generative-ai");
-    const genAI = new GoogleGenerativeAI(apiKey);
-    // Usamos Flash para mayor velocidad y menor costo en generación en masa
-    const model = genAI.getGenerativeModel({ 
-      model: "gemini-flash-latest", 
-      generationConfig: { responseMimeType: "application/json" } 
+    const openai = new OpenAI({
+      baseURL: 'https://api.deepseek.com',
+      apiKey: process.env.DEEPSEEK_API_KEY
     });
 
-    const promptText = `
-Eres un diseñador experto de iconos vectoriales SVG para AutoCAD. 
+    const systemPrompt = `Eres un diseñador experto de iconos SVG.
 Genera iconos limpios y profesionales basados en estos comandos o descripciones.
 
 Contexto / Industria: ${theme}
 El estilo visual que el usuario desea es: "${styleOption}". Usa esto como dirección de arte.
 
 REGLAS DE DISEÑO ESTRICTAS (Bicolor/Tricolor):
-1. Genera SIEMPRE 3 variaciones exactas para este comando.
+1. Genera SIEMPRE 3 variaciones exactas para cada comando solicitado.
 2. No uses colores hex (como #000000 o #FFFFFF). 
 3. Para las líneas y trazados principales estáticos, usa EXACTAMENTE \`currentColor\`.
 4. Para elementos dinámicos, flechas de acción o partes destacadas, usa EXACTAMENTE \`var(--icon-accent)\`.
@@ -521,31 +516,28 @@ REGLAS DE DISEÑO ESTRICTAS (Bicolor/Tricolor):
 8. El viewBox DEBE ser "0 0 32 32".
 9. El código debe ser SVG puro. No pongas etiquetas XML extra. No pongas markdown. Solo el \`<svg>...</svg>\`.
 
-Comandos solicitados:
-${prompts.join('\\n')}
+INSTRUCCIONES DE FORMATO DE RESPUESTA:
+Debes responder ÚNICAMENTE con un objeto JSON (sin markdown, sin bloques de código) con esta estructura exacta:
+{
+  "results": [
+    { "id": "uuid1", "filename": "NOMBRE_CORTO_VAR_1", "description": "Breve desc", "svgCode": "<svg>...</svg>" },
+    { "id": "uuid2", "filename": "NOMBRE_CORTO_VAR_2", "description": "Breve desc", "svgCode": "<svg>...</svg>" },
+    { "id": "uuid3", "filename": "NOMBRE_CORTO_VAR_3", "description": "Breve desc", "svgCode": "<svg>...</svg>" }
+  ]
+}`;
 
-Debes responder ÚNICAMENTE con un JSON válido en este formato exacto:
-[
-  {
-    "prompt": "nombre del comando",
-    "variation": 1,
-    "svgCode": "<svg ...> ... </svg>"
-  }
-]
-`;
+    const userPrompt = `Comandos solicitados:\n${prompts.join('\n')}`;
 
-    console.log("Iniciando llamada a Gemini...");
-    const result = await model.generateContent(promptText);
-    console.log("Gemini respondió. Extrayendo texto...");
-    const responseText = result.response.text();
-    console.log("Texto extraído. Parseando JSON...");
-    
-    // Si Gemini incluyó backticks (```json), los quitamos
-    const cleanJson = responseText.replace(/```json\\n?/g, '').replace(/```/g, '').trim();
-    
-    const jsonResult = JSON.parse(cleanJson);
-    console.log("JSON parseado con éxito. Enviando respuesta.");
+    const completion = await openai.chat.completions.create({
+      messages: [
+        { role: "system", content: systemPrompt },
+        { role: "user", content: userPrompt }
+      ],
+      model: "deepseek-v4-flash",
+      response_format: { type: "json_object" }
+    });
 
+    const jsonResult = JSON.parse(completion.choices[0].message.content);
     return res.status(200).json(jsonResult);
   } catch (error) {
     console.error("Error generando iconos:", error);
@@ -560,30 +552,26 @@ exports.generateHatch = onRequest({ cors: true, maxInstances: 10 }, async (req, 
   if (!prompts || !Array.isArray(prompts)) return res.status(400).send("Bad Request");
 
   try {
-    const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
-    const model = genAI.getGenerativeModel({ 
-      model: "gemini-flash-latest", 
-      generationConfig: { responseMimeType: "application/json" } 
-    });
-
-    const promptText = `Eres un experto matemático y programador en AutoLISP.
+    const openai = new OpenAI({ baseURL: 'https://api.deepseek.com', apiKey: process.env.DEEPSEEK_API_KEY });
+    const systemPrompt = `Eres un experto matemático y programador en AutoLISP.
 Genera patrones de sombreado (Hatch) de AutoCAD (.pat) basados en estas descripciones.
 Contexto: ${theme}
 
 REGLAS DE DISEÑO:
 1. El código PAT debe ser válido matemáticamente. Cada línea define: ángulo, x-origen, y-origen, delta-x, delta-y, y opcionalmente los dashes (trazo, espacio).
 2. Genera exactamente 1 patrón de alta calidad por cada descripción.
-3. Formato de salida: Array de JSON con objetos: { id: "uuid", filename: "NOMBRE_CORTO_SIN_ESPACIOS", description: "Breve descripción", patCode: "0, 0,0, 0,10..." }. No incluyas la línea del nombre en el patCode (el *Nombre, desc). Devuelve SOLO las líneas de números.
+3. Formato de salida: Objeto JSON con una propiedad "results" que sea un Array con objetos: { "id": "uuid", "filename": "NOMBRE_CORTO_SIN_ESPACIOS", "description": "Breve descripción", "patCode": "0, 0,0, 0,10..." }. No incluyas la línea del nombre en el patCode (el *Nombre, desc). Devuelve SOLO las líneas de números.`;
 
-Descripciones:
-${prompts.join('\n')}
-`;
+    const userPrompt = `Descripciones:\n${prompts.join('\n')}`;
 
-    const result = await model.generateContent(promptText);
-    const text = result.response.text();
-    const jsonResult = JSON.parse(text);
+    const completion = await openai.chat.completions.create({
+      messages: [{ role: "system", content: systemPrompt }, { role: "user", content: userPrompt }],
+      model: "deepseek-v4-flash",
+      response_format: { type: "json_object" }
+    });
 
-    return res.status(200).json({ results: jsonResult });
+    const jsonResult = JSON.parse(completion.choices[0].message.content);
+    return res.status(200).json(jsonResult);
   } catch (error) {
     console.error("Error generando hatch:", error);
     return res.status(500).send("Error: " + error.message);
@@ -597,29 +585,25 @@ exports.generateLinetype = onRequest({ cors: true, maxInstances: 10 }, async (re
   if (!prompts || !Array.isArray(prompts)) return res.status(400).send("Bad Request");
 
   try {
-    const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
-    const model = genAI.getGenerativeModel({ 
-      model: "gemini-flash-latest", 
-      generationConfig: { responseMimeType: "application/json" } 
-    });
-
-    const promptText = `Eres un experto en AutoCAD.
+    const openai = new OpenAI({ baseURL: 'https://api.deepseek.com', apiKey: process.env.DEEPSEEK_API_KEY });
+    const systemPrompt = `Eres un experto en AutoCAD.
 Genera definiciones de tipos de línea complejos (.lin) basados en estas descripciones.
 
 REGLAS DE DISEÑO:
 1. El código LIN define la secuencia de pluma: trazo (positivo), espacio (negativo), punto (0), y texto/formas.
-2. Formato de salida: Array JSON con objetos: { id: "uuid", filename: "NOMBRE_CORTO", description: "Breve", linCode: "A,10,-5,[\"GAS\",STANDARD,S=2.5,R=0,X=-2.5,Y=-1.25],-5" }.
-3. Devuelve SOLO la definición de la línea (empieza por A, o la secuencia), NO incluyas la línea del asterisco (*Nombre).
+2. Formato de salida: Objeto JSON con una propiedad "results" que sea un Array con objetos: { "id": "uuid", "filename": "NOMBRE_CORTO", "description": "Breve", "linCode": "A,10,-5,[\"GAS\",STANDARD,S=2.5,R=0,X=-2.5,Y=-1.25],-5" }.
+3. Devuelve SOLO la definición de la línea (empieza por A, o la secuencia), NO incluyas la línea del asterisco (*Nombre).`;
 
-Descripciones:
-${prompts.join('\n')}
-`;
+    const userPrompt = `Descripciones:\n${prompts.join('\n')}`;
 
-    const result = await model.generateContent(promptText);
-    const text = result.response.text();
-    const jsonResult = JSON.parse(text);
+    const completion = await openai.chat.completions.create({
+      messages: [{ role: "system", content: systemPrompt }, { role: "user", content: userPrompt }],
+      model: "deepseek-v4-flash",
+      response_format: { type: "json_object" }
+    });
 
-    return res.status(200).json({ results: jsonResult });
+    const jsonResult = JSON.parse(completion.choices[0].message.content);
+    return res.status(200).json(jsonResult);
   } catch (error) {
     console.error("Error generando linetype:", error);
     return res.status(500).send("Error: " + error.message);
