@@ -32,3 +32,15 @@ El archivo `download.html` contiene un script embebido que evita que el usuario 
 
 ## 4. Backend Autorizador (Cloud Functions)
 La validación de estas llaves ocurre en `functions/index.js`, donde la API de Google Cloud Run acepta inmediatamente cualquier petición GET donde el parámetro `apiKey` comience por `trial_tmd_`. Esto permite una experiencia "plug and play" en AutoCAD.
+
+---
+
+## 5. Evolución a Astro y React (Arquitectura Moderna)
+El stack original de HTML plano (MVP) fue migrado a **Astro y React** para soportar herramientas interactivas complejas y multi-idioma (i18n).
+
+### 5.1 Generador de Iconos con IA (Icon Factory)
+Se introdujo una nueva herramienta en el portal web (`/pt/tools/icon-generator`) que permite a los desarrolladores LISP generar automáticamente íconos SVG para sus comandos de AutoCAD.
+
+- **Frontend (React + Astro):** Una interfaz de 3 columnas (Configuración, Previsualización de variaciones y Carrito de Exportación). Soporta Live Update de colores usando variables CSS (`var(--icon-accent)`), y cambio de modo Claro/Oscuro en tiempo real.
+- **Backend (Firebase Functions):** Endpoint `generateIcons` que se conecta a la API de Google Gemini (`gemini-flash-latest`) para generar vectores estructurados en JSON. Utiliza Secret Manager para proteger la `GEMINI_API_KEY`.
+- **Exportación Local (Cero Backend Storage):** Los SVGs devueltos por la IA se empaquetan en un archivo `.zip` directamente en el navegador del usuario usando `JSZip` y `Canvas` API, generando automáticamente versiones en 16x16 y 32x32 para temas claros y oscuros, listos para los archivos CUIx de AutoCAD.

@@ -1,0 +1,62 @@
+---
+import DocsLayout from '../../../layouts/DocsLayout.astro';
+import IconGenerator from '../../../components/tools/IconGenerator.jsx';
+---
+
+<DocsLayout 
+  title="Gerador de Ícones AutoCAD (IA) — Criar SVG e PNG | LispCentral" 
+  description="Gere ícones SVG e PNG perfeitos para suas paletas, Ribbon e plugins LISP do AutoCAD usando Inteligência Artificial. Totalmente grátis e em segundos."
+  keywords="autocad icon generator, criar icones autocad, svg para autocad, lisp icon, cuix icon, gerador de icones IA, autocad ribbon icons"
+>
+  <div class="tool-container">
+    <div class="tool-header">
+      <h1>Gerador de Ícones (IA) <span class="badge">BETA</span></h1>
+      <p>Crie pacotes de ícones consistentes para suas paletas e Ribbon do AutoCAD em segundos.</p>
+    </div>
+
+    <!-- Carga del componente React en el cliente -->
+    <IconGenerator client:load />
+
+  </div>
+</DocsLayout>
+
+<style>
+  .tool-container {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 20px;
+    height: calc(100vh - 140px); /* Restar header y padding aproximado */
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .tool-header {
+    margin-bottom: 20px;
+    flex-shrink: 0;
+  }
+  
+  .tool-header h1 {
+    font-size: 2rem;
+    color: var(--text-main);
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+  }
+  
+  .tool-header p {
+    color: var(--text-muted);
+    font-size: 1.1rem;
+    max-width: 800px;
+  }
+  
+  .badge {
+    background-color: rgba(242, 109, 33, 0.2);
+    color: var(--tmd-orange);
+    font-size: 0.8rem;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-weight: 600;
+    vertical-align: middle;
+  }
+</style>

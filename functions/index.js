@@ -478,3 +478,75 @@ exports.generateLoader = onRequest({ cors: true }, async (req, res) => {
   res.setHeader("Content-Type", "text/plain; charset=utf-8");
   return res.status(200).send(loaderCode);
 });
+
+// Endpoint para el Generador de Iconos IA
+exports.generateIcons = onRequest({ cors: true, secrets: ["GEMINI_API_KEY"] }, async (req, res) => {
+  try {
+    if (req.method !== 'POST') {
+      return res.status(405).send('Method Not Allowed');
+    }
+
+    const { theme, styleOption, prompts } = req.body;
+    if (!prompts) return res.status(400).send('Prompts array required');
+
+    const apiKey = process.env.GEMINI_API_KEY;
+    if (!apiKey) {
+      console.error("Missing GEMINI_API_KEY environment variable in Firebase");
+      return res.status(500).send('Server configuration error: Missing API Key');
+    }
+
+    const { GoogleGenerativeAI } = require("@google/generative-ai");
+    const genAI = new GoogleGenerativeAI(apiKey);
+    // Usamos Flash para mayor velocidad y menor costo en generación en masa
+    const model = genAI.getGenerativeModel({ 
+      model: "gemini-flash-latest", 
+      generationConfig: { responseMimeType: "application/json" } 
+    });
+
+    const promptText = `
+Eres un diseñador experto de iconos vectoriales SVG para AutoCAD. 
+Genera iconos limpios y profesionales basados en estos comandos o descripciones.
+
+Contexto / Industria: ${theme}
+Estilo visual deseado: ${styleOption}
+
+Reglas de Diseño:
+1. Usa viewBox="0 0 32 32". Todo debe caber en una proporción cuadrada.
+2. Usa trazos finos (stroke-width="1" o "1.5").
+3. Evita estrictamente los bordes redondeados. Usa stroke-linecap="square" y stroke-linejoin="miter". Queremos un diseño técnico, definido y afilado.
+4. Color Base: Usa "currentColor" para los trazos principales (para que se adapte al Light/Dark mode).
+5. Color de Acento: Si la acción requiere un color de acento o foco (ej. una flecha), usa exactamente "var(--icon-accent)". NO uses colores hex fijos, debes usar esa variable CSS literal.
+6. Evita usar código SVG con <style> o dependencias externas complejas. Mantén paths simples y limpios.
+7. Genera exactamente 3 variaciones para cada comando proporcionado.
+
+Comandos solicitados:
+${prompts.join('\\n')}
+
+Debes responder ÚNICAMENTE con un JSON válido en este formato exacto:
+[
+  {
+    "prompt": "nombre del comando",
+    "variation": 1,
+    "svgCode": "<svg ...> ... </svg>"
+  }
+]
+`;
+
+    console.log("Iniciando llamada a Gemini...");
+    const result = await model.generateContent(promptText);
+    console.log("Gemini respondió. Extrayendo texto...");
+    const responseText = result.response.text();
+    console.log("Texto extraído. Parseando JSON...");
+    
+    // Si Gemini incluyó backticks (```json), los quitamos
+    const cleanJson = responseText.replace(/```json\\n?/g, '').replace(/```/g, '').trim();
+    
+    const jsonResult = JSON.parse(cleanJson);
+    console.log("JSON parseado con éxito. Enviando respuesta.");
+
+    return res.status(200).json(jsonResult);
+  } catch (error) {
+    console.error("Error generando iconos:", error);
+    return res.status(500).send("Error: " + error.message + " - Stack: " + error.stack);
+  }
+});

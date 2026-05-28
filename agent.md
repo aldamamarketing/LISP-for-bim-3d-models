@@ -124,3 +124,11 @@ El Dashboard web (React + Firebase) se ha reestructurado para operar como una co
 *   **Notificaciones:** Sistema de campana interactiva (Dropdown) con contador de mensajes no leídos y capacidad de cambiar el estado de lectura en tiempo real.
 *   **IDs Semánticos en Firestore:** La carga de rutinas LISP utiliza `setDoc` para forzar la creación de documentos en `lispFiles` con IDs predecibles y semánticos (`lisp_[tenantId]_[lispId]`), abandonando los UUIDs aleatorios nativos de Firebase.
 *   **Desbloqueo de Custom Suites:** El backend (Cloud Run) ahora permite que la paleta nativa recupere absolutamente todos los LISPs pertenecientes al `tenantId` del usuario activo, ignorando el filtro restrictivo de `activeSuites` (que solo aplica para los módulos base de la plataforma).
+
+---
+
+## 🎨 Herramientas para Desarrolladores (Icon Factory AI)
+Para acelerar la creación de comandos en la plataforma B2B, se migró el stack web a **Astro + React** y se incorporó un **Generador de Iconos IA**:
+* **Gemini-Flash-Latest:** Se utiliza Firebase Functions + `GoogleGenerativeAI` para generar SVGs técnicos al vuelo a partir de nombres de comandos (ej: *Acotar muro*). Genera 3 variaciones exactas con trazos finos y sin bordes redondeados.
+* **Empaquetado Nativo:** El frontend empaqueta los SVGs seleccionados utilizando `JSZip` y la API de `Canvas` de HTML5 para renderizar los iconos a PNG (16x16 y 32x32) tanto en Dark Theme como en Light Theme de manera local, forzando la descarga del `.zip` listo para integrar en el CUIx de AutoCAD.
+* **Estilos CSS Dinámicos:** Los SVGs devueltos por la IA utilizan `currentColor` y `var(--icon-accent)`. Esto permite previsualizar los modos claros y oscuros, e inyectar el color de acento corporativo directamente desde un color picker de React sin tener que volver a llamar a la API.
