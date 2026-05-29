@@ -74,7 +74,7 @@ export default function IconGenerator() {
       setGeneratedIcons(newIcons);
     } catch (error) {
       console.error(error);
-      alert("Hubo un error comunicándose con la IA. Asegúrate de que el backend de Firebase esté corriendo y la API Key esté configurada.");
+      alert("No momento, estamos enfrentando instabilidade em nossos serviços de IA. Por favor, tente novamente em alguns instantes.");
     } finally {
       setIsGenerating(false);
     }

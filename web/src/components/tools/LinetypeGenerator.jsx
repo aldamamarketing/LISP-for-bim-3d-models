@@ -33,7 +33,7 @@ export default function LinetypeGenerator() {
       setGeneratedLines(data.results || []);
     } catch (error) {
       console.error(error);
-      alert("Error al conectar con la IA. Asegúrate de estar conectado a internet o revisa la consola para más detalles.");
+      alert("No momento, estamos enfrentando instabilidade em nossos serviços de IA. Por favor, tente novamente em alguns instantes.");
     } finally {
       setIsGenerating(false);
     }
