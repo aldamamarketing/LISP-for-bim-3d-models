@@ -560,7 +560,8 @@ Contexto: ${theme}
 REGLAS DE DISEÑO:
 1. El código PAT debe ser válido matemáticamente. Cada línea define: ángulo, x-origen, y-origen, delta-x, delta-y, y opcionalmente los dashes (trazo, espacio).
 2. Genera exactamente 1 patrón de alta calidad por cada descripción.
-3. Formato de salida: Objeto JSON con una propiedad "results" que sea un Array con objetos: { "id": "uuid", "filename": "NOMBRE_CORTO_SIN_ESPACIOS", "description": "Breve descripción", "patCode": "0, 0,0, 0,10..." }. No incluyas la línea del nombre en el patCode (el *Nombre, desc). Devuelve SOLO las líneas de números.`;
+3. Formato de salida: Objeto JSON con una propiedad "results" que sea un Array con objetos: { "id": "uuid", "filename": "NOMBRE_CORTO_SIN_ESPACIOS", "description": "Breve descripción", "patCode": "0, 0,0, 0,10...", "svgPreview": "<svg viewBox='0 0 100 100'>...</svg>" }. No incluyas la línea del nombre en el patCode.
+4. IMPORTANTE: En "svgPreview", genera un SVG puro (sin markdown) de 100x100 píxeles que dibuje una muestra visual aproximada del patrón. Usa <line>, <path> o <polygon>, con stroke="currentColor", stroke-width="1.5" y fill="none". Esta será la previsualización gráfica que verá el usuario.`;
 
     const userPrompt = `Descripciones:\n${prompts.join('\n')}`;
 
@@ -591,8 +592,9 @@ Genera definiciones de tipos de línea complejos (.lin) basados en estas descrip
 
 REGLAS DE DISEÑO:
 1. El código LIN define la secuencia de pluma: trazo (positivo), espacio (negativo), punto (0), y texto/formas.
-2. Formato de salida: Objeto JSON con una propiedad "results" que sea un Array con objetos: { "id": "uuid", "filename": "NOMBRE_CORTO", "description": "Breve", "linCode": "A,10,-5,[\"GAS\",STANDARD,S=2.5,R=0,X=-2.5,Y=-1.25],-5" }.
-3. Devuelve SOLO la definición de la línea (empieza por A, o la secuencia), NO incluyas la línea del asterisco (*Nombre).`;
+2. Formato de salida: Objeto JSON con una propiedad "results" que sea un Array con objetos: { "id": "uuid", "filename": "NOMBRE_CORTO", "description": "Breve", "linCode": "A,10,-5...", "svgPreview": "<svg viewBox='0 0 200 20'>...</svg>" }.
+3. Devuelve SOLO la definición de la línea (empieza por A), NO incluyas el asterisco (*Nombre).
+4. IMPORTANTE: En "svgPreview", genera un SVG puro (sin markdown) de 200x20 píxeles que dibuje una línea horizontal de ejemplo de izquierda a derecha (y=10) imitando los trazos, espacios y textos de la línea. Usa stroke="currentColor" y stroke-width="2".`;
 
     const userPrompt = `Descripciones:\n${prompts.join('\n')}`;
 

@@ -125,7 +125,13 @@ export default function LinetypeGenerator() {
                   style={{ height: 'auto', width: '100%', flexDirection: 'column', padding: '15px', alignItems: 'flex-start' }}
                 >
                   <strong style={{ color: 'var(--tmd-orange)', marginBottom: '10px' }}>*{line.filename}, {line.description}</strong>
-                  <pre style={{ margin: 0, fontSize: '0.8rem', color: 'var(--preview-fg)', whiteSpace: 'pre-wrap', wordBreak: 'break-all', fontFamily: 'monospace' }}>
+                  {line.svgPreview && (
+                    <div 
+                      style={{ width: '100%', height: '40px', marginBottom: '15px', color: 'var(--preview-fg)', display: 'flex', alignItems: 'center' }} 
+                      dangerouslySetInnerHTML={{ __html: line.svgPreview }} 
+                    />
+                  )}
+                  <pre style={{ margin: 0, fontSize: '0.8rem', color: 'var(--preview-fg)', whiteSpace: 'pre-wrap', wordBreak: 'break-all', fontFamily: 'monospace', backgroundColor: 'rgba(0,0,0,0.2)', padding: '10px', borderRadius: '4px', width: '100%' }}>
                     {line.linCode}
                   </pre>
                 </div>
