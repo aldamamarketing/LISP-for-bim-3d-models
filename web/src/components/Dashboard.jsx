@@ -414,6 +414,10 @@ export default function Dashboard({ mode = 'dashboard' }) {
             Reportar Bug
           </button>
 
+          <a href="/favorites" style={{ textDecoration: 'none', color: 'var(--tmd-orange)', fontWeight: 'bold', fontSize: '0.9rem', marginLeft: '10px' }}>
+            ⭐ Meus Favoritos
+          </a>
+
           <div style={{ position: 'relative' }}>
             <div style={{ position: 'relative', cursor: 'pointer', fontSize: '1.2rem', display: 'inline-block' }} onClick={() => setShowNotifications(!showNotifications)} title="Notificações">
               🔔
