@@ -1,12 +1,14 @@
 import React, { useState } from 'react';
-import './IconGenerator.css'; // Reutilizamos el CSS por consistencia
+import './IconGenerator.css';
+import LinetypePreview from './LinetypePreview';
 
 export default function LinetypeGenerator() {
-  const [prompts, setPrompts] = useState('Línea de Gas (Texto "GAS")\\nLínea con puntos y trazos largos');
+  const [prompts, setPrompts] = useState('Línea de Gas (Texto "GAS")\nLínea con puntos y trazos largos');
   const [isGenerating, setIsGenerating] = useState(false);
   const [generatedLines, setGeneratedLines] = useState([]);
   const [selectedLines, setSelectedLines] = useState([]);
   const [isExporting, setIsExporting] = useState(false);
+  const [zoomScale, setZoomScale] = useState(1);
 
   const handleGenerate = async () => {
     if (!prompts.trim()) return;
@@ -111,6 +113,18 @@ export default function LinetypeGenerator() {
           </span>
         </div>
         <div className="panel-body">
+          {generatedLines.length > 0 && (
+            <div style={{ padding: '15px', backgroundColor: '#1a1a1a', borderRadius: '8px', marginBottom: '15px' }}>
+              <label style={{ color: 'var(--text-muted)', display: 'block', marginBottom: '10px', fontSize: '0.9rem' }}>
+                Zoom de Previsualización: {zoomScale.toFixed(1)}x
+              </label>
+              <input 
+                type="range" min="0.1" max="5" step="0.1" value={zoomScale} 
+                onChange={(e) => setZoomScale(parseFloat(e.target.value))}
+                style={{ width: '100%', accentColor: 'var(--tmd-orange)' }}
+              />
+            </div>
+          )}
           {generatedLines.length === 0 ? (
             <div className="empty-state">
               Escribe tus comandos a la izquierda y presiona Generar.
@@ -125,12 +139,7 @@ export default function LinetypeGenerator() {
                   style={{ height: 'auto', width: '100%', flexDirection: 'column', padding: '15px', alignItems: 'flex-start' }}
                 >
                   <strong style={{ color: 'var(--tmd-orange)', marginBottom: '10px' }}>*{line.filename}, {line.description}</strong>
-                  {line.svgPreview && (
-                    <div 
-                      style={{ width: '100%', height: '40px', marginBottom: '15px', color: 'var(--preview-fg)', display: 'flex', alignItems: 'center' }} 
-                      dangerouslySetInnerHTML={{ __html: line.svgPreview }} 
-                    />
-                  )}
+                  <LinetypePreview linCode={line.linCode} scale={zoomScale} />
                   <pre style={{ margin: 0, fontSize: '0.8rem', color: 'var(--preview-fg)', whiteSpace: 'pre-wrap', wordBreak: 'break-all', fontFamily: 'monospace', backgroundColor: 'rgba(0,0,0,0.2)', padding: '10px', borderRadius: '4px', width: '100%' }}>
                     {line.linCode}
                   </pre>

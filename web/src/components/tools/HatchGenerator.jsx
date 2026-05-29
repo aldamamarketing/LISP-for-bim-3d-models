@@ -1,13 +1,15 @@
 import React, { useState } from 'react';
 import './IconGenerator.css'; // Reutilizamos el CSS del IconGenerator por consistencia
+import HatchPreview from './HatchPreview';
 
 export default function HatchGenerator() {
   const [theme, setTheme] = useState('Arquitectura');
-  const [prompts, setPrompts] = useState('Ladrillo en espina de pez\\nMadera entramada');
+  const [prompts, setPrompts] = useState('Ladrillo en espina de pez\nMadera entramada');
   const [isGenerating, setIsGenerating] = useState(false);
   const [generatedHatches, setGeneratedHatches] = useState([]);
   const [selectedHatches, setSelectedHatches] = useState([]);
   const [isExporting, setIsExporting] = useState(false);
+  const [zoomScale, setZoomScale] = useState(1);
 
   const handleGenerate = async () => {
     if (!prompts.trim()) return;
@@ -127,6 +129,16 @@ export default function HatchGenerator() {
             </div>
           ) : (
             <div className="grid-container" style={{ gridTemplateColumns: '1fr' }}>
+              <div style={{ padding: '15px', backgroundColor: '#1a1a1a', borderRadius: '8px', marginBottom: '15px' }}>
+                <label style={{ color: 'var(--text-muted)', display: 'block', marginBottom: '10px', fontSize: '0.9rem' }}>
+                  Zoom de Previsualización: {zoomScale.toFixed(1)}x
+                </label>
+                <input 
+                  type="range" min="0.1" max="5" step="0.1" value={zoomScale} 
+                  onChange={(e) => setZoomScale(parseFloat(e.target.value))}
+                  style={{ width: '100%', accentColor: 'var(--tmd-orange)' }}
+                />
+              </div>
               {generatedHatches.map((hatch) => (
                 <div 
                   key={hatch.id} 
@@ -135,12 +147,7 @@ export default function HatchGenerator() {
                   style={{ height: 'auto', width: '100%', flexDirection: 'column', padding: '15px', alignItems: 'flex-start' }}
                 >
                   <strong style={{ color: 'var(--tmd-orange)', marginBottom: '10px' }}>*{hatch.filename}, {hatch.description}</strong>
-                  {hatch.svgPreview && (
-                    <div 
-                      style={{ width: '100px', height: '100px', marginBottom: '15px', color: 'var(--preview-fg)' }} 
-                      dangerouslySetInnerHTML={{ __html: hatch.svgPreview }} 
-                    />
-                  )}
+                  <HatchPreview patCode={hatch.patCode} scale={zoomScale} />
                   <pre style={{ margin: 0, fontSize: '0.8rem', color: 'var(--preview-fg)', whiteSpace: 'pre-wrap', wordBreak: 'break-all', fontFamily: 'monospace', backgroundColor: 'rgba(0,0,0,0.2)', padding: '10px', borderRadius: '4px', width: '100%' }}>
                     {hatch.patCode}
                   </pre>
