@@ -566,8 +566,11 @@ REGLAS DE DISEÑO:
 3. PRECISIÓN ESTRUCTURAL Y DIMENSIONAL (CRÍTICO): 
    - Respeta escrupulosamente la geometría solicitada (ej. "matajuntas" o "stretcher bond" NO es "herringbone" o "espina de pez").
    - Si el usuario provee medidas (ej. 40x20cm, juntas de 1cm, ángulos), DEBES aplicar la matemática exacta para que las proporciones del Hatch reflejen esas medidas a escala 1:1.
-4. Formato de salida: Objeto JSON con una propiedad "results" que sea un Array con objetos: { "id": "uuid", "name": "Name in English", "category": "Architecture", "filename": "SHORT_NAME", "description": "DETAILED description in English including ALL units and dimensions (e.g., 40x20cm bricks with 1cm joints)", "patCode": "0, 0,0, 0,10..." }. No incluyas la línea del nombre en el patCode. Devuelve SOLO las líneas matemáticas.
-5. FILTRO DE SEGURIDAD (CRÍTICO): RECHAZA categóricamente solicitudes con símbolos de odio, esvásticas, contenido adulto, cruces o discriminación. Devuelve un "results" vacío si detectas esto.`;
+4. TRUCO PARA MATAJUNTAS (STRETCHER BOND): Para ladrillos intercalados, NUNCA uses una cuadrícula continua. Las líneas verticales DEBEN ser segmentadas y desfasadas usando dash y delta-x. Fórmula para bloque LxC (Largo x Alto):
+   - Horizontales: "0, 0,0, 0,C"
+   - Verticales: "90, 0,0, C,L, C,-C"
+5. Formato de salida: JSON con "results" Array: { "id": "uuid", "name": "English Name", "category": "Architecture", "filename": "SHORT_NAME", "description": "Concise description (e.g. 'Stretcher bond 40x20cm blocks with 1cm joints')", "patCode": "0, 0,0..." }. Devuelve SOLO las líneas matemáticas en patCode.
+6. FILTRO DE SEGURIDAD (CRÍTICO): RECHAZA símbolos de odio, esvásticas, cruces, etc. Devuelve "results" vacío si detectas esto.`;
 
     const userPrompt = `Descripciones:\n${prompts.join('\n')}`;
 
@@ -618,3 +621,4 @@ REGLAS DE DISEÑO:
     return res.status(500).send("Error: " + error.message);
   }
 });
+

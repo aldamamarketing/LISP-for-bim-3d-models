@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import './IconGenerator.css';
 import { saveToGlobalLibrary, addToFavorites } from '../../utils/library';
+import { auth } from '../../firebase';
+import { onAuthStateChanged } from 'firebase/auth';
 import LinetypePreview from './LinetypePreview';
 import LibraryPanel from './LibraryPanel';
 
@@ -13,6 +15,12 @@ export default function LinetypeGenerator() {
   const [zoomScale, setZoomScale] = useState(1);
   const [activeTab, setActiveTab] = useState('library');
   const [saving, setSaving] = useState(null);
+  const [user, setUser] = useState(null);
+
+  useEffect(() => {
+    const unsub = onAuthStateChanged(auth, u => setUser(u));
+    return unsub;
+  }, []);
 
   const handleGenerate = async () => {
     if (!prompts.trim()) return;
@@ -250,14 +258,24 @@ export default function LinetypeGenerator() {
               </strong>
               <span style={{ color: '#ccc' }}>{selectedLines[selectedLines.length - 1].description}</span>
             </div>
-            <button 
-              className="btn-primary" 
-              style={{ width: '100%' }}
-              onClick={handleExport}
-              disabled={isExporting}
-            >
-              {isExporting ? 'Empacotando...' : 'Baixar Arquivo .LIN'}
-            </button>
+            {user ? (
+              <button 
+                className="btn-primary" 
+                style={{ width: '100%' }}
+                onClick={handleExport}
+                disabled={isExporting}
+              >
+                {isExporting ? 'Empacotando...' : 'Baixar Arquivo .LIN'}
+              </button>
+            ) : (
+              <button 
+                className="btn-primary" 
+                style={{ width: '100%', backgroundColor: '#555', fontSize: '0.85rem' }}
+                onClick={() => window.location.href = '/login?redirect=/pt/tools/linetype-generator'}
+              >
+                Iniciar sessão para Baixar / Usar no AutoCAD
+              </button>
+            )}
           </div>
         )}
       </div>

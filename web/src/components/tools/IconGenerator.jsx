@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import './IconGenerator.css';
 import { exportIconsToZip } from '../../utils/iconExporter';
 import { saveToGlobalLibrary, addToFavorites } from '../../utils/library';
+import { auth } from '../../firebase';
+import { onAuthStateChanged } from 'firebase/auth';
 import LibraryPanel from './LibraryPanel';
 
 // Componente para renderizar SVG de forma segura
@@ -31,6 +33,12 @@ export default function IconGenerator() {
   const [isExporting, setIsExporting] = useState(false);
   const [activeTab, setActiveTab] = useState('library');
   const [saving, setSaving] = useState(null);
+  const [user, setUser] = useState(null);
+
+  React.useEffect(() => {
+    const unsub = onAuthStateChanged(auth, u => setUser(u));
+    return unsub;
+  }, []);
 
   const handleGenerate = async () => {
     if (!prompts.trim()) return;
@@ -322,14 +330,25 @@ export default function IconGenerator() {
             </div>
           )}
 
-          <button 
-            className="btn-primary" 
-            style={{ flexShrink: 0 }}
-            disabled={selectedIcons.length === 0 || isExporting}
-            onClick={handleExport}
-          >
-            {isExporting ? "Empacotando..." : "2. Baixar Pacote (.zip)"}
-          </button>
+          {user ? (
+            <button 
+              className="btn-primary" 
+              style={{ flexShrink: 0 }}
+              disabled={selectedIcons.length === 0 || isExporting}
+              onClick={handleExport}
+            >
+              {isExporting ? "Empacotando..." : "2. Baixar Pacote (.zip)"}
+            </button>
+          ) : (
+            <button 
+              className="btn-primary" 
+              style={{ flexShrink: 0, backgroundColor: '#555', fontSize: '0.85rem' }}
+              disabled={selectedIcons.length === 0}
+              onClick={() => window.location.href = '/login?redirect=/pt/tools/icon-generator'}
+            >
+              Iniciar sessão para Baixar / Usar no AutoCAD
+            </button>
+          )}
           <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)', textAlign: 'center', marginTop: '10px' }}>
             Serão gerados 4 arquivos PNG (16x16 e 32x32 em Dark/Light mode) para cada ícone.
           </p>
