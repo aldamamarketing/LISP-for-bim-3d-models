@@ -3,6 +3,7 @@ import { auth, db, loginWithGoogle, logout } from '../firebase';
 import { onAuthStateChanged, signInWithEmailAndPassword, createUserWithEmailAndPassword } from 'firebase/auth';
 import { collection, doc, getDocs, setDoc, query, where, updateDoc, addDoc, deleteDoc, serverTimestamp } from 'firebase/firestore';
 import { ref, uploadBytes, deleteObject } from 'firebase/storage';
+import ToastContainer, { showToast } from './Toast';
 
 export default function Dashboard({ mode = 'dashboard' }) {
   const [firebaseUser, setFirebaseUser] = useState(null);
@@ -100,7 +101,7 @@ export default function Dashboard({ mode = 'dashboard' }) {
       setUserData({ ...userData, name: editName, role: editRole });
       setIsEditingProfile(false);
     } catch(e) {
-      alert('Erro ao atualizar perfil.');
+      showToast('Erro ao atualizar perfil.', 'error');
     }
   };
 
@@ -241,10 +242,10 @@ export default function Dashboard({ mode = 'dashboard' }) {
       
       setTenantLisps([...tenantLisps, ...newUploaded]);
       setDraftLisps([]);
-      alert('Upload concluído com sucesso!');
+      showToast('Upload concluído com sucesso!', 'success');
     } catch(err) {
       console.error(err);
-      alert('Erro durante o upload múltiplo.');
+      showToast('Erro durante o upload.', 'error');
     }
     setIsUploading(false);
   };
@@ -270,7 +271,7 @@ export default function Dashboard({ mode = 'dashboard' }) {
       setEditingLispId(null);
     } catch(e) {
       console.error('Erro ao salvar', e);
-      alert('Erro ao salvar as edições.');
+      showToast('Erro ao salvar as edições.', 'error');
     }
   };
 
@@ -281,7 +282,7 @@ export default function Dashboard({ mode = 'dashboard' }) {
       await deleteObject(ref(storage, lisp.storagePath)).catch(e => console.warn(e));
       await deleteDoc(doc(db, 'lispFiles', lisp.id));
       setTenantLisps(tenantLisps.filter(l => l.id !== lisp.id));
-    } catch(err) { alert('Erro ao excluir.'); }
+    } catch(err) { showToast('Erro ao excluir.', 'error'); }
   };
 
   // --- EQUIPMENTS ---
@@ -306,7 +307,7 @@ export default function Dashboard({ mode = 'dashboard' }) {
       
       await updateDoc(userRef, updates);
       setUserData({ ...userData, ...updates });
-    } catch(e) { alert('Erro ao desvincular.'); }
+    } catch(e) { showToast('Erro ao desvincular.', 'error'); }
   };
 
   // --- SUPPORT ---
@@ -322,12 +323,12 @@ export default function Dashboard({ mode = 'dashboard' }) {
         createdAt: serverTimestamp(),
         status: 'open'
       });
-      alert('Mensagem enviada com sucesso! Nossa equipe entrará em contato.');
+      showToast('Mensagem enviada! Nossa equipe entrará em contato.', 'success');
       setShowSupportModal(false);
       setSupportMsg('');
     } catch(e) {
       console.error(e);
-      alert('Erro ao enviar mensagem.');
+      showToast('Erro ao enviar mensagem.', 'error');
     }
   };
 
@@ -338,10 +339,10 @@ export default function Dashboard({ mode = 'dashboard' }) {
       const newSeats = parseInt(seats, 10);
       await updateDoc(doc(db, 'users', userData.id), { maxSeats: newSeats });
       setUserData({ ...userData, maxSeats: newSeats });
-      alert('Plano atualizado com sucesso! Novos assentos liberados (Modo Beta Tester).');
+      showToast('Plano atualizado! Novos assentos liberados.', 'success');
     } catch(e) {
       console.error(e);
-      alert('Erro ao atualizar plano.');
+      showToast('Erro ao atualizar plano.', 'error');
     }
   };
 
@@ -401,6 +402,7 @@ export default function Dashboard({ mode = 'dashboard' }) {
 
   return (
     <div style={{ maxWidth: '1000px', margin: '0 auto', paddingBottom: '40px' }}>
+      <ToastContainer />
       {/* HEADER & THIN PROFILE */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '15px', flexWrap: 'wrap', gap: '15px' }}>
         <h1 style={{ color: 'var(--tmd-orange)', margin: 0, fontSize: 'clamp(1.4rem, 4vw, 1.8rem)' }}>Painel do Cliente</h1>

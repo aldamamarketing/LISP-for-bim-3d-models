@@ -40,7 +40,7 @@ export default function AutoCADPalette() {
       const lispCommand = `(LC_ApplyAsset "${item.type}" "${name}" "${codeB64}")\n`;
       window.external.ExecuteAutoCADCommand(lispCommand);
     } else {
-      alert("Esta función solo está disponible dentro de la Paleta de LispCentral en AutoCAD.");
+      console.warn("[LC] Função disponível apenas na Paleta do AutoCAD.");
     }
   };
 

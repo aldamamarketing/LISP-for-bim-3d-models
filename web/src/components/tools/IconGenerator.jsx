@@ -50,7 +50,7 @@ export default function IconGenerator() {
     const finalStyle = styleOption === 'Personalizado' ? customStyle : styleOption;
 
     if (!finalTheme || !finalStyle) {
-      alert("Por favor define el tema y estilo personalizado.");
+      showToast("Defina o tema e estilo personalizado.", "warning");
       setIsGenerating(false);
       return;
     }
@@ -88,7 +88,7 @@ export default function IconGenerator() {
       if (parsedResults.length > 0) setActiveTab('ai');
     } catch (error) {
       console.error(error);
-      alert("No momento, estamos enfrentando instabilidade em nossos serviços de IA. Por favor, tente novamente em alguns instantes.");
+      showToast("Instabilidade nos serviços de IA. Tente novamente em instantes.", "error");
     } finally {
       setIsGenerating(false);
     }
@@ -149,7 +149,7 @@ export default function IconGenerator() {
       await exportIconsToZip(selectedIcons, accentColor, secondaryColor);
     } catch (error) {
       console.error("Error al exportar:", error);
-      alert("Hubo un error al empaquetar los iconos.");
+      showToast("Erro ao empaquetar os ícones.", "error");
     } finally {
       setIsExporting(false);
     }

@@ -50,7 +50,7 @@ export default function LinetypeGenerator() {
       if (parsedResults.length > 0) setActiveTab('ai');
     } catch (error) {
       console.error(error);
-      alert("No momento, estamos enfrentando instabilidade em nossos serviços de IA. Por favor, tente novamente em alguns instantes.");
+      showToast("Instabilidade nos serviços de IA. Tente novamente em instantes.", "error");
     } finally {
       setIsGenerating(false);
     }
