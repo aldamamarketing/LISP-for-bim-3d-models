@@ -247,6 +247,12 @@ export default function LinetypeGenerator() {
         </div>
         {selectedLines.length > 0 && (
           <div style={{ padding: '15px', borderTop: '1px solid var(--border-color)', background: 'var(--bg-dark)' }}>
+            <div style={{ marginBottom: '15px', padding: '10px', backgroundColor: '#1a1a1a', border: '1px solid #333', borderRadius: '4px', fontSize: '0.85rem' }}>
+              <strong style={{ color: 'var(--tmd-orange)', display: 'block', marginBottom: '5px' }}>
+                Detalles de la línea seleccionada ({selectedLines[selectedLines.length - 1].name || selectedLines[selectedLines.length - 1].filename}):
+              </strong>
+              <span style={{ color: '#ccc' }}>{selectedLines[selectedLines.length - 1].description}</span>
+            </div>
             <button 
               className="btn-primary" 
               style={{ width: '100%' }}

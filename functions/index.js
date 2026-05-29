@@ -521,7 +521,7 @@ INSTRUCCIONES DE FORMATO DE RESPUESTA:
 Debes responder ÚNICAMENTE con un objeto JSON (sin markdown, sin bloques de código) con esta estructura exacta:
 {
   "results": [
-    { "id": "uuid1", "name": "Nombre de Icono", "category": "Categoría General", "filename": "NOMBRE_CORTO_VAR_1", "description": "Breve desc", "svgCode": "<svg>...</svg>" },
+    { "id": "uuid1", "name": "Name in English", "category": "English Category", "filename": "SHORT_NAME", "description": "Short description in English", "svgCode": "<svg>...</svg>" },
     { "id": "uuid2", "filename": "NOMBRE_CORTO_VAR_2", "description": "Breve desc", "svgCode": "<svg>...</svg>" },
     { "id": "uuid3", "filename": "NOMBRE_CORTO_VAR_3", "description": "Breve desc", "svgCode": "<svg>...</svg>" }
   ]
@@ -561,7 +561,7 @@ Contexto: ${theme}
 REGLAS DE DISEÑO:
 1. El código PAT debe ser válido matemáticamente. Cada línea define: ángulo, x-origen, y-origen, delta-x, delta-y, y opcionalmente los dashes (trazo, espacio).
 2. Genera exactamente 1 patrón de alta calidad por cada descripción.
-3. Formato de salida: Objeto JSON con una propiedad "results" que sea un Array con objetos: { "id": "uuid", "name": "Nombre Humano", "category": "Arquitectura", "filename": "NOMBRE_CORTO_SIN_ESPACIOS", "description": "Breve descripción", "patCode": "0, 0,0, 0,10..." }. No incluyas la línea del nombre en el patCode. Devuelve SOLO las líneas matemáticas.
+3. Formato de salida: Objeto JSON con una propiedad "results" que sea un Array con objetos: { "id": "uuid", "name": "Name in English", "category": "Architecture", "filename": "SHORT_NAME", "description": "Short description in English", "patCode": "0, 0,0, 0,10..." }. No incluyas la línea del nombre en el patCode. Devuelve SOLO las líneas matemáticas.
 4. FILTRO DE SEGURIDAD (CRÍTICO): RECHAZA categóricamente solicitudes con símbolos de odio, esvásticas, contenido adulto, cruces o discriminación. Devuelve un "results" vacío si detectas esto.`;
 
     const userPrompt = `Descripciones:\n${prompts.join('\n')}`;
@@ -593,7 +593,7 @@ Genera definiciones de tipos de línea complejos (.lin) basados en estas descrip
 
 REGLAS DE DISEÑO:
 1. El código LIN define la secuencia de pluma: trazo (positivo), espacio (negativo), punto (0), y texto/formas.
-2. Formato de salida: Objeto JSON con una propiedad "results" que sea un Array con objetos: { "id": "uuid", "name": "Nombre de Línea", "category": "Ingeniería", "filename": "NOMBRE_CORTO", "description": "Breve", "linCode": "A,10,-5..." }.
+2. Formato de salida: Objeto JSON con una propiedad "results" que sea un Array con objetos: { "id": "uuid", "name": "Line Name in English", "category": "Engineering", "filename": "SHORT_NAME", "description": "Short description in English", "linCode": "A,10,-5..." }.
 3. Devuelve SOLO la definición de la línea (empieza por A), NO incluyas el asterisco (*Nombre).
 4. FILTRO DE SEGURIDAD (CRÍTICO): RECHAZA solicitudes con símbolos de odio, contenido adulto o discriminación devolviendo un "results" vacío.`;
 

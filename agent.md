@@ -151,3 +151,24 @@ Para acelerar la creación de comandos en la plataforma B2B, se migró el stack 
 4. **Imágenes Optimizadas:** Restringir el uso de la etiqueta nativa `<img>`. En su lugar, obligar el uso de `astro:assets` (`<Image />`) para redimensionar, convertir formato a WebP/AVIF y cuidar el LCP de la página.
 5. **Rendimiento:** Entregar CERO JavaScript por defecto. Cualquier KB de JS que vaya al navegador debe tener una justificación de UI.
 6. **Integraciones seguras:** Usar `npx astro add [tool]` al integrar librerías para evitar configuraciones manuales propensas a error en `astro.config.mjs`.
+
+---
+
+## 📚 Ecosistema de Biblioteca Global y Paleta AutoCAD
+*El sistema ha evolucionado de "Generación Bajo Demanda" a un "Catálogo Global".*
+
+### 1. Curaduría por IA (English First)
+- Las Cloud Functions (Generadores de Hatch, Linetype e Iconos) utilizan la IA no solo para generar la matemática, sino como **Curador de Contenido**.
+- La IA está instruida obligatoriamente para devolver un **nombre, descripción y categoría EN INGLÉS**, garantizando la uniformidad y estandarización del catálogo global.
+- Los recursos se guardan directamente en la colección `publicAssets` de Firestore. Solo se almacena el código plano (`patCode`, `linCode`, `svgCode`), evitando el uso ineficiente de Storage (archivos físicos).
+
+### 2. Panel de Biblioteca (LibraryPanel)
+- Integrado de forma permanente en los generadores (Hatch, Lin, Icon).
+- El usuario puede alternar entre "Resultados IA" (si acaba de generar algo) y "Biblioteca Pública" (contenido curado por la comunidad/IA).
+- Permite filtrado semántico y categorización, además de ofrecer el botón "⭐ Añadir a Favoritos".
+- Muestra los detalles y descripciones de los recursos directamente en el cuadro de selección.
+
+### 3. Dashboard de Favoritos y Paleta Integrada
+- **/favorites**: Consola web que agrupa los recursos guardados por el usuario. Permite eliminar ("Apagar") o descargar dinámicamente los recursos.
+- **/palette**: Endpoint minimalista diseñado *exclusivamente* para ser cargado dentro de la paleta lateral de AutoCAD mediante un WebView (C# Loader).
+- **Inyección Directa (Bridge)**: Al hacer clic en "Insertar en AutoCAD" desde `/palette`, se codifica la matemática en Base64 y se dispara `window.external.ExecuteAutoCADCommand()`, llamando a la función LISP `LC_ApplyAsset`. Esto inserta o aplica el bloque/trama sin salir jamás de la interfaz nativa del programa.

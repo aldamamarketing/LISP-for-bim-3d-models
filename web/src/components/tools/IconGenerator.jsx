@@ -313,6 +313,15 @@ export default function IconGenerator() {
             )}
           </div>
 
+          {selectedIcons.length > 0 && (
+            <div style={{ marginBottom: '15px', padding: '10px', backgroundColor: '#1a1a1a', border: '1px solid #333', borderRadius: '4px', fontSize: '0.85rem' }}>
+              <strong style={{ color: 'var(--tmd-orange)', display: 'block', marginBottom: '5px' }}>
+                Detalles del icono seleccionado ({selectedIcons[selectedIcons.length - 1].name || selectedIcons[selectedIcons.length - 1].filename}):
+              </strong>
+              <span style={{ color: '#ccc' }}>{selectedIcons[selectedIcons.length - 1].description || selectedIcons[selectedIcons.length - 1].prompt}</span>
+            </div>
+          )}
+
           <button 
             className="btn-primary" 
             style={{ flexShrink: 0 }}
