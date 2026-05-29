@@ -43,6 +43,11 @@ export default function HatchPreview({ patCode, scale = 1 }) {
     ctx.strokeStyle = '#f26d21'; // tmd-orange
     ctx.lineWidth = 1;
 
+    // Calcular escala dinámica para que el patrón se repita ~4 veces (3x3 garantizado)
+    const maxSpacing = Math.max(...patterns.map(p => Math.max(Math.abs(p.dx), Math.abs(p.dy)))) || 10;
+    const baseScale = (height / 4) / maxSpacing;
+    const finalScale = baseScale * scale;
+
     // Suficiente para cubrir el área
     const maxDist = Math.max(width, height) * 3; 
 
@@ -52,14 +57,14 @@ export default function HatchPreview({ patCode, scale = 1 }) {
       // Preparar guiones. En AutoCAD: + es línea, - es espacio, 0 es punto.
       // Math.abs convierte los espacios negativos en distancias de canvas válidas.
       // Canvas ignora el dash 0, así que lo convertimos a un valor muy pequeño (0.5) para que sea un punto.
-      const canvasDashes = pat.dashes.map(d => d === 0 ? 0.5 : Math.abs(d) * scale * 10); // Multiplicamos x10 para que los patrones pequeños se vean
+      const canvasDashes = pat.dashes.map(d => d === 0 ? 0.5 : Math.abs(d) * finalScale);
       
       ctx.save();
       // Origen en el centro para facilitar la visualización
       ctx.translate(width / 2, height / 2);
       
       // AutoCAD Y crece hacia arriba, Canvas Y crece hacia abajo
-      ctx.translate(pat.ox * scale * 10, -pat.oy * scale * 10); 
+      ctx.translate(pat.ox * finalScale, -pat.oy * finalScale); 
       ctx.rotate(-angleRad); 
       
       ctx.beginPath();
@@ -69,8 +74,8 @@ export default function HatchPreview({ patCode, scale = 1 }) {
         ctx.setLineDash([]);
       }
       
-      const dy = pat.dy * scale * 10;
-      const dx = pat.dx * scale * 10;
+      const dy = pat.dy * finalScale;
+      const dx = pat.dx * finalScale;
       
       // Si dy es 0, dibujamos una sola línea en el centro
       if (Math.abs(dy) < 0.001) {
