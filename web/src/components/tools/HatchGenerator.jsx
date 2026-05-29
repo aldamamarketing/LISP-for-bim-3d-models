@@ -132,7 +132,7 @@ export default function HatchGenerator() {
                   key={hatch.id} 
                   className={`icon-preview-box ${selectedHatches.some(h => h.id === hatch.id) ? 'selected' : ''}`}
                   onClick={() => toggleSelectHatch(hatch)}
-                  style={{ height: 'auto', padding: '15px', alignItems: 'flex-start' }}
+                  style={{ height: 'auto', width: '100%', flexDirection: 'column', padding: '15px', alignItems: 'flex-start' }}
                 >
                   <strong style={{ color: 'var(--tmd-orange)', marginBottom: '10px' }}>*{hatch.filename}, {hatch.description}</strong>
                   <pre style={{ margin: 0, fontSize: '0.8rem', color: 'var(--preview-fg)', whiteSpace: 'pre-wrap', wordBreak: 'break-all', fontFamily: 'monospace' }}>

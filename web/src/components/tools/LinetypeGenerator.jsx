@@ -122,7 +122,7 @@ export default function LinetypeGenerator() {
                   key={line.id} 
                   className={`icon-preview-box ${selectedLines.some(l => l.id === line.id) ? 'selected' : ''}`}
                   onClick={() => toggleSelectLine(line)}
-                  style={{ height: 'auto', padding: '15px', alignItems: 'flex-start' }}
+                  style={{ height: 'auto', width: '100%', flexDirection: 'column', padding: '15px', alignItems: 'flex-start' }}
                 >
                   <strong style={{ color: 'var(--tmd-orange)', marginBottom: '10px' }}>*{line.filename}, {line.description}</strong>
                   <pre style={{ margin: 0, fontSize: '0.8rem', color: 'var(--preview-fg)', whiteSpace: 'pre-wrap', wordBreak: 'break-all', fontFamily: 'monospace' }}>
