@@ -149,18 +149,15 @@ import Logo from '../components/Logo.astro';
 
   <!-- 404 CONTENT -->
   <main class="error-container">
-    <h1 class="error-code">404</h1>
-    <h2 class="error-title">L.I.S.P.<br>Lost In Syntax Parentheses</h2>
+    <h1 class="error-title">
+      <span style="color: var(--tmd-orange)">L</span>ost<span style="color: var(--tmd-orange)">I</span>n<span style="color: var(--tmd-orange)">S</span>yntax<span style="color: var(--tmd-orange)">P</span>arentheses
+    </h1>
     
-    <div class="code-joke">
-      <span class="comment">;; Parece que te has perdido entre tantos paréntesis</span><br/>
-      (<span class="keyword">defun</span> <span class="string">find-page</span> (url)<br/>
-      &nbsp;&nbsp;(<span class="keyword">if</span> (<span class="keyword">not</span> (exists url))<br/>
-      &nbsp;&nbsp;&nbsp;&nbsp;(<span class="keyword">return</span> <span class="string">"nil"</span>)))<br/>
-      <span class="comment">;; ¯\_(ツ)_/¯</span>
+    <div class="emoticon" style="font-size: 3rem; color: var(--text-muted); margin-bottom: 24px; font-family: monospace;">
+      ;; ¯\_(ツ)_/¯
     </div>
 
-    <p class="error-subtitle">La página que buscas no existe o ha sido movida. Revisa la URL o vuelve a un lugar seguro antes de que falte un paréntesis de cierre.</p>
+    <p class="error-subtitle">;; Parece que me perdi entre tantos parênteses...</p>
     
     <div class="error-cta">
       <a href="/" class="btn-primary">Volver al Inicio</a>

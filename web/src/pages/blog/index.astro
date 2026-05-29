@@ -13,10 +13,10 @@ const posts = (await getCollection('blog')).sort(
   keywords="blog autolisp, tutoriais lisp, autocad corporativo, bim manager, automação"
 >
   <div class="blog-index">
-    <header class="index-header">
+    <div class="index-header">
       <h1>Engineering <span>Blog</span></h1>
       <p>Artigos técnicos, guias de automação e estratégias corporativas para BIM Managers e Coordenadores de Projeto.</p>
-    </header>
+    </div>
 
     <div class="posts-grid">
       {posts.map((post) => (
