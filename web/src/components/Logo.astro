@@ -1,9 +1,9 @@
 ---
 // Logo.astro
-// Representa "((LC))" simulando paréntesis como L y C.
+// Representa "(LC)" con paréntesis naranjas y texto adaptable.
 ---
 <div class="tmd-logo">
-  <span class="l-paren">((</span><span class="l-text">L</span><span class="c-text">C</span><span class="r-paren">))</span>
+  <span class="paren">(</span><span class="text">LC</span><span class="paren">)</span>
 </div>
 
 <style>
@@ -16,8 +16,6 @@
     align-items: center;
     user-select: none;
   }
-  .l-paren { color: #f0f0f0; margin-right: -2px; }
-  .l-text { color: #f0f0f0; }
-  .c-text { color: var(--tmd-orange); }
-  .r-paren { color: var(--tmd-orange); margin-left: -2px; }
+  .paren { color: var(--tmd-orange); }
+  .text { color: var(--text-main); }
 </style>
