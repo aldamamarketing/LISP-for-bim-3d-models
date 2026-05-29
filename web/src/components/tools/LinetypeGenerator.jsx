@@ -69,7 +69,7 @@ export default function LinetypeGenerator() {
       };
       await saveToGlobalLibrary(assetData);
       await addToFavorites(line.id);
-      alert('¡Añadido a tus Favoritos y a la Biblioteca Pública!');
+      alert('Adicionado aos Favoritos e à Biblioteca Pública!');
     } catch (error) {
       alert(error.message);
     }
@@ -103,20 +103,17 @@ export default function LinetypeGenerator() {
       
       {/* 1. CONFIGURACIÓN */}
       <div className="panel col-settings">
-        <div className="panel-header">Configuración</div>
+        <div className="panel-header">Configuração</div>
         <div className="panel-body">
           <div className="form-group">
-            <label>Tipos de Línea (uno por línea)</label>
+            <label>Linhas a Gerar (uma por linha)</label>
             <textarea 
               className="form-control" 
               rows="6" 
               value={prompts}
               onChange={(e) => setPrompts(e.target.value)}
-              placeholder="Ej: Línea de Gas&#10;Punteada"
+              placeholder="Ex: Linha de Gás (Texto &quot;GÁS&quot;)&#10;Linha com pontos e traços longos"
             ></textarea>
-            <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>
-              Se generará la sintaxis (.lin) para cada uno.
-            </span>
           </div>
 
           <button 
@@ -125,7 +122,7 @@ export default function LinetypeGenerator() {
             onClick={handleGenerate}
             disabled={isGenerating}
           >
-            {isGenerating ? 'Calculando Linetype...' : 'Gerar Linhas (IA)'}
+            {isGenerating ? 'Calculando Geometria...' : 'Gerar Linhas'}
           </button>
         </div>
       </div>
@@ -149,7 +146,7 @@ export default function LinetypeGenerator() {
                 onClick={() => setActiveTab('ai')}
                 style={{ flex: 1, padding: '15px', backgroundColor: activeTab === 'ai' ? '#333' : 'transparent', color: activeTab === 'ai' ? 'var(--tmd-orange)' : 'var(--text-muted)', border: 'none', cursor: 'pointer', fontWeight: 'bold' }}
               >
-                Resultados IA ({results.length})
+                Resultados ({results.length})
               </button>
             </div>
 
@@ -173,14 +170,14 @@ export default function LinetypeGenerator() {
 
                   {results.length === 0 && !isGenerating && (
                     <div className="empty-state" style={{ padding: '20px' }}>
-                      Escribe tus comandos a la izquierda y presiona Generar, o busca en la Biblioteca Pública.
+                      Escreva seus comandos à esquerda e clique em Gerar, ou busque na Biblioteca Pública.
                     </div>
                   )}
 
                   {isGenerating && (
                     <div className="loading-state" style={{ padding: '20px', textAlign: 'center' }}>
                       <div className="spinner" style={{ margin: '0 auto 15px auto', width: '40px', height: '40px', border: '3px solid rgba(242, 109, 33, 0.3)', borderTop: '3px solid var(--tmd-orange)', borderRadius: '50%', animation: 'spin 1s linear infinite' }}></div>
-                      <p>Generando líneas con DeepSeek... (aprox 10-15s)</p>
+                      <p>Gerando linhas... (aprox 10-15s)</p>
                     </div>
                   )}
 
@@ -197,7 +194,7 @@ export default function LinetypeGenerator() {
                         disabled={saving === line.id}
                         style={{ width: '100%', padding: '10px', backgroundColor: '#333', color: '#fff', border: 'none', borderRadius: '4px', cursor: 'pointer', marginTop: '15px', fontWeight: 'bold' }}
                       >
-                        {saving === line.id ? 'Guardando...' : '⭐ Añadir a Favoritos'}
+                        {saving === line.id ? 'Salvando...' : '⭐ Adicionar aos Favoritos'}
                       </button>
                     </div>
                   ))}
@@ -249,7 +246,7 @@ export default function LinetypeGenerator() {
           <div style={{ padding: '15px', borderTop: '1px solid var(--border-color)', background: 'var(--bg-dark)' }}>
             <div style={{ marginBottom: '15px', padding: '10px', backgroundColor: '#1a1a1a', border: '1px solid #333', borderRadius: '4px', fontSize: '0.85rem' }}>
               <strong style={{ color: 'var(--tmd-orange)', display: 'block', marginBottom: '5px' }}>
-                Detalles de la línea seleccionada ({selectedLines[selectedLines.length - 1].name || selectedLines[selectedLines.length - 1].filename}):
+                Detalhes da linha selecionada ({selectedLines[selectedLines.length - 1].name || selectedLines[selectedLines.length - 1].filename}):
               </strong>
               <span style={{ color: '#ccc' }}>{selectedLines[selectedLines.length - 1].description}</span>
             </div>

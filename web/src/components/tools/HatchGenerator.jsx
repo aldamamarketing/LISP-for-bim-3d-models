@@ -61,7 +61,7 @@ export default function HatchGenerator() {
       };
       await saveToGlobalLibrary(assetData);
       await addToFavorites(hatch.id);
-      alert('¡Añadido a tus Favoritos y a la Biblioteca Pública!');
+      alert('Adicionado aos Favoritos e à Biblioteca Pública!');
     } catch (error) {
       alert(error.message);
     }
@@ -104,25 +104,25 @@ export default function HatchGenerator() {
       
       {/* 1. CONFIGURACIÓN */}
       <div className="panel col-settings">
-        <div className="panel-header">Configuración</div>
+        <div className="panel-header">Configuração</div>
         <div className="panel-body">
           <div className="form-group">
-            <label>Contexto / Categoría</label>
+            <label>Contexto / Categoria</label>
             <select className="form-control" value={theme} onChange={(e) => setTheme(e.target.value)}>
-              <option value="Arquitectura">Arquitectura (Muros, Pisos)</option>
-              <option value="Topografía">Topografía (Terrenos)</option>
-              <option value="Materiales">Materiales (Acero, Madera)</option>
+              <option value="Arquitectura">Arquitetura (Paredes, Pisos)</option>
+              <option value="Topografía">Topografia (Terrenos)</option>
+              <option value="Materiales">Materiais (Aço, Madeira)</option>
             </select>
           </div>
 
           <div className="form-group">
-            <label>Hachuras a Generar (una por línea)</label>
+            <label>Hachuras a Gerar (uma por linha)</label>
             <textarea 
               className="form-control" 
               rows="6" 
               value={prompts}
               onChange={(e) => setPrompts(e.target.value)}
-              placeholder="Ej: Ladrillo 20x40&#10;Patrón hexagonal"
+              placeholder="Ex: Tijolo 20x40&#10;Padrão hexagonal"
             ></textarea>
           </div>
 
@@ -132,7 +132,7 @@ export default function HatchGenerator() {
             onClick={handleGenerate}
             disabled={isGenerating}
           >
-            {isGenerating ? 'Calculando Geometría...' : 'Gerar Padrões (IA)'}
+            {isGenerating ? 'Calculando Geometria...' : 'Gerar Padrões'}
           </button>
         </div>
       </div>
@@ -157,7 +157,7 @@ export default function HatchGenerator() {
                 onClick={() => setActiveTab('ai')}
                 style={{ flex: 1, padding: '15px', backgroundColor: activeTab === 'ai' ? '#333' : 'transparent', color: activeTab === 'ai' ? 'var(--tmd-orange)' : 'var(--text-muted)', border: 'none', cursor: 'pointer', fontWeight: 'bold' }}
               >
-                Resultados IA ({results.length})
+                Resultados ({results.length})
               </button>
             </div>
 
@@ -169,7 +169,7 @@ export default function HatchGenerator() {
                   {results.length > 0 && (
                     <div style={{ padding: '15px', backgroundColor: '#1a1a1a', borderRadius: '8px', marginBottom: '5px' }}>
                       <label style={{ color: 'var(--text-muted)', display: 'block', marginBottom: '10px', fontSize: '0.9rem' }}>
-                        Zoom de Previsualización: {zoomScale.toFixed(1)}x
+                        Zoom da Previsão: {zoomScale.toFixed(1)}x
                       </label>
                       <input 
                         type="range" min="0.1" max="5" step="0.1" value={zoomScale} 
@@ -181,14 +181,14 @@ export default function HatchGenerator() {
 
                   {results.length === 0 && !isGenerating && (
                     <div className="empty-state" style={{ padding: '20px' }}>
-                      Escribe tus comandos a la izquierda y presiona Generar, o busca en la Biblioteca Pública.
+                      Escreva seus comandos à esquerda e clique em Gerar, ou busque na Biblioteca Pública.
                     </div>
                   )}
 
                   {isGenerating && (
                     <div className="loading-state" style={{ padding: '20px', textAlign: 'center' }}>
                       <div className="spinner" style={{ margin: '0 auto 15px auto', width: '40px', height: '40px', border: '3px solid rgba(242, 109, 33, 0.3)', borderTop: '3px solid var(--tmd-orange)', borderRadius: '50%', animation: 'spin 1s linear infinite' }}></div>
-                      <p>Generando patrones con DeepSeek... (aprox 10-15s)</p>
+                      <p>Gerando padrões... (aprox 10-15s)</p>
                     </div>
                   )}
 
@@ -205,7 +205,7 @@ export default function HatchGenerator() {
                         disabled={saving === hatch.id}
                         style={{ width: '100%', padding: '10px', backgroundColor: '#333', color: '#fff', border: 'none', borderRadius: '4px', cursor: 'pointer', marginTop: '15px', fontWeight: 'bold' }}
                       >
-                        {saving === hatch.id ? 'Guardando...' : '⭐ Añadir a Favoritos'}
+                        {saving === hatch.id ? 'Salvando...' : '⭐ Adicionar aos Favoritos'}
                       </button>
                     </div>
                   ))}
@@ -257,7 +257,7 @@ export default function HatchGenerator() {
           <div style={{ padding: '15px', borderTop: '1px solid var(--border-color)', background: 'var(--bg-dark)' }}>
             <div style={{ marginBottom: '15px', padding: '10px', backgroundColor: '#1a1a1a', border: '1px solid #333', borderRadius: '4px', fontSize: '0.85rem' }}>
               <strong style={{ color: 'var(--tmd-orange)', display: 'block', marginBottom: '5px' }}>
-                Detalles del patrón seleccionado ({selectedHatches[selectedHatches.length - 1].name || selectedHatches[selectedHatches.length - 1].filename}):
+                Detalhes da hachura selecionada ({selectedHatches[selectedHatches.length - 1].name || selectedHatches[selectedHatches.length - 1].filename}):
               </strong>
               <span style={{ color: '#ccc' }}>{selectedHatches[selectedHatches.length - 1].description}</span>
             </div>

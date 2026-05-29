@@ -98,7 +98,7 @@ export default function IconGenerator() {
       };
       await saveToGlobalLibrary(assetData);
       await addToFavorites(icon.id);
-      alert('¡Añadido a tus Favoritos y a la Biblioteca Pública!');
+      alert('Adicionado aos Favoritos e à Biblioteca Pública!');
     } catch (error) {
       alert(error.message);
     }
@@ -152,7 +152,7 @@ export default function IconGenerator() {
       {/* 1. CONFIGURACIÓN */}
       <div className="panel col-settings">
         <div className="panel-header">
-          <span>Configuração IA</span>
+          <span>Configuração</span>
         </div>
         <div className="panel-body">
           <div className="form-group">
@@ -236,7 +236,7 @@ export default function IconGenerator() {
                 onClick={() => setActiveTab('ai')}
                 style={{ flex: 1, padding: '15px', backgroundColor: activeTab === 'ai' ? '#333' : 'transparent', color: activeTab === 'ai' ? 'var(--tmd-orange)' : 'var(--text-muted)', border: 'none', cursor: 'pointer', fontWeight: 'bold' }}
               >
-                Resultados IA ({generatedIcons.length})
+                Resultados ({generatedIcons.length})
               </button>
             </div>
 
@@ -247,14 +247,14 @@ export default function IconGenerator() {
                 <div style={{ padding: '15px', display: 'flex', flexDirection: 'column', gap: '15px' }}>
                   {generatedIcons.length === 0 && !isGenerating && (
                     <div className="empty-state" style={{ padding: '20px' }}>
-                      Escribe tus comandos a la izquierda y presiona Generar, o busca en la Biblioteca Pública.
+                      Escreva seus comandos à esquerda e clique em Gerar, ou busque na Biblioteca Pública.
                     </div>
                   )}
 
                   {isGenerating && (
                     <div className="loading-state" style={{ padding: '20px', textAlign: 'center' }}>
                       <div className="spinner" style={{ margin: '0 auto 15px auto', width: '40px', height: '40px', border: '3px solid rgba(242, 109, 33, 0.3)', borderTop: '3px solid var(--tmd-orange)', borderRadius: '50%', animation: 'spin 1s linear infinite' }}></div>
-                      <p>Generando iconos con DeepSeek... (aprox 10-15s)</p>
+                      <p>Gerando ícones... (aprox 10-15s)</p>
                     </div>
                   )}
 
@@ -270,7 +270,7 @@ export default function IconGenerator() {
                         disabled={saving === icon.id}
                         style={{ width: '100%', padding: '10px', backgroundColor: '#333', color: '#fff', border: 'none', borderRadius: '4px', cursor: 'pointer', marginTop: '15px', fontWeight: 'bold' }}
                       >
-                        {saving === icon.id ? 'Guardando...' : '⭐ Añadir a Favoritos'}
+                        {saving === icon.id ? 'Salvando...' : '⭐ Adicionar aos Favoritos'}
                       </button>
                     </div>
                   ))}
@@ -316,7 +316,7 @@ export default function IconGenerator() {
           {selectedIcons.length > 0 && (
             <div style={{ marginBottom: '15px', padding: '10px', backgroundColor: '#1a1a1a', border: '1px solid #333', borderRadius: '4px', fontSize: '0.85rem' }}>
               <strong style={{ color: 'var(--tmd-orange)', display: 'block', marginBottom: '5px' }}>
-                Detalles del icono seleccionado ({selectedIcons[selectedIcons.length - 1].name || selectedIcons[selectedIcons.length - 1].filename}):
+                Detalhes do ícone selecionado ({selectedIcons[selectedIcons.length - 1].name || selectedIcons[selectedIcons.length - 1].filename}):
               </strong>
               <span style={{ color: '#ccc' }}>{selectedIcons[selectedIcons.length - 1].description || selectedIcons[selectedIcons.length - 1].prompt}</span>
             </div>

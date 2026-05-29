@@ -34,7 +34,7 @@ export default function LibraryPanel({ currentType, searchQuery = '' }) {
     setSaving(assetId);
     try {
       await addToFavorites(assetId);
-      alert('Añadido a Favoritos correctamente');
+      alert('Adicionado aos Favoritos com sucesso');
     } catch (e) {
       alert(e.message);
     }
@@ -63,7 +63,7 @@ export default function LibraryPanel({ currentType, searchQuery = '' }) {
       <div style={{ marginBottom: '15px' }}>
         <h3 style={{ margin: 0, color: '#fff', fontSize: '1.1rem' }}>Biblioteca Pública ({filtered.length})</h3>
         <p style={{ margin: '5px 0 0 0', color: 'var(--text-muted)', fontSize: '0.8rem' }}>
-          Busca y guarda recursos para usarlos en AutoCAD.
+          Busque e guarde recursos para usar no AutoCAD.
         </p>
       </div>
 
@@ -90,11 +90,11 @@ export default function LibraryPanel({ currentType, searchQuery = '' }) {
 
       <div style={{ flex: 1, overflowY: 'auto', display: 'grid', gridTemplateColumns: '1fr', gap: '15px' }}>
         {loading ? (
-          <p style={{ color: 'var(--text-muted)' }}>Cargando biblioteca...</p>
+          <p style={{ color: 'var(--text-muted)' }}>Carregando biblioteca...</p>
         ) : filtered.length === 0 ? (
           <div style={{ textAlign: 'center', padding: '20px' }}>
-            <p style={{ color: 'var(--text-muted)' }}>No se encontraron recursos en la base de datos.</p>
-            <p style={{ color: '#fff', fontSize: '0.9rem' }}>¡Usa el botón naranja para generarlo con Inteligencia Artificial!</p>
+            <p style={{ color: 'var(--text-muted)' }}>Nenhum recurso encontrado no banco de dados.</p>
+            <p style={{ color: '#fff', fontSize: '0.9rem' }}>Use o botão laranja para gerar novos recursos!</p>
           </div>
         ) : (
           filtered.map(item => (
@@ -121,7 +121,7 @@ export default function LibraryPanel({ currentType, searchQuery = '' }) {
                   fontWeight: 'bold'
                 }}
               >
-                {saving === item.id ? 'Guardando...' : '⭐ Añadir a Favoritos'}
+                {saving === item.id ? 'Salvando...' : '⭐ Adicionar aos Favoritos'}
               </button>
             </div>
           ))
