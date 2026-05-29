@@ -435,108 +435,94 @@ exports.generateLoader = onRequest({ cors: true }, async (req, res) => {
   (princ)
 )
 
-;; Comando Principal Manual de la Paleta Unificada (Fuerza la reapertura o el foco)
+;; Comando Principal de la Paleta Unificada (CP1)
 (defun c:CP1 (/ doc find-path bridge-dir html-path loader-js f-js)
   (vl-load-com)
   (setq doc (vla-get-ActiveDocument (vlax-get-acad-object)))
   (vla-StartUndoMark doc)
   
-  (princ "\\n[⚙] Abriendo/Enfocando LispCentral Command Palette...")
+  (princ "\\n[⚙] Abrindo LispCentral Palette...")
   
   (setq find-path (findfile "LC_Loader.lsp"))
   (if find-path
     (setq bridge-dir (vl-filename-directory find-path))
+    (setq bridge-dir (getenv "USERPROFILE"))
+  )
+  
+  ;; Cachear URL (previene duplicados)
+  (if (not (boundp '*LC-PALETTE-URL*))
     (progn
-      (if (vl-file-directory-p "Z:/Autocad Config/LISP")
-        (setq bridge-dir "Z:/Autocad Config/LISP")
-        (setq bridge-dir "C:/Users/TM PROJETOS/Downloads")
+      (setq html-path (strcat bridge-dir "/web/inspector_unified.html"))
+      (setq html-path (vl-string-translate "\\\\" "/" html-path))
+      (if (not (vl-string-search "file:///" html-path))
+        (if (= (substr html-path 1 1) "/")
+          (setq html-path (strcat "file://" html-path))
+          (setq html-path (strcat "file:///" html-path))
+        )
+      )
+      (while (vl-string-search " " html-path)
+        (setq html-path (vl-string-subst "%20" " " html-path))
+      )
+      (setq *LC-PALETTE-URL* (strcat html-path "?token=" *LC-SEAT-TOKEN* "&hwid=" *LC-HWID*))
+    )
+  )
+  
+  ;; Solo inyectar si la paleta NO fue creada (previene duplicados)
+  (if (not (boundp '*LC-PALETTE-ACTIVE*))
+    (progn
+      (setq loader-js (strcat (getenv "TEMP") "/LC_Palette_Loader.js"))
+      (setq loader-js (vl-string-translate "\\\\" "/" loader-js))
+      (setq f-js (open loader-js "w"))
+      (if f-js
+        (progn
+          (write-line "if (typeof Acad !== 'undefined') {" f-js)
+          (write-line (strcat "    Acad.Application.addPalette(\"Command Palette\", \"" *LC-PALETTE-URL* "\");") f-js)
+          (write-line "}" f-js)
+          (close f-js)
+          (vl-cmdf "_.WEBLOAD" "_L" (strcat "\"" loader-js "\""))
+          (setq *LC-PALETTE-ACTIVE* T)
+          (LC:Init-EventHub)
+          (princ "\\n[✔] LispCentral Palette pronta.")
+        )
+        (princ "\\n[❌] Erro ao criar arquivo JS da paleta.")
       )
     )
-  )
-  
-  (setq html-path (strcat bridge-dir "/web/inspector_unified.html"))
-  (setq html-path (vl-string-translate "\\\\" "/" html-path))
-  
-  (if (not (vl-string-search "file:///" html-path))
-    (if (= (substr html-path 1 1) "/")
-      (setq html-path (strcat "file://" html-path))
-      (setq html-path (strcat "file:///" html-path))
-    )
-  )
-  
-  (while (vl-string-search " " html-path)
-    (setq html-path (vl-string-subst "%20" " " html-path))
-  )
-  
-  ;; URL Constante: Esto evita duplicados reales en AutoCAD
-  (setq html-path (strcat html-path "?token=" *LC-SEAT-TOKEN* "&hwid=" *LC-HWID*))
-  
-  (setq loader-js (strcat bridge-dir "/web/LC_Palette_Loader.js"))
-  (setq loader-js (vl-string-translate "\\\\" "/" loader-js))
-  
-  (setq f-js (open loader-js "w"))
-  (if f-js
-    (progn
-      (write-line "if (typeof Acad !== 'undefined') {" f-js)
-      ;; addPalette con la misma URL y Nombre solo la enfoca si ya existe, o la reabre si fue cerrada.
-      (write-line (strcat "    Acad.Application.addPalette(\\"Command Palette\\", \\"" html-path "\\");") f-js)
-      (write-line "    Acad.Editor.writeMessage(\\"\\\\n[✔] LispCentral Palette lista.\\\\n\\");" f-js)
-      (write-line "} else {" f-js)
-      (write-line "    console.error(\\"[❌] Error: API de JavaScript de AutoCAD no detectada.\\");" f-js)
-      (write-line "}" f-js)
-      (close f-js)
-      
-      (vl-cmdf "_.WEBLOAD" "_L" (strcat "\\"" loader-js "\\""))
-      
-      (LC:Init-EventHub)
-      (vl-bb-set 'LC_PALETTE_LOADED T)
-    )
-    (princ "\\n[❌] Error: Não foi possível carregar a interface da paleta.")
+    (princ "\\n[✔] Paleta já ativa. LC_RESET para forçar.")
   )
   
   (vla-EndUndoMark doc)
   (princ)
 )
 
-;; Función de Arranque Automático Silencioso (Para nuevos dibujos)
-(defun LC:AutoStart ()
-  (if (not (vl-bb-ref 'LC_PALETTE_LOADED))
-    (progn
-      (princ "\\n[LispCentral] Inicializando Command Palette asíncrona...")
-      (c:CP1)
-    )
-  )
-  (princ)
-)
-
-;; Alias Oficiales (comandos intuitivos para reabrir la paleta)
+;; Alias Oficiales
 (defun c:LC_INSPECT () (c:CP1))
 (defun c:TMD_INSPECT () (c:CP1))
-(defun c:LC () (c:CP1))          ;; Alias corto y fácil de recordar
-(defun c:PALETA () (c:CP1))      ;; Alias en portugués
-(defun c:PALETTE () (c:CP1))     ;; Alias en inglés
+(defun c:LC () (c:CP1))
+(defun c:PALETA () (c:CP1))
+(defun c:PALETTE () (c:CP1))
 
-;; Comando de ajuda: lista todos los comandos disponibles
+;; Reset: fuerza reabrir paleta
+(defun c:LC_RESET ()
+  (setq *LC-PALETTE-ACTIVE* nil)
+  (setq *LC-PALETTE-URL* nil)
+  (princ "\\n[LC] Paleta resetada.")
+  (c:CP1)
+)
+
+;; Ajuda
 (defun c:LC_HELP ()
-  (princ "\\\\n")
-  (princ "\\\\n  ╔══════════════════════════════════════════════════╗")
-  (princ "\\\\n  ║       LISPCENTRAL — COMANDOS DISPONÍVEIS        ║")
-  (princ "\\\\n  ╠══════════════════════════════════════════════════╣")
-  (princ "\\\\n  ║                                                  ║")
-  (princ "\\\\n  ║  LC / PALETA / CP1 .. Abrir Command Palette      ║")
-  (princ "\\\\n  ║  LC_HELP ........... Mostrar esta ajuda          ║")
-  (princ "\\\\n  ║                                                  ║")
-  (princ "\\\\n  ║  Dica: Se fechou a paleta, basta digitar LC      ║")
-  (princ "\\\\n  ║  na linha de comando para reabri-la.             ║")
-  (princ "\\\\n  ║                                                  ║")
-  (princ "\\\\n  ╚══════════════════════════════════════════════════╝")
-  (princ "\\\\n")
+  (princ "\\n  LC / PALETA / CP1 .. Abrir Palette")
+  (princ "\\n  LC_RESET .......... Reabrir paleta")
+  (princ "\\n  LC_HELP ........... Esta ajuda")
+  (princ "\\n")
   (princ)
 )
 
-;; Arranque Automático del Loader (Solo la primera vez)
-(LC:AutoStart)
-(princ "\\\\n[LispCentral] Digite LC para abrir a paleta. LC_HELP para ajuda.")
+;; Arranque
+(princ "\\n[LispCentral] Inicializando...")
+(c:CP1)
+(princ "\\n[LispCentral] LC_HELP para comandos.")
+
 `;
 
   res.setHeader("Content-Disposition", 'attachment; filename="LC_Loader.lsp"');
