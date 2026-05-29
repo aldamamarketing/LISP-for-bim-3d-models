@@ -44,7 +44,10 @@ export default function HatchPreview({ patCode, scale = 1 }) {
     ctx.lineWidth = 1;
 
     // Calcular escala dinámica para que el patrón se repita ~4 veces (3x3 garantizado)
-    const maxSpacing = Math.max(...patterns.map(p => Math.max(Math.abs(p.dx), Math.abs(p.dy)))) || 10;
+    const maxSpacing = Math.max(...patterns.map(p => {
+      const dashSum = p.dashes.reduce((sum, d) => sum + Math.abs(d), 0);
+      return Math.max(Math.abs(p.dx), Math.abs(p.dy), dashSum);
+    })) || 10;
     const baseScale = (height / 4) / maxSpacing;
     const finalScale = baseScale * scale;
 
