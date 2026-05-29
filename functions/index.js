@@ -559,7 +559,9 @@ Genera patrones de sombreado (Hatch) de AutoCAD (.pat) basados en estas descripc
 Contexto: ${theme}
 
 REGLAS DE DISEÑO:
-1. El código PAT debe ser válido matemáticamente. Cada línea define: ángulo, x-origen, y-origen, delta-x, delta-y, y opcionalmente los dashes (trazo, espacio).
+1. El código PAT debe ser válido matemáticamente. Formato: `ángulo, x-origen, y-origen, delta-x, delta-y, dash-1, dash-2`.
+   - ATENCIÓN CRÍTICA: `delta-x` es el desplazamiento PARALELO a la línea. `delta-y` es el desplazamiento PERPENDICULAR a la línea (separación entre líneas de la familia).
+   - ERROR COMÚN A EVITAR: Para líneas verticales (ángulo 90), la separación entre columnas DEBE ir en `delta-y`, NO en `delta-x`. (Ej. `90, 0,0, 0,41` separa las líneas verticales 41 unidades. Si escribes `90, 0,0, 41,0`, todas se dibujan en la misma columna X).
 2. Genera exactamente 1 patrón de alta calidad por cada descripción.
 3. PRECISIÓN ESTRUCTURAL Y DIMENSIONAL (CRÍTICO): 
    - Respeta escrupulosamente la geometría solicitada (ej. "matajuntas" o "stretcher bond" NO es "herringbone" o "espina de pez").
