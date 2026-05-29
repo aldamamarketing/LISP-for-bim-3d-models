@@ -19,7 +19,7 @@ export default function HatchGenerator() {
   const [saving, setSaving] = useState(null);
   const [user, setUser] = useState(null);
 
-  useEffect(() => {
+  React.useEffect(() => {
     const unsub = onAuthStateChanged(auth, u => setUser(u));
     return unsub;
   }, []);
