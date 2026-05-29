@@ -43,10 +43,11 @@ export default function IconGenerator() {
     }
     
     try {
-      // La URL base puede venir de .env en producción
-      const apiUrl = import.meta.env.PUBLIC_FUNCTIONS_URL 
-        ? `${import.meta.env.PUBLIC_FUNCTIONS_URL}/generateIcons`
-        : 'http://127.0.0.1:5001/lispcentral/us-central1/generateIcons';
+      const isDev = import.meta.env.DEV;
+      const baseUrl = isDev 
+        ? 'http://127.0.0.1:5001/lispcentral/us-central1'
+        : 'https://us-central1-lispcentral.cloudfunctions.net';
+      const apiUrl = `${baseUrl}/generateIcons`;
 
       const response = await fetch(apiUrl, {
         method: 'POST',

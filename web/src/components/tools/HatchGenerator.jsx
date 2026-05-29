@@ -16,9 +16,11 @@ export default function HatchGenerator() {
     const lines = prompts.split('\n').filter(p => p.trim() !== '');
     
     try {
-      const apiUrl = import.meta.env.PUBLIC_FUNCTIONS_URL 
-        ? `${import.meta.env.PUBLIC_FUNCTIONS_URL}/generateHatch`
-        : 'http://127.0.0.1:5001/lispcentral/us-central1/generateHatch';
+      const isDev = import.meta.env.DEV;
+      const baseUrl = isDev 
+        ? 'http://127.0.0.1:5001/lispcentral/us-central1'
+        : 'https://us-central1-lispcentral.cloudfunctions.net';
+      const apiUrl = `${baseUrl}/generateHatch`;
 
       const response = await fetch(apiUrl, {
         method: 'POST',
@@ -32,7 +34,7 @@ export default function HatchGenerator() {
       setGeneratedHatches(data.results || []);
     } catch (error) {
       console.error(error);
-      alert("Error al conectar con la IA. Es posible que tu API Key haya caducado (Error 403).");
+      alert("Error al conectar con la IA. Asegúrate de estar conectado a internet o revisa la consola para más detalles.");
     } finally {
       setIsGenerating(false);
     }
