@@ -1,0 +1,27 @@
+---
+import AutoCADPalette from '../components/AutoCADPalette.jsx';
+---
+
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Paleta LispCentral</title>
+    <style>
+      body {
+        margin: 0;
+        padding: 0;
+        background-color: #181818;
+        font-family: 'Inter', sans-serif;
+      }
+      /* Variables CSS compartidas para mantener consistencia con los previews */
+      :root {
+        --tmd-orange: #f26d21;
+        --text-muted: #888;
+      }
+    </style>
+  </head>
+  <body>
+    <AutoCADPalette client:load />
+  </body>
+</html>

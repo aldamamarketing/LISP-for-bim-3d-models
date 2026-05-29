@@ -1,14 +1,18 @@
 import React, { useState } from 'react';
 import './IconGenerator.css';
+import { saveToGlobalLibrary, addToFavorites } from '../../utils/library';
 import LinetypePreview from './LinetypePreview';
+import LibraryPanel from './LibraryPanel';
 
 export default function LinetypeGenerator() {
   const [prompts, setPrompts] = useState('Línea de Gas (Texto "GAS")\nLínea con puntos y trazos largos');
   const [isGenerating, setIsGenerating] = useState(false);
-  const [generatedLines, setGeneratedLines] = useState([]);
+  const [results, setResults] = useState([]);
   const [selectedLines, setSelectedLines] = useState([]);
   const [isExporting, setIsExporting] = useState(false);
   const [zoomScale, setZoomScale] = useState(1);
+  const [activeTab, setActiveTab] = useState('library');
+  const [saving, setSaving] = useState(null);
 
   const handleGenerate = async () => {
     if (!prompts.trim()) return;
@@ -32,7 +36,9 @@ export default function LinetypeGenerator() {
       if (!response.ok) throw new Error("Error del servidor");
 
       const data = await response.json();
-      setGeneratedLines(data.results || []);
+      const parsedResults = Array.isArray(data.results) ? data.results : [];
+      setResults(parsedResults);
+      if (parsedResults.length > 0) setActiveTab('ai');
     } catch (error) {
       console.error(error);
       alert("No momento, estamos enfrentando instabilidade em nossos serviços de IA. Por favor, tente novamente em alguns instantes.");
@@ -48,6 +54,26 @@ export default function LinetypeGenerator() {
     } else {
       setSelectedLines([...selectedLines, line]);
     }
+  };
+
+  const handleSaveToFavorites = async (line) => {
+    setSaving(line.id);
+    try {
+      const assetData = {
+        id: line.id,
+        type: 'lin',
+        name: line.name || line.filename,
+        description: line.description,
+        category: line.category || 'General',
+        code: line.linCode
+      };
+      await saveToGlobalLibrary(assetData);
+      await addToFavorites(line.id);
+      alert('¡Añadido a tus Favoritos y a la Biblioteca Pública!');
+    } catch (error) {
+      alert(error.message);
+    }
+    setSaving(null);
   };
 
   const handleExport = () => {
@@ -108,45 +134,77 @@ export default function LinetypeGenerator() {
       <div className="panel col-preview">
         <div className="panel-header">
           Fábrica de Linhas (.lin)
-          <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>
-            {generatedLines.length} linhas geradas
-          </span>
         </div>
         <div className="panel-body">
-          {generatedLines.length > 0 && (
-            <div style={{ padding: '15px', backgroundColor: '#1a1a1a', borderRadius: '8px', marginBottom: '15px' }}>
-              <label style={{ color: 'var(--text-muted)', display: 'block', marginBottom: '10px', fontSize: '0.9rem' }}>
-                Zoom de Previsualización: {zoomScale.toFixed(1)}x
-              </label>
-              <input 
-                type="range" min="0.1" max="5" step="0.1" value={zoomScale} 
-                onChange={(e) => setZoomScale(parseFloat(e.target.value))}
-                style={{ width: '100%', accentColor: 'var(--tmd-orange)' }}
-              />
+          <div style={{ flex: 1, backgroundColor: '#222', borderRadius: '8px', display: 'flex', flexDirection: 'column', height: '100%', overflow: 'hidden' }}>
+            
+            <div style={{ display: 'flex', borderBottom: '1px solid #333' }}>
+              <button 
+                onClick={() => setActiveTab('library')}
+                style={{ flex: 1, padding: '15px', backgroundColor: activeTab === 'library' ? '#333' : 'transparent', color: activeTab === 'library' ? '#fff' : 'var(--text-muted)', border: 'none', cursor: 'pointer', fontWeight: 'bold' }}
+              >
+                Biblioteca Pública
+              </button>
+              <button 
+                onClick={() => setActiveTab('ai')}
+                style={{ flex: 1, padding: '15px', backgroundColor: activeTab === 'ai' ? '#333' : 'transparent', color: activeTab === 'ai' ? 'var(--tmd-orange)' : 'var(--text-muted)', border: 'none', cursor: 'pointer', fontWeight: 'bold' }}
+              >
+                Resultados IA ({results.length})
+              </button>
             </div>
-          )}
-          {generatedLines.length === 0 ? (
-            <div className="empty-state">
-              Escribe tus comandos a la izquierda y presiona Generar.
-            </div>
-          ) : (
-            <div className="grid-container" style={{ gridTemplateColumns: '1fr' }}>
-              {generatedLines.map((line) => (
-                <div 
-                  key={line.id} 
-                  className={`icon-preview-box ${selectedLines.some(l => l.id === line.id) ? 'selected' : ''}`}
-                  onClick={() => toggleSelectLine(line)}
-                  style={{ height: 'auto', width: '100%', flexDirection: 'column', padding: '15px', alignItems: 'flex-start' }}
-                >
-                  <strong style={{ color: 'var(--tmd-orange)', marginBottom: '10px' }}>*{line.filename}, {line.description}</strong>
-                  <LinetypePreview linCode={line.linCode} scale={zoomScale} />
-                  <pre style={{ margin: 0, fontSize: '0.8rem', color: 'var(--preview-fg)', whiteSpace: 'pre-wrap', wordBreak: 'break-all', fontFamily: 'monospace', backgroundColor: 'rgba(0,0,0,0.2)', padding: '10px', borderRadius: '4px', width: '100%' }}>
-                    {line.linCode}
-                  </pre>
+
+            <div style={{ flex: 1, overflowY: 'auto', display: 'flex', flexDirection: 'column' }}>
+              {activeTab === 'library' ? (
+                <LibraryPanel currentType="lin" searchQuery={prompts} />
+              ) : (
+                <div style={{ padding: '15px', display: 'flex', flexDirection: 'column', gap: '15px' }}>
+                  {results.length > 0 && (
+                    <div style={{ padding: '15px', backgroundColor: '#1a1a1a', borderRadius: '8px', marginBottom: '5px' }}>
+                      <label style={{ color: 'var(--text-muted)', display: 'block', marginBottom: '10px', fontSize: '0.9rem' }}>
+                        Zoom de Previsualización: {zoomScale.toFixed(1)}x
+                      </label>
+                      <input 
+                        type="range" min="0.1" max="5" step="0.1" value={zoomScale} 
+                        onChange={(e) => setZoomScale(parseFloat(e.target.value))}
+                        style={{ width: '100%', accentColor: 'var(--tmd-orange)' }}
+                      />
+                    </div>
+                  )}
+
+                  {results.length === 0 && !isGenerating && (
+                    <div className="empty-state" style={{ padding: '20px' }}>
+                      Escribe tus comandos a la izquierda y presiona Generar, o busca en la Biblioteca Pública.
+                    </div>
+                  )}
+
+                  {isGenerating && (
+                    <div className="loading-state" style={{ padding: '20px', textAlign: 'center' }}>
+                      <div className="spinner" style={{ margin: '0 auto 15px auto', width: '40px', height: '40px', border: '3px solid rgba(242, 109, 33, 0.3)', borderTop: '3px solid var(--tmd-orange)', borderRadius: '50%', animation: 'spin 1s linear infinite' }}></div>
+                      <p>Generando líneas con DeepSeek... (aprox 10-15s)</p>
+                    </div>
+                  )}
+
+                  {!isGenerating && results.map((line) => (
+                    <div key={line.id} style={{ display: 'flex', backgroundColor: '#1a1a1a', borderRadius: '8px', overflow: 'hidden', border: '1px solid #333', flexDirection: 'column', padding: '15px', alignItems: 'flex-start' }}>
+                      <strong style={{ color: 'var(--tmd-orange)', marginBottom: '10px' }}>*{line.filename || line.name}, {line.description}</strong>
+                      <LinetypePreview linCode={line.linCode} scale={zoomScale} />
+                      <pre style={{ margin: 0, fontSize: '0.8rem', color: 'var(--preview-fg)', whiteSpace: 'pre-wrap', wordBreak: 'break-all', fontFamily: 'monospace', backgroundColor: 'rgba(0,0,0,0.2)', padding: '10px', borderRadius: '4px', width: '100%' }}>
+                        {line.linCode}
+                      </pre>
+                      
+                      <button 
+                        onClick={() => handleSaveToFavorites(line)}
+                        disabled={saving === line.id}
+                        style={{ width: '100%', padding: '10px', backgroundColor: '#333', color: '#fff', border: 'none', borderRadius: '4px', cursor: 'pointer', marginTop: '15px', fontWeight: 'bold' }}
+                      >
+                        {saving === line.id ? 'Guardando...' : '⭐ Añadir a Favoritos'}
+                      </button>
+                    </div>
+                  ))}
                 </div>
-              ))}
+              )}
             </div>
-          )}
+          </div>
         </div>
       </div>
 

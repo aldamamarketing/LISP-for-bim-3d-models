@@ -1,15 +1,19 @@
 import React, { useState } from 'react';
-import './IconGenerator.css'; // Reutilizamos el CSS del IconGenerator por consistencia
+import './IconGenerator.css'; 
+import { saveToGlobalLibrary, addToFavorites } from '../../utils/library';
 import HatchPreview from './HatchPreview';
+import LibraryPanel from './LibraryPanel';
 
 export default function HatchGenerator() {
   const [theme, setTheme] = useState('Arquitectura');
   const [prompts, setPrompts] = useState('Ladrillo en espina de pez\nMadera entramada');
   const [isGenerating, setIsGenerating] = useState(false);
-  const [generatedHatches, setGeneratedHatches] = useState([]);
+  const [results, setResults] = useState([]);
   const [selectedHatches, setSelectedHatches] = useState([]);
   const [isExporting, setIsExporting] = useState(false);
   const [zoomScale, setZoomScale] = useState(1);
+  const [activeTab, setActiveTab] = useState('library');
+  const [saving, setSaving] = useState(null);
 
   const handleGenerate = async () => {
     if (!prompts.trim()) return;
@@ -33,13 +37,35 @@ export default function HatchGenerator() {
       if (!response.ok) throw new Error("Error del servidor");
 
       const data = await response.json();
-      setGeneratedHatches(data.results || []);
+      const parsedResults = Array.isArray(data.results) ? data.results : [];
+      setResults(parsedResults);
+      if (parsedResults.length > 0) setActiveTab('ai');
     } catch (error) {
       console.error(error);
       alert("No momento, estamos enfrentando instabilidade em nossos serviços de IA. Por favor, tente novamente em alguns instantes.");
     } finally {
       setIsGenerating(false);
     }
+  };
+
+  const handleSaveToFavorites = async (hatch) => {
+    setSaving(hatch.id);
+    try {
+      const assetData = {
+        id: hatch.id,
+        type: 'hatch',
+        name: hatch.name || hatch.filename,
+        description: hatch.description,
+        category: hatch.category || 'General',
+        code: hatch.patCode
+      };
+      await saveToGlobalLibrary(assetData);
+      await addToFavorites(hatch.id);
+      alert('¡Añadido a tus Favoritos y a la Biblioteca Pública!');
+    } catch (error) {
+      alert(error.message);
+    }
+    setSaving(null);
   };
 
   const toggleSelectHatch = (hatch) => {
@@ -98,9 +124,6 @@ export default function HatchGenerator() {
               onChange={(e) => setPrompts(e.target.value)}
               placeholder="Ej: Ladrillo 20x40&#10;Patrón hexagonal"
             ></textarea>
-            <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>
-              Se generará la matemática (.pat) para cada uno.
-            </span>
           </div>
 
           <button 
@@ -118,43 +141,78 @@ export default function HatchGenerator() {
       <div className="panel col-preview">
         <div className="panel-header">
           Fábrica de Hachuras (.pat)
-          <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>
-            {generatedHatches.length} patrones generados
-          </span>
         </div>
         <div className="panel-body">
-          {generatedHatches.length === 0 ? (
-            <div className="empty-state">
-              Escribe tus comandos a la izquierda y presiona Generar.
+          <div style={{ flex: 1, backgroundColor: '#222', borderRadius: '8px', display: 'flex', flexDirection: 'column', height: '100%', overflow: 'hidden' }}>
+            
+            {/* Tabs Header */}
+            <div style={{ display: 'flex', borderBottom: '1px solid #333' }}>
+              <button 
+                onClick={() => setActiveTab('library')}
+                style={{ flex: 1, padding: '15px', backgroundColor: activeTab === 'library' ? '#333' : 'transparent', color: activeTab === 'library' ? '#fff' : 'var(--text-muted)', border: 'none', cursor: 'pointer', fontWeight: 'bold' }}
+              >
+                Biblioteca Pública
+              </button>
+              <button 
+                onClick={() => setActiveTab('ai')}
+                style={{ flex: 1, padding: '15px', backgroundColor: activeTab === 'ai' ? '#333' : 'transparent', color: activeTab === 'ai' ? 'var(--tmd-orange)' : 'var(--text-muted)', border: 'none', cursor: 'pointer', fontWeight: 'bold' }}
+              >
+                Resultados IA ({results.length})
+              </button>
             </div>
-          ) : (
-            <div className="grid-container" style={{ gridTemplateColumns: '1fr' }}>
-              <div style={{ padding: '15px', backgroundColor: '#1a1a1a', borderRadius: '8px', marginBottom: '15px' }}>
-                <label style={{ color: 'var(--text-muted)', display: 'block', marginBottom: '10px', fontSize: '0.9rem' }}>
-                  Zoom de Previsualización: {zoomScale.toFixed(1)}x
-                </label>
-                <input 
-                  type="range" min="0.1" max="5" step="0.1" value={zoomScale} 
-                  onChange={(e) => setZoomScale(parseFloat(e.target.value))}
-                  style={{ width: '100%', accentColor: 'var(--tmd-orange)' }}
-                />
-              </div>
-              {generatedHatches.map((hatch) => (
-                <div 
-                  key={hatch.id} 
-                  className={`icon-preview-box ${selectedHatches.some(h => h.id === hatch.id) ? 'selected' : ''}`}
-                  onClick={() => toggleSelectHatch(hatch)}
-                  style={{ height: 'auto', width: '100%', flexDirection: 'column', padding: '15px', alignItems: 'flex-start' }}
-                >
-                  <strong style={{ color: 'var(--tmd-orange)', marginBottom: '10px' }}>*{hatch.filename}, {hatch.description}</strong>
-                  <HatchPreview patCode={hatch.patCode} scale={zoomScale} />
-                  <pre style={{ margin: 0, fontSize: '0.8rem', color: 'var(--preview-fg)', whiteSpace: 'pre-wrap', wordBreak: 'break-all', fontFamily: 'monospace', backgroundColor: 'rgba(0,0,0,0.2)', padding: '10px', borderRadius: '4px', width: '100%' }}>
-                    {hatch.patCode}
-                  </pre>
+
+            <div style={{ flex: 1, overflowY: 'auto', display: 'flex', flexDirection: 'column' }}>
+              {activeTab === 'library' ? (
+                <LibraryPanel currentType="hatch" searchQuery={prompts} />
+              ) : (
+                <div style={{ padding: '15px', display: 'flex', flexDirection: 'column', gap: '15px' }}>
+                  {results.length > 0 && (
+                    <div style={{ padding: '15px', backgroundColor: '#1a1a1a', borderRadius: '8px', marginBottom: '5px' }}>
+                      <label style={{ color: 'var(--text-muted)', display: 'block', marginBottom: '10px', fontSize: '0.9rem' }}>
+                        Zoom de Previsualización: {zoomScale.toFixed(1)}x
+                      </label>
+                      <input 
+                        type="range" min="0.1" max="5" step="0.1" value={zoomScale} 
+                        onChange={(e) => setZoomScale(parseFloat(e.target.value))}
+                        style={{ width: '100%', accentColor: 'var(--tmd-orange)' }}
+                      />
+                    </div>
+                  )}
+
+                  {results.length === 0 && !isGenerating && (
+                    <div className="empty-state" style={{ padding: '20px' }}>
+                      Escribe tus comandos a la izquierda y presiona Generar, o busca en la Biblioteca Pública.
+                    </div>
+                  )}
+
+                  {isGenerating && (
+                    <div className="loading-state" style={{ padding: '20px', textAlign: 'center' }}>
+                      <div className="spinner" style={{ margin: '0 auto 15px auto', width: '40px', height: '40px', border: '3px solid rgba(242, 109, 33, 0.3)', borderTop: '3px solid var(--tmd-orange)', borderRadius: '50%', animation: 'spin 1s linear infinite' }}></div>
+                      <p>Generando patrones con DeepSeek... (aprox 10-15s)</p>
+                    </div>
+                  )}
+
+                  {!isGenerating && results.map((hatch) => (
+                    <div key={hatch.id} style={{ display: 'flex', backgroundColor: '#1a1a1a', borderRadius: '8px', overflow: 'hidden', border: '1px solid #333', flexDirection: 'column', padding: '15px', alignItems: 'flex-start' }}>
+                      <strong style={{ color: 'var(--tmd-orange)', marginBottom: '10px' }}>*{hatch.filename || hatch.name}, {hatch.description}</strong>
+                      <HatchPreview patCode={hatch.patCode} scale={zoomScale} />
+                      <pre style={{ margin: 0, fontSize: '0.8rem', color: 'var(--preview-fg)', whiteSpace: 'pre-wrap', wordBreak: 'break-all', fontFamily: 'monospace', backgroundColor: 'rgba(0,0,0,0.2)', padding: '10px', borderRadius: '4px', width: '100%' }}>
+                        {hatch.patCode}
+                      </pre>
+                      
+                      <button 
+                        onClick={() => handleSaveToFavorites(hatch)}
+                        disabled={saving === hatch.id}
+                        style={{ width: '100%', padding: '10px', backgroundColor: '#333', color: '#fff', border: 'none', borderRadius: '4px', cursor: 'pointer', marginTop: '15px', fontWeight: 'bold' }}
+                      >
+                        {saving === hatch.id ? 'Guardando...' : '⭐ Añadir a Favoritos'}
+                      </button>
+                    </div>
+                  ))}
                 </div>
-              ))}
+              )}
             </div>
-          )}
+          </div>
         </div>
       </div>
 

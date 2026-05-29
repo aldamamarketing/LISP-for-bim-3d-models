@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import './IconGenerator.css';
 import { exportIconsToZip } from '../../utils/iconExporter';
+import { saveToGlobalLibrary, addToFavorites } from '../../utils/library';
+import LibraryPanel from './LibraryPanel';
 
 // Componente para renderizar SVG de forma segura
 const SvgPreview = ({ svgString }) => {
@@ -24,9 +26,11 @@ export default function IconGenerator() {
   const [prompts, setPrompts] = useState('Alinear arriba\nLínea a pared\nAcotar muro');
   
   const [isGenerating, setIsGenerating] = useState(false);
-  const [isExporting, setIsExporting] = useState(false);
   const [generatedIcons, setGeneratedIcons] = useState([]);
   const [selectedIcons, setSelectedIcons] = useState([]);
+  const [isExporting, setIsExporting] = useState(false);
+  const [activeTab, setActiveTab] = useState('library');
+  const [saving, setSaving] = useState(null);
 
   const handleGenerate = async () => {
     if (!prompts.trim()) return;
@@ -66,18 +70,39 @@ export default function IconGenerator() {
       const data = await response.json();
       
       // Aseguramos un ID único por si el modelo devuelve formatos genéricos
-      const newIcons = data.map((icon, idx) => ({
+      const parsedResults = Array.isArray(data) ? data.map((icon, idx) => ({
         ...icon,
         id: `gen-${Date.now()}-${idx}`
-      }));
+      })) : [];
 
-      setGeneratedIcons(newIcons);
+      setGeneratedIcons(parsedResults);
+      if (parsedResults.length > 0) setActiveTab('ai');
     } catch (error) {
       console.error(error);
       alert("No momento, estamos enfrentando instabilidade em nossos serviços de IA. Por favor, tente novamente em alguns instantes.");
     } finally {
       setIsGenerating(false);
     }
+  };
+
+  const handleSaveToFavorites = async (icon) => {
+    setSaving(icon.id);
+    try {
+      const assetData = {
+        id: icon.id,
+        type: 'icon',
+        name: icon.name || icon.filename || icon.prompt,
+        description: icon.description || icon.prompt,
+        category: icon.category || 'General',
+        code: icon.svgCode
+      };
+      await saveToGlobalLibrary(assetData);
+      await addToFavorites(icon.id);
+      alert('¡Añadido a tus Favoritos y a la Biblioteca Pública!');
+    } catch (error) {
+      alert(error.message);
+    }
+    setSaving(null);
   };
 
   const toggleSelection = (icon) => {
@@ -197,43 +222,62 @@ export default function IconGenerator() {
       <div className="panel col-preview">
         <div className="panel-header">
           Fábrica de Ícones
-          <div style={{ display: 'flex', gap: '15px', alignItems: 'center' }}>
-            <div style={{ display: 'flex', gap: '5px', fontSize: '0.8rem', backgroundColor: 'var(--bg-darker)', padding: '4px 8px', borderRadius: '4px' }}>
-              <label style={{ display: 'flex', alignItems: 'center', gap: '5px', cursor: 'pointer' }}>
-                <input type="radio" name="previewMode" checked={previewMode === 'dark'} onChange={() => setPreviewMode('dark')} /> Dark
-              </label>
-              <label style={{ display: 'flex', alignItems: 'center', gap: '5px', cursor: 'pointer', marginLeft: '10px' }}>
-                <input type="radio" name="previewMode" checked={previewMode === 'light'} onChange={() => setPreviewMode('light')} /> Light
-              </label>
-            </div>
-            <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>
-              {generatedIcons.length} variações geradas
-            </span>
-          </div>
         </div>
         <div className="panel-body">
-          {generatedIcons.length === 0 ? (
-            <div className="cart-empty" style={{ marginTop: '50px' }}>
-              <p>Os ícones gerados aparecerão aqui.</p>
-              <p style={{ fontSize: '0.9rem'}}>Descreva o que precisa no painel à esquerda e clique em Gerar.</p>
+          <div style={{ flex: 1, backgroundColor: '#222', borderRadius: '8px', display: 'flex', flexDirection: 'column', height: '100%', overflow: 'hidden' }}>
+            <div style={{ display: 'flex', borderBottom: '1px solid #333' }}>
+              <button 
+                onClick={() => setActiveTab('library')}
+                style={{ flex: 1, padding: '15px', backgroundColor: activeTab === 'library' ? '#333' : 'transparent', color: activeTab === 'library' ? '#fff' : 'var(--text-muted)', border: 'none', cursor: 'pointer', fontWeight: 'bold' }}
+              >
+                Biblioteca Pública
+              </button>
+              <button 
+                onClick={() => setActiveTab('ai')}
+                style={{ flex: 1, padding: '15px', backgroundColor: activeTab === 'ai' ? '#333' : 'transparent', color: activeTab === 'ai' ? 'var(--tmd-orange)' : 'var(--text-muted)', border: 'none', cursor: 'pointer', fontWeight: 'bold' }}
+              >
+                Resultados IA ({generatedIcons.length})
+              </button>
             </div>
-          ) : (
-            <div className="grid-icons">
-              {generatedIcons.map(icon => {
-                const isSelected = selectedIcons.some(i => i.id === icon.id);
-                return (
-                  <div 
-                    key={icon.id} 
-                    className={`icon-card ${isSelected ? 'selected' : ''}`}
-                    onClick={() => toggleSelection(icon)}
-                  >
-                    <SvgPreview svgString={icon.svgCode} />
-                    <span className="icon-title">{icon.prompt} (v{icon.variation})</span>
-                  </div>
-                );
-              })}
+
+            <div style={{ flex: 1, overflowY: 'auto', display: 'flex', flexDirection: 'column' }}>
+              {activeTab === 'library' ? (
+                <LibraryPanel currentType="icon" searchQuery={prompts} />
+              ) : (
+                <div style={{ padding: '15px', display: 'flex', flexDirection: 'column', gap: '15px' }}>
+                  {generatedIcons.length === 0 && !isGenerating && (
+                    <div className="empty-state" style={{ padding: '20px' }}>
+                      Escribe tus comandos a la izquierda y presiona Generar, o busca en la Biblioteca Pública.
+                    </div>
+                  )}
+
+                  {isGenerating && (
+                    <div className="loading-state" style={{ padding: '20px', textAlign: 'center' }}>
+                      <div className="spinner" style={{ margin: '0 auto 15px auto', width: '40px', height: '40px', border: '3px solid rgba(242, 109, 33, 0.3)', borderTop: '3px solid var(--tmd-orange)', borderRadius: '50%', animation: 'spin 1s linear infinite' }}></div>
+                      <p>Generando iconos con DeepSeek... (aprox 10-15s)</p>
+                    </div>
+                  )}
+
+                  {!isGenerating && generatedIcons.map((icon) => (
+                    <div key={icon.id} style={{ display: 'flex', backgroundColor: '#1a1a1a', borderRadius: '8px', overflow: 'hidden', border: '1px solid #333', flexDirection: 'column', padding: '15px', alignItems: 'flex-start' }}>
+                      <strong style={{ color: 'var(--tmd-orange)', marginBottom: '10px' }}>*{icon.filename || icon.name}, {icon.description}</strong>
+                      <div style={{ width: '100px', height: '100px', backgroundColor: 'rgba(0,0,0,0.2)', padding: '10px', borderRadius: '6px', margin: '10px 0' }}>
+                        <SvgPreview svgString={icon.svgCode} />
+                      </div>
+                      
+                      <button 
+                        onClick={() => handleSaveToFavorites(icon)}
+                        disabled={saving === icon.id}
+                        style={{ width: '100%', padding: '10px', backgroundColor: '#333', color: '#fff', border: 'none', borderRadius: '4px', cursor: 'pointer', marginTop: '15px', fontWeight: 'bold' }}
+                      >
+                        {saving === icon.id ? 'Guardando...' : '⭐ Añadir a Favoritos'}
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
-          )}
+          </div>
         </div>
       </div>
 
