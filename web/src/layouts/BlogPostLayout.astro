@@ -1,0 +1,403 @@
+---
+import DocsLayout from './DocsLayout.astro';
+import { trackDocView } from '../utils/analytics.js';
+
+import { getCollection } from 'astro:content';
+
+const { frontmatter } = Astro.props;
+const { title, description, pubDate, updatedDate, heroImage, author, tags } = frontmatter || Astro.props;
+
+const canonicalUrl = Astro.url.href;
+
+// Busca todos os posts para a seção de "Conteúdo Relacionado"
+const allPosts = await getCollection('blog');
+const currentSlug = Astro.url.pathname.split('/').filter(Boolean).pop();
+const relatedPosts = allPosts
+  .filter(p => p.slug !== currentSlug)
+  .sort(() => 0.5 - Math.random()) // Aleatório simples para demonstração
+  .slice(0, 3);
+
+// Formatação de data
+const formattedDate = new Date(pubDate).toLocaleDateString('pt-BR', {
+  year: 'numeric',
+  month: 'long',
+  day: 'numeric'
+});
+---
+
+<DocsLayout 
+  title={`${title} | Blog LispCentral`}
+  description={description}
+  keywords={tags ? tags.join(', ') : 'lisp, autocad, bim manager'}
+  canonicalUrl={canonicalUrl}
+>
+  <article class="blog-post">
+    <!-- Breadcrumbs (Migas de pão) -->
+    <nav class="breadcrumbs" aria-label="Breadcrumb">
+      <ol>
+        <li><a href="/">Home</a></li>
+        <li><span class="separator">/</span></li>
+        <li><a href="/blog">Blog</a></li>
+        <li><span class="separator">/</span></li>
+        <li aria-current="page" class="current">{title.substring(0, 40)}{title.length > 40 ? '...' : ''}</li>
+      </ol>
+    </nav>
+
+    {heroImage && (
+      <div class="hero-image-container">
+        <img src={heroImage} alt={title} class="hero-image" loading="eager" />
+      </div>
+    )}
+    
+    <header class="post-header">
+      <div class="meta">
+        <span class="date">{formattedDate}</span>
+        <span class="author">Por {author}</span>
+      </div>
+      <h1 class="title">{title}</h1>
+      <p class="description">{description}</p>
+      
+      {tags && tags.length > 0 && (
+        <div class="tags">
+          {tags.map((tag) => (
+            <span class="tag">#{tag}</span>
+          ))}
+        </div>
+      )}
+    </header>
+
+    <div class="post-content">
+      <slot />
+    </div>
+
+    <!-- CTA B2B (App & Ferramentas) -->
+    <div class="post-cta">
+      <div class="cta-content">
+        <h3>Pare de lutar com rotinas LISP locais</h3>
+        <p>Acelere sua equipe com nossos Geradores com Inteligência Artificial e nossa nuvem JIT para AutoCAD.</p>
+        <div class="cta-buttons">
+          <a href="/login" class="btn-primary">Criar Conta Gratuita</a>
+          <a href="/pt/tools/icon-generator" class="btn-ghost">Testar Ferramentas de IA</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Conteúdo Relacionado -->
+    {relatedPosts.length > 0 && (
+      <div class="related-content">
+        <h3>Leia Também</h3>
+        <div class="related-grid">
+          {relatedPosts.map((post) => (
+            <a href={`/blog/${post.slug}/`} class="related-card">
+              <h4>{post.data.title}</h4>
+              <p>{post.data.description.substring(0, 80)}...</p>
+            </a>
+          ))}
+        </div>
+      </div>
+    )}
+  </article>
+
+  <!-- Article Schema.org para SEO -->
+  <script type="application/ld+json" set:html={JSON.stringify({
+    "@context": "https://schema.org",
+    "@type": "BlogPosting",
+    "headline": title,
+    "description": description,
+    "image": heroImage ? new URL(heroImage, Astro.url).href : undefined,
+    "author": {
+      "@type": "Organization",
+      "name": author
+    },
+    "datePublished": new Date(pubDate).toISOString(),
+    "dateModified": updatedDate ? new Date(updatedDate).toISOString() : new Date(pubDate).toISOString(),
+    "publisher": {
+      "@type": "Organization",
+      "name": "LispCentral",
+      "logo": {
+        "@type": "ImageObject",
+        "url": new URL("/favicon.svg", Astro.url).href
+      }
+    },
+    "mainEntityOfPage": {
+      "@type": "WebPage",
+      "@id": canonicalUrl
+    }
+  })} />
+
+</DocsLayout>
+
+<style>
+  .blog-post {
+    max-width: 800px;
+    margin: 0 auto;
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    overflow: hidden;
+  }
+  
+  .hero-image-container {
+    width: 100%;
+    height: 400px;
+    overflow: hidden;
+    border-bottom: 1px solid var(--border-color);
+  }
+  
+  .hero-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  
+  .post-header {
+    padding: 40px 40px 0;
+  }
+  
+  .meta {
+    display: flex;
+    gap: 15px;
+    color: var(--text-muted);
+    font-size: 0.9rem;
+    margin-bottom: 15px;
+  }
+  
+  .title {
+    font-size: 2.5rem;
+    font-weight: 800;
+    color: var(--text-main);
+    line-height: 1.2;
+    margin-bottom: 15px;
+  }
+  
+  .description {
+    font-size: 1.2rem;
+    color: var(--text-muted);
+    line-height: 1.6;
+    margin-bottom: 25px;
+  }
+  
+  .tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    padding-bottom: 30px;
+    border-bottom: 1px solid var(--border-color);
+  }
+  
+  .tag {
+    background: rgba(242, 109, 33, 0.1);
+    color: var(--tmd-orange);
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    font-weight: 600;
+  }
+  
+  .post-content {
+    padding: 40px;
+    font-size: 1.1rem;
+    line-height: 1.8;
+    color: #e5e5e5;
+  }
+  
+  /* Markdown Styles for content */
+  :global(.post-content h2) {
+    font-size: 1.8rem;
+    margin: 40px 0 20px;
+    color: #fff;
+    border-bottom: 1px solid var(--border-color);
+    padding-bottom: 10px;
+  }
+  
+  :global(.post-content h3) {
+    font-size: 1.4rem;
+    margin: 30px 0 15px;
+    color: #f0f0f0;
+  }
+  
+  :global(.post-content p) {
+    margin-bottom: 20px;
+  }
+  
+  :global(.post-content ul), :global(.post-content ol) {
+    margin-bottom: 20px;
+    padding-left: 20px;
+  }
+  
+  :global(.post-content li) {
+    margin-bottom: 10px;
+  }
+  
+  :global(.post-content blockquote) {
+    border-left: 4px solid var(--tmd-orange);
+    background: rgba(242, 109, 33, 0.05);
+    padding: 15px 20px;
+    margin: 20px 0;
+    border-radius: 0 8px 8px 0;
+    font-style: italic;
+  }
+  
+  :global(.post-content pre) {
+    background: #0d0d0d;
+    border: 1px solid #333;
+    padding: 20px;
+    border-radius: 8px;
+    overflow-x: auto;
+    margin: 20px 0;
+  }
+  
+  :global(.post-content code) {
+    font-family: 'Consolas', monospace;
+    font-size: 0.9rem;
+    color: #a6e22e;
+  }
+  
+  :global(.post-content p code) {
+    background: #1a1a1a;
+    padding: 2px 6px;
+    border-radius: 4px;
+    border: 1px solid #333;
+  }
+
+  /* Breadcrumbs */
+  .breadcrumbs {
+    padding: 20px 40px 0;
+    font-size: 0.85rem;
+    color: #888;
+  }
+  .breadcrumbs ol {
+    list-style: none;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
+    padding: 0;
+    margin: 0;
+  }
+  .breadcrumbs a {
+    color: var(--tmd-orange);
+    text-decoration: none;
+    transition: opacity 0.2s;
+  }
+  .breadcrumbs a:hover {
+    opacity: 0.8;
+  }
+  .breadcrumbs .separator {
+    color: #444;
+  }
+  .breadcrumbs .current {
+    color: #a3a3a3;
+  }
+
+  /* CTA B2B */
+  .post-cta {
+    margin: 40px 20px;
+    padding: 40px 20px;
+    background: linear-gradient(135deg, rgba(242, 109, 33, 0.1), rgba(20, 20, 20, 0.8));
+    border: 1px solid rgba(242, 109, 33, 0.3);
+    border-radius: 12px;
+    text-align: center;
+  }
+  .cta-content h3 {
+    font-size: 1.8rem;
+    color: #fff;
+    margin-bottom: 10px;
+  }
+  .cta-content p {
+    color: #a3a3a3;
+    font-size: 1.1rem;
+    margin-bottom: 25px;
+  }
+  .cta-buttons {
+    display: flex;
+    gap: 15px;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+  .btn-primary {
+    background: var(--tmd-orange);
+    color: #fff;
+    padding: 12px 24px;
+    border-radius: 6px;
+    text-decoration: none;
+    font-weight: 600;
+    transition: background 0.2s;
+  }
+  .btn-primary:hover {
+    background: #e06019;
+  }
+  .btn-ghost {
+    background: transparent;
+    color: #fff;
+    border: 1px solid #444;
+    padding: 12px 24px;
+    border-radius: 6px;
+    text-decoration: none;
+    font-weight: 600;
+    transition: background 0.2s, border-color 0.2s;
+  }
+  .btn-ghost:hover {
+    background: rgba(255,255,255,0.05);
+    border-color: #666;
+  }
+
+  /* Conteúdo Relacionado */
+  .related-content {
+    margin: 0 20px 40px;
+    padding-top: 40px;
+    border-top: 1px solid var(--border-color);
+  }
+  .related-content h3 {
+    font-size: 1.5rem;
+    color: #fff;
+    margin-bottom: 25px;
+  }
+  .related-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 20px;
+  }
+  .related-card {
+    background: #0f0f0f;
+    border: 1px solid #222;
+    padding: 20px;
+    border-radius: 8px;
+    text-decoration: none;
+    transition: transform 0.2s, border-color 0.2s;
+  }
+  .related-card:hover {
+    transform: translateY(-4px);
+    border-color: rgba(242, 109, 33, 0.4);
+  }
+  .related-card h4 {
+    color: #fff;
+    font-size: 1.1rem;
+    margin-bottom: 10px;
+    line-height: 1.4;
+  }
+  .related-card p {
+    color: #888;
+    font-size: 0.85rem;
+    line-height: 1.5;
+  }
+  
+  @media (max-width: 768px) {
+    .breadcrumbs, .post-cta, .related-content {
+      margin-left: 10px;
+      margin-right: 10px;
+      padding-left: 0;
+      padding-right: 0;
+    }
+    .post-cta { padding: 30px 15px; margin-left: 10px; margin-right: 10px; }
+    .post-header, .post-content {
+      padding: 25px;
+    }
+    .title {
+      font-size: 2rem;
+    }
+    .hero-image-container {
+      height: 250px;
+    }
+  }
+</style>

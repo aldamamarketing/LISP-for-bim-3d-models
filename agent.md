@@ -132,3 +132,22 @@ Para acelerar la creación de comandos en la plataforma B2B, se migró el stack 
 * **Gemini-Flash-Latest:** Se utiliza Firebase Functions + `GoogleGenerativeAI` para generar SVGs técnicos al vuelo a partir de nombres de comandos (ej: *Acotar muro*). Genera 3 variaciones exactas con trazos finos y sin bordes redondeados.
 * **Empaquetado Nativo:** El frontend empaqueta los SVGs seleccionados utilizando `JSZip` y la API de `Canvas` de HTML5 para renderizar los iconos a PNG (16x16 y 32x32) tanto en Dark Theme como en Light Theme de manera local, forzando la descarga del `.zip` listo para integrar en el CUIx de AutoCAD.
 * **Estilos CSS Dinámicos:** Los SVGs devueltos por la IA utilizan `currentColor` y `var(--icon-accent)`. Esto permite previsualizar los modos claros y oscuros, e inyectar el color de acento corporativo directamente desde un color picker de React sin tener que volver a llamar a la API.
+
+---
+
+## 🎨 Guías de Diseño de Interfaz Web (Web Interface Guidelines)
+*Implementado a partir del skill de Vercel (web-design-guidelines).*
+- **Accesibilidad (A11y):** Asegurar contrastes adecuados, usar etiquetas semánticas (`aria-label`) y mantener estados de `focus-visible` en elementos interactivos. Reemplazar `divs` clickeables por botones semánticos (`<button>`).
+- **Responsividad:** Los contenedores principales (como Footer o layouts de Blog) deben usar anchos máximos (`max-width: 1200px`), márgenes fluidos (`margin: 0 auto`) y reflows en móvil (`@media (max-width: 768px)`).
+- **Legibilidad:** Limitar el ancho máximo de bloques de texto grandes (ej. max-width 800px para artículos) para prevenir fatiga visual.
+
+---
+
+## 🚀 Mejores Prácticas para Agentes en Astro (Frontend "Iron Laws")
+*Instrucciones técnicas obligatorias al trabajar con el stack frontend en Astro.*
+1. **Priorizar Componentes estáticos (`.astro`):** Usar siempre `.astro` para UI estática. Los frameworks de UI (React) quedan estrictamente reservados para las "islas interactivas".
+2. **Hidratación Explícita:** Declarar explícitamente el uso de JS en el cliente (usando `client:load`, `client:idle`, `client:visible`). Nunca cargar JS de cliente por defecto.
+3. **Colecciones Type-Safe:** Administrar datos estructurados (ej. Blog) con `Content Collections` y `zod`. Prohibido el uso nativo de `Astro.glob()` para posts y colecciones.
+4. **Imágenes Optimizadas:** Restringir el uso de la etiqueta nativa `<img>`. En su lugar, obligar el uso de `astro:assets` (`<Image />`) para redimensionar, convertir formato a WebP/AVIF y cuidar el LCP de la página.
+5. **Rendimiento:** Entregar CERO JavaScript por defecto. Cualquier KB de JS que vaya al navegador debe tener una justificación de UI.
+6. **Integraciones seguras:** Usar `npx astro add [tool]` al integrar librerías para evitar configuraciones manuales propensas a error en `astro.config.mjs`.

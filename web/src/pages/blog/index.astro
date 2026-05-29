@@ -1,0 +1,170 @@
+---
+import { getCollection } from 'astro:content';
+import DocsLayout from '../../layouts/DocsLayout.astro';
+
+const posts = (await getCollection('blog')).sort(
+  (a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf()
+);
+---
+
+<DocsLayout 
+  title="Blog Técnico LispCentral | LISP, AutoCAD & BIM"
+  description="Artigos avançados sobre AutoLISP, gestão de equipes de engenharia, integração BIM e tecnologia SaaS para escritórios de projeto."
+  keywords="blog autolisp, tutoriais lisp, autocad corporativo, bim manager, automação"
+>
+  <div class="blog-index">
+    <header class="index-header">
+      <h1>Engineering <span>Blog</span></h1>
+      <p>Artigos técnicos, guias de automação e estratégias corporativas para BIM Managers e Coordenadores de Projeto.</p>
+    </header>
+
+    <div class="posts-grid">
+      {posts.map((post) => (
+        <a href={`/blog/${post.slug}/`} class="post-card">
+          {post.data.heroImage && (
+            <div class="image-wrapper">
+              <img src={post.data.heroImage} alt={post.data.title} loading="lazy" />
+            </div>
+          )}
+          <div class="content">
+            <div class="meta">
+              <span class="date">
+                {post.data.pubDate.toLocaleDateString('pt-BR', {
+                  year: 'numeric',
+                  month: 'short',
+                  day: 'numeric',
+                })}
+              </span>
+            </div>
+            <h2 class="title">{post.data.title}</h2>
+            <p class="description">{post.data.description}</p>
+            <div class="tags">
+              {post.data.tags?.slice(0, 3).map((tag) => (
+                <span class="tag">#{tag}</span>
+              ))}
+            </div>
+          </div>
+        </a>
+      ))}
+    </div>
+  </div>
+</DocsLayout>
+
+<style>
+  .blog-index {
+    max-width: 1000px;
+    margin: 0 auto;
+  }
+
+  .index-header {
+    text-align: center;
+    margin-bottom: 40px;
+    padding: 20px 0;
+  }
+
+  .index-header h1 {
+    font-size: clamp(2.5rem, 5vw, 3.5rem);
+    font-weight: 800;
+    color: var(--text-main);
+    margin-bottom: 15px;
+    letter-spacing: -0.02em;
+  }
+
+  .index-header h1 span {
+    color: var(--tmd-orange);
+  }
+
+  .index-header p {
+    font-size: 1.2rem;
+    color: var(--text-muted);
+    max-width: 600px;
+    margin: 0 auto;
+    line-height: 1.6;
+  }
+
+  .posts-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 30px;
+  }
+
+  .post-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    overflow: hidden;
+    text-decoration: none;
+    transition: transform 0.2s, border-color 0.2s;
+    display: flex;
+    flex-direction: column;
+    color: var(--text-main);
+  }
+
+  .post-card:hover {
+    transform: translateY(-4px);
+    border-color: rgba(242, 109, 33, 0.4);
+  }
+
+  .image-wrapper {
+    height: 200px;
+    width: 100%;
+    overflow: hidden;
+    border-bottom: 1px solid var(--border-color);
+  }
+
+  .image-wrapper img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.3s;
+  }
+
+  .post-card:hover .image-wrapper img {
+    transform: scale(1.05);
+  }
+
+  .content {
+    padding: 25px;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .meta {
+    font-size: 0.85rem;
+    color: var(--tmd-orange);
+    font-weight: 600;
+    margin-bottom: 10px;
+  }
+
+  .title {
+    font-size: 1.4rem;
+    color: var(--text-main);
+    font-weight: 700;
+    line-height: 1.3;
+    margin-bottom: 10px;
+  }
+
+  .description {
+    font-size: 0.95rem;
+    color: var(--text-muted);
+    line-height: 1.5;
+    margin-bottom: 20px;
+    flex: 1;
+  }
+
+  .tags {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin-top: auto;
+  }
+
+  .tag {
+    font-size: 0.8rem;
+    color: #888;
+    background: rgba(255, 255, 255, 0.05);
+    padding: 2px 8px;
+    border-radius: 4px;
+  }
+</style>

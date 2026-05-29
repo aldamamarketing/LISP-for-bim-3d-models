@@ -397,25 +397,149 @@
       text-align: center;
       border-top: 1px solid var(--panel-border);
     }
+
+    .hidden {
+      display: none !important;
+    }
+
+    /* -------------------------------------------
+       RESPONSIVE RIBBON MODE (Horizontal Layout) 
+       Se activa en paneles muy anchos (ej. anclaje superior/inferior)
+       ------------------------------------------- */
+    @media (min-width: 650px) {
+      body {
+        padding: 8px;
+        flex-direction: column;
+      }
+      
+      .top-ribbon-bar {
+        display: flex;
+        flex-direction: row;
+        align-items: flex-start;
+        gap: 16px;
+        margin-bottom: 12px;
+      }
+      
+      .search-container {
+        width: 320px;
+        flex-shrink: 0;
+        margin-bottom: 0;
+      }
+      
+      #favoritesSection {
+        flex: 1;
+        margin-bottom: 0;
+        display: flex;
+        flex-direction: column-reverse; /* Título abajo como en Ribbon */
+        overflow: hidden;
+      }
+      
+      #favoritesSection.hidden {
+        display: none !important;
+      }
+
+      /* Lista Horizontal Principal */
+      .modules-list {
+        flex-direction: row;
+        flex-wrap: nowrap;
+        overflow-x: auto;
+        overflow-y: hidden;
+        align-items: flex-start;
+        padding-bottom: 8px; /* Para el scroll */
+      }
+      
+      .modules-list::-webkit-scrollbar {
+        height: 8px;
+      }
+
+      /* Paneles Estilo AutoCAD Ribbon (Wrapper dinámico) */
+      .ribbon-panel {
+        display: flex;
+        flex-direction: column-reverse; /* Título de categoría abajo */
+        border-right: 1px solid var(--panel-border);
+        padding-right: 12px;
+        margin-right: 12px;
+        height: 100%;
+        min-width: fit-content;
+      }
+      
+      .ribbon-panel:last-child {
+        border-right: none;
+        margin-right: 0;
+      }
+
+      .group-header {
+        margin-top: 8px;
+        padding: 4px;
+        justify-content: center;
+      }
+
+      .group-header span:first-child {
+        border-left: none;
+        padding-left: 0;
+        color: var(--text-muted);
+        text-align: center;
+        width: 100%;
+      }
+
+      /* Contenedor que apila iconos en columnas (max 3 filas por ej) */
+      .group-container {
+        display: flex;
+        flex-direction: column;
+        flex-wrap: wrap;
+        align-content: flex-start;
+        gap: 4px;
+        margin-top: 0;
+        /* Restringimos la altura para forzar a que envuelva en nuevas columnas */
+        max-height: 110px; 
+      }
+      
+      /* Reducir los ítems para que quepan 3 apilados verticalmente */
+      .module-item {
+        height: 32px;
+        padding: 4px 6px;
+        width: 160px; /* Ancho fijo para las columnas */
+      }
+
+      .module-icon-container {
+        width: 20px;
+        height: 20px;
+      }
+      
+      .module-name {
+        font-size: 10px;
+      }
+
+      .module-friendly-name {
+        display: none; /* Ocultamos el friendly en Ribbon por espacio */
+      }
+
+      .palette-footer {
+        display: none; /* Ocultamos footer en modo Ribbon para ahorrar altura */
+      }
+    }
   </style>
 </head>
 <body>
 
-  <!-- Spotlight Search & Chips -->
-  <div class="search-container">
-    <input type="text" class="search-input" id="searchInput" placeholder="Escriba tags (ej: arq, pared) y presione Enter">
-    <svg class="search-icon" viewBox="0 0 24 24">
-      <path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/>
-    </svg>
-    <div class="chips-container" id="chipsContainer"></div>
-  </div>
-
-  <!-- Favoritos -->
-  <div id="favoritesSection" style="display: none; margin-bottom: 20px;">
-    <div class="group-header">
-      <span>FAVORITOS (PINNED)</span>
+  <!-- TOP RIBBON BAR (Search + Favoritos en modo horizontal) -->
+  <div class="top-ribbon-bar">
+    <!-- Spotlight Search & Chips -->
+    <div class="search-container">
+      <input type="text" class="search-input" id="searchInput" placeholder="Escriba tags (ej: arq, pared) y presione Enter">
+      <svg class="search-icon" viewBox="0 0 24 24">
+        <path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/>
+      </svg>
+      <div class="chips-container" id="chipsContainer"></div>
     </div>
-    <div class="group-container" id="favoritesList"></div>
+
+    <!-- Favoritos -->
+    <div id="favoritesSection" class="hidden">
+      <div class="group-header">
+        <span>FAVORITOS (PINNED)</span>
+      </div>
+      <div class="group-container" id="favoritesList"></div>
+    </div>
   </div>
 
   <!-- Estatus del Sincronizador -->

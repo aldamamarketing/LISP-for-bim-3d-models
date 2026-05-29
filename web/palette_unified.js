@@ -125,11 +125,11 @@ function renderFavorites() {
   const pinnedMods = modulesData.filter(mod => favorites.includes(mod.name));
   
   if (pinnedMods.length === 0) {
-    section.style.display = "none";
+    section.classList.add("hidden");
     return;
   }
   
-  section.style.display = "block";
+  section.classList.remove("hidden");
   
   pinnedMods.forEach(mod => {
     const item = document.createElement("div");
@@ -242,6 +242,11 @@ function renderModules() {
     const list = groups[groupName];
     const groupId = groupName.replace(/[^a-zA-Z0-9]/g, "-").toLowerCase();
     
+    // Wrapper para Ribbon Mode
+    const ribbonPanel = document.createElement("div");
+    ribbonPanel.className = "ribbon-panel";
+    ribbonPanel.id = `ribbon-panel-${groupId}`;
+    
     // Crear cabecera de grupo
     const header = document.createElement("div");
     header.className = "group-header";
@@ -250,7 +255,7 @@ function renderModules() {
       <span>${groupName}</span>
       <span class="group-count" id="group-count-${groupId}">${list.length}</span>
     `;
-    container.appendChild(header);
+    ribbonPanel.appendChild(header);
     
     // Contenedor de comandos del grupo
     const groupContainer = document.createElement("div");
@@ -293,7 +298,8 @@ function renderModules() {
       groupContainer.appendChild(item);
     });
     
-    container.appendChild(groupContainer);
+    ribbonPanel.appendChild(groupContainer);
+    container.appendChild(ribbonPanel);
   });
 }
 
@@ -318,8 +324,8 @@ function filterModules() {
   Object.keys(groups).forEach(groupName => {
     const list = groups[groupName];
     const groupId = groupName.replace(/[^a-zA-Z0-9]/g, "-").toLowerCase();
+    const ribbonPanel = document.getElementById(`ribbon-panel-${groupId}`);
     const header = document.getElementById(`group-header-${groupId}`);
-    const container = document.getElementById(`group-container-${groupId}`);
     
     let visibleCount = 0;
     
@@ -350,17 +356,15 @@ function filterModules() {
       }
     });
     
-    // Ocultar cabeceras vacías
+    // Ocultar/Mostrar el panel envolvente
     if (visibleCount === 0) {
-      if (header) header.style.display = "none";
-      if (container) container.style.display = "none";
+      if (ribbonPanel) ribbonPanel.classList.add("hidden");
     } else {
-      if (header) {
-        header.style.display = "flex";
+      if (ribbonPanel) {
+        ribbonPanel.classList.remove("hidden");
         const countBadge = document.getElementById(`group-count-${groupId}`);
         if (countBadge) countBadge.innerText = visibleCount;
       }
-      if (container) container.style.display = "grid";
     }
   });
 }
