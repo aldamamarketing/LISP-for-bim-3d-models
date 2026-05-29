@@ -621,18 +621,3 @@ REGLAS DE DISEÑO:
     return res.status(500).send("Error: " + error.message);
   }
 });
-
-exports.cleanAssets = onRequest({ cors: true }, async (req, res) => {
-  const db = getDb();
-  const snapshot = await db.collection('publicAssets').get();
-  if (snapshot.empty) {
-    res.json({ message: "No documents to delete." });
-    return;
-  }
-  const batch = db.batch();
-  snapshot.docs.forEach((doc) => {
-    batch.delete(doc.ref);
-  });
-  await batch.commit();
-  res.json({ message: `Deleted ${snapshot.docs.length} documents from publicAssets.` });
-});
