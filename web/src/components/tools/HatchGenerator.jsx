@@ -11,6 +11,7 @@ export default function HatchGenerator() {
   const [results, setResults] = useState([]);
   const [selectedHatches, setSelectedHatches] = useState([]);
   const [isExporting, setIsExporting] = useState(false);
+  const [isRevitFormat, setIsRevitFormat] = useState(false);
   const [zoomScale, setZoomScale] = useState(1);
   const [activeTab, setActiveTab] = useState('library');
   const [saving, setSaving] = useState(null);
@@ -81,6 +82,10 @@ export default function HatchGenerator() {
     setIsExporting(true);
     let combinedContent = "";
     
+    if (isRevitFormat) {
+      combinedContent += ";%TYPE=MODEL\n;%UNITS=MM\n\n";
+    }
+
     selectedHatches.forEach(h => {
       combinedContent += `*${h.filename}, ${h.description}\n`;
       combinedContent += h.patCode + "\n\n";
@@ -261,6 +266,20 @@ export default function HatchGenerator() {
               </strong>
               <span style={{ color: '#ccc' }}>{selectedHatches[selectedHatches.length - 1].description}</span>
             </div>
+            
+            <div style={{ marginBottom: '15px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <input 
+                type="checkbox" 
+                id="revitFormat" 
+                checked={isRevitFormat}
+                onChange={(e) => setIsRevitFormat(e.target.checked)}
+                style={{ cursor: 'pointer', width: '16px', height: '16px' }}
+              />
+              <label htmlFor="revitFormat" style={{ color: '#fff', fontSize: '0.85rem', cursor: 'pointer' }}>
+                Exportar para Revit (;%TYPE=MODEL)
+              </label>
+            </div>
+
             <button 
               className="btn-primary" 
               style={{ width: '100%' }}
