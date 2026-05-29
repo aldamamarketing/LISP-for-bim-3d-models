@@ -482,7 +482,7 @@ exports.generateLoader = onRequest({ cors: true }, async (req, res) => {
 });
 
 // Endpoint para el Generador de Iconos IA
-exports.generateIcons = onRequest({ cors: true, maxInstances: 10 }, async (req, res) => {
+exports.generateIcons = onRequest({ cors: true, maxInstances: 10, timeoutSeconds: 300 }, async (req, res) => {
   if (req.method !== "POST") {
     return res.status(405).send("Method Not Allowed");
   }
@@ -547,7 +547,7 @@ Debes responder ÚNICAMENTE con un objeto JSON (sin markdown, sin bloques de có
 });
 
 // Endpoint para generar Hatch Patterns (.pat)
-exports.generateHatch = onRequest({ cors: true, maxInstances: 10 }, async (req, res) => {
+exports.generateHatch = onRequest({ cors: true, maxInstances: 10, timeoutSeconds: 300 }, async (req, res) => {
   if (req.method !== "POST") return res.status(405).send("Method Not Allowed");
   const { prompts, theme } = req.body;
   if (!prompts || !Array.isArray(prompts)) return res.status(400).send("Bad Request");
@@ -581,7 +581,7 @@ REGLAS DE DISEÑO:
 });
 
 // Endpoint para generar Linetypes (.lin)
-exports.generateLinetype = onRequest({ cors: true, maxInstances: 10 }, async (req, res) => {
+exports.generateLinetype = onRequest({ cors: true, maxInstances: 10, timeoutSeconds: 300 }, async (req, res) => {
   if (req.method !== "POST") return res.status(405).send("Method Not Allowed");
   const { prompts } = req.body;
   if (!prompts || !Array.isArray(prompts)) return res.status(400).send("Bad Request");
