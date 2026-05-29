@@ -47,8 +47,8 @@ export default function LibraryPanel({ currentType, searchQuery = '' }) {
     if (activeCategory !== 'Todas' && a.category !== activeCategory) return false;
     if (searchQuery && searchQuery.trim().length > 2) {
       const lowerQ = searchQuery.toLowerCase();
-      // Verificamos si alguna de las palabras clave del usuario está en el título
-      const keywords = lowerQ.split(/[\n, ]+/).filter(k => k.length > 3);
+      // Verificamos si alguna de las palabras clave del usuario está en el título o descripción
+      const keywords = lowerQ.split(/[\n, ]+/).filter(k => k.length >= 2);
       if (keywords.length > 0) {
         const textToSearch = `${a.name || ''} ${a.description || ''}`.toLowerCase();
         const matches = keywords.some(k => textToSearch.includes(k));

@@ -561,8 +561,11 @@ Contexto: ${theme}
 REGLAS DE DISEÑO:
 1. El código PAT debe ser válido matemáticamente. Cada línea define: ángulo, x-origen, y-origen, delta-x, delta-y, y opcionalmente los dashes (trazo, espacio).
 2. Genera exactamente 1 patrón de alta calidad por cada descripción.
-3. Formato de salida: Objeto JSON con una propiedad "results" que sea un Array con objetos: { "id": "uuid", "name": "Name in English", "category": "Architecture", "filename": "SHORT_NAME", "description": "Short description in English", "patCode": "0, 0,0, 0,10..." }. No incluyas la línea del nombre en el patCode. Devuelve SOLO las líneas matemáticas.
-4. FILTRO DE SEGURIDAD (CRÍTICO): RECHAZA categóricamente solicitudes con símbolos de odio, esvásticas, contenido adulto, cruces o discriminación. Devuelve un "results" vacío si detectas esto.`;
+3. PRECISIÓN ESTRUCTURAL Y DIMENSIONAL (CRÍTICO): 
+   - Respeta escrupulosamente la geometría solicitada (ej. "matajuntas" o "stretcher bond" NO es "herringbone" o "espina de pez").
+   - Si el usuario provee medidas (ej. 40x20cm, juntas de 1cm, ángulos), DEBES aplicar la matemática exacta para que las proporciones del Hatch reflejen esas medidas a escala 1:1.
+4. Formato de salida: Objeto JSON con una propiedad "results" que sea un Array con objetos: { "id": "uuid", "name": "Name in English", "category": "Architecture", "filename": "SHORT_NAME", "description": "DETAILED description in English including ALL units and dimensions (e.g., 40x20cm bricks with 1cm joints)", "patCode": "0, 0,0, 0,10..." }. No incluyas la línea del nombre en el patCode. Devuelve SOLO las líneas matemáticas.
+5. FILTRO DE SEGURIDAD (CRÍTICO): RECHAZA categóricamente solicitudes con símbolos de odio, esvásticas, contenido adulto, cruces o discriminación. Devuelve un "results" vacío si detectas esto.`;
 
     const userPrompt = `Descripciones:\n${prompts.join('\n')}`;
 
@@ -593,9 +596,10 @@ Genera definiciones de tipos de línea complejos (.lin) basados en estas descrip
 
 REGLAS DE DISEÑO:
 1. El código LIN define la secuencia de pluma: trazo (positivo), espacio (negativo), punto (0), y texto/formas.
-2. Formato de salida: Objeto JSON con una propiedad "results" que sea un Array con objetos: { "id": "uuid", "name": "Line Name in English", "category": "Engineering", "filename": "SHORT_NAME", "description": "Short description in English", "linCode": "A,10,-5..." }.
-3. Devuelve SOLO la definición de la línea (empieza por A), NO incluyas el asterisco (*Nombre).
-4. FILTRO DE SEGURIDAD (CRÍTICO): RECHAZA solicitudes con símbolos de odio, contenido adulto o discriminación devolviendo un "results" vacío.`;
+2. PRECISIÓN (CRÍTICO): Si el usuario provee medidas o textos, aplícalos de forma exacta en la definición LIN.
+3. Formato de salida: Objeto JSON con una propiedad "results" que sea un Array con objetos: { "id": "uuid", "name": "Line Name in English", "category": "Engineering", "filename": "SHORT_NAME", "description": "DETAILED description in English including specs", "linCode": "A,10,-5..." }.
+4. Devuelve SOLO la definición de la línea (empieza por A), NO incluyas el asterisco (*Nombre).
+5. FILTRO DE SEGURIDAD (CRÍTICO): RECHAZA solicitudes con símbolos de odio, contenido adulto o discriminación devolviendo un "results" vacío.`;
 
     const userPrompt = `Descripciones:\n${prompts.join('\n')}`;
 
