@@ -183,14 +183,15 @@
           (if (>= space_left needed)
             (progn
               (setq placed t)
-              (setq new_bins (append new_bins (list (list (- space_left needed) (append (cadr bin) (list piece))))))
+              (setq new_bins (cons (list (- space_left needed) (append (cadr bin) (list piece))) new_bins))
             )
-            (setq new_bins (append new_bins (list bin)))
+            (setq new_bins (cons bin new_bins))
           )
         )
-        (setq new_bins (append new_bins (list bin)))
+        (setq new_bins (cons bin new_bins))
       )
     )
+    (setq new_bins (reverse new_bins))
     (if (not placed)
       (setq new_bins (append new_bins (list (list (- BAR_LEN len) (list piece)))))
     )
@@ -214,10 +215,11 @@
   (while (< i (sslength ss))
     (setq ent (ssname ss i))
     (if (not (member ent wires))
-      (setq wires (append wires (list ent)))
+      (setq wires (cons ent wires))
     )
     (setq i (1+ i))
   )
+  (setq wires (reverse wires))
   
   (setq counter 1)
   (foreach ent wires
@@ -230,12 +232,13 @@
       (progn
         (setq pos (strcat "m" (itoa counter)))
         (setq counter (1+ counter))
-        (setq dict (append dict (list (cons key pos))))
+        (setq dict (cons (cons key pos) dict))
       )
     )
     
     (vlax-ldata-put ent "TMD_POS" pos)
   )
+  (setq dict (reverse dict))
   (princ (strcat "\n[OK] Numeracao concluida. " (itoa (1- counter)) " marcas geradas.\n"))
   (princ)
 )
@@ -254,10 +257,11 @@
   (while (< i (sslength ss))
     (setq ent (ssname ss i))
     (if (not (member ent wires))
-      (setq wires (append wires (list ent)))
+      (setq wires (cons ent wires))
     )
     (setq i (1+ i))
   )
+  (setq wires (reverse wires))
   
   (foreach ent wires
     (setq pos (vlax-ldata-get ent "TMD_POS"))
@@ -269,9 +273,10 @@
     (setq itemData (cdr (assoc key dict)))
     (if itemData
       (setq dict (subst (cons key (list (1+ (car itemData)) pos nome comp)) (assoc key dict) dict))
-      (setq dict (append dict (list (cons key (list 1 pos nome comp)))))
+      (setq dict (cons (cons key (list 1 pos nome comp)) dict))
     )
   )
+  (setq dict (reverse dict))
   
   (setq itemList (mapcar 'cdr dict))
   (setq itemList (vl-sort itemList '(lambda (a b) (< (cadr a) (cadr b)))))
@@ -366,17 +371,19 @@
         
         (setq p_list nil)
         ;; Expandir cantidad
-        (repeat qtd (setq p_list (append p_list (list (cons comp pos)))))
+        (repeat qtd (setq p_list (cons (cons comp pos) p_list)))
+        (setq p_list (reverse p_list))
         
         (setq perfilData (assoc perfil dict))
         (if perfilData
           (setq dict (subst (cons perfil (append (cdr perfilData) p_list)) perfilData dict))
-          (setq dict (append dict (list (cons perfil p_list))))
+          (setq dict (cons (cons perfil p_list) dict))
         )
       )
     )
     (setq i (1+ i))
   )
+  (setq dict (reverse dict))
   
   (if (not dict)
     (progn (princ "\n[ERRO] Nenhuma tabela contem LData valido de Montagem.") (exit))
@@ -399,9 +406,10 @@
       (setq entry (assoc str grouped_bins))
       (if entry
         (setq grouped_bins (subst (cons str (1+ (cdr entry))) entry grouped_bins))
-        (setq grouped_bins (append grouped_bins (list (cons str 1))))
+        (setq grouped_bins (cons (cons str 1) grouped_bins))
       )
     )
+    (setq grouped_bins (reverse grouped_bins))
     (setq allProfiles (append allProfiles (list (list perfil totalBarras grouped_bins))))
   )
   
