@@ -5,6 +5,7 @@ import { auth } from '../../firebase';
 import { onAuthStateChanged } from 'firebase/auth';
 import HatchPreview from './HatchPreview';
 import LibraryPanel from './LibraryPanel';
+import ToastContainer, { showToast } from '../Toast';
 
 export default function HatchGenerator() {
   const [theme, setTheme] = useState('Arquitectura');
@@ -58,6 +59,14 @@ export default function HatchGenerator() {
   };
 
   const handleSaveToFavorites = async (hatch) => {
+    if (!user) {
+      showToast(
+        'Crie uma conta gratuita para salvar nos favoritos e usar direto no AutoCAD. <a href="/login?redirect=' + encodeURIComponent(window.location.pathname) + '" style="color:#f26d21;font-weight:bold;text-decoration:underline">Criar conta →</a>',
+        'warning',
+        6000
+      );
+      return;
+    }
     setSaving(hatch.id);
     try {
       const assetData = {
@@ -70,9 +79,9 @@ export default function HatchGenerator() {
       };
       await saveToGlobalLibrary(assetData);
       await addToFavorites(hatch.id);
-      alert('Adicionado aos Favoritos e à Biblioteca Pública!');
+      showToast('Adicionado aos Favoritos com sucesso! ⭐', 'success');
     } catch (error) {
-      alert(error.message);
+      showToast(error.message, 'error');
     }
     setSaving(null);
   };
@@ -110,9 +119,17 @@ export default function HatchGenerator() {
     URL.revokeObjectURL(url);
     
     setIsExporting(false);
+
+    // CTA cloud post-descarga
+    showToast(
+      '📥 Download concluído! <strong>Dica:</strong> Com o LispCentral Loader, você usa esses hatches direto no AutoCAD sem baixar arquivos. <a href="/dashboard" style="color:#f26d21;font-weight:bold;text-decoration:underline">Saiba mais →</a>',
+      'info',
+      8000
+    );
   };
 
   return (
+    <>
     <div className="icon-gen-container" style={{ '--preview-bg': '#1a1a1a', '--preview-fg': '#ffffff' }}>
       
       {/* 1. CONFIGURACIÓN */}
@@ -298,18 +315,26 @@ export default function HatchGenerator() {
                 {isExporting ? 'Empacotando...' : 'Baixar Arquivo .PAT'}
               </button>
             ) : (
-              <button 
-                className="btn-primary" 
-                style={{ width: '100%', backgroundColor: '#555', fontSize: '0.85rem' }}
-                onClick={() => window.location.href = '/login?redirect=/pt/tools/hatch-generator'}
-              >
-                Iniciar sessão para Baixar / Usar no AutoCAD
-              </button>
+              <>
+                <button 
+                  className="btn-primary" 
+                  style={{ width: '100%' }}
+                  onClick={handleExport}
+                  disabled={isExporting}
+                >
+                  {isExporting ? 'Empacotando...' : 'Baixar Arquivo .PAT'}
+                </button>
+                <div style={{ marginTop: '8px', padding: '8px 12px', backgroundColor: 'rgba(242,109,33,0.08)', border: '1px solid rgba(242,109,33,0.2)', borderRadius: '6px', fontSize: '0.8rem', color: '#ccc', textAlign: 'center' }}>
+                  💡 <a href={'/login?redirect=' + encodeURIComponent('/pt/tools/hatch-generator')} style={{ color: '#f26d21', textDecoration: 'none', fontWeight: 'bold' }}>Crie uma conta</a> para salvar nos favoritos e usar direto no AutoCAD.
+                </div>
+              </>
             )}
           </div>
         )}
       </div>
 
     </div>
+    <ToastContainer />
+    </>
   );
 }

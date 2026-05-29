@@ -11,9 +11,9 @@
 (setq *TMD-ACADVER* (getvar "ACADVER"))
 
 ;; Funcao profissional para Dialog Box (Yes/No)
-(defun TMD:MsgBox (title msg type / wsh res)
-  (if (setq wsh (vlax-create-object "WScript.Shell"))
-    (progn
+(defun TMD:MsgBox (title msg type / wsh res) 
+  (if (setq wsh (vlax-create-object "WScript.Shell")) 
+    (progn 
       (setq res (vlax-invoke-method wsh 'Popup msg 0 title type))
       (vlax-release-object wsh)
       res
@@ -23,13 +23,13 @@
 )
 
 ;; Funcao utilitaria para codificar espacos na URL
-(defun LC:url-encode (str / res i len char)
+(defun LC:url-encode (str / res i len char) 
   (setq res "")
   (setq i 1)
   (setq len (strlen str))
-  (while (<= i len)
+  (while (<= i len) 
     (setq char (substr str i 1))
-    (if (= char " ")
+    (if (= char " ") 
       (setq res (strcat res "%20"))
       (setq res (strcat res char))
     )
@@ -39,46 +39,62 @@
 )
 
 ;; Funcao para baixar e avaliar codigo na memoria do AutoCAD sem gravar arquivos fisicos (Online-Only)
-(defun LC:load-remote-routine (lisp_id / xmlhttp url status response)
+(defun LC:load-remote-routine (lisp_id / xmlhttp url status response) 
   (princ (strcat "\n[TM Digital] Baixando pacote '" lisp_id "'..."))
   ;; Usamos token y lispId como parametros semanticos
-  (setq url (strcat *TMD-API-ENDPOINT* "?token=" *TMD-SEAT-TOKEN* "&hwId=" (LC:url-encode *TMD-HWID*) "&lispId=" lisp_id))
+  (setq url (strcat *TMD-API-ENDPOINT* 
+                    "?token="
+                    *TMD-SEAT-TOKEN*
+                    "&hwId="
+                    (LC:url-encode *TMD-HWID*)
+                    "&lispId="
+                    lisp_id
+            )
+  )
   (setq xmlhttp (vlax-create-object "MSXML2.XMLHTTP.6.0"))
-  (if xmlhttp
-    (progn
-      (vl-catch-all-apply
-        '(lambda ()
+  (if xmlhttp 
+    (progn 
+      (vl-catch-all-apply 
+        '(lambda () 
            (vlax-invoke-method xmlhttp 'open "GET" url :vlax-false)
            (vlax-invoke-method xmlhttp 'send)
          )
       )
       (setq status (vl-catch-all-apply 'vlax-get-property (list xmlhttp 'status)))
-      (if (= status 200)
-        (progn
+      (if (= status 200) 
+        (progn 
           (setq response (vlax-get-property xmlhttp 'responseText))
           ;; Executa o codigo em RAM de forma isolada (backend ja entrega minificado e com progn)
-          (if (vl-catch-all-error-p (vl-catch-all-apply 'eval (list (read response))))
-            (progn
+          (if 
+            (vl-catch-all-error-p (vl-catch-all-apply 'eval (list (read response))))
+            (progn 
               (princ (strcat "\n[❌] Erro de sintaxe na rotina: " lisp_id))
               (setvar "USERS1" (strcat lisp_id ":error"))
               nil
             )
-            (progn
+            (progn 
               (setvar "USERS1" (strcat lisp_id ":success"))
               (princ (strcat "\n[✔] Rotina '" lisp_id "' carregada na RAM."))
               t
             )
           )
         )
-        (progn
-          (princ (strcat "\n[❌] Falha ao baixar '" lisp_id "' (Status: " (vl-princ-to-string status) ")."))
+        (progn 
+          (princ 
+            (strcat "\n[❌] Falha ao baixar '" 
+                    lisp_id
+                    "' (Status: "
+                    (vl-princ-to-string status)
+                    ")."
+            )
+          )
           (setvar "USERS1" (strcat lisp_id ":error"))
           nil
         )
       )
       (vlax-release-object xmlhttp)
     )
-    (progn
+    (progn 
       (princ "\n[❌] Falha ao instanciar o objeto XMLHTTP.")
       (setvar "USERS1" (strcat lisp_id ":error"))
       nil
@@ -88,9 +104,9 @@
 )
 
 ;; Mapeamento de nome de arquivo para o comando real definido em LISP
-(defun LC:get-command-name (routine_name / r-upper)
+(defun LC:get-command-name (routine_name / r-upper) 
   (setq r-upper (strcase routine_name))
-  (cond
+  (cond 
     ((= r-upper "ABAPARAM") "ABA_PARAM")
     ((= r-upper "ABAPERFIL") "ABA_PERFIL")
     ((= r-upper "ACMMVP") "ACM")
@@ -108,77 +124,209 @@
 (if (not *LC-LOADED-ROUTINES*) (setq *LC-LOADED-ROUTINES* nil))
 
 ;; Funcao para rodar um comando com JIT Loading
-(defun LC:run-or-load (lisp_id / cmd-name cmd-sym)
+(defun LC:run-or-load (lisp_id / cmd-name cmd-sym) 
   (setq cmd-name (LC:get-command-name lisp_id))
   (setq cmd-sym (read (strcat "c:" cmd-name)))
-  
-  (if (not (member lisp_id *LC-LOADED-ROUTINES*))
-    (progn
-      (princ (strcat "\n[TM Digital] Comando '" cmd-name "' nao esta na RAM. Fazendo JIT Load..."))
+
+  (if (not (member lisp_id *LC-LOADED-ROUTINES*)) 
+    (progn 
+      (princ 
+        (strcat "\n[TM Digital] Comando '" 
+                cmd-name
+                "' nao esta na RAM. Fazendo JIT Load..."
+        )
+      )
       (LC:load-remote-routine lisp_id)
       (setq *LC-LOADED-ROUTINES* (cons lisp_id *LC-LOADED-ROUTINES*))
     )
   )
-  
-  (if (member lisp_id *LC-LOADED-ROUTINES*)
-    (progn
+
+  (if (member lisp_id *LC-LOADED-ROUTINES*) 
+    (progn 
       (eval (list cmd-sym))
     )
-    (alert (strcat "\n[❌] Erro: Nao foi possivel carregar o comando JIT: " cmd-name))
+    (alert 
+      (strcat "\n[❌] Erro: Nao foi possivel carregar o comando JIT: " cmd-name)
+    )
   )
   (princ)
 )
 
 ;; Registro instantaneo de Ghost Commands (Stubs) para JIT Loading Zero-Disk
-(defun LC:register-ghosts (/ cmds)
+(defun LC:register-ghosts (/ cmds) 
   (princ "\n[LispCentral] Injetando Ghost Commands (JIT)...")
-  (setq cmds '(("ABA_PARAM" "AbaParam") ("ABA_PERFIL" "AbaPerfil") ("ACM" "AcmMVP") ("ABA_CRIAR" "AcmTools")
-               ("CORTARPAREDE" "CortarParedes") ("VIGA" "EstruturaMVP") ("PAREDE" "ParedeMVP")
-               ("PORTA" "PortaMVP") ("TELHADO" "TejadoMVP") ("BOM" "TMD_BOM") ("JOINTS" "TMD_JOINTS")
-               ("BUILD" "TMD_BUILD") ("WIRES" "TMD_Wires") ("NIVEIS" "TMD_Niveis") ("SYNC" "TMD_SYNC")
-               ("TAGS" "TMD_Tags") ("MATCH" "TMD_MATCH") ("ALIGN" "TMD_Align") ("GROUPS" "TMD_Groups")
-               ("FACECUT" "TMD_FACE_CUT") ("TABLAS" "TMD_Tablas") ("CNC" "TMD_CNC")
-               ("TR25" "TMD_Teja_TR25") ("UTILS" "TMD_Utils") ("LC_CLEAN" "LC_CLEAN") 
-               ("LC_FLATZ" "LC_FLATZ") ("LC_ZLABEL" "LC_ZLABEL")
-               ("ARQ-SYS-Config" "ARQ-SYS-Config") ("ARQ-GRID-Axes" "ARQ-GRID-Axes") ("ARQ-GRID-Line" "ARQ-GRID-Line")
-               ("ARQ-WALL-Draw" "ARQ-WALL-Draw") ("ARQ-WALL-FromAxis" "ARQ-WALL-FromAxis") ("ARQ-WALL-Thickness" "ARQ-WALL-Thickness")
-               ("ARQ-WALL-Trim" "ARQ-WALL-Trim") ("ARQ-COL-Insert" "ARQ-COL-Insert") ("ARQ-DOOR-Insert" "ARQ-DOOR-Insert")
-               ("ARQ-WIN-Insert" "ARQ-WIN-Insert") ("ARQ-WALL-MoveOpening" "ARQ-WALL-MoveOpening") ("ARQ-WALL-ResizeOpening" "ARQ-WALL-ResizeOpening")
-               ("ARQ-DIM-Opening" "ARQ-DIM-Opening") ("ARQ-DIM-Quick" "ARQ-DIM-Quick") ("ARQ-SYM-Level" "ARQ-SYM-Level")))
-  (foreach item cmds
-    (eval (list 'defun (read (strcat "c:" (car item))) '()
-                (list 'LC:run-or-load (cadr item))
-          ))
+  (setq cmds '(("ABA_PARAM" "AbaParam")
+               ("ABA_PERFIL" "AbaPerfil")
+               ("ACM" "AcmMVP")
+               ("ABA_CRIAR" "AcmTools")
+               ("CORTARPAREDE" "CortarParedes")
+               ("VIGA" "EstruturaMVP")
+               ("PAREDE" "ParedeMVP")
+               ("PORTA" "PortaMVP")
+               ("TELHADO" "TejadoMVP")
+               ("BOM" "TMD_BOM")
+               ("JOINTS" "TMD_JOINTS")
+               ("BUILD" "TMD_BUILD")
+               ("WIRES" "TMD_Wires")
+               ("NIVEIS" "TMD_Niveis")
+               ("SYNC" "TMD_SYNC")
+               ("TAGS" "TMD_Tags")
+               ("MATCH" "TMD_MATCH")
+               ("ALIGN" "TMD_Align")
+               ("GROUPS" "TMD_Groups")
+               ("FACECUT" "TMD_FACE_CUT")
+               ("TABLAS" "TMD_Tablas")
+               ("CNC" "TMD_CNC")
+               ("TR25" "TMD_Teja_TR25")
+               ("UTILS" "TMD_Utils")
+               ("LC_CLEAN" "LC_CLEAN")
+               ("LC_FLATZ" "LC_FLATZ")
+               ("LC_ZLABEL" "LC_ZLABEL")
+               ("ARQ-SYS-Config" "ARQ-SYS-Config")
+               ("ARQ-GRID-Axes" "ARQ-GRID-Axes")
+               ("ARQ-GRID-Line" "ARQ-GRID-Line")
+               ("ARQ-WALL-Draw" "ARQ-WALL-Draw")
+               ("ARQ-WALL-FromAxis" "ARQ-WALL-FromAxis")
+               ("ARQ-WALL-Thickness" "ARQ-WALL-Thickness")
+               ("ARQ-WALL-Trim" "ARQ-WALL-Trim")
+               ("ARQ-COL-Insert" "ARQ-COL-Insert")
+               ("ARQ-DOOR-Insert" "ARQ-DOOR-Insert")
+               ("ARQ-WIN-Insert" "ARQ-WIN-Insert")
+               ("ARQ-WALL-MoveOpening" "ARQ-WALL-MoveOpening")
+               ("ARQ-WALL-ResizeOpening" "ARQ-WALL-ResizeOpening")
+               ("ARQ-DIM-Opening" "ARQ-DIM-Opening")
+               ("ARQ-DIM-Quick" "ARQ-DIM-Quick")
+               ("ARQ-SYM-Level" "ARQ-SYM-Level")
+              )
+  )
+  (foreach item cmds 
+    (eval 
+      (list 'defun 
+            (read (strcat "c:" (car item)))
+            '()
+            (list 'LC:run-or-load (cadr item))
+      )
+    )
   )
   (princ " OK.")
 )
 (LC:register-ghosts)
 
+;; --------------------------------------------------------------------------
+;; RESOURCE PALETTE: Funciones para aplicar Hatches y Linetypes desde favoritos
+;; --------------------------------------------------------------------------
+
+;; Decodifica Base64 (simplificado, para ASCII/PAT/LIN)
+(defun LC:b64-decode (b64str / idx ch val buf result pad charset) 
+  (setq charset "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/")
+  (setq result ""
+        buf    0
+        idx    1
+        pad    0
+  )
+  (while (<= idx (strlen b64str)) 
+    (setq ch (substr b64str idx 1))
+    (if (= ch "=") 
+      (progn (setq pad (1+ pad)) (setq idx (1+ idx)))
+      (progn 
+        (setq val (1- (vl-string-search ch charset)))
+        (if (and val (>= val 0)) 
+          (progn 
+            (setq buf (logior (lsh buf 6) val))
+            (if (= 0 (rem idx 4)) 
+              (progn 
+                (setq result (strcat result 
+                                     (chr (logand (lsh buf -16) 255))
+                                     (chr (logand (lsh buf -8) 255))
+                                     (chr (logand buf 255))
+                             )
+                )
+                (setq buf 0)
+              )
+            )
+          )
+        )
+        (setq idx (1+ idx))
+      )
+    )
+  )
+  result
+)
+
+;; Aplica un Hatch desde la paleta de recursos
+(defun LC_ApplyHatch (patName codeB64 / tmpDir tmpFile f decoded) 
+  (setq tmpDir (getenv "TEMP"))
+  (setq tmpFile (strcat tmpDir "\\LC_" patName ".pat"))
+  (setq decoded (LC:b64-decode codeB64))
+  (setq f (open tmpFile "w"))
+  (if f 
+    (progn 
+      (write-line (strcat "*" patName ", LispCentral Cloud Resource") f)
+      (write-line decoded f)
+      (close f)
+      ;; Agregar ruta de busqueda temporalmente
+      (setvar "HPNAME" patName)
+      (setenv "ACAD" (strcat (getenv "ACAD") ";" tmpDir))
+      (princ 
+        (strcat "\n[LC] Hachura '" patName "' disponível. Use HATCH para aplicar.")
+      )
+    )
+    (princ "\n[LC] Erro ao criar arquivo temporário de hachura.")
+  )
+  (princ)
+)
+
+;; Aplica un Linetype desde la paleta de recursos
+(defun LC_ApplyLinetype (linName codeB64 / tmpDir tmpFile f decoded) 
+  (setq tmpDir (getenv "TEMP"))
+  (setq tmpFile (strcat tmpDir "\\LC_" linName ".lin"))
+  (setq decoded (LC:b64-decode codeB64))
+  (setq f (open tmpFile "w"))
+  (if f 
+    (progn 
+      (write-line (strcat "*" linName ", LispCentral Cloud Resource") f)
+      (write-line decoded f)
+      (close f)
+      ;; Cargar el linetype en el dibujo actual
+      (vl-cmdf "._-LINETYPE" "_Load" linName tmpFile "")
+      (princ (strcat "\n[LC] Linha '" linName "' carregada com sucesso."))
+    )
+    (princ "\n[LC] Erro ao criar arquivo temporário de linha.")
+  )
+  (princ)
+)
+
 
 ;; --------------------------------------------------------------------------
 ;; EVENT HUB: Reactor de Cambio de Documento para Paletas Web (LC_SESSION_HUB)
 ;; --------------------------------------------------------------------------
-(defun LC:DocChanged-Callback (reactorObj eventList / activeDoc f-js event-js bridge-dir find-path)
+(defun LC:DocChanged-Callback (reactorObj eventList / activeDoc f-js event-js 
+                               bridge-dir find-path
+                              ) 
   ;; Se dispara cuando el usuario cambia de pestaña de dibujo
-  (vl-catch-all-apply
-    '(lambda ()
+  (vl-catch-all-apply 
+    '(lambda () 
        ;; Encontramos la ruta para crear el archivo temporal de inyección
        (setq find-path (findfile "LC_Loader.lsp"))
-       (if find-path
+       (if find-path 
          (setq bridge-dir (vl-filename-directory find-path))
          (setq bridge-dir "Z:/Autocad Config/LISP")
        )
-       
+
        ;; Inyectamos un pequeño script JS que dispara el evento global
        (setq event-js (strcat bridge-dir "/web/LC_DocEvent.js"))
        (setq event-js (vl-string-translate "\\" "/" event-js))
-       
+
        (setq f-js (open event-js "w"))
-       (if f-js
-         (progn
+       (if f-js 
+         (progn 
            (write-line "if (typeof window !== 'undefined') {" f-js)
-           (write-line "    window.dispatchEvent(new CustomEvent('lc_context_changed'));" f-js)
-           (write-line "    console.log('[LC Event Hub] Cambio de documento activo notificado a las paletas.');" f-js)
+           (write-line "    window.dispatchEvent(new CustomEvent('lc_context_changed'));" 
+                       f-js
+           )
+           (write-line "    console.log('[LC Event Hub] Cambio de documento activo notificado a las paletas.');" 
+                       f-js
+           )
            (write-line "}" f-js)
            (close f-js)
            ;; Disparamos el script en el entorno de AutoCAD
@@ -190,99 +338,133 @@
   (princ)
 )
 
-(defun LC:Init-EventHub ()
+(defun LC:Init-EventHub () 
   (vl-load-com)
   ;; Desregistrar si ya existe (prevención de errores)
-  (if (and (boundp '*LC-DOC-REACTOR*) *LC-DOC-REACTOR*)
+  (if (and (boundp '*LC-DOC-REACTOR*) *LC-DOC-REACTOR*) 
     (vlr-remove *LC-DOC-REACTOR*)
   )
   ;; Registrar el reactor de cambio de documento
-  (setq *LC-DOC-REACTOR*
-    (vlr-docmanager-reactor 
-      nil 
-      (list (cons :vlr-documentBecameCurrent 'LC:DocChanged-Callback))
-    )
+  (setq *LC-DOC-REACTOR* (vlr-docmanager-reactor 
+                           nil
+                           (list 
+                             (cons :vlr-documentBecameCurrent 
+                                   'LC:DocChanged-Callback
+                             )
+                           )
+                         )
   )
   (princ "\n[LC Event Hub] Reactor Global de Sesión Inicializado.")
 )
 
-;; Comando Principal de la Paleta Unificada (CP1) - Patrón Singleton
-(defun c:CP1 (/ doc find-path bridge-dir html-path loader-js f-js)
+;; Comando Principal de la Paleta Unificada (CP1)
+;; addPalette ya maneja singleton: si existe la enfoca, si fue cerrada la reabre
+(defun c:CP1 (/ doc find-path bridge-dir html-path loader-js f-js) 
   (vl-load-com)
   (setq doc (vla-get-ActiveDocument (vlax-get-acad-object)))
   (vla-StartUndoMark doc)
-  
-  ;; VERIFICACIÓN SINGLETON (Blackboard)
-  ;; Si la paleta ya fue cargada en esta sesión de AutoCAD, no la duplicamos
-  (if (not (vl-bb-ref 'LC_PALETTE_LOADED))
-    (progn
-      (princ "\n[⚙] Carregando LispCentral Command Palette (Primera vez en la sesión)...")
-      
-      ;; 1. Localizar o diretório
-      (setq find-path (findfile "LC_Loader.lsp"))
-      (if find-path
-        (setq bridge-dir (vl-filename-directory find-path))
-        (if (vl-file-directory-p "Z:/Autocad Config/LISP")
-          (setq bridge-dir "Z:/Autocad Config/LISP")
-          (setq bridge-dir "C:/Users/TM PROJETOS/Downloads")
+
+  (princ "\n[⚙] Abrindo LispCentral Palette...")
+
+  ;; 1. Localizar o diretório
+  (setq find-path (findfile "LC_Loader.lsp"))
+  (if find-path 
+    (setq bridge-dir (vl-filename-directory find-path))
+    (if (vl-file-directory-p "Z:/Autocad Config/LISP") 
+      (setq bridge-dir "Z:/Autocad Config/LISP")
+      (setq bridge-dir "C:/Users/TM PROJETOS/Downloads")
+    )
+  )
+
+  ;; 2. Construir o caminho (URL)
+  (setq html-path (strcat bridge-dir "/web/inspector_unified.html"))
+  (setq html-path (vl-string-translate "\\" "/" html-path))
+
+  (if (not (vl-string-search "file:///" html-path)) 
+    (if (= (substr html-path 1 1) "/") 
+      (setq html-path (strcat "file://" html-path))
+      (setq html-path (strcat "file:///" html-path))
+    )
+  )
+
+  (while (vl-string-search " " html-path) 
+    (setq html-path (vl-string-subst "%20" " " html-path))
+  )
+
+  ;; Cachear la URL para que siempre sea idéntica (previene duplicados)
+  (if (not (boundp '*LC-PALETTE-URL*))
+    (setq *LC-PALETTE-URL* (strcat html-path "?token=" *TMD-SEAT-TOKEN* "&hwid=" *TMD-HWID*))
+  )
+
+  ;; 3. Inyectar/Reabrir Palette via JS
+  (setq loader-js (strcat bridge-dir "/web/LC_Palette_Loader.js"))
+  (setq loader-js (vl-string-translate "\\" "/" loader-js))
+
+  (setq f-js (open loader-js "w"))
+  (if f-js 
+    (progn 
+      (write-line "if (typeof Acad !== 'undefined') {" f-js)
+      ;; Intentar remover la paleta existente antes de re-agregarla (previene duplicados)
+      (write-line "    try { Acad.Application.removePalette('Command Palette'); } catch(e) {}" f-js)
+      (write-line 
+        (strcat "    Acad.Application.addPalette(\"Command Palette\", \"" 
+                *LC-PALETTE-URL*
+                "\");"
         )
+        f-js
       )
-      
-      ;; 2. Construir o caminho (URL)
-      (setq html-path (strcat bridge-dir "/web/inspector_unified.html"))
-      (setq html-path (vl-string-translate "\\" "/" html-path))
-      
-      (if (not (vl-string-search "file:///" html-path))
-        (if (= (substr html-path 1 1) "/")
-          (setq html-path (strcat "file://" html-path))
-          (setq html-path (strcat "file:///" html-path))
-        )
+      (write-line "    Acad.Editor.writeMessage(\"\\n[✔] LispCentral Palette pronta.\\n\");" 
+                  f-js
       )
-      
-      (while (vl-string-search " " html-path)
-        (setq html-path (vl-string-subst "%20" " " html-path))
+      (write-line "} else {" f-js)
+      (write-line "    console.error(\"[❌] API de JavaScript de AutoCAD não detectada.\");" 
+                  f-js
       )
-      
-      (setq html-path (strcat html-path "?token=" *TMD-SEAT-TOKEN* "&hwid=" *TMD-HWID*))
-      
-      ;; 3. Inyectar Palette
-      (setq loader-js (strcat bridge-dir "/web/LC_Palette_Loader.js"))
-      (setq loader-js (vl-string-translate "\\" "/" loader-js))
-      
-      (setq f-js (open loader-js "w"))
-      (if f-js
-        (progn
-          (write-line "if (typeof Acad !== 'undefined') {" f-js)
-          (write-line (strcat "    Acad.Application.addPalette(\"Command Palette\", \"" html-path "\");") f-js)
-          (write-line "    Acad.Editor.writeMessage(\"\\n[✔] LispCentral Palette carregada com sucesso.\\n\");" f-js)
-          (write-line "} else {" f-js)
-          (write-line "    console.error(\"[❌] Error: API de JavaScript de AutoCAD no detectada.\");" f-js)
-          (write-line "}" f-js)
-          (close f-js)
-          
-          (vl-cmdf "_.WEBLOAD" "_L" (strcat "\"" loader-js "\""))
-          
-          ;; 4. Inicializar Reactores y marcar Singleton
+      (write-line "}" f-js)
+      (close f-js)
+
+      (vl-cmdf "_.WEBLOAD" "_L" (strcat "\"" loader-js "\""))
+
+      ;; Inicializar EventHub (solo la primera vez)
+      (if (not (vl-bb-ref 'LC_PALETTE_LOADED)) 
+        (progn 
           (LC:Init-EventHub)
           (vl-bb-set 'LC_PALETTE_LOADED T)
         )
-        (princ "\n[❌] Error: Não foi possível criar o arquivo JS da paleta.")
       )
     )
-    (progn
-      ;; Si ya está cargada, solo avisamos y podríamos lanzar un focus event aquí.
-      (princ "\n[ℹ] La LispCentral Palette ya se encuentra activa en esta sesión.")
-    )
+    (princ "\n[❌] Erro: Não foi possível criar o arquivo JS da paleta.")
   )
-  
+
   (vla-EndUndoMark doc)
   (princ)
 )
 
-;; Alias Oficiales
+;; Alias Oficiales (comandos intuitivos para reabrir la paleta)
 (defun c:LC_INSPECT () (c:CP1))
 (defun c:TMD_INSPECT () (c:CP1))
+(defun c:LC () (c:CP1))
+(defun c:PALETA () (c:CP1))
+(defun c:PALETTE () (c:CP1))
+
+;; Comando de ajuda
+(defun c:LC_HELP () 
+  (princ "\n")
+  (princ "\n  ╔══════════════════════════════════════════════════╗")
+  (princ "\n  ║       LISPCENTRAL — COMANDOS DISPONÍVEIS         ║")
+  (princ "\n  ╠══════════════════════════════════════════════════╣")
+  (princ "\n  ║                                                  ║")
+  (princ "\n  ║  LC / PALETA / CP1 .. Abrir Command Palette      ║")
+  (princ "\n  ║  LC_HELP ........... Mostrar esta ajuda          ║")
+  (princ "\n  ║                                                  ║")
+  (princ "\n  ║  Dica: Se fechou a paleta, basta digitar LC      ║")
+  (princ "\n  ║  na linha de comando para reabri-la.             ║")
+  (princ "\n  ║                                                  ║")
+  (princ "\n  ╚══════════════════════════════════════════════════╝")
+  (princ "\n")
+  (princ)
+)
 
 ;; Arranque Automático del Loader
 (c:CP1)
-(princ)
+(princ "\n[LispCentral] Digite LC para abrir a paleta. LC_HELP para ajuda.")

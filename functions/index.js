@@ -393,6 +393,48 @@ exports.generateLoader = onRequest({ cors: true }, async (req, res) => {
   (princ "\\n[LC Event Hub] Reactor Global de Sesión Inicializado.")
 )
 
+;; --------------------------------------------------------------------------
+;; RESOURCE PALETTE: Aplicar Hatches e Linetypes dos favoritos cloud
+;; --------------------------------------------------------------------------
+
+;; Aplica um Hatch recebido da paleta de recursos (dados em Base64)
+(defun LC_ApplyHatch (patName codeB64 / tmpDir tmpFile f)
+  (setq tmpDir (getenv "TEMP"))
+  (setq tmpFile (strcat tmpDir "\\\\LC_" patName ".pat"))
+  (setq f (open tmpFile "w"))
+  (if f
+    (progn
+      (write-line (strcat "*" patName ", LispCentral Cloud") f)
+      ;; Decodifica Base64 inline: el frontend envia el patCode codificado
+      (write-line (vl-catch-all-apply 'eval (list (read (strcat "(LC:b64d \\"" codeB64 "\\")")))) f)
+      (close f)
+      (setenv "ACAD" (strcat (getenv "ACAD") ";" tmpDir))
+      (setvar "HPNAME" patName)
+      (princ (strcat "\\\\n[LC] Hachura '" patName "' pronta. Use HATCH."))
+    )
+    (princ "\\\\n[LC] Erro ao salvar hachura temp.")
+  )
+  (princ)
+)
+
+;; Aplica um Linetype recebido da paleta de recursos
+(defun LC_ApplyLinetype (linName codeB64 / tmpDir tmpFile f)
+  (setq tmpDir (getenv "TEMP"))
+  (setq tmpFile (strcat tmpDir "\\\\LC_" linName ".lin"))
+  (setq f (open tmpFile "w"))
+  (if f
+    (progn
+      (write-line (strcat "*" linName ", LispCentral Cloud") f)
+      (write-line (vl-catch-all-apply 'eval (list (read (strcat "(LC:b64d \\"" codeB64 "\\")")))) f)
+      (close f)
+      (vl-cmdf "._-LINETYPE" "_Load" linName tmpFile "")
+      (princ (strcat "\\\\n[LC] Linha '" linName "' carregada."))
+    )
+    (princ "\\\\n[LC] Erro ao salvar linha temp.")
+  )
+  (princ)
+)
+
 ;; Comando Principal Manual de la Paleta Unificada (Fuerza la reapertura o el foco)
 (defun c:CP1 (/ doc find-path bridge-dir html-path loader-js f-js)
   (vl-load-com)
@@ -467,13 +509,34 @@ exports.generateLoader = onRequest({ cors: true }, async (req, res) => {
   (princ)
 )
 
-;; Alias Oficiales
+;; Alias Oficiales (comandos intuitivos para reabrir la paleta)
 (defun c:LC_INSPECT () (c:CP1))
 (defun c:TMD_INSPECT () (c:CP1))
+(defun c:LC () (c:CP1))          ;; Alias corto y fácil de recordar
+(defun c:PALETA () (c:CP1))      ;; Alias en portugués
+(defun c:PALETTE () (c:CP1))     ;; Alias en inglés
+
+;; Comando de ajuda: lista todos los comandos disponibles
+(defun c:LC_HELP ()
+  (princ "\\\\n")
+  (princ "\\\\n  ╔══════════════════════════════════════════════════╗")
+  (princ "\\\\n  ║       LISPCENTRAL — COMANDOS DISPONÍVEIS        ║")
+  (princ "\\\\n  ╠══════════════════════════════════════════════════╣")
+  (princ "\\\\n  ║                                                  ║")
+  (princ "\\\\n  ║  LC / PALETA / CP1 .. Abrir Command Palette      ║")
+  (princ "\\\\n  ║  LC_HELP ........... Mostrar esta ajuda          ║")
+  (princ "\\\\n  ║                                                  ║")
+  (princ "\\\\n  ║  Dica: Se fechou a paleta, basta digitar LC      ║")
+  (princ "\\\\n  ║  na linha de comando para reabri-la.             ║")
+  (princ "\\\\n  ║                                                  ║")
+  (princ "\\\\n  ╚══════════════════════════════════════════════════╝")
+  (princ "\\\\n")
+  (princ)
+)
 
 ;; Arranque Automático del Loader (Solo la primera vez)
 (LC:AutoStart)
-(princ)
+(princ "\\\\n[LispCentral] Digite LC para abrir a paleta. LC_HELP para ajuda.")
 `;
 
   res.setHeader("Content-Disposition", 'attachment; filename="LC_Loader.lsp"');
@@ -619,5 +682,49 @@ REGLAS DE DISEÑO:
   } catch (error) {
     console.error("Error generando linetype:", error);
     return res.status(500).send("Error: " + error.message);
+  }
+});
+
+// Endpoint para que la paleta embebida en AutoCAD obtenga los favoritos del usuario
+// Autenticación por apiKey (token del Loader), sin necesidad de Firebase Auth SDK
+exports.getUserResources = onRequest({ cors: true }, async (req, res) => {
+  const token = req.query.token || req.query.apiKey;
+  const type = req.query.type || 'hatch'; // 'hatch', 'lin', 'icon'
+
+  if (!token) {
+    return res.status(400).json({ error: "Token ausente." });
+  }
+
+  try {
+    const db = getDb();
+
+    // Buscar usuario por apiKey
+    const userSnap = await db.collection("users").where("apiKey", "==", token).limit(1).get();
+    if (userSnap.empty) {
+      return res.status(401).json({ error: "Token inválido." });
+    }
+
+    const userDoc = userSnap.docs[0];
+    const userId = userDoc.id;
+
+    // Obtener IDs de favoritos del usuario
+    const favSnap = await db.collection(`users/${userId}/favorites`).get();
+    const favIds = favSnap.docs.map(d => d.id);
+
+    if (favIds.length === 0) {
+      return res.status(200).json([]);
+    }
+
+    // Obtener los assets públicos que coincidan con los favoritos y el tipo
+    const assetsSnap = await db.collection("publicAssets").where("type", "==", type).get();
+    const results = assetsSnap.docs
+      .filter(d => favIds.includes(d.id))
+      .map(d => ({ id: d.id, ...d.data() }));
+
+    res.setHeader("Cache-Control", "public, max-age=30"); // Cache corto para sync rápido
+    return res.status(200).json(results);
+  } catch (err) {
+    console.error("Error en getUserResources:", err);
+    return res.status(500).json({ error: "Erro interno." });
   }
 });

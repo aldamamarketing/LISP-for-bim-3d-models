@@ -5,6 +5,7 @@ import { auth } from '../../firebase';
 import { onAuthStateChanged } from 'firebase/auth';
 import LinetypePreview from './LinetypePreview';
 import LibraryPanel from './LibraryPanel';
+import ToastContainer, { showToast } from '../Toast';
 
 export default function LinetypeGenerator() {
   const [prompts, setPrompts] = useState('Línea de Gas (Texto "GAS")\nLínea con puntos y trazos largos');
@@ -65,6 +66,14 @@ export default function LinetypeGenerator() {
   };
 
   const handleSaveToFavorites = async (line) => {
+    if (!user) {
+      showToast(
+        'Crie uma conta gratuita para salvar nos favoritos e usar direto no AutoCAD. <a href="/login?redirect=' + encodeURIComponent(window.location.pathname) + '" style="color:#f26d21;font-weight:bold;text-decoration:underline">Criar conta →</a>',
+        'warning',
+        6000
+      );
+      return;
+    }
     setSaving(line.id);
     try {
       const assetData = {
@@ -77,9 +86,9 @@ export default function LinetypeGenerator() {
       };
       await saveToGlobalLibrary(assetData);
       await addToFavorites(line.id);
-      alert('Adicionado aos Favoritos e à Biblioteca Pública!');
+      showToast('Adicionado aos Favoritos com sucesso! ⭐', 'success');
     } catch (error) {
-      alert(error.message);
+      showToast(error.message, 'error');
     }
     setSaving(null);
   };
@@ -104,9 +113,16 @@ export default function LinetypeGenerator() {
     URL.revokeObjectURL(url);
     
     setIsExporting(false);
+
+    showToast(
+      '📥 Download concluído! <strong>Dica:</strong> Com o LispCentral Loader, você usa essas linhas direto no AutoCAD sem baixar arquivos. <a href="/dashboard" style="color:#f26d21;font-weight:bold;text-decoration:underline">Saiba mais →</a>',
+      'info',
+      8000
+    );
   };
 
   return (
+    <>
     <div className="icon-gen-container" style={{ '--preview-bg': '#1a1a1a', '--preview-fg': '#ffffff' }}>
       
       {/* 1. CONFIGURACIÓN */}
@@ -268,18 +284,26 @@ export default function LinetypeGenerator() {
                 {isExporting ? 'Empacotando...' : 'Baixar Arquivo .LIN'}
               </button>
             ) : (
-              <button 
-                className="btn-primary" 
-                style={{ width: '100%', backgroundColor: '#555', fontSize: '0.85rem' }}
-                onClick={() => window.location.href = '/login?redirect=/pt/tools/linetype-generator'}
-              >
-                Iniciar sessão para Baixar / Usar no AutoCAD
-              </button>
+              <>
+                <button 
+                  className="btn-primary" 
+                  style={{ width: '100%' }}
+                  onClick={handleExport}
+                  disabled={isExporting}
+                >
+                  {isExporting ? 'Empacotando...' : 'Baixar Arquivo .LIN'}
+                </button>
+                <div style={{ marginTop: '8px', padding: '8px 12px', backgroundColor: 'rgba(242,109,33,0.08)', border: '1px solid rgba(242,109,33,0.2)', borderRadius: '6px', fontSize: '0.8rem', color: '#ccc', textAlign: 'center' }}>
+                  💡 <a href={'/login?redirect=' + encodeURIComponent('/pt/tools/linetype-generator')} style={{ color: '#f26d21', textDecoration: 'none', fontWeight: 'bold' }}>Crie uma conta</a> para salvar nos favoritos e usar direto no AutoCAD.
+                </div>
+              </>
             )}
           </div>
         )}
       </div>
 
     </div>
+    <ToastContainer />
+    </>
   );
 }

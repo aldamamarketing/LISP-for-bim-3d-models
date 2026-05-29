@@ -5,6 +5,7 @@ import { saveToGlobalLibrary, addToFavorites } from '../../utils/library';
 import { auth } from '../../firebase';
 import { onAuthStateChanged } from 'firebase/auth';
 import LibraryPanel from './LibraryPanel';
+import ToastContainer, { showToast } from '../Toast';
 
 // Componente para renderizar SVG de forma segura
 const SvgPreview = ({ svgString }) => {
@@ -94,6 +95,14 @@ export default function IconGenerator() {
   };
 
   const handleSaveToFavorites = async (icon) => {
+    if (!user) {
+      showToast(
+        'Crie uma conta gratuita para salvar nos favoritos. <a href="/login?redirect=' + encodeURIComponent(window.location.pathname) + '" style="color:#f26d21;font-weight:bold;text-decoration:underline">Criar conta →</a>',
+        'warning',
+        6000
+      );
+      return;
+    }
     setSaving(icon.id);
     try {
       const assetData = {
@@ -106,9 +115,9 @@ export default function IconGenerator() {
       };
       await saveToGlobalLibrary(assetData);
       await addToFavorites(icon.id);
-      alert('Adicionado aos Favoritos e à Biblioteca Pública!');
+      showToast('Adicionado aos Favoritos com sucesso! ⭐', 'success');
     } catch (error) {
-      alert(error.message);
+      showToast(error.message, 'error');
     }
     setSaving(null);
   };
@@ -147,6 +156,7 @@ export default function IconGenerator() {
   };
 
   return (
+    <>
     <div 
       className="icon-gen-container"
       style={{
@@ -330,25 +340,30 @@ export default function IconGenerator() {
             </div>
           )}
 
-          {user ? (
-            <button 
-              className="btn-primary" 
-              style={{ flexShrink: 0 }}
-              disabled={selectedIcons.length === 0 || isExporting}
-              onClick={handleExport}
-            >
-              {isExporting ? "Empacotando..." : "2. Baixar Pacote (.zip)"}
-            </button>
-          ) : (
-            <button 
-              className="btn-primary" 
-              style={{ flexShrink: 0, backgroundColor: '#555', fontSize: '0.85rem' }}
-              disabled={selectedIcons.length === 0}
-              onClick={() => window.location.href = '/login?redirect=/pt/tools/icon-generator'}
-            >
-              Iniciar sessão para Baixar / Usar no AutoCAD
-            </button>
-          )}
+            {user ? (
+              <button 
+                className="btn-primary" 
+                style={{ flexShrink: 0 }}
+                disabled={selectedIcons.length === 0 || isExporting}
+                onClick={handleExport}
+              >
+                {isExporting ? "Empacotando..." : "2. Baixar Pacote (.zip)"}
+              </button>
+            ) : (
+              <>
+                <button 
+                  className="btn-primary" 
+                  style={{ flexShrink: 0 }}
+                  disabled={selectedIcons.length === 0 || isExporting}
+                  onClick={handleExport}
+                >
+                  {isExporting ? "Empacotando..." : "2. Baixar Pacote (.zip)"}
+                </button>
+                <div style={{ marginTop: '8px', padding: '8px 12px', backgroundColor: 'rgba(242,109,33,0.08)', border: '1px solid rgba(242,109,33,0.2)', borderRadius: '6px', fontSize: '0.8rem', color: '#ccc', textAlign: 'center' }}>
+                  💡 <a href={'/login?redirect=' + encodeURIComponent('/pt/tools/icon-generator')} style={{ color: '#f26d21', textDecoration: 'none', fontWeight: 'bold' }}>Crie uma conta</a> para salvar nos favoritos.
+                </div>
+              </>
+            )}
           <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)', textAlign: 'center', marginTop: '10px' }}>
             Serão gerados 4 arquivos PNG (16x16 e 32x32 em Dark/Light mode) para cada ícone.
           </p>
@@ -356,5 +371,7 @@ export default function IconGenerator() {
       </div>
 
     </div>
+    <ToastContainer />
+    </>
   );
 }

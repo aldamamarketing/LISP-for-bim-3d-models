@@ -3,6 +3,7 @@ import { getUserFavorites, removeFromFavorites } from '../utils/library';
 import HatchPreview from './tools/HatchPreview';
 import LinetypePreview from './tools/LinetypePreview';
 import JSZip from 'jszip';
+import ToastContainer, { showToast } from './Toast';
 
 const SvgPreview = ({ svgString }) => (
   <div 
@@ -40,8 +41,9 @@ export default function FavoritesManager() {
       await removeFromFavorites(id);
       setFavorites(prev => prev.filter(f => f.id !== id));
       setSelectedIds(prev => prev.filter(selId => selId !== id));
+      showToast('Recurso removido dos favoritos.', 'info', 3000);
     } catch (e) {
-      alert("Error eliminando: " + e.message);
+      showToast('Erro ao remover: ' + e.message, 'error');
     }
   };
 
@@ -113,6 +115,7 @@ export default function FavoritesManager() {
   };
 
   return (
+    <>
     <div style={{ backgroundColor: '#111', color: '#fff', borderRadius: '8px', padding: '20px', minHeight: '600px' }}>
       <div style={{ marginBottom: '15px' }}>
         <a href="/dashboard" style={{ color: '#888', textDecoration: 'none', fontSize: '0.9rem', display: 'inline-flex', alignItems: 'center', gap: '5px' }}>
@@ -120,7 +123,7 @@ export default function FavoritesManager() {
         </a>
       </div>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '10px', marginBottom: '20px' }}>
-        <h2 style={{ color: 'var(--tmd-orange)', margin: 0 }}>Mis Recursos (Favoritos)</h2>
+        <h2 style={{ color: 'var(--tmd-orange)', margin: 0 }}>Meus Recursos (Favoritos)</h2>
         <div style={{ display: 'flex', gap: '15px', alignItems: 'center' }}>
           <input 
             type="text" 
@@ -266,8 +269,8 @@ export default function FavoritesManager() {
                 {activeTab === 'icon' ? `Baixar .ZIP (${selectedItems.length})` : `Baixar Único Arquivo (${selectedItems.length})`}
               </button>
 
-              <div style={{ marginTop: '10px', fontSize: '0.75rem', color: 'var(--text-muted)', textAlign: 'center' }}>
-                Com o Loader instalado, você não precisa baixar. Basta sincronizar sua paleta no AutoCAD.
+              <div style={{ marginTop: '10px', fontSize: '0.8rem', color: '#aaa', textAlign: 'center', padding: '10px', backgroundColor: 'rgba(242,109,33,0.05)', border: '1px solid rgba(242,109,33,0.15)', borderRadius: '6px' }}>
+                💡 <strong style={{ color: 'var(--tmd-orange)' }}>Dica Pro:</strong> Com o <a href="/dashboard" style={{ color: '#f26d21', textDecoration: 'underline' }}>Loader instalado</a>, seus favoritos ficam disponíveis direto na paleta do AutoCAD — sem precisar baixar nada.
               </div>
             </div>
 
@@ -276,5 +279,7 @@ export default function FavoritesManager() {
         </div>
       )}
     </div>
+    <ToastContainer />
+    </>
   );
 }

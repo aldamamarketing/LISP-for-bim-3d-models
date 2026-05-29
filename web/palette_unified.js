@@ -168,7 +168,7 @@ function renderFavorites() {
 
 async function initPalette() {
   try {
-    writeConsoleMessage("\n[LispCentral] Inicializando Command Palette asíncrona...");
+    writeConsoleMessage("[LispCentral] Palette conectada.");
     
     // 1. Obtener Índice dinámico de comandos desde el servidor SaaS (con cache busting)
     const indexUrl = `${BASE_ENDPOINT}?apiKey=${apiKey}&hwId=${hwId}&routine=INDEX&t=${Date.now()}`;
@@ -510,14 +510,11 @@ function runAutoCADCommand(cmdName) {
 function writeConsoleMessage(msg) {
   console.log(msg);
   if (typeof Acad !== 'undefined' && Acad.Editor) {
-    // Acad.Editor.writeMessage DOES NOT EXIST in JS API.
-    // To print to AutoCAD console, we execute a LISP princ.
-    // Escaping newlines and quotes to prevent LISP syntax errors.
-    const safeMsg = msg.replace(/\n/g, "\\n").replace(/"/g, '\\"');
+    // SOLO evaluateLisp — executeCommand inyecta \n que causa loops infinitos
+    const safeMsg = msg.replace(/"/g, '\\"');
     if (typeof Acad.Editor.evaluateLisp === 'function') {
-      Acad.Editor.evaluateLisp(`(princ "${safeMsg}")(princ)`);
-    } else if (typeof Acad.Editor.executeCommand === 'function') {
-      Acad.Editor.executeCommand(`(princ "${safeMsg}")(princ)\n`);
+      Acad.Editor.evaluateLisp(`(princ "\\n${safeMsg}")(princ)`);
     }
+    // NO usar executeCommand como fallback — causa re-ejecución de comandos
   }
 }

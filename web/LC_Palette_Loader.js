@@ -1,6 +1,7 @@
 if (typeof Acad !== 'undefined') {
-    Acad.Application.addPalette("Command Palette", "file:///Z:/Autocad%20Config/LISP/web/inspector_unified.html?token=lc_key_S5ggQl1Gk4f3&hwid=DESKTOP-UAMQ784@TM PROJETOS");
-    Acad.Editor.writeMessage("\n[\U+2714] LispCentral Palette carregada com sucesso.\n");
+    try { Acad.Application.removePalette('Command Palette'); } catch(e) {}
+    Acad.Application.addPalette("Command Palette", "file:///Z:/Autocad%20Config/LISP/web/inspector_unified.html?token={{SEAT_TOKEN}}&hwid=DESKTOP-UAMQ784@TM PROJETOS");
+    Acad.Editor.writeMessage("\n[\U+2714] LispCentral Palette pronta.\n");
 } else {
-    console.error("[\U+274C] Error: API de JavaScript de AutoCAD no detectada.");
+    console.error("[\U+274C] API de JavaScript de AutoCAD não detectada.");
 }
