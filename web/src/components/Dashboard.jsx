@@ -540,7 +540,6 @@ export default function Dashboard({ mode = 'dashboard' }) {
 
           {/* TAB: PROFILE */}
           {activeTab === 'profile' && (
-      {/* PROFILE CARD */}
       <div className="card" style={{ padding: '10px 20px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', margin: '0 0 20px 0', flexDirection: 'row', flexWrap: 'wrap', gap: '10px' }}>
         {isEditingProfile ? (
           <form onSubmit={handleUpdateProfile} style={{ display: 'flex', gap: '10px', alignItems: 'center', width: '100%' }}>
@@ -571,7 +570,6 @@ export default function Dashboard({ mode = 'dashboard' }) {
 
           {/* TAB: LICENSES */}
           {activeTab === 'licenses' && (
-      {/* SUBSCRIPTIONS & SEATS FOUNDATION (Moved UP) */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '20px', marginBottom: '20px' }}>
         
         {/* LICENSES & ACCESS */}
@@ -644,7 +642,6 @@ export default function Dashboard({ mode = 'dashboard' }) {
 
           {/* TAB: LISP */}
           {activeTab === 'lisp' && (
-      {/* WORKSPACE (Massive Upload & Table) - Moved DOWN */}
       <div className="card" style={{ marginBottom: '20px', overflowX: 'auto' }}>
         <h3 style={{ marginTop: 0, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           Workspace LISPs
@@ -815,7 +812,6 @@ export default function Dashboard({ mode = 'dashboard' }) {
 
           {/* FAQ (Shows inside Licenses) */}
           {activeTab === 'licenses' && (
-      {/* FAQ / HELP SECTION */}
       <div id="faq-section" className="card" style={{ marginBottom: '40px' }}>
         <h3 style={{ marginTop: 0 }}>Centro de Ajuda / FAQ</h3>
         <p style={{ fontSize: '0.9rem', color: 'var(--text-muted)' }}>Encontre respostas rápidas para os problemas mais comuns.</p>
