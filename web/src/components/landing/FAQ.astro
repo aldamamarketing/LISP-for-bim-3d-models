@@ -1,0 +1,37 @@
+---
+const faqs = [
+  {
+    question: "Como o LispCentral se integra ao meu AutoCAD?",
+    answer: "A integração é feita através de um conector leve no AutoCAD. Esse conector se comunica de forma segura e criptografada (HTTPS) com a nuvem do LispCentral, recebendo as rotinas e atualizações em tempo real, sem necessidade de instalações complexas."
+  },
+  {
+    question: "Meu código LISP intelectual fica exposto nos clientes?",
+    answer: "Nunca. O LispCentral utiliza compilação JIT (Just-In-Time) com injeção Zero-Disk. As rotinas LISP são transferidas criptografadas e compiladas diretamente na memória do AutoCAD do cliente. Nenhum arquivo .LSP é salvo no disco rígido."
+  },
+  {
+    question: "Preciso saber HTML para usar as Paletas Web?",
+    answer: "Absolutamente não. A plataforma se encarrega de renderizar e disponibilizar suas ferramentas nativas do AutoCAD através de Paletas Web prontas, responsivas e modernas. Você foca na engenharia, nós gerenciamos a interface visual."
+  },
+  {
+    question: "Posso vender ou gerenciar acessos para outras empresas?",
+    answer: "Sim. A arquitetura foi desenhada para Multi-Tenant B2B. Através do Portal SaaS, você pode criar licenças temporárias, revogar acessos instantaneamente e gerenciar 'seats' por escritório de engenharia."
+  }
+];
+---
+<section class="py-section-padding relative overflow-hidden bg-background border-t border-surface-variant">
+    <div class="max-w-[800px] mx-auto px-gutter relative z-10">
+        <div class="text-center mb-16">
+            <h2 class="font-headline-lg text-headline-lg text-white mb-4">Perguntas Frequentes</h2>
+            <p class="font-body-lg text-body-lg text-on-surface-variant">Tudo o que você precisa saber sobre segurança, integração e arquitetura da plataforma.</p>
+        </div>
+        
+        <div class="space-y-4">
+            {faqs.map((faq) => (
+                <div class="bg-[#0D0D0D] border border-[#262626] rounded-xl p-6 hover:border-primary-container/50 transition-colors shadow-lg">
+                    <h3 class="font-headline-md text-headline-md text-white text-[20px] mb-3">{faq.question}</h3>
+                    <p class="font-body-md text-body-md text-on-surface-variant leading-relaxed">{faq.answer}</p>
+                </div>
+            ))}
+        </div>
+    </div>
+</section>
