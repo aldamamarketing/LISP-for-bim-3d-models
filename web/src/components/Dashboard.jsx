@@ -588,7 +588,7 @@ export default function Dashboard({ mode = 'dashboard' }) {
                   <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
                     <div style={{ width: '24px', height: '24px', background: 'rgba(255,255,255,0.1)', borderRadius: '4px', padding: '2px', color: 'var(--tmd-orange)', display: 'flex', alignItems: 'center', justifyContent: 'center' }} dangerouslySetInnerHTML={{ __html: draft.svgIcon || '' }} />
                     <input type="file" accept=".svg" id={`svg-upload-draft-${i}`} style={{ display: 'none' }} onChange={(e) => handleSvgUpload(e, i, true)} />
-                    <button className="btn btn-secondary" style={{ padding: '2px 4px', fontSize: '0.7rem' }} onClick={() => document.getElementById(`svg-upload-draft-${i}`).click()} title="Upload SVG">📁</button>
+                    <button className="btn btn-secondary" style={{ padding: '2px 4px', fontSize: '0.7rem' }} onClick={() => document.getElementById(`svg-upload-draft-${i}`).click()} title="Upload SVG" aria-label="Fazer upload de ícone SVG">📁</button>
                   </div>
                   <input type="text" value={draft.svgIcon} onChange={e => updateDraft(i, 'svgIcon', e.target.value)} style={{ width: '100%', padding: '2px', background: 'var(--bg-darker)', border: '1px solid var(--border-color)', color: '#fff', fontSize: '0.7rem', marginTop: '4px' }} placeholder="<svg..." />
                 </td>
@@ -606,7 +606,7 @@ export default function Dashboard({ mode = 'dashboard' }) {
                 </td>
                 <td style={{ padding: '8px', textAlign: 'right' }}>
                   <span style={{ fontSize: '0.75rem', color: 'var(--tmd-orange)', marginRight: '10px' }}>Aguardando Upload</span>
-                  <button className="btn btn-secondary" onClick={() => removeDraft(i)} style={{ padding: '2px 6px', fontSize: '0.8rem', color: '#ff4444' }}>X</button>
+                  <button className="btn btn-secondary" onClick={() => removeDraft(i)} style={{ padding: '2px 6px', fontSize: '0.8rem', color: '#ff4444' }} aria-label="Remover rascunho">X</button>
                 </td>
               </tr>
             ))}
@@ -623,7 +623,7 @@ export default function Dashboard({ mode = 'dashboard' }) {
                       <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
                         <div style={{ width: '24px', height: '24px', background: 'rgba(255,255,255,0.1)', borderRadius: '4px', padding: '2px', color: 'var(--tmd-orange)', display: 'flex', alignItems: 'center', justifyContent: 'center' }} dangerouslySetInnerHTML={{ __html: editLispData.svgIcon || '' }} />
                         <input type="file" accept=".svg" id={`svg-upload-edit-${lisp.id}`} style={{ display: 'none' }} onChange={(e) => handleSvgUpload(e, null, false)} />
-                        <button className="btn btn-secondary" style={{ padding: '2px 4px', fontSize: '0.7rem' }} onClick={() => document.getElementById(`svg-upload-edit-${lisp.id}`).click()} title="Upload SVG">📁</button>
+                        <button className="btn btn-secondary" style={{ padding: '2px 4px', fontSize: '0.7rem' }} onClick={() => document.getElementById(`svg-upload-edit-${lisp.id}`).click()} title="Upload SVG" aria-label="Fazer upload de ícone SVG">📁</button>
                       </div>
                       <input type="text" value={editLispData.svgIcon} onChange={e => setEditLispData({...editLispData, svgIcon: e.target.value})} style={{ width: '100%', padding: '2px', background: 'var(--bg-darker)', border: '1px solid var(--tmd-orange)', color: '#fff', fontSize: '0.7rem', marginTop: '4px' }} placeholder="<svg..." />
                     </td>
@@ -692,7 +692,7 @@ export default function Dashboard({ mode = 'dashboard' }) {
         <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', marginTop: '20px' }}>
           
           <div style={{ border: '1px solid var(--panel-border)', borderRadius: '6px', overflow: 'hidden' }}>
-            <button style={{ width: '100%', textAlign: 'left', padding: '15px', background: 'var(--panel-bg)', border: 'none', color: '#fff', fontSize: '1rem', cursor: 'pointer', display: 'flex', justifyContent: 'space-between' }} onClick={() => setOpenFaq(openFaq === 1 ? null : 1)}>
+            <button aria-expanded={openFaq === 1} style={{ width: '100%', textAlign: 'left', padding: '15px', background: 'var(--panel-bg)', border: 'none', color: '#fff', fontSize: '1rem', cursor: 'pointer', display: 'flex', justifyContent: 'space-between' }} onClick={() => setOpenFaq(openFaq === 1 ? null : 1)}>
               <span>Como carrego meus LISPs no AutoCAD?</span>
               <span>{openFaq === 1 ? '▲' : '▼'}</span>
             </button>
@@ -704,7 +704,7 @@ export default function Dashboard({ mode = 'dashboard' }) {
           </div>
 
           <div style={{ border: '1px solid var(--panel-border)', borderRadius: '6px', overflow: 'hidden' }}>
-            <button style={{ width: '100%', textAlign: 'left', padding: '15px', background: 'var(--panel-bg)', border: 'none', color: '#fff', fontSize: '1rem', cursor: 'pointer', display: 'flex', justifyContent: 'space-between' }} onClick={() => setOpenFaq(openFaq === 2 ? null : 2)}>
+            <button aria-expanded={openFaq === 2} style={{ width: '100%', textAlign: 'left', padding: '15px', background: 'var(--panel-bg)', border: 'none', color: '#fff', fontSize: '1rem', cursor: 'pointer', display: 'flex', justifyContent: 'space-between' }} onClick={() => setOpenFaq(openFaq === 2 ? null : 2)}>
               <span>O que faço se atingir o limite de Equipamentos?</span>
               <span>{openFaq === 2 ? '▲' : '▼'}</span>
             </button>
@@ -716,7 +716,7 @@ export default function Dashboard({ mode = 'dashboard' }) {
           </div>
 
           <div style={{ border: '1px solid var(--panel-border)', borderRadius: '6px', overflow: 'hidden' }}>
-            <button style={{ width: '100%', textAlign: 'left', padding: '15px', background: 'var(--panel-bg)', border: 'none', color: '#fff', fontSize: '1rem', cursor: 'pointer', display: 'flex', justifyContent: 'space-between' }} onClick={() => setOpenFaq(openFaq === 3 ? null : 3)}>
+            <button aria-expanded={openFaq === 3} style={{ width: '100%', textAlign: 'left', padding: '15px', background: 'var(--panel-bg)', border: 'none', color: '#fff', fontSize: '1rem', cursor: 'pointer', display: 'flex', justifyContent: 'space-between' }} onClick={() => setOpenFaq(openFaq === 3 ? null : 3)}>
               <span>A Paleta não está atualizando meus LISPs novos. Por quê?</span>
               <span>{openFaq === 3 ? '▲' : '▼'}</span>
             </button>
