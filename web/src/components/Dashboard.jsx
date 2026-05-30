@@ -666,44 +666,44 @@ export default function Dashboard({ mode = 'dashboard' }) {
           {uniqueGroups.map(g => <option key={g} value={g} />)}
         </datalist>
 
-        <table style={{ width: '100%', minWidth: '850px', borderCollapse: 'collapse', fontSize: '0.9rem', textAlign: 'left' }}>
+        <table className="w-full text-left border-collapse">
           <thead>
-            <tr style={{ borderBottom: '1px solid var(--border-color)', color: 'var(--text-muted)' }}>
-              <th style={{ padding: '8px', width: '90px' }}>Ícone SVG</th>
-              <th style={{ padding: '8px', width: '250px' }}>Arquivo & Nome Amigável</th>
-              <th style={{ padding: '8px', width: '130px' }}>Suite</th>
-              <th style={{ padding: '8px', width: '130px' }}>Grupo</th>
-              <th style={{ padding: '8px', width: '150px', textAlign: 'right' }}>Ações</th>
+            <tr className="border-b border-[#262626] text-label-md font-label-md text-on-secondary-container">
+              <th className="pb-3 pl-4 font-normal w-[90px]">Ícone SVG</th>
+              <th className="pb-3 font-normal w-[250px]">Arquivo / Amigável</th>
+              <th className="pb-3 font-normal w-[130px]">Suite</th>
+              <th className="pb-3 font-normal w-[130px]">Grupo</th>
+              <th className="pb-3 pr-4 text-right font-normal w-[150px]">Ações</th>
             </tr>
           </thead>
           <tbody>
             
             {/* DRAFTS SECTION */}
             {draftLisps.map((draft, i) => (
-              <tr key={'draft-'+i} style={{ background: 'rgba(242, 109, 33, 0.05)', borderBottom: '1px solid var(--panel-border)' }}>
-                <td style={{ padding: '8px' }}>
-                  <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
-                    <div style={{ width: '24px', height: '24px', background: 'rgba(255,255,255,0.1)', borderRadius: '4px', padding: '2px', color: 'var(--tmd-orange)', display: 'flex', alignItems: 'center', justifyContent: 'center' }} dangerouslySetInnerHTML={{ __html: draft.svgIcon || '' }} />
-                    <input type="file" accept=".svg" id={`svg-upload-draft-${i}`} style={{ display: 'none' }} onChange={(e) => handleSvgUpload(e, i, true)} />
-                    <button className="btn btn-secondary" style={{ padding: '2px 4px', fontSize: '0.7rem' }} onClick={() => document.getElementById(`svg-upload-draft-${i}`).click()} title="Upload SVG">📁</button>
+              <tr key={'draft-'+i} className="border-b border-[#262626] bg-primary-container/5 hover:bg-[#1a1c1c] transition-colors group">
+                <td className="py-4 pl-4">
+                  <div className="flex gap-2 items-center">
+                    <div className="w-8 h-8 bg-white/5 rounded flex items-center justify-center text-primary-container" dangerouslySetInnerHTML={{ __html: draft.svgIcon || '' }} />
+                    <input type="file" accept=".svg" id={`svg-upload-draft-${i}`} className="hidden" onChange={(e) => handleSvgUpload(e, i, true)} />
+                    <button className="text-on-secondary-container hover:text-primary transition-colors" onClick={() => document.getElementById(`svg-upload-draft-${i}`).click()} title="Upload SVG"><span className="material-symbols-outlined text-[18px]">folder_open</span></button>
                   </div>
-                  <input type="text" value={draft.svgIcon} onChange={e => updateDraft(i, 'svgIcon', e.target.value)} style={{ width: '100%', padding: '2px', background: 'var(--bg-darker)', border: '1px solid var(--border-color)', color: '#fff', fontSize: '0.7rem', marginTop: '4px' }} placeholder="<svg..." />
+                  <input type="text" value={draft.svgIcon} onChange={e => updateDraft(i, 'svgIcon', e.target.value)} className="w-full mt-2 bg-[#0A0A0A] border border-[#262626] rounded text-[#888] text-[10px] p-1 font-mono" placeholder="<svg..." />
                 </td>
-                <td style={{ padding: '8px', color: '#fff' }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                    <span style={{ fontWeight: 'bold' }}>{draft.originalName}</span>
-                    <input type="text" value={draft.friendlyName} onChange={e => updateDraft(i, 'friendlyName', e.target.value)} style={{ flex: 1, padding: '4px', background: 'var(--bg-darker)', border: '1px solid var(--tmd-orange)', color: '#fff', fontSize: '0.85rem' }} placeholder="Nome amigável" />
+                <td className="py-4 text-white">
+                  <div className="flex flex-col gap-1 pr-2">
+                    <span className="font-bold font-code-sm text-code-sm">{draft.originalName}</span>
+                    <input type="text" value={draft.friendlyName} onChange={e => updateDraft(i, 'friendlyName', e.target.value)} className="w-full bg-[#141414] border border-primary-container/30 rounded text-white text-sm p-1.5 focus:border-primary-container focus:outline-none" placeholder="Nome amigável" />
                   </div>
                 </td>
-                <td style={{ padding: '8px' }}>
-                  <input list="suite-list" value={draft.suite} onChange={e => updateDraft(i, 'suite', e.target.value)} style={{ width: '100%', padding: '4px', background: 'var(--bg-darker)', border: '1px solid var(--border-color)', color: '#fff' }} />
+                <td className="py-4 pr-2">
+                  <input list="suite-list" value={draft.suite} onChange={e => updateDraft(i, 'suite', e.target.value)} className="w-full bg-[#141414] border border-[#262626] rounded text-white text-sm p-1.5 focus:border-primary-container focus:outline-none" />
                 </td>
-                <td style={{ padding: '8px' }}>
-                  <input list="group-list" value={draft.group} onChange={e => updateDraft(i, 'group', e.target.value)} style={{ width: '100%', padding: '4px', background: 'var(--bg-darker)', border: '1px solid var(--border-color)', color: '#fff' }} />
+                <td className="py-4 pr-2">
+                  <input list="group-list" value={draft.group} onChange={e => updateDraft(i, 'group', e.target.value)} className="w-full bg-[#141414] border border-[#262626] rounded text-white text-sm p-1.5 focus:border-primary-container focus:outline-none" />
                 </td>
-                <td style={{ padding: '8px', textAlign: 'right' }}>
-                  <span style={{ fontSize: '0.75rem', color: 'var(--tmd-orange)', marginRight: '10px' }}>Aguardando Upload</span>
-                  <button className="btn btn-secondary" onClick={() => removeDraft(i)} style={{ padding: '2px 6px', fontSize: '0.8rem', color: '#ff4444' }}>X</button>
+                <td className="py-4 pr-4 text-right">
+                  <span className="text-[11px] text-primary-container block mb-1">Aguardando Upload</span>
+                  <button className="text-on-secondary-container hover:text-error transition-colors" onClick={() => removeDraft(i)}><span className="material-symbols-outlined text-[18px]">delete</span></button>
                 </td>
               </tr>
             ))}
@@ -715,30 +715,30 @@ export default function Dashboard({ mode = 'dashboard' }) {
               if (isEditing) {
                 // EDIT MODE
                 return (
-                  <tr key={lisp.id} style={{ background: 'rgba(255, 255, 255, 0.05)', borderBottom: '1px solid var(--panel-border)' }}>
-                    <td style={{ padding: '8px' }}>
-                      <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
-                        <div style={{ width: '24px', height: '24px', background: 'rgba(255,255,255,0.1)', borderRadius: '4px', padding: '2px', color: 'var(--tmd-orange)', display: 'flex', alignItems: 'center', justifyContent: 'center' }} dangerouslySetInnerHTML={{ __html: editLispData.svgIcon || '' }} />
-                        <input type="file" accept=".svg" id={`svg-upload-edit-${lisp.id}`} style={{ display: 'none' }} onChange={(e) => handleSvgUpload(e, null, false)} />
-                        <button className="btn btn-secondary" style={{ padding: '2px 4px', fontSize: '0.7rem' }} onClick={() => document.getElementById(`svg-upload-edit-${lisp.id}`).click()} title="Upload SVG">📁</button>
+                  <tr key={lisp.id} className="border-b border-[#262626] bg-white/5 hover:bg-[#1a1c1c] transition-colors group">
+                    <td className="py-4 pl-4">
+                      <div className="flex gap-2 items-center">
+                        <div className="w-8 h-8 bg-white/5 rounded flex items-center justify-center text-primary-container" dangerouslySetInnerHTML={{ __html: editLispData.svgIcon || '' }} />
+                        <input type="file" accept=".svg" id={`svg-upload-edit-${lisp.id}`} className="hidden" onChange={(e) => handleSvgUpload(e, null, false)} />
+                        <button className="text-on-secondary-container hover:text-primary transition-colors" onClick={() => document.getElementById(`svg-upload-edit-${lisp.id}`).click()} title="Upload SVG"><span className="material-symbols-outlined text-[18px]">folder_open</span></button>
                       </div>
-                      <input type="text" value={editLispData.svgIcon} onChange={e => setEditLispData({...editLispData, svgIcon: e.target.value})} style={{ width: '100%', padding: '2px', background: 'var(--bg-darker)', border: '1px solid var(--tmd-orange)', color: '#fff', fontSize: '0.7rem', marginTop: '4px' }} placeholder="<svg..." />
+                      <input type="text" value={editLispData.svgIcon} onChange={e => setEditLispData({...editLispData, svgIcon: e.target.value})} className="w-full mt-2 bg-[#0A0A0A] border border-primary-container/50 rounded text-[#888] text-[10px] p-1 font-mono" placeholder="<svg..." />
                     </td>
-                    <td style={{ padding: '8px', color: '#fff' }}>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                        <span style={{ fontWeight: 'bold' }}>{lisp.originalName}</span>
-                        <input type="text" value={editLispData.friendlyName} onChange={e => setEditLispData({...editLispData, friendlyName: e.target.value})} style={{ flex: 1, padding: '4px', background: 'var(--bg-darker)', border: '1px solid var(--tmd-orange)', color: '#fff', fontSize: '0.85rem' }} placeholder="Nome amigável" />
+                    <td className="py-4 text-white">
+                      <div className="flex flex-col gap-1 pr-2">
+                        <span className="font-bold font-code-sm text-code-sm">{lisp.originalName}</span>
+                        <input type="text" value={editLispData.friendlyName} onChange={e => setEditLispData({...editLispData, friendlyName: e.target.value})} className="w-full bg-[#141414] border border-primary-container/50 rounded text-white text-sm p-1.5 focus:border-primary-container focus:outline-none" placeholder="Nome amigável" />
                       </div>
                     </td>
-                    <td style={{ padding: '8px' }}>
-                      <input list="suite-list" value={editLispData.suite} onChange={e => setEditLispData({...editLispData, suite: e.target.value})} style={{ width: '100%', padding: '4px', background: 'var(--bg-darker)', border: '1px solid var(--tmd-orange)', color: '#fff' }} />
+                    <td className="py-4 pr-2">
+                      <input list="suite-list" value={editLispData.suite} onChange={e => setEditLispData({...editLispData, suite: e.target.value})} className="w-full bg-[#141414] border border-primary-container/50 rounded text-white text-sm p-1.5 focus:border-primary-container focus:outline-none" />
                     </td>
-                    <td style={{ padding: '8px' }}>
-                      <input list="group-list" value={editLispData.group} onChange={e => setEditLispData({...editLispData, group: e.target.value})} style={{ width: '100%', padding: '4px', background: 'var(--bg-darker)', border: '1px solid var(--tmd-orange)', color: '#fff' }} />
+                    <td className="py-4 pr-2">
+                      <input list="group-list" value={editLispData.group} onChange={e => setEditLispData({...editLispData, group: e.target.value})} className="w-full bg-[#141414] border border-primary-container/50 rounded text-white text-sm p-1.5 focus:border-primary-container focus:outline-none" />
                     </td>
-                    <td style={{ padding: '8px', textAlign: 'right' }}>
-                      <button className="btn" onClick={handleSaveEdit} style={{ padding: '4px 8px', fontSize: '0.8rem', marginRight: '5px' }}>Salvar</button>
-                      <button className="btn btn-secondary" onClick={handleCancelEdit} style={{ padding: '4px 8px', fontSize: '0.8rem' }}>Cancelar</button>
+                    <td className="py-4 pr-4 text-right">
+                      <button className="bg-primary-container text-white px-3 py-1.5 rounded text-xs font-bold hover:bg-[#e66000] transition-colors mb-1 shadow-sm w-full" onClick={handleSaveEdit}>Salvar</button>
+                      <button className="bg-transparent border border-[#262626] text-on-secondary-container hover:text-white px-3 py-1.5 rounded text-xs transition-colors w-full" onClick={handleCancelEdit}>Cancelar</button>
                     </td>
                   </tr>
                 );
@@ -746,24 +746,27 @@ export default function Dashboard({ mode = 'dashboard' }) {
 
               // VIEW MODE
               return (
-                <tr key={lisp.id} style={{ borderBottom: '1px solid var(--panel-border)' }}>
-                  <td style={{ padding: '8px' }}>
-                    <div style={{ width: '28px', height: '28px', background: 'rgba(255,255,255,0.08)', border: '1px solid rgba(255,255,255,0.15)', borderRadius: '4px', padding: '4px', color: 'var(--tmd-orange)', display: 'flex', alignItems: 'center', justifyContent: 'center' }} dangerouslySetInnerHTML={{ __html: lisp.svgIcon || '' }} />
+                <tr key={lisp.id} className="border-b border-[#262626] hover:bg-[#1a1c1c] transition-colors group">
+                  <td className="py-4 pl-4">
+                    <div className="w-8 h-8 bg-surface-container-highest border border-surface-variant rounded flex items-center justify-center text-primary-container" dangerouslySetInnerHTML={{ __html: lisp.svgIcon || '' }} />
                   </td>
-                  <td style={{ padding: '8px', color: '#fff' }}>
-                    <strong>{lisp.originalName}</strong>
-                    <span style={{ margin: '0 8px', color: 'var(--panel-border)' }}>|</span>
-                    <span style={{ color: 'var(--text-muted)' }}>{lisp.friendlyName}</span>
+                  <td className="py-4">
+                    <div className="flex flex-col">
+                      <span className="font-bold text-white font-code-sm text-code-sm">{lisp.originalName}</span>
+                      <span className="text-on-surface-variant text-sm">{lisp.friendlyName}</span>
+                    </div>
                   </td>
-                  <td style={{ padding: '8px' }}>
-                    <span style={{ background: 'var(--bg-darker)', padding: '4px 8px', borderRadius: '4px', border: '1px solid var(--border-color)', fontSize: '0.8rem' }}>{lisp.suite}</span>
+                  <td className="py-4">
+                    <span className="px-2.5 py-1 bg-[#1a1c1c] border border-[#343535] rounded text-xs font-mono text-secondary">{lisp.suite || '-'}</span>
                   </td>
-                  <td style={{ padding: '8px' }}>
-                    <span style={{ background: 'var(--bg-darker)', padding: '4px 8px', borderRadius: '4px', border: '1px solid var(--border-color)', fontSize: '0.8rem' }}>{lisp.group}</span>
+                  <td className="py-4">
+                    <span className="px-2.5 py-1 bg-[#1a1c1c] border border-[#343535] rounded text-xs font-mono text-secondary">{lisp.group || '-'}</span>
                   </td>
-                  <td style={{ padding: '8px', textAlign: 'right' }}>
-                    <button className="btn btn-secondary" onClick={() => handleEditClick(lisp)} style={{ padding: '4px 8px', fontSize: '0.8rem', marginRight: '5px' }}>Editar</button>
-                    <button className="btn btn-secondary" onClick={() => handleDeleteLisp(lisp)} style={{ padding: '4px 8px', fontSize: '0.8rem', color: '#ff4444', borderColor: 'rgba(255,68,68,0.3)' }}>Excluir</button>
+                  <td className="py-4 pr-4 text-right">
+                    <div className="flex justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                      <button className="w-8 h-8 flex items-center justify-center rounded border border-[#262626] text-on-secondary-container hover:text-white hover:border-primary-container transition-colors" onClick={() => handleEditClick(lisp)} title="Editar"><span className="material-symbols-outlined text-[16px]">edit</span></button>
+                      <button className="w-8 h-8 flex items-center justify-center rounded border border-[#262626] text-on-secondary-container hover:text-error hover:border-error/50 transition-colors" onClick={() => handleDeleteLisp(lisp)} title="Excluir"><span className="material-symbols-outlined text-[16px]">delete</span></button>
+                    </div>
                   </td>
                 </tr>
               );
