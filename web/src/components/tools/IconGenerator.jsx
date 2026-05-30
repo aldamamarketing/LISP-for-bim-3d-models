@@ -73,7 +73,7 @@ export default function IconGenerator() {
       });
 
       if (!response.ok) {
-        throw new Error('Error al generar iconos');
+        throw new Error('Erro ao gerar ícones');
       }
 
       const data = await response.json();
@@ -148,8 +148,8 @@ export default function IconGenerator() {
     try {
       await exportIconsToZip(selectedIcons, accentColor, secondaryColor);
     } catch (error) {
-      console.error("Error al exportar:", error);
-      showToast("Erro ao empaquetar os ícones.", "error");
+      console.error("Erro ao exportar:", error);
+      showToast("Erro ao empacotar os ícones.", "error");
     } finally {
       setIsExporting(false);
     }

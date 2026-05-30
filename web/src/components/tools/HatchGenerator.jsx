@@ -255,7 +255,7 @@ export default function HatchGenerator() {
         <div className="panel-body">
           {selectedHatches.length === 0 ? (
             <div className="empty-state">
-              Haz clic en los patrones del centro para añadirlos al paquete.
+              Clique nos padrões ao centro para adicionar ao pacote.
             </div>
           ) : (
             <div className="cart-list">
