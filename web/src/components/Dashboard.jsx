@@ -3,8 +3,10 @@ import { auth, db, loginWithGoogle, logout } from '../firebase';
 import { onAuthStateChanged, signInWithEmailAndPassword, createUserWithEmailAndPassword } from 'firebase/auth';
 import { collection, doc, getDocs, setDoc, query, where, updateDoc, addDoc, deleteDoc, serverTimestamp } from 'firebase/firestore';
 import { ref, uploadBytes, deleteObject } from 'firebase/storage';
+import FavoritesManager from './FavoritesManager';
 
 export default function Dashboard({ mode = 'dashboard' }) {
+  const [activeTab, setActiveTab] = useState('lisp');
   const [firebaseUser, setFirebaseUser] = useState(null);
   const [userData, setUserData] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -469,54 +471,75 @@ export default function Dashboard({ mode = 'dashboard' }) {
   });
 
   return (
-    <div style={{ maxWidth: '1000px', margin: '0 auto', paddingBottom: '40px' }}>
-      {/* HEADER & THIN PROFILE */}
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '15px', flexWrap: 'wrap', gap: '15px' }}>
-        <h1 style={{ color: 'var(--tmd-orange)', margin: 0, fontSize: 'clamp(1.4rem, 4vw, 1.8rem)' }}>Painel do Cliente</h1>
-        <div style={{ display: 'flex', gap: '20px', alignItems: 'center' }}>
-          
-          <button style={{ background: 'transparent', border: 'none', color: 'var(--text-muted)', cursor: 'pointer', fontSize: '0.9rem', padding: 0 }} onClick={() => document.getElementById('faq-section').scrollIntoView({ behavior: 'smooth' })}>
-            Ajuda / FAQ
+    <div className="flex min-h-screen bg-background text-white font-body-md">
+      {/* SIDEBAR */}
+      <aside className="w-64 fixed inset-y-0 left-0 bg-[#0D0D0D] border-r border-[#262626] flex flex-col z-20">
+        <div className="p-6 border-b border-[#262626]">
+          <h2 className="text-xl font-bold text-primary-container flex items-center gap-2">
+            <span className="material-symbols-outlined" data-weight="fill">code_blocks</span>
+            LispCentral
+          </h2>
+          <span className="text-xs text-on-surface-variant mt-1 block">Painel do Cliente</span>
+        </div>
+        
+        <nav className="flex-1 overflow-y-auto p-4 space-y-2">
+          <div className="text-xs font-bold text-[#555] uppercase tracking-wider mb-2 mt-4 px-2">Principal</div>
+          <button onClick={() => setActiveTab('lisp')} className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg transition-colors ${activeTab === 'lisp' ? 'bg-[#1a1c1c] text-primary-container border border-[#343535]' : 'text-on-surface-variant hover:text-white hover:bg-[#141414]'}`}>
+            <span className="material-symbols-outlined text-[20px]">folder_copy</span> Gestor de LISPs
           </button>
-          
-          <button style={{ background: 'transparent', border: 'none', color: 'var(--text-muted)', cursor: 'pointer', fontSize: '0.9rem', padding: 0 }} onClick={() => setShowSupportModal(true)}>
-            Reportar Bug
+          <button onClick={() => setActiveTab('favorites')} className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg transition-colors ${activeTab === 'favorites' ? 'bg-[#1a1c1c] text-primary-container border border-[#343535]' : 'text-on-surface-variant hover:text-white hover:bg-[#141414]'}`}>
+            <span className="material-symbols-outlined text-[20px]">star</span> Minha Coleção
           </button>
 
-          <a href="/favorites" style={{ textDecoration: 'none', color: 'var(--tmd-orange)', fontWeight: 'bold', fontSize: '0.9rem', marginLeft: '10px' }}>
-            ⭐ Meus Favoritos
-          </a>
+          <div className="text-xs font-bold text-[#555] uppercase tracking-wider mb-2 mt-6 px-2">Conta & Configurações</div>
+          <button onClick={() => setActiveTab('profile')} className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg transition-colors ${activeTab === 'profile' ? 'bg-[#1a1c1c] text-primary-container border border-[#343535]' : 'text-on-surface-variant hover:text-white hover:bg-[#141414]'}`}>
+            <span className="material-symbols-outlined text-[20px]">person</span> Meu Perfil
+          </button>
+          <button onClick={() => setActiveTab('licenses')} className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg transition-colors ${activeTab === 'licenses' ? 'bg-[#1a1c1c] text-primary-container border border-[#343535]' : 'text-on-surface-variant hover:text-white hover:bg-[#141414]'}`}>
+            <span className="material-symbols-outlined text-[20px]">vpn_key</span> Licenças & Acessos
+          </button>
+          <button onClick={() => setActiveTab('notifications')} className={`w-full flex items-center justify-between px-3 py-2 rounded-lg transition-colors ${activeTab === 'notifications' ? 'bg-[#1a1c1c] text-primary-container border border-[#343535]' : 'text-on-surface-variant hover:text-white hover:bg-[#141414]'}`}>
+            <div className="flex items-center gap-3"><span className="material-symbols-outlined text-[20px]">notifications</span> Notificações</div>
+            {unreadCount > 0 && <span className="bg-primary-container text-white text-[10px] font-bold px-2 py-0.5 rounded-full">{unreadCount}</span>}
+          </button>
 
-          <div style={{ position: 'relative' }}>
-            <div style={{ position: 'relative', cursor: 'pointer', fontSize: '1.2rem', display: 'inline-block' }} onClick={() => setShowNotifications(!showNotifications)} title="Notificações">
-              🔔
-              {unreadCount > 0 && <span style={{ position: 'absolute', top: '-5px', right: '-8px', background: 'var(--tmd-orange)', color: '#fff', fontSize: '0.65rem', padding: '2px 5px', borderRadius: '50%', fontWeight: 'bold' }}>{unreadCount}</span>}
+          <div className="text-xs font-bold text-[#555] uppercase tracking-wider mb-2 mt-6 px-2">Ajuda</div>
+          <button onClick={() => setShowSupportModal(true)} className="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-on-surface-variant hover:text-white hover:bg-[#141414] transition-colors">
+            <span className="material-symbols-outlined text-[20px]">bug_report</span> Reportar Bug
+          </button>
+        </nav>
+        
+        <div className="p-4 border-t border-[#262626]">
+          <div className="flex items-center gap-3 mb-4 px-2">
+            <div className="w-8 h-8 rounded-full bg-primary-container text-white flex items-center justify-center font-bold text-sm">{userData?.name?.charAt(0) || 'U'}</div>
+            <div className="flex-1 overflow-hidden">
+              <div className="text-sm font-bold truncate">{userData?.name}</div>
+              <div className="text-xs text-on-surface-variant truncate">{userData?.role || 'Engenheiro'}</div>
             </div>
-            {showNotifications && (
-              <div style={{ position: 'absolute', top: '100%', right: 0, background: 'var(--panel-bg)', border: '1px solid var(--panel-border)', borderRadius: '8px', width: '280px', padding: '10px', marginTop: '10px', zIndex: 100, boxShadow: '0 4px 12px rgba(0,0,0,0.5)' }}>
-                <h4 style={{ margin: '0 0 10px 0', borderBottom: '1px solid var(--border-color)', paddingBottom: '5px' }}>Notificações</h4>
-                
-                {notifications.length === 0 ? (
-                  <div style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>Nenhuma notificação.</div>
-                ) : (
-                  notifications.map(n => (
-                    <div key={n.id} style={{ fontSize: '0.85rem', color: '#fff', marginBottom: '8px', padding: '8px', background: n.read ? 'var(--bg-color)' : 'var(--bg-darker)', borderRadius: '4px', borderLeft: n.read ? 'none' : '3px solid var(--tmd-orange)' }}>
-                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-                        <strong style={{ color: n.read ? 'var(--text-muted)' : '#4caf50' }}>{n.title}</strong>
-                        {!n.read && <button onClick={() => markAsRead(n.id)} style={{ background: 'transparent', border: 'none', color: 'var(--text-muted)', cursor: 'pointer', fontSize: '0.7rem' }}>✔ Lido</button>}
-                      </div>
-                      <div style={{ marginTop: '4px', color: n.read ? 'var(--text-muted)' : '#fff' }}>{n.text}</div>
-                    </div>
-                  ))
-                )}
-              </div>
-            )}
+          </div>
+          <button onClick={logout} className="w-full flex items-center gap-2 justify-center px-4 py-2 border border-[#262626] text-on-surface-variant hover:text-red-400 hover:border-red-400/50 rounded-lg transition-colors text-sm">
+            <span className="material-symbols-outlined text-[18px]">logout</span> Sair
+          </button>
+        </div>
+      </aside>
+
+      {/* MAIN CONTENT AREA */}
+      <main className="flex-1 ml-64 p-8 relative min-h-screen">
+        <div className="absolute inset-0 pointer-events-none opacity-20 z-0" style={{ backgroundImage: 'linear-gradient(rgba(38, 38, 38, 0.2) 1px, transparent 1px), linear-gradient(90deg, rgba(38, 38, 38, 0.2) 1px, transparent 1px)', backgroundSize: '24px 24px' }}></div>
+        
+        <div className="relative z-10 max-w-[1000px] mx-auto">
+          
+          {/* BREADCRUMBS */}
+          <div className="flex items-center gap-2 text-sm text-on-surface-variant mb-8">
+            <a href="/" className="hover:text-primary-container transition-colors flex items-center gap-1"><span className="material-symbols-outlined text-[16px]">home</span> LispCentral</a>
+            <span className="material-symbols-outlined text-[16px]">chevron_right</span>
+            <span className="text-white">Painel do Cliente</span>
+            <span className="material-symbols-outlined text-[16px]">chevron_right</span>
+            <span className="text-primary-container font-bold capitalize">{activeTab === 'lisp' ? 'Gestor de LISPs' : activeTab === 'favorites' ? 'Minha Coleção' : activeTab === 'profile' ? 'Meu Perfil' : activeTab === 'licenses' ? 'Licenças & Acessos' : 'Notificações'}</span>
           </div>
 
-          <button className="btn btn-secondary" onClick={logout} style={{ padding: '6px 12px' }}>Sair</button>
-        </div>
-      </div>
-
+          {/* TAB: PROFILE */}
+          {activeTab === 'profile' && (
       {/* PROFILE CARD */}
       <div className="card" style={{ padding: '10px 20px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', margin: '0 0 20px 0', flexDirection: 'row', flexWrap: 'wrap', gap: '10px' }}>
         {isEditingProfile ? (
@@ -544,6 +567,10 @@ export default function Dashboard({ mode = 'dashboard' }) {
         )}
       </div>
 
+          )}
+
+          {/* TAB: LICENSES */}
+          {activeTab === 'licenses' && (
       {/* SUBSCRIPTIONS & SEATS FOUNDATION (Moved UP) */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '20px', marginBottom: '20px' }}>
         
@@ -613,6 +640,10 @@ export default function Dashboard({ mode = 'dashboard' }) {
         </div>
       </div>
 
+          )}
+
+          {/* TAB: LISP */}
+          {activeTab === 'lisp' && (
       {/* WORKSPACE (Massive Upload & Table) - Moved DOWN */}
       <div className="card" style={{ marginBottom: '20px', overflowX: 'auto' }}>
         <h3 style={{ marginTop: 0, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
@@ -753,6 +784,37 @@ export default function Dashboard({ mode = 'dashboard' }) {
         )}
       </div>
 
+          )}
+
+          {/* TAB: FAVORITES */}
+          {activeTab === 'favorites' && (
+            <div className="card" style={{ marginBottom: '20px' }}>
+              <FavoritesManager />
+            </div>
+          )}
+
+          {/* TAB: NOTIFICATIONS */}
+          {activeTab === 'notifications' && (
+            <div className="card" style={{ marginBottom: '20px' }}>
+               <h3 style={{ marginTop: 0 }}>Notificações do Sistema</h3>
+               {notifications.length === 0 ? (
+                  <div style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>Nenhuma notificação.</div>
+                ) : (
+                  notifications.map(n => (
+                    <div key={n.id} style={{ fontSize: '0.85rem', color: '#fff', marginBottom: '8px', padding: '12px', background: n.read ? 'var(--bg-color)' : 'var(--bg-darker)', borderRadius: '6px', borderLeft: n.read ? 'none' : '4px solid var(--tmd-orange)' }}>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                        <strong style={{ color: n.read ? 'var(--text-muted)' : '#4caf50', fontSize: '1rem' }}>{n.title}</strong>
+                        {!n.read && <button onClick={() => markAsRead(n.id)} className="btn btn-secondary" style={{ padding: '4px 8px', fontSize: '0.75rem' }}>✔ Marcar como Lido</button>}
+                      </div>
+                      <div style={{ marginTop: '8px', color: n.read ? 'var(--text-muted)' : '#ccc' }}>{n.text}</div>
+                    </div>
+                  ))
+                )}
+            </div>
+          )}
+
+          {/* FAQ (Shows inside Licenses) */}
+          {activeTab === 'licenses' && (
       {/* FAQ / HELP SECTION */}
       <div id="faq-section" className="card" style={{ marginBottom: '40px' }}>
         <h3 style={{ marginTop: 0 }}>Centro de Ajuda / FAQ</h3>
@@ -799,6 +861,8 @@ export default function Dashboard({ mode = 'dashboard' }) {
         </div>
       </div>
 
+          )}
+
       {/* SUPPORT MODAL */}
       {showSupportModal && (
         <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.7)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000 }}>
@@ -826,6 +890,8 @@ export default function Dashboard({ mode = 'dashboard' }) {
         </div>
       )}
 
+        </div>
+      </main>
     </div>
   );
 }
