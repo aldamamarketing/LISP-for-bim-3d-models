@@ -350,36 +350,105 @@ export default function Dashboard({ mode = 'dashboard' }) {
 
   if (mode === 'login' || !firebaseUser) {
     return (
-      <div className="card" style={{ maxWidth: '400px', margin: '40px auto', textAlign: 'center', position: 'relative' }}>
-        <button onClick={() => window.history.back()} style={{ position: 'absolute', top: '15px', left: '15px', background: 'transparent', border: 'none', color: 'var(--text-muted)', cursor: 'pointer', fontSize: '0.9rem' }}>
-          ← Voltar
-        </button>
-        <h2 style={{ marginTop: '30px' }}>Acesso Restrito</h2>
-        <p>Por favor, inicie sessão para entrar no seu painel.</p>
-        
-        <form style={{ display: 'flex', flexDirection: 'column', gap: '10px', marginTop: '20px' }}>
-          <input type="email" placeholder="E-mail" value={emailStr} onChange={(e) => setEmailStr(e.target.value)} style={{ padding: '10px', background: 'var(--bg-darker)', color: '#fff', border: '1px solid var(--border-color)', borderRadius: '4px' }} />
-          <input type="password" placeholder="Senha" value={passwordStr} onChange={(e) => setPasswordStr(e.target.value)} style={{ padding: '10px', background: 'var(--bg-darker)', color: '#fff', border: '1px solid var(--border-color)', borderRadius: '4px' }} />
-          {isRegistering && <input type="password" placeholder="Confirmar Senha" value={passwordConfirmStr} onChange={(e) => setPasswordConfirmStr(e.target.value)} style={{ padding: '10px', background: 'var(--bg-darker)', color: '#fff', border: '1px solid var(--border-color)', borderRadius: '4px' }} />}
-          {authError && <div style={{ color: '#ff7043', fontSize: '0.85rem' }}>{authError}</div>}
-          
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '15px', marginTop: '10px' }}>
-            <button className="btn" onClick={isRegistering ? handleEmailSignup : handleEmailLogin} style={{ width: '100%' }}>
-              {isRegistering ? 'Criar Conta' : 'Entrar'}
-            </button>
-            <div style={{ fontSize: '0.9rem', color: 'var(--text-muted)' }}>
-              {isRegistering ? 'Já tem conta? ' : 'Não tem uma conta? '}
-              <button type="button" onClick={(e) => { e.preventDefault(); setIsRegistering(!isRegistering); setAuthError(''); }} style={{ background: 'none', border: 'none', color: 'var(--tmd-orange)', cursor: 'pointer', padding: 0 }}>
-                {isRegistering ? 'Fazer Login' : 'Criar Conta'}
-              </button>
+      <div className="min-h-screen bg-background flex flex-col items-center justify-center p-4">
+        <div className="w-full max-w-md bg-[#141414] border border-[#262626] rounded-2xl shadow-2xl overflow-hidden relative">
+          <div className="p-8">
+            <div className="text-center mb-8">
+              <h2 className="font-headline-lg text-headline-lg text-white mb-2">
+                {isRegistering ? 'Criar Conta' : 'Bem-vindo de volta'}
+              </h2>
+              <p className="font-body-md text-body-md text-on-surface-variant">
+                {isRegistering ? 'Junte-se à plataforma LispCentral Beta.' : 'Entre para gerenciar suas rotinas LISP.'}
+              </p>
             </div>
+            
+            <form className="space-y-4" onSubmit={isRegistering ? handleEmailSignup : handleEmailLogin}>
+              <div>
+                <label className="block font-label-md text-label-md text-on-surface-variant mb-1">E-mail Corporativo</label>
+                <input 
+                  type="email" 
+                  value={emailStr} 
+                  onChange={(e) => setEmailStr(e.target.value)} 
+                  className="w-full bg-[#0D0D0D] border border-[#262626] text-white font-body-md px-4 py-3 rounded-lg focus:outline-none focus:border-primary-container focus:ring-1 focus:ring-primary-container transition-all"
+                  placeholder="seu@email.com"
+                  required
+                />
+              </div>
+              
+              <div>
+                <label className="block font-label-md text-label-md text-on-surface-variant mb-1">Senha</label>
+                <input 
+                  type="password" 
+                  value={passwordStr} 
+                  onChange={(e) => setPasswordStr(e.target.value)} 
+                  className="w-full bg-[#0D0D0D] border border-[#262626] text-white font-body-md px-4 py-3 rounded-lg focus:outline-none focus:border-primary-container focus:ring-1 focus:ring-primary-container transition-all"
+                  placeholder="••••••••"
+                  required
+                />
+              </div>
+
+              {isRegistering && (
+                <div>
+                  <label className="block font-label-md text-label-md text-on-surface-variant mb-1">Confirmar Senha</label>
+                  <input 
+                    type="password" 
+                    value={passwordConfirmStr} 
+                    onChange={(e) => setPasswordConfirmStr(e.target.value)} 
+                    className="w-full bg-[#0D0D0D] border border-[#262626] text-white font-body-md px-4 py-3 rounded-lg focus:outline-none focus:border-primary-container focus:ring-1 focus:ring-primary-container transition-all"
+                    placeholder="••••••••"
+                    required
+                  />
+                </div>
+              )}
+
+              {authError && (
+                <div className="bg-red-500/10 border border-red-500/50 rounded-lg p-3 text-red-400 font-code-sm text-code-sm">
+                  {authError}
+                </div>
+              )}
+              
+              <button 
+                type="submit" 
+                className="w-full bg-primary-container text-white font-label-md text-label-md font-bold px-8 py-3.5 rounded-lg hover:bg-[#e66000] transition-colors shadow-[0_0_15px_rgba(255,107,0,0.2)] mt-6"
+              >
+                {isRegistering ? 'Criar Conta' : 'Entrar no Painel'}
+              </button>
+            </form>
+
+            <div className="mt-8 flex items-center justify-center space-x-4">
+              <div className="flex-1 h-px bg-[#262626]"></div>
+              <span className="font-code-sm text-code-sm text-on-surface-variant">ou</span>
+              <div className="flex-1 h-px bg-[#262626]"></div>
+            </div>
+
+            <button 
+              type="button"
+              onClick={loginWithGoogle} 
+              className="w-full mt-6 bg-white text-black font-label-md text-label-md font-bold px-8 py-3 rounded-lg hover:bg-gray-100 transition-colors flex items-center justify-center gap-3"
+            >
+              <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" className="w-5 h-5" alt="Google" />
+              Continuar com Google
+            </button>
           </div>
-        </form>
-        <div style={{ margin: '20px 0', borderBottom: '1px solid var(--border-color)' }}></div>
-        <button className="btn" onClick={loginWithGoogle} style={{ width: '100%', background: '#fff', color: '#333' }}>
-          <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" style={{ width: '18px', verticalAlign: 'middle', marginRight: '8px' }} alt="Google" />
-          Continuar com Google
-        </button>
+          
+          <div className="bg-[#0D0D0D] border-t border-[#262626] p-6 text-center">
+            <span className="font-body-md text-body-md text-on-surface-variant">
+              {isRegistering ? 'Já tem uma conta? ' : 'Não tem uma conta? '}
+            </span>
+            <button 
+              type="button"
+              onClick={(e) => { e.preventDefault(); setIsRegistering(!isRegistering); setAuthError(''); }}
+              className="font-label-md text-label-md font-bold text-primary-container hover:text-white transition-colors ml-2"
+            >
+              {isRegistering ? 'Fazer Login' : 'Criar Conta Gratuita'}
+            </button>
+          </div>
+        </div>
+        
+        <a href="/" className="mt-8 font-label-md text-label-md text-on-surface-variant hover:text-white transition-colors flex items-center gap-2">
+          <span className="material-symbols-outlined text-[18px]">arrow_back</span>
+          Voltar para o site
+        </a>
       </div>
     );
   }
