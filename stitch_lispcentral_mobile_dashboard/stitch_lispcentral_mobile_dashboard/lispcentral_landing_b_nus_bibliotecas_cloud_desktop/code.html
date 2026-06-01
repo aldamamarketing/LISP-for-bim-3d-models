@@ -1,0 +1,461 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="pt-BR"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>LispCentral - B2B SaaS B2B B2B SaaS B2B B2B SaaS B2B B2B SaaS</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=JetBrains+Mono:wght@400&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "tertiary-container": "#9a9898",
+                        "surface": "#121414",
+                        "primary": "#ffb693",
+                        "surface-container-high": "#292a2a",
+                        "on-secondary-container": "#bab8b7",
+                        "background": "#121414",
+                        "primary-fixed": "#ffdbcc",
+                        "tertiary-fixed": "#e5e2e1",
+                        "on-primary": "#561f00",
+                        "error": "#ffb4ab",
+                        "secondary-fixed-dim": "#c9c6c5",
+                        "surface-container-lowest": "#0d0e0f",
+                        "on-primary-fixed": "#351000",
+                        "outline-variant": "#5a4136",
+                        "tertiary-fixed-dim": "#c8c6c5",
+                        "error-container": "#93000a",
+                        "surface-tint": "#ffb693",
+                        "on-primary-container": "#572000",
+                        "inverse-primary": "#a04100",
+                        "surface-variant": "#343535",
+                        "on-tertiary-fixed": "#1c1b1b",
+                        "on-tertiary-fixed-variant": "#474746",
+                        "primary-fixed-dim": "#ffb693",
+                        "inverse-surface": "#e3e2e2",
+                        "secondary": "#c9c6c5",
+                        "on-secondary": "#313030",
+                        "inverse-on-surface": "#2f3131",
+                        "on-primary-fixed-variant": "#7a3000",
+                        "secondary-fixed": "#e5e2e1",
+                        "on-surface": "#e3e2e2",
+                        "on-background": "#e3e2e2",
+                        "surface-container": "#1e2020",
+                        "primary-container": "#ff6b00",
+                        "on-secondary-fixed-variant": "#474646",
+                        "surface-container-low": "#1a1c1c",
+                        "on-secondary-fixed": "#1c1b1b",
+                        "on-error": "#690005",
+                        "on-tertiary-container": "#313131",
+                        "on-surface-variant": "#e2bfb0",
+                        "surface-container-highest": "#343535",
+                        "tertiary": "#c8c6c5",
+                        "on-error-container": "#ffdad6",
+                        "on-tertiary": "#313030",
+                        "surface-bright": "#38393a",
+                        "outline": "#a98a7d",
+                        "surface-dim": "#121414",
+                        "secondary-container": "#4a4949"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.125rem",
+                        "lg": "0.25rem",
+                        "xl": "0.5rem",
+                        "full": "0.75rem"
+                    },
+                    "spacing": {
+                        "section-padding": "80px",
+                        "container-max-width": "1200px",
+                        "unit": "8px",
+                        "gutter": "24px",
+                        "margin-mobile": "16px"
+                    },
+                    "fontFamily": {
+                        "code-sm": [
+                            "JetBrains Mono"
+                        ],
+                        "headline-lg": [
+                            "Inter"
+                        ],
+                        "body-md": [
+                            "Inter"
+                        ],
+                        "headline-md": [
+                            "Inter"
+                        ],
+                        "label-md": [
+                            "Inter"
+                        ],
+                        "headline-lg-mobile": [
+                            "Inter"
+                        ],
+                        "headline-xl": [
+                            "Inter"
+                        ],
+                        "body-lg": [
+                            "Inter"
+                        ]
+                    },
+                    "fontSize": {
+                        "code-sm": [
+                            "13px",
+                            {
+                                "lineHeight": "1.5",
+                                "fontWeight": "400"
+                            }
+                        ],
+                        "headline-lg": [
+                            "32px",
+                            {
+                                "lineHeight": "1.2",
+                                "letterSpacing": "-0.01em",
+                                "fontWeight": "700"
+                            }
+                        ],
+                        "body-md": [
+                            "16px",
+                            {
+                                "lineHeight": "1.6",
+                                "fontWeight": "400"
+                            }
+                        ],
+                        "headline-md": [
+                            "24px",
+                            {
+                                "lineHeight": "1.3",
+                                "fontWeight": "600"
+                            }
+                        ],
+                        "label-md": [
+                            "14px",
+                            {
+                                "lineHeight": "1.4",
+                                "letterSpacing": "0.01em",
+                                "fontWeight": "500"
+                            }
+                        ],
+                        "headline-lg-mobile": [
+                            "28px",
+                            {
+                                "lineHeight": "1.2",
+                                "fontWeight": "700"
+                            }
+                        ],
+                        "headline-xl": [
+                            "48px",
+                            {
+                                "lineHeight": "1.1",
+                                "letterSpacing": "-0.02em",
+                                "fontWeight": "700"
+                            }
+                        ],
+                        "body-lg": [
+                            "18px",
+                            {
+                                "lineHeight": "1.6",
+                                "fontWeight": "400"
+                            }
+                        ]
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        /* Decorative grid pattern for backgrounds */
+        .bg-grid-pattern {
+            background-image: linear-gradient(to right, rgba(255, 107, 0, 0.05) 1px, transparent 1px),
+                              linear-gradient(to bottom, rgba(255, 107, 0, 0.05) 1px, transparent 1px);
+            background-size: 40px 40px;
+        }
+    </style>
+</head>
+<body class="bg-background text-on-surface font-body-md antialiased selection:bg-primary-container selection:text-white">
+<!-- TopNavBar -->
+<nav class="bg-background dark:bg-background w-full top-0 sticky z-50 border-b border-surface-variant dark:border-surface-variant">
+<div class="flex justify-between items-center px-8 py-4 max-w-[1200px] mx-auto">
+<div class="text-headline-md font-headline-md font-bold text-primary dark:text-primary tracking-tight">
+                LispCentral
+            </div>
+<div class="hidden md:flex items-center space-x-8">
+<a class="text-primary font-bold border-b-2 border-primary pb-1 font-body-md text-body-md transition-all" href="#">Solução B2B</a>
+<a class="text-on-surface dark:text-on-surface hover:text-primary transition-colors duration-200 font-body-md text-body-md" href="#">Recursos</a>
+<a class="text-on-surface dark:text-on-surface hover:text-primary transition-colors duration-200 font-body-md text-body-md" href="#">Blog</a>
+<a class="text-on-surface dark:text-on-surface hover:text-primary transition-colors duration-200 font-body-md text-body-md" href="#">Portal SaaS</a>
+</div>
+<div class="hidden md:flex items-center space-x-4">
+<button class="font-label-md text-label-md text-on-surface hover:text-primary transition-colors px-4 py-2">
+                    Login
+                </button>
+<button class="bg-primary-container text-white hover:bg-[#e66000] transition-all font-label-md text-label-md font-bold px-6 py-2.5 rounded shadow-[0_0_15px_rgba(255,107,0,0.2)]">
+                    Falar com Especialista
+                </button>
+</div>
+</div>
+</nav>
+<!-- Hero Section -->
+<section class="relative pt-section-padding pb-section-padding overflow-hidden">
+<div class="absolute inset-0 bg-grid-pattern pointer-events-none"></div>
+<div class="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[600px] bg-primary-container/10 blur-[120px] rounded-full pointer-events-none"></div>
+<div class="max-w-container-max-width mx-auto px-gutter relative z-10">
+<div class="text-center max-w-3xl mx-auto mb-16">
+<span class="inline-block py-1 px-3 rounded-full bg-surface-container border border-surface-variant text-primary font-code-sm text-code-sm mb-6">
+<span class="material-symbols-outlined text-[14px] align-middle mr-1">code</span>
+                    INFRAESTRUTURA BIM CLOUD
+                </span>
+<h1 class="font-headline-xl text-headline-xl mb-6 text-white">Assuma o controle total dos seus <span class="text-primary-container">códigos LISP</span></h1>
+<p class="font-body-lg text-body-lg text-on-surface-variant mb-10">
+                    A plataforma corporativa definitiva para gestão, segurança e distribuição de rotinas LISP. Proteja sua propriedade intelectual e padronize fluxos de engenharia em tempo real.
+                </p>
+<div class="flex flex-col sm:flex-row justify-center items-center gap-4">
+<button class="w-full sm:w-auto bg-primary-container text-white font-label-md text-label-md font-bold px-8 py-4 rounded hover:bg-[#e66000] transition-all shadow-[0_0_20px_rgba(255,107,0,0.3)]">
+                        Começar Agora
+                    </button>
+<button class="w-full sm:w-auto border border-surface-variant text-white font-label-md text-label-md font-bold px-8 py-4 rounded hover:border-primary-container hover:text-primary-container transition-all flex items-center justify-center gap-2">
+<span class="material-symbols-outlined">play_circle</span>
+                        Ver Demonstração
+                    </button>
+</div>
+</div>
+<!-- Tablet Image Showcase -->
+<div class="relative max-w-4xl mx-auto mt-20">
+<div class="absolute -inset-4 bg-gradient-to-b from-surface-container-high to-transparent opacity-50 rounded-xl blur-lg"></div>
+<img alt="A person holding a tablet displaying a dark-mode architectural blueprint with orange accent lines and structural data, demonstrating LispCentral's cloud integration with AutoCAD interfaces. The aesthetic is highly technical, precise, and professional." class="w-full h-auto rounded-xl border border-surface-variant shadow-2xl relative z-10" data-alt="A person holding a white tablet device in their hand. The tablet screen displays a sophisticated, dark-mode architectural software interface. On the screen, there are four distinct blueprint layouts of a building, drawn with fine white lines and highlighted with vibrant orange structural elements and grid lines. The aesthetic is technical, clean, and modern, representing high-end engineering software tools." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAYDDsvzuXDEZZU4Ex3mBwaMTVrwBGFEkbMY9kZD8lp_9-a7DcFk6IboBBb5w7eHPVNRMAGRdvhqBJUgRcO1OKnRM4vs-RVAv-TczsV1NzSe6alH1BLwh6UeDlGPRHpwjBoYjpDnYxd0_qdH8cqJrXun1trGgCopuNnk8UoKJo0fbG9njK1aES7Ip6DMXlk8b4NxTMWT43MTbIqM6YXRSa71xnkiPCAqnOQ-WxiDi7zXtvLuqUf-LfXFXQxxdKCbOtz001nO9hjeNI"/>
+</div>
+</div>
+</section>
+<!-- Core Features Row -->
+<section class="py-section-padding bg-surface-container-lowest border-y border-surface-variant">
+<div class="max-w-container-max-width mx-auto px-gutter">
+<div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+<!-- Feature 1 -->
+<div class="bg-surface p-8 rounded border border-surface-variant hover:border-primary-container transition-colors group">
+<div class="w-12 h-12 rounded bg-surface-container-highest flex items-center justify-center mb-6 group-hover:bg-primary-container/20 transition-colors">
+<span class="material-symbols-outlined text-primary-container text-2xl" data-icon="lock">lock</span>
+</div>
+<h3 class="font-headline-md text-headline-md text-white mb-3">Criptografia HTTPS</h3>
+<p class="font-body-md text-body-md text-on-surface-variant">
+                        Transferência segura de ponta a ponta. Suas rotinas são encriptadas em repouso e em trânsito, garantindo integridade máxima.
+                    </p>
+</div>
+<!-- Feature 2 -->
+<div class="bg-surface p-8 rounded border border-surface-variant hover:border-primary-container transition-colors group">
+<div class="w-12 h-12 rounded bg-surface-container-highest flex items-center justify-center mb-6 group-hover:bg-primary-container/20 transition-colors">
+<span class="material-symbols-outlined text-primary-container text-2xl" data-icon="shield">shield</span>
+</div>
+<h3 class="font-headline-md text-headline-md text-white mb-3">Proteção de IP</h3>
+<p class="font-body-md text-body-md text-on-surface-variant">
+                        Impeça o roubo de código. Distribua rotinas LISP de forma compilada ou ofuscada, controlando exatamente quem tem acesso à fonte.
+                    </p>
+</div>
+<!-- Feature 3 -->
+<div class="bg-surface p-8 rounded border border-surface-variant hover:border-primary-container transition-colors group">
+<div class="w-12 h-12 rounded bg-surface-container-highest flex items-center justify-center mb-6 group-hover:bg-primary-container/20 transition-colors">
+<span class="material-symbols-outlined text-primary-container text-2xl" data-icon="cloud_sync">cloud_sync</span>
+</div>
+<h3 class="font-headline-md text-headline-md text-white mb-3">Acesso Direto</h3>
+<p class="font-body-md text-body-md text-on-surface-variant">
+                        Integração nativa. Carregue rotinas diretamente da nuvem para o ambiente CAD sem etapas intermediárias complexas.
+                    </p>
+</div>
+</div>
+</div>
+</section>
+<!-- Bonus Section -->
+<section class="py-section-padding">
+<div class="max-w-container-max-width mx-auto px-gutter">
+<div class="mb-16">
+<h2 class="font-headline-lg text-headline-lg text-white mb-4">Sua Biblioteca LISP, <span class="text-primary-container">Sempre Disponível</span></h2>
+<p class="font-body-lg text-body-lg text-on-surface-variant max-w-2xl">
+                    Centralize sua equipe de engenharia. Diga adeus aos arquivos locais desatualizados e garanta que todos usem a versão correta da ferramenta.
+                </p>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+<div class="bg-[#141414] border border-[#262626] rounded p-6 hover:border-primary-container transition-colors">
+<span class="material-symbols-outlined text-primary-container mb-4 text-3xl" data-icon="cloud">cloud</span>
+<h4 class="font-label-md text-label-md text-white font-bold mb-2">Armazenamento em Nuvem</h4>
+<p class="font-body-md text-code-sm text-on-surface-variant">Repositório centralizado e escalável para todos os seus scripts.</p>
+</div>
+<div class="bg-[#141414] border border-[#262626] rounded p-6 hover:border-primary-container transition-colors">
+<span class="material-symbols-outlined text-primary-container mb-4 text-3xl" data-icon="share">share</span>
+<h4 class="font-label-md text-label-md text-white font-bold mb-2">Compartilhamento Seguro</h4>
+<p class="font-body-md text-code-sm text-on-surface-variant">Defina permissões granulares por usuário, equipe ou projeto.</p>
+</div>
+<div class="bg-[#141414] border border-[#262626] rounded p-6 hover:border-primary-container transition-colors">
+<span class="material-symbols-outlined text-primary-container mb-4 text-3xl" data-icon="devices">devices</span>
+<h4 class="font-label-md text-label-md text-white font-bold mb-2">Controle de Dispositivos</h4>
+<p class="font-body-md text-code-sm text-on-surface-variant">Gerencie quais máquinas estão autorizadas a rodar seus códigos.</p>
+</div>
+<div class="bg-[#141414] border border-[#262626] rounded p-6 hover:border-primary-container transition-colors">
+<span class="material-symbols-outlined text-primary-container mb-4 text-3xl" data-icon="web">web</span>
+<h4 class="font-label-md text-label-md text-white font-bold mb-2">Paletas Web</h4>
+<p class="font-body-md text-code-sm text-on-surface-variant">Interfaces HTML ricas integradas diretamente ao seu software CAD.</p>
+</div>
+</div>
+</div>
+</section>
+<!-- Special Tools Section -->
+<section class="py-section-padding bg-surface-container-lowest border-y border-surface-variant">
+<div class="max-w-container-max-width mx-auto px-gutter">
+<div class="text-center mb-16">
+<h2 class="font-headline-lg text-headline-lg text-white mb-4">Mais que LISP, <span class="text-primary-container">uma central de ferramentas</span></h2>
+<p class="font-body-lg text-body-lg text-on-surface-variant max-w-2xl mx-auto">
+                    Expanda as capacidades do seu ambiente CAD com bibliotecas visuais gerenciadas pela nuvem e ferramentas de personalização de interface.
+                </p>
+</div>
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+<!-- Hatch Library -->
+<div class="bg-[#141414] border border-[#262626] rounded-xl overflow-hidden group">
+<div class="h-64 overflow-hidden relative border-b border-[#262626]">
+<img alt="A highly technical dark-mode interface displaying a 'Hatch Pattern Library Pro'. It features a grid of intricate, orange geometric and architectural hatch patterns (like concrete, stone, wood, grid) on a very dark grey background. The UI is clean, utility-focused, and designed for structural engineers." class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" data-alt="A screenshot of a sophisticated software interface titled 'HATCH PATTERN LIBRARY PRO'. The interface is in dark mode, with a deep charcoal background and a faint grid overlay. It displays a vast grid of architectural hatch patterns, all rendered in a bright, vibrant orange color. The patterns include textures for granite, stone, oak, and various geometric meshes. The overall aesthetic is highly technical, precise, and tailored for professional engineering environments." src="https://lh3.googleusercontent.com/aida/ADBb0ujBheElLlQnYDoytomVyN1XeRppy9BWnbhYUBjgA_C3A4klYEoAR4_3q6zqHesCl5be24xxHynbDJVmAgN6uEB2V0jVOaK9aMnJj_j5USCHsx3dwjBTLR2MoyZyQPNcxMteB2S8zuy0PUoY68GyOS3MsO7RJ6HxRmyHZVzEhQ0LVgeo26THQ0w0djOFnKntOvLFDS1yBM4t5q_M3lLjGZVzekaETsRtII2zhqe8vf7G4O-JVLALoBuOJg"/>
+</div>
+<div class="p-8">
+<div class="flex items-center gap-3 mb-4">
+<span class="material-symbols-outlined text-primary-container" data-icon="grid_view">grid_view</span>
+<h3 class="font-headline-md text-headline-md text-white">Hatch Library</h3>
+</div>
+<p class="font-body-md text-body-md text-on-surface-variant mb-6">
+                            Sincronize centenas de padrões de hachura personalizados para toda a empresa instantaneamente. Evite a perda de tempo procurando arquivos .pat perdidos.
+                        </p>
+<a class="text-primary-container font-label-md text-label-md font-bold hover:text-[#e66000] flex items-center gap-2" href="#">
+                            Explorar Hachuras <span class="material-symbols-outlined text-[16px]">arrow_forward</span>
+</a>
+</div>
+</div>
+<!-- Line Library -->
+<div class="bg-[#141414] border border-[#262626] rounded-xl overflow-hidden group">
+<div class="h-64 overflow-hidden relative border-b border-[#262626] bg-surface-container-high flex items-center justify-center">
+<img alt="Dark mode interface showing a technical line type library. Precise orange lines on dark background." class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" data-alt="A close-up view of a dark-mode software interface focusing on technical line types. The screen shows various styles of architectural and engineering lines, such as dashed, dotted, and complex line segments, all drawn in a sharp orange hue against a deep grey background. The design is utilitarian, emphasizing precision and clarity." src="https://lh3.googleusercontent.com/aida/ADBb0uipfO9F9v3uY99ouDrhjp2Zna6RUwlmeONVRuEV2JuJ6JtBQfXFPElM2Q4FDs769bb5yffoaOjIPMKcefqZW7_eZUq_gbxa5bBWQi2WA1EcyZYHIbRu6_0j3MWd4Ip1PzlExjYFibGvmocn1G5Fcee7he76liqvDzLPGyHiyruukkQZrNnXHxylsJQVoPkpFP6LCTvOWahDapl1YejMBwEHiTqJa5TW3ASpQvq4xrmrPbcUGXExaZM1rWM"/>
+</div>
+<div class="p-8">
+<div class="flex items-center gap-3 mb-4">
+<span class="material-symbols-outlined text-primary-container" data-icon="horizontal_rule">horizontal_rule</span>
+<h3 class="font-headline-md text-headline-md text-white">Line Library</h3>
+</div>
+<p class="font-body-md text-body-md text-on-surface-variant mb-6">
+                            Padronize os tipos de linha de todos os projetos. Distribua bibliotecas de linhas complexas globalmente com controle de versão rigoroso.
+                        </p>
+<a class="text-primary-container font-label-md text-label-md font-bold hover:text-[#e66000] flex items-center gap-2" href="#">
+                            Ver Tipos de Linha <span class="material-symbols-outlined text-[16px]">arrow_forward</span>
+</a>
+</div>
+</div>
+</div>
+<div class="mt-8 text-center">
+<span class="inline-flex items-center gap-2 px-4 py-2 rounded bg-surface border border-surface-variant text-on-surface-variant font-code-sm text-code-sm">
+<span class="material-symbols-outlined text-primary-container text-[16px]">new_releases</span>
+                    Também inclui: <strong>Ribbon Icon Generator</strong> para personalização total da interface CAD.
+                </span>
+</div>
+</div>
+</section>
+<!-- Web Palette Integration -->
+<section class="py-section-padding relative overflow-hidden">
+<div class="max-w-container-max-width mx-auto px-gutter">
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+<div>
+<h2 class="font-headline-lg text-headline-lg text-white mb-6">Paletas Web Integradas</h2>
+<p class="font-body-lg text-body-lg text-on-surface-variant mb-8">
+                        Modernize a interface das suas rotinas. Construa painéis HTML avançados que se comunicam perfeitamente com o AutoCAD, substituindo caixas de diálogo LISP legadas por interfaces web responsivas.
+                    </p>
+<ul class="space-y-4">
+<li class="flex items-start gap-3">
+<span class="material-symbols-outlined text-primary-container mt-1">check_circle</span>
+<div>
+<strong class="text-white font-label-md text-label-md block mb-1">Sincronização em Tempo Real</strong>
+<span class="text-on-surface-variant font-body-md text-code-sm block">Atualizações de UI refletem imediatamente nos clientes sem reinicialização.</span>
+</div>
+</li>
+<li class="flex items-start gap-3">
+<span class="material-symbols-outlined text-primary-container mt-1">check_circle</span>
+<div>
+<strong class="text-white font-label-md text-label-md block mb-1">Busca Inteligente</strong>
+<span class="text-on-surface-variant font-body-md text-code-sm block">Filtre centenas de comandos e blocos instantaneamente via interface web.</span>
+</div>
+</li>
+<li class="flex items-start gap-3">
+<span class="material-symbols-outlined text-primary-container mt-1">check_circle</span>
+<div>
+<strong class="text-white font-label-md text-label-md block mb-1">Analytics de Uso</strong>
+<span class="text-on-surface-variant font-body-md text-code-sm block">Monitore quais comandos são mais utilizados pela sua equipe de engenharia.</span>
+</div>
+</li>
+</ul>
+</div>
+<div class="relative">
+<div class="absolute inset-0 bg-gradient-to-tr from-primary-container/20 to-transparent blur-2xl rounded-full"></div>
+<div class="bg-[#0D0D0D] border border-[#262626] rounded-lg p-2 shadow-2xl relative z-10">
+<div class="bg-[#141414] rounded border border-[#262626] h-[400px] flex flex-col">
+<div class="border-b border-[#262626] p-3 flex items-center gap-2">
+<div class="w-3 h-3 rounded-full bg-[#343535]"></div>
+<div class="w-3 h-3 rounded-full bg-[#343535]"></div>
+<div class="w-3 h-3 rounded-full bg-[#343535]"></div>
+<div class="ml-4 font-code-sm text-code-sm text-on-surface-variant">LispCentral Web Palette API</div>
+</div>
+<div class="p-6 flex-1 bg-grid-pattern relative">
+<!-- Abstract Mockup UI -->
+<div class="space-y-4">
+<div class="h-10 bg-[#0D0D0D] border border-[#262626] rounded flex items-center px-4 w-full">
+<span class="material-symbols-outlined text-on-surface-variant mr-2 text-[18px]">search</span>
+<div class="h-2 w-32 bg-[#262626] rounded"></div>
+</div>
+<div class="grid grid-cols-2 gap-4">
+<div class="h-24 bg-[#1A1A1A] border border-[#262626] rounded p-4 border-l-2 border-l-primary-container">
+<div class="h-3 w-20 bg-[#343535] rounded mb-2"></div>
+<div class="h-2 w-full bg-[#262626] rounded mb-1"></div>
+<div class="h-2 w-4/5 bg-[#262626] rounded"></div>
+</div>
+<div class="h-24 bg-[#1A1A1A] border border-[#262626] rounded p-4">
+<div class="h-3 w-16 bg-[#343535] rounded mb-2"></div>
+<div class="h-2 w-full bg-[#262626] rounded mb-1"></div>
+<div class="h-2 w-3/5 bg-[#262626] rounded"></div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Closing CTA Section -->
+<section class="py-24 bg-primary-container/5 border-t border-surface-variant">
+<div class="max-w-3xl mx-auto px-gutter text-center">
+<h2 class="font-headline-lg text-headline-lg text-white mb-6">Pronto para centralizar sua engenharia?</h2>
+<p class="font-body-md text-body-md text-on-surface-variant mb-10">
+                Junte-se às empresas líderes que já modernizaram a gestão de suas rotinas LISP e padrões CAD. Solicite acesso antecipado hoje.
+            </p>
+<form class="flex flex-col sm:flex-row gap-4 justify-center max-w-lg mx-auto">
+<input class="flex-1 bg-[#0D0D0D] border border-[#262626] text-white font-body-md px-4 py-3 rounded focus:outline-none focus:border-primary-container focus:ring-1 focus:ring-primary-container transition-all" placeholder="Seu e-mail corporativo" required="" type="email"/>
+<button class="bg-primary-container text-white font-label-md text-label-md font-bold px-8 py-3 rounded hover:bg-[#e66000] transition-colors whitespace-nowrap shadow-[0_0_15px_rgba(255,107,0,0.2)]" type="submit">
+                    Solicitar Acesso
+                </button>
+</form>
+<p class="mt-4 font-code-sm text-code-sm text-on-surface-variant">Sem cartão de crédito necessário para demonstração.</p>
+</div>
+</section>
+<!-- Footer -->
+<footer class="bg-surface-container-lowest dark:bg-surface-container-lowest w-full mt-auto border-t border-surface-variant dark:border-surface-variant">
+<div class="grid grid-cols-1 md:grid-cols-4 gap-gutter px-8 py-section-padding max-w-[1200px] mx-auto">
+<div class="md:col-span-1">
+<div class="text-headline-sm font-headline-sm font-bold text-on-surface mb-4">LispCentral</div>
+<p class="font-label-md text-label-md text-on-secondary-container">© 2024 LispCentral. Infraestrutura robusta para engenharia de software BIM.</p>
+</div>
+<div class="md:col-span-3 flex flex-wrap justify-md-end gap-x-8 gap-y-4 md:ml-auto">
+<a class="font-label-md text-label-md text-on-secondary-container hover:text-primary transition-colors" href="#">Privacidade</a>
+<a class="font-label-md text-label-md text-on-secondary-container hover:text-primary transition-colors" href="#">Segurança</a>
+<a class="font-label-md text-label-md text-on-secondary-container hover:text-primary transition-colors" href="#">Documentação Técnica</a>
+<a class="font-label-md text-label-md text-on-secondary-container hover:text-primary transition-colors" href="#">Suporte API</a>
+<a class="font-label-md text-label-md text-on-secondary-container hover:text-primary transition-colors" href="#">Termos de Uso</a>
+</div>
+</div>
+</footer>
+</body></html>

@@ -4,8 +4,10 @@ import { onAuthStateChanged, signInWithEmailAndPassword, createUserWithEmailAndP
 import { collection, doc, getDocs, setDoc, query, where, updateDoc, addDoc, deleteDoc, serverTimestamp } from 'firebase/firestore';
 import { ref, uploadBytes, deleteObject } from 'firebase/storage';
 import ToastContainer, { showToast } from './Toast';
+import FavoritesManager from './FavoritesManager';
 
 export default function Dashboard({ mode = 'dashboard' }) {
+  const [activeTab, setActiveTab] = useState('lisp');
   const [firebaseUser, setFirebaseUser] = useState(null);
   const [userData, setUserData] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -351,36 +353,105 @@ export default function Dashboard({ mode = 'dashboard' }) {
 
   if (mode === 'login' || !firebaseUser) {
     return (
-      <div className="card" style={{ maxWidth: '400px', margin: '40px auto', textAlign: 'center', position: 'relative' }}>
-        <button onClick={() => window.history.back()} style={{ position: 'absolute', top: '15px', left: '15px', background: 'transparent', border: 'none', color: 'var(--text-muted)', cursor: 'pointer', fontSize: '0.9rem' }}>
-          ← Voltar
-        </button>
-        <h2 style={{ marginTop: '30px' }}>Acesso Restrito</h2>
-        <p>Por favor, inicie sessão para entrar no seu painel.</p>
-        
-        <form style={{ display: 'flex', flexDirection: 'column', gap: '10px', marginTop: '20px' }}>
-          <input type="email" placeholder="E-mail" value={emailStr} onChange={(e) => setEmailStr(e.target.value)} style={{ padding: '10px', background: 'var(--bg-darker)', color: '#fff', border: '1px solid var(--border-color)', borderRadius: '4px' }} />
-          <input type="password" placeholder="Senha" value={passwordStr} onChange={(e) => setPasswordStr(e.target.value)} style={{ padding: '10px', background: 'var(--bg-darker)', color: '#fff', border: '1px solid var(--border-color)', borderRadius: '4px' }} />
-          {isRegistering && <input type="password" placeholder="Confirmar Senha" value={passwordConfirmStr} onChange={(e) => setPasswordConfirmStr(e.target.value)} style={{ padding: '10px', background: 'var(--bg-darker)', color: '#fff', border: '1px solid var(--border-color)', borderRadius: '4px' }} />}
-          {authError && <div style={{ color: '#ff7043', fontSize: '0.85rem' }}>{authError}</div>}
-          
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '15px', marginTop: '10px' }}>
-            <button className="btn" onClick={isRegistering ? handleEmailSignup : handleEmailLogin} style={{ width: '100%' }}>
-              {isRegistering ? 'Criar Conta' : 'Entrar'}
-            </button>
-            <div style={{ fontSize: '0.9rem', color: 'var(--text-muted)' }}>
-              {isRegistering ? 'Já tem conta? ' : 'Não tem uma conta? '}
-              <button type="button" onClick={(e) => { e.preventDefault(); setIsRegistering(!isRegistering); setAuthError(''); }} style={{ background: 'none', border: 'none', color: 'var(--tmd-orange)', cursor: 'pointer', padding: 0 }}>
-                {isRegistering ? 'Fazer Login' : 'Criar Conta'}
-              </button>
+      <div className="min-h-screen bg-background flex flex-col items-center justify-center p-4">
+        <div className="w-full max-w-md bg-[#141414] border border-[#262626] rounded-2xl shadow-2xl overflow-hidden relative">
+          <div className="p-8">
+            <div className="text-center mb-8">
+              <h2 className="font-headline-lg text-headline-lg text-white mb-2">
+                {isRegistering ? 'Criar Conta' : 'Bem-vindo de volta'}
+              </h2>
+              <p className="font-body-md text-body-md text-on-surface-variant">
+                {isRegistering ? 'Junte-se à plataforma LispCentral Beta.' : 'Entre para gerenciar suas rotinas LISP.'}
+              </p>
             </div>
+            
+            <form className="space-y-4" onSubmit={isRegistering ? handleEmailSignup : handleEmailLogin}>
+              <div>
+                <label className="block font-label-md text-label-md text-on-surface-variant mb-1">E-mail Corporativo</label>
+                <input 
+                  type="email" 
+                  value={emailStr} 
+                  onChange={(e) => setEmailStr(e.target.value)} 
+                  className="w-full bg-[#0D0D0D] border border-[#262626] text-white font-body-md px-4 py-3 rounded-lg focus:outline-none focus:border-primary-container focus:ring-1 focus:ring-primary-container transition-all"
+                  placeholder="seu@email.com"
+                  required
+                />
+              </div>
+              
+              <div>
+                <label className="block font-label-md text-label-md text-on-surface-variant mb-1">Senha</label>
+                <input 
+                  type="password" 
+                  value={passwordStr} 
+                  onChange={(e) => setPasswordStr(e.target.value)} 
+                  className="w-full bg-[#0D0D0D] border border-[#262626] text-white font-body-md px-4 py-3 rounded-lg focus:outline-none focus:border-primary-container focus:ring-1 focus:ring-primary-container transition-all"
+                  placeholder="••••••••"
+                  required
+                />
+              </div>
+
+              {isRegistering && (
+                <div>
+                  <label className="block font-label-md text-label-md text-on-surface-variant mb-1">Confirmar Senha</label>
+                  <input 
+                    type="password" 
+                    value={passwordConfirmStr} 
+                    onChange={(e) => setPasswordConfirmStr(e.target.value)} 
+                    className="w-full bg-[#0D0D0D] border border-[#262626] text-white font-body-md px-4 py-3 rounded-lg focus:outline-none focus:border-primary-container focus:ring-1 focus:ring-primary-container transition-all"
+                    placeholder="••••••••"
+                    required
+                  />
+                </div>
+              )}
+
+              {authError && (
+                <div className="bg-red-500/10 border border-red-500/50 rounded-lg p-3 text-red-400 font-code-sm text-code-sm">
+                  {authError}
+                </div>
+              )}
+              
+              <button 
+                type="submit" 
+                className="w-full bg-primary-container text-white font-label-md text-label-md font-bold px-8 py-3.5 rounded-lg hover:bg-[#e66000] transition-colors shadow-[0_0_15px_rgba(255,107,0,0.2)] mt-6"
+              >
+                {isRegistering ? 'Criar Conta' : 'Entrar no Painel'}
+              </button>
+            </form>
+
+            <div className="mt-8 flex items-center justify-center space-x-4">
+              <div className="flex-1 h-px bg-[#262626]"></div>
+              <span className="font-code-sm text-code-sm text-on-surface-variant">ou</span>
+              <div className="flex-1 h-px bg-[#262626]"></div>
+            </div>
+
+            <button 
+              type="button"
+              onClick={loginWithGoogle} 
+              className="w-full mt-6 bg-white text-black font-label-md text-label-md font-bold px-8 py-3 rounded-lg hover:bg-gray-100 transition-colors flex items-center justify-center gap-3"
+            >
+              <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" className="w-5 h-5" alt="Google" />
+              Continuar com Google
+            </button>
           </div>
-        </form>
-        <div style={{ margin: '20px 0', borderBottom: '1px solid var(--border-color)' }}></div>
-        <button className="btn" onClick={loginWithGoogle} style={{ width: '100%', background: '#fff', color: '#333' }}>
-          <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" style={{ width: '18px', verticalAlign: 'middle', marginRight: '8px' }} alt="Google" />
-          Continuar com Google
-        </button>
+          
+          <div className="bg-[#0D0D0D] border-t border-[#262626] p-6 text-center">
+            <span className="font-body-md text-body-md text-on-surface-variant">
+              {isRegistering ? 'Já tem uma conta? ' : 'Não tem uma conta? '}
+            </span>
+            <button 
+              type="button"
+              onClick={(e) => { e.preventDefault(); setIsRegistering(!isRegistering); setAuthError(''); }}
+              className="font-label-md text-label-md font-bold text-primary-container hover:text-white transition-colors ml-2"
+            >
+              {isRegistering ? 'Fazer Login' : 'Criar Conta Gratuita'}
+            </button>
+          </div>
+        </div>
+        
+        <a href="/" className="mt-8 font-label-md text-label-md text-on-surface-variant hover:text-white transition-colors flex items-center gap-2">
+          <span className="material-symbols-outlined text-[18px]">arrow_back</span>
+          Voltar para o site
+        </a>
       </div>
     );
   }
@@ -401,56 +472,77 @@ export default function Dashboard({ mode = 'dashboard' }) {
   });
 
   return (
-    <div style={{ maxWidth: '1000px', margin: '0 auto', paddingBottom: '40px' }}>
+    <div className="flex min-h-screen bg-background text-white font-body-md">
       <ToastContainer />
-      {/* HEADER & THIN PROFILE */}
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '15px', flexWrap: 'wrap', gap: '15px' }}>
-        <h1 style={{ color: 'var(--tmd-orange)', margin: 0, fontSize: 'clamp(1.4rem, 4vw, 1.8rem)' }}>Painel do Cliente</h1>
-        <div style={{ display: 'flex', gap: '20px', alignItems: 'center' }}>
-          
-          <button style={{ background: 'transparent', border: 'none', color: 'var(--text-muted)', cursor: 'pointer', fontSize: '0.9rem', padding: 0 }} onClick={() => document.getElementById('faq-section').scrollIntoView({ behavior: 'smooth' })}>
-            Ajuda / FAQ
+      {/* SIDEBAR */}
+      <aside className="w-64 fixed inset-y-0 left-0 bg-[#0D0D0D] border-r border-[#262626] flex flex-col z-20">
+        <div className="p-6 border-b border-[#262626]">
+          <h2 className="text-xl font-bold text-primary-container flex items-center gap-2">
+            <span className="material-symbols-outlined" data-weight="fill">code_blocks</span>
+            LispCentral
+          </h2>
+          <span className="text-xs text-on-surface-variant mt-1 block">Painel do Cliente</span>
+        </div>
+        
+        <nav className="flex-1 overflow-y-auto p-4 space-y-2">
+          <div className="text-xs font-bold text-[#555] uppercase tracking-wider mb-2 mt-4 px-2">Principal</div>
+          <button onClick={() => setActiveTab('lisp')} className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg transition-colors ${activeTab === 'lisp' ? 'bg-[#1a1c1c] text-primary-container border border-[#343535]' : 'text-on-surface-variant hover:text-white hover:bg-[#141414]'}`}>
+            <span className="material-symbols-outlined text-[20px]">folder_copy</span> Gestor de LISPs
+
           </button>
-          
-          <button style={{ background: 'transparent', border: 'none', color: 'var(--text-muted)', cursor: 'pointer', fontSize: '0.9rem', padding: 0 }} onClick={() => setShowSupportModal(true)}>
-            Reportar Bug
+          <button onClick={() => setActiveTab('favorites')} className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg transition-colors ${activeTab === 'favorites' ? 'bg-[#1a1c1c] text-primary-container border border-[#343535]' : 'text-on-surface-variant hover:text-white hover:bg-[#141414]'}`}>
+            <span className="material-symbols-outlined text-[20px]">star</span> Minha Coleção
           </button>
 
-          <a href="/favorites" style={{ textDecoration: 'none', color: 'var(--tmd-orange)', fontWeight: 'bold', fontSize: '0.9rem', marginLeft: '10px' }}>
-            ⭐ Meus Favoritos
-          </a>
+          <div className="text-xs font-bold text-[#555] uppercase tracking-wider mb-2 mt-6 px-2">Conta & Configurações</div>
+          <button onClick={() => setActiveTab('profile')} className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg transition-colors ${activeTab === 'profile' ? 'bg-[#1a1c1c] text-primary-container border border-[#343535]' : 'text-on-surface-variant hover:text-white hover:bg-[#141414]'}`}>
+            <span className="material-symbols-outlined text-[20px]">person</span> Meu Perfil
+          </button>
+          <button onClick={() => setActiveTab('licenses')} className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg transition-colors ${activeTab === 'licenses' ? 'bg-[#1a1c1c] text-primary-container border border-[#343535]' : 'text-on-surface-variant hover:text-white hover:bg-[#141414]'}`}>
+            <span className="material-symbols-outlined text-[20px]">vpn_key</span> Licenças & Acessos
+          </button>
+          <button onClick={() => setActiveTab('notifications')} className={`w-full flex items-center justify-between px-3 py-2 rounded-lg transition-colors ${activeTab === 'notifications' ? 'bg-[#1a1c1c] text-primary-container border border-[#343535]' : 'text-on-surface-variant hover:text-white hover:bg-[#141414]'}`}>
+            <div className="flex items-center gap-3"><span className="material-symbols-outlined text-[20px]">notifications</span> Notificações</div>
+            {unreadCount > 0 && <span className="bg-primary-container text-white text-[10px] font-bold px-2 py-0.5 rounded-full">{unreadCount}</span>}
+          </button>
 
-          <div style={{ position: 'relative' }}>
-            <div style={{ position: 'relative', cursor: 'pointer', fontSize: '1.2rem', display: 'inline-block' }} onClick={() => setShowNotifications(!showNotifications)} title="Notificações">
-              🔔
-              {unreadCount > 0 && <span style={{ position: 'absolute', top: '-5px', right: '-8px', background: 'var(--tmd-orange)', color: '#fff', fontSize: '0.65rem', padding: '2px 5px', borderRadius: '50%', fontWeight: 'bold' }}>{unreadCount}</span>}
+          <div className="text-xs font-bold text-[#555] uppercase tracking-wider mb-2 mt-6 px-2">Ajuda</div>
+          <button onClick={() => setShowSupportModal(true)} className="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-on-surface-variant hover:text-white hover:bg-[#141414] transition-colors">
+            <span className="material-symbols-outlined text-[20px]">bug_report</span> Reportar Bug
+          </button>
+        </nav>
+        
+        <div className="p-4 border-t border-[#262626]">
+          <div className="flex items-center gap-3 mb-4 px-2">
+            <div className="w-8 h-8 rounded-full bg-primary-container text-white flex items-center justify-center font-bold text-sm">{userData?.name?.charAt(0) || 'U'}</div>
+            <div className="flex-1 overflow-hidden">
+              <div className="text-sm font-bold truncate">{userData?.name}</div>
+              <div className="text-xs text-on-surface-variant truncate">{userData?.role || 'Engenheiro'}</div>
             </div>
-            {showNotifications && (
-              <div style={{ position: 'absolute', top: '100%', right: 0, background: 'var(--panel-bg)', border: '1px solid var(--panel-border)', borderRadius: '8px', width: '280px', padding: '10px', marginTop: '10px', zIndex: 100, boxShadow: '0 4px 12px rgba(0,0,0,0.5)' }}>
-                <h4 style={{ margin: '0 0 10px 0', borderBottom: '1px solid var(--border-color)', paddingBottom: '5px' }}>Notificações</h4>
-                
-                {notifications.length === 0 ? (
-                  <div style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>Nenhuma notificação.</div>
-                ) : (
-                  notifications.map(n => (
-                    <div key={n.id} style={{ fontSize: '0.85rem', color: '#fff', marginBottom: '8px', padding: '8px', background: n.read ? 'var(--bg-color)' : 'var(--bg-darker)', borderRadius: '4px', borderLeft: n.read ? 'none' : '3px solid var(--tmd-orange)' }}>
-                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-                        <strong style={{ color: n.read ? 'var(--text-muted)' : '#4caf50' }}>{n.title}</strong>
-                        {!n.read && <button onClick={() => markAsRead(n.id)} style={{ background: 'transparent', border: 'none', color: 'var(--text-muted)', cursor: 'pointer', fontSize: '0.7rem' }}>✔ Lido</button>}
-                      </div>
-                      <div style={{ marginTop: '4px', color: n.read ? 'var(--text-muted)' : '#fff' }}>{n.text}</div>
-                    </div>
-                  ))
-                )}
-              </div>
-            )}
+          </div>
+          <button onClick={logout} className="w-full flex items-center gap-2 justify-center px-4 py-2 border border-[#262626] text-on-surface-variant hover:text-red-400 hover:border-red-400/50 rounded-lg transition-colors text-sm">
+            <span className="material-symbols-outlined text-[18px]">logout</span> Sair
+          </button>
+        </div>
+      </aside>
+
+      {/* MAIN CONTENT AREA */}
+      <main className="flex-1 ml-64 p-8 relative min-h-screen">
+        <div className="absolute inset-0 pointer-events-none opacity-20 z-0" style={{ backgroundImage: 'linear-gradient(rgba(38, 38, 38, 0.2) 1px, transparent 1px), linear-gradient(90deg, rgba(38, 38, 38, 0.2) 1px, transparent 1px)', backgroundSize: '24px 24px' }}></div>
+        
+        <div className="relative z-10 max-w-[1000px] mx-auto">
+          
+          {/* BREADCRUMBS */}
+          <div className="flex items-center gap-2 text-sm text-on-surface-variant mb-8">
+            <a href="/" className="hover:text-primary-container transition-colors flex items-center gap-1"><span className="material-symbols-outlined text-[16px]">home</span> LispCentral</a>
+            <span className="material-symbols-outlined text-[16px]">chevron_right</span>
+            <span className="text-white">Painel do Cliente</span>
+            <span className="material-symbols-outlined text-[16px]">chevron_right</span>
+            <span className="text-primary-container font-bold capitalize">{activeTab === 'lisp' ? 'Gestor de LISPs' : activeTab === 'favorites' ? 'Minha Coleção' : activeTab === 'profile' ? 'Meu Perfil' : activeTab === 'licenses' ? 'Licenças & Acessos' : 'Notificações'}</span>
           </div>
 
-          <button className="btn btn-secondary" onClick={logout} style={{ padding: '6px 12px' }}>Sair</button>
-        </div>
-      </div>
-
-      {/* PROFILE CARD */}
+          {/* TAB: PROFILE */}
+          {activeTab === 'profile' && (
       <div className="card" style={{ padding: '10px 20px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', margin: '0 0 20px 0', flexDirection: 'row', flexWrap: 'wrap', gap: '10px' }}>
         {isEditingProfile ? (
           <form onSubmit={handleUpdateProfile} style={{ display: 'flex', gap: '10px', alignItems: 'center', width: '100%' }}>
@@ -477,7 +569,10 @@ export default function Dashboard({ mode = 'dashboard' }) {
         )}
       </div>
 
-      {/* SUBSCRIPTIONS & SEATS FOUNDATION (Moved UP) */}
+          )}
+
+          {/* TAB: LICENSES */}
+          {activeTab === 'licenses' && (
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '20px', marginBottom: '20px' }}>
         
         {/* LICENSES & ACCESS */}
@@ -546,7 +641,10 @@ export default function Dashboard({ mode = 'dashboard' }) {
         </div>
       </div>
 
-      {/* WORKSPACE (Massive Upload & Table) - Moved DOWN */}
+          )}
+
+          {/* TAB: LISP */}
+          {activeTab === 'lisp' && (
       <div className="card" style={{ marginBottom: '20px', overflowX: 'auto' }}>
         <h3 style={{ marginTop: 0, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           Workspace LISPs
@@ -571,44 +669,44 @@ export default function Dashboard({ mode = 'dashboard' }) {
           {uniqueGroups.map(g => <option key={g} value={g} />)}
         </datalist>
 
-        <table style={{ width: '100%', minWidth: '850px', borderCollapse: 'collapse', fontSize: '0.9rem', textAlign: 'left' }}>
+        <table className="w-full text-left border-collapse">
           <thead>
-            <tr style={{ borderBottom: '1px solid var(--border-color)', color: 'var(--text-muted)' }}>
-              <th style={{ padding: '8px', width: '90px' }}>Ícone SVG</th>
-              <th style={{ padding: '8px', width: '250px' }}>Arquivo & Nome Amigável</th>
-              <th style={{ padding: '8px', width: '130px' }}>Suite</th>
-              <th style={{ padding: '8px', width: '130px' }}>Grupo</th>
-              <th style={{ padding: '8px', width: '150px', textAlign: 'right' }}>Ações</th>
+            <tr className="border-b border-[#262626] text-label-md font-label-md text-on-secondary-container">
+              <th className="pb-3 pl-4 font-normal w-[90px]">Ícone SVG</th>
+              <th className="pb-3 font-normal w-[250px]">Arquivo / Amigável</th>
+              <th className="pb-3 font-normal w-[130px]">Suite</th>
+              <th className="pb-3 font-normal w-[130px]">Grupo</th>
+              <th className="pb-3 pr-4 text-right font-normal w-[150px]">Ações</th>
             </tr>
           </thead>
           <tbody>
             
             {/* DRAFTS SECTION */}
             {draftLisps.map((draft, i) => (
-              <tr key={'draft-'+i} style={{ background: 'rgba(242, 109, 33, 0.05)', borderBottom: '1px solid var(--panel-border)' }}>
-                <td style={{ padding: '8px' }}>
-                  <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
-                    <div style={{ width: '24px', height: '24px', background: 'rgba(255,255,255,0.1)', borderRadius: '4px', padding: '2px', color: 'var(--tmd-orange)', display: 'flex', alignItems: 'center', justifyContent: 'center' }} dangerouslySetInnerHTML={{ __html: draft.svgIcon || '' }} />
-                    <input type="file" accept=".svg" id={`svg-upload-draft-${i}`} style={{ display: 'none' }} onChange={(e) => handleSvgUpload(e, i, true)} />
-                    <button className="btn btn-secondary" style={{ padding: '2px 4px', fontSize: '0.7rem' }} onClick={() => document.getElementById(`svg-upload-draft-${i}`).click()} title="Upload SVG">📁</button>
+              <tr key={'draft-'+i} className="border-b border-[#262626] bg-primary-container/5 hover:bg-[#1a1c1c] transition-colors group">
+                <td className="py-4 pl-4">
+                  <div className="flex gap-2 items-center">
+                    <div className="w-8 h-8 bg-white/5 rounded flex items-center justify-center text-primary-container" dangerouslySetInnerHTML={{ __html: draft.svgIcon || '' }} />
+                    <input type="file" accept=".svg" id={`svg-upload-draft-${i}`} className="hidden" onChange={(e) => handleSvgUpload(e, i, true)} />
+                    <button className="text-on-secondary-container hover:text-primary transition-colors" onClick={() => document.getElementById(`svg-upload-draft-${i}`).click()} title="Upload SVG"><span className="material-symbols-outlined text-[18px]">folder_open</span></button>
                   </div>
-                  <input type="text" value={draft.svgIcon} onChange={e => updateDraft(i, 'svgIcon', e.target.value)} style={{ width: '100%', padding: '2px', background: 'var(--bg-darker)', border: '1px solid var(--border-color)', color: '#fff', fontSize: '0.7rem', marginTop: '4px' }} placeholder="<svg..." />
+                  <input type="text" value={draft.svgIcon} onChange={e => updateDraft(i, 'svgIcon', e.target.value)} className="w-full mt-2 bg-[#0A0A0A] border border-[#262626] rounded text-[#888] text-[10px] p-1 font-mono" placeholder="<svg..." />
                 </td>
-                <td style={{ padding: '8px', color: '#fff' }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                    <span style={{ fontWeight: 'bold' }}>{draft.originalName}</span>
-                    <input type="text" value={draft.friendlyName} onChange={e => updateDraft(i, 'friendlyName', e.target.value)} style={{ flex: 1, padding: '4px', background: 'var(--bg-darker)', border: '1px solid var(--tmd-orange)', color: '#fff', fontSize: '0.85rem' }} placeholder="Nome amigável" />
+                <td className="py-4 text-white">
+                  <div className="flex flex-col gap-1 pr-2">
+                    <span className="font-bold font-code-sm text-code-sm">{draft.originalName}</span>
+                    <input type="text" value={draft.friendlyName} onChange={e => updateDraft(i, 'friendlyName', e.target.value)} className="w-full bg-[#141414] border border-primary-container/30 rounded text-white text-sm p-1.5 focus:border-primary-container focus:outline-none" placeholder="Nome amigável" />
                   </div>
                 </td>
-                <td style={{ padding: '8px' }}>
-                  <input list="suite-list" value={draft.suite} onChange={e => updateDraft(i, 'suite', e.target.value)} style={{ width: '100%', padding: '4px', background: 'var(--bg-darker)', border: '1px solid var(--border-color)', color: '#fff' }} />
+                <td className="py-4 pr-2">
+                  <input list="suite-list" value={draft.suite} onChange={e => updateDraft(i, 'suite', e.target.value)} className="w-full bg-[#141414] border border-[#262626] rounded text-white text-sm p-1.5 focus:border-primary-container focus:outline-none" />
                 </td>
-                <td style={{ padding: '8px' }}>
-                  <input list="group-list" value={draft.group} onChange={e => updateDraft(i, 'group', e.target.value)} style={{ width: '100%', padding: '4px', background: 'var(--bg-darker)', border: '1px solid var(--border-color)', color: '#fff' }} />
+                <td className="py-4 pr-2">
+                  <input list="group-list" value={draft.group} onChange={e => updateDraft(i, 'group', e.target.value)} className="w-full bg-[#141414] border border-[#262626] rounded text-white text-sm p-1.5 focus:border-primary-container focus:outline-none" />
                 </td>
-                <td style={{ padding: '8px', textAlign: 'right' }}>
-                  <span style={{ fontSize: '0.75rem', color: 'var(--tmd-orange)', marginRight: '10px' }}>Aguardando Upload</span>
-                  <button className="btn btn-secondary" onClick={() => removeDraft(i)} style={{ padding: '2px 6px', fontSize: '0.8rem', color: '#ff4444' }}>X</button>
+                <td className="py-4 pr-4 text-right">
+                  <span className="text-[11px] text-primary-container block mb-1">Aguardando Upload</span>
+                  <button className="text-on-secondary-container hover:text-error transition-colors" onClick={() => removeDraft(i)}><span className="material-symbols-outlined text-[18px]">delete</span></button>
                 </td>
               </tr>
             ))}
@@ -620,30 +718,30 @@ export default function Dashboard({ mode = 'dashboard' }) {
               if (isEditing) {
                 // EDIT MODE
                 return (
-                  <tr key={lisp.id} style={{ background: 'rgba(255, 255, 255, 0.05)', borderBottom: '1px solid var(--panel-border)' }}>
-                    <td style={{ padding: '8px' }}>
-                      <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
-                        <div style={{ width: '24px', height: '24px', background: 'rgba(255,255,255,0.1)', borderRadius: '4px', padding: '2px', color: 'var(--tmd-orange)', display: 'flex', alignItems: 'center', justifyContent: 'center' }} dangerouslySetInnerHTML={{ __html: editLispData.svgIcon || '' }} />
-                        <input type="file" accept=".svg" id={`svg-upload-edit-${lisp.id}`} style={{ display: 'none' }} onChange={(e) => handleSvgUpload(e, null, false)} />
-                        <button className="btn btn-secondary" style={{ padding: '2px 4px', fontSize: '0.7rem' }} onClick={() => document.getElementById(`svg-upload-edit-${lisp.id}`).click()} title="Upload SVG">📁</button>
+                  <tr key={lisp.id} className="border-b border-[#262626] bg-white/5 hover:bg-[#1a1c1c] transition-colors group">
+                    <td className="py-4 pl-4">
+                      <div className="flex gap-2 items-center">
+                        <div className="w-8 h-8 bg-white/5 rounded flex items-center justify-center text-primary-container" dangerouslySetInnerHTML={{ __html: editLispData.svgIcon || '' }} />
+                        <input type="file" accept=".svg" id={`svg-upload-edit-${lisp.id}`} className="hidden" onChange={(e) => handleSvgUpload(e, null, false)} />
+                        <button className="text-on-secondary-container hover:text-primary transition-colors" onClick={() => document.getElementById(`svg-upload-edit-${lisp.id}`).click()} title="Upload SVG"><span className="material-symbols-outlined text-[18px]">folder_open</span></button>
                       </div>
-                      <input type="text" value={editLispData.svgIcon} onChange={e => setEditLispData({...editLispData, svgIcon: e.target.value})} style={{ width: '100%', padding: '2px', background: 'var(--bg-darker)', border: '1px solid var(--tmd-orange)', color: '#fff', fontSize: '0.7rem', marginTop: '4px' }} placeholder="<svg..." />
+                      <input type="text" value={editLispData.svgIcon} onChange={e => setEditLispData({...editLispData, svgIcon: e.target.value})} className="w-full mt-2 bg-[#0A0A0A] border border-primary-container/50 rounded text-[#888] text-[10px] p-1 font-mono" placeholder="<svg..." />
                     </td>
-                    <td style={{ padding: '8px', color: '#fff' }}>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                        <span style={{ fontWeight: 'bold' }}>{lisp.originalName}</span>
-                        <input type="text" value={editLispData.friendlyName} onChange={e => setEditLispData({...editLispData, friendlyName: e.target.value})} style={{ flex: 1, padding: '4px', background: 'var(--bg-darker)', border: '1px solid var(--tmd-orange)', color: '#fff', fontSize: '0.85rem' }} placeholder="Nome amigável" />
+                    <td className="py-4 text-white">
+                      <div className="flex flex-col gap-1 pr-2">
+                        <span className="font-bold font-code-sm text-code-sm">{lisp.originalName}</span>
+                        <input type="text" value={editLispData.friendlyName} onChange={e => setEditLispData({...editLispData, friendlyName: e.target.value})} className="w-full bg-[#141414] border border-primary-container/50 rounded text-white text-sm p-1.5 focus:border-primary-container focus:outline-none" placeholder="Nome amigável" />
                       </div>
                     </td>
-                    <td style={{ padding: '8px' }}>
-                      <input list="suite-list" value={editLispData.suite} onChange={e => setEditLispData({...editLispData, suite: e.target.value})} style={{ width: '100%', padding: '4px', background: 'var(--bg-darker)', border: '1px solid var(--tmd-orange)', color: '#fff' }} />
+                    <td className="py-4 pr-2">
+                      <input list="suite-list" value={editLispData.suite} onChange={e => setEditLispData({...editLispData, suite: e.target.value})} className="w-full bg-[#141414] border border-primary-container/50 rounded text-white text-sm p-1.5 focus:border-primary-container focus:outline-none" />
                     </td>
-                    <td style={{ padding: '8px' }}>
-                      <input list="group-list" value={editLispData.group} onChange={e => setEditLispData({...editLispData, group: e.target.value})} style={{ width: '100%', padding: '4px', background: 'var(--bg-darker)', border: '1px solid var(--tmd-orange)', color: '#fff' }} />
+                    <td className="py-4 pr-2">
+                      <input list="group-list" value={editLispData.group} onChange={e => setEditLispData({...editLispData, group: e.target.value})} className="w-full bg-[#141414] border border-primary-container/50 rounded text-white text-sm p-1.5 focus:border-primary-container focus:outline-none" />
                     </td>
-                    <td style={{ padding: '8px', textAlign: 'right' }}>
-                      <button className="btn" onClick={handleSaveEdit} style={{ padding: '4px 8px', fontSize: '0.8rem', marginRight: '5px' }}>Salvar</button>
-                      <button className="btn btn-secondary" onClick={handleCancelEdit} style={{ padding: '4px 8px', fontSize: '0.8rem' }}>Cancelar</button>
+                    <td className="py-4 pr-4 text-right">
+                      <button className="bg-primary-container text-white px-3 py-1.5 rounded text-xs font-bold hover:bg-[#e66000] transition-colors mb-1 shadow-sm w-full" onClick={handleSaveEdit}>Salvar</button>
+                      <button className="bg-transparent border border-[#262626] text-on-secondary-container hover:text-white px-3 py-1.5 rounded text-xs transition-colors w-full" onClick={handleCancelEdit}>Cancelar</button>
                     </td>
                   </tr>
                 );
@@ -651,24 +749,27 @@ export default function Dashboard({ mode = 'dashboard' }) {
 
               // VIEW MODE
               return (
-                <tr key={lisp.id} style={{ borderBottom: '1px solid var(--panel-border)' }}>
-                  <td style={{ padding: '8px' }}>
-                    <div style={{ width: '28px', height: '28px', background: 'rgba(255,255,255,0.08)', border: '1px solid rgba(255,255,255,0.15)', borderRadius: '4px', padding: '4px', color: 'var(--tmd-orange)', display: 'flex', alignItems: 'center', justifyContent: 'center' }} dangerouslySetInnerHTML={{ __html: lisp.svgIcon || '' }} />
+                <tr key={lisp.id} className="border-b border-[#262626] hover:bg-[#1a1c1c] transition-colors group">
+                  <td className="py-4 pl-4">
+                    <div className="w-8 h-8 bg-surface-container-highest border border-surface-variant rounded flex items-center justify-center text-primary-container" dangerouslySetInnerHTML={{ __html: lisp.svgIcon || '' }} />
                   </td>
-                  <td style={{ padding: '8px', color: '#fff' }}>
-                    <strong>{lisp.originalName}</strong>
-                    <span style={{ margin: '0 8px', color: 'var(--panel-border)' }}>|</span>
-                    <span style={{ color: 'var(--text-muted)' }}>{lisp.friendlyName}</span>
+                  <td className="py-4">
+                    <div className="flex flex-col">
+                      <span className="font-bold text-white font-code-sm text-code-sm">{lisp.originalName}</span>
+                      <span className="text-on-surface-variant text-sm">{lisp.friendlyName}</span>
+                    </div>
                   </td>
-                  <td style={{ padding: '8px' }}>
-                    <span style={{ background: 'var(--bg-darker)', padding: '4px 8px', borderRadius: '4px', border: '1px solid var(--border-color)', fontSize: '0.8rem' }}>{lisp.suite}</span>
+                  <td className="py-4">
+                    <span className="px-2.5 py-1 bg-[#1a1c1c] border border-[#343535] rounded text-xs font-mono text-secondary">{lisp.suite || '-'}</span>
                   </td>
-                  <td style={{ padding: '8px' }}>
-                    <span style={{ background: 'var(--bg-darker)', padding: '4px 8px', borderRadius: '4px', border: '1px solid var(--border-color)', fontSize: '0.8rem' }}>{lisp.group}</span>
+                  <td className="py-4">
+                    <span className="px-2.5 py-1 bg-[#1a1c1c] border border-[#343535] rounded text-xs font-mono text-secondary">{lisp.group || '-'}</span>
                   </td>
-                  <td style={{ padding: '8px', textAlign: 'right' }}>
-                    <button className="btn btn-secondary" onClick={() => handleEditClick(lisp)} style={{ padding: '4px 8px', fontSize: '0.8rem', marginRight: '5px' }}>Editar</button>
-                    <button className="btn btn-secondary" onClick={() => handleDeleteLisp(lisp)} style={{ padding: '4px 8px', fontSize: '0.8rem', color: '#ff4444', borderColor: 'rgba(255,68,68,0.3)' }}>Excluir</button>
+                  <td className="py-4 pr-4 text-right">
+                    <div className="flex justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                      <button className="w-8 h-8 flex items-center justify-center rounded border border-[#262626] text-on-secondary-container hover:text-white hover:border-primary-container transition-colors" onClick={() => handleEditClick(lisp)} title="Editar"><span className="material-symbols-outlined text-[16px]">edit</span></button>
+                      <button className="w-8 h-8 flex items-center justify-center rounded border border-[#262626] text-on-secondary-container hover:text-error hover:border-error/50 transition-colors" onClick={() => handleDeleteLisp(lisp)} title="Excluir"><span className="material-symbols-outlined text-[16px]">delete</span></button>
+                    </div>
                   </td>
                 </tr>
               );
@@ -686,7 +787,37 @@ export default function Dashboard({ mode = 'dashboard' }) {
         )}
       </div>
 
-      {/* FAQ / HELP SECTION */}
+          )}
+
+          {/* TAB: FAVORITES */}
+          {activeTab === 'favorites' && (
+            <div className="card" style={{ marginBottom: '20px' }}>
+              <FavoritesManager />
+            </div>
+          )}
+
+          {/* TAB: NOTIFICATIONS */}
+          {activeTab === 'notifications' && (
+            <div className="card" style={{ marginBottom: '20px' }}>
+               <h3 style={{ marginTop: 0 }}>Notificações do Sistema</h3>
+               {notifications.length === 0 ? (
+                  <div style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>Nenhuma notificação.</div>
+                ) : (
+                  notifications.map(n => (
+                    <div key={n.id} style={{ fontSize: '0.85rem', color: '#fff', marginBottom: '8px', padding: '12px', background: n.read ? 'var(--bg-color)' : 'var(--bg-darker)', borderRadius: '6px', borderLeft: n.read ? 'none' : '4px solid var(--tmd-orange)' }}>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                        <strong style={{ color: n.read ? 'var(--text-muted)' : '#4caf50', fontSize: '1rem' }}>{n.title}</strong>
+                        {!n.read && <button onClick={() => markAsRead(n.id)} className="btn btn-secondary" style={{ padding: '4px 8px', fontSize: '0.75rem' }}>✔ Marcar como Lido</button>}
+                      </div>
+                      <div style={{ marginTop: '8px', color: n.read ? 'var(--text-muted)' : '#ccc' }}>{n.text}</div>
+                    </div>
+                  ))
+                )}
+            </div>
+          )}
+
+          {/* FAQ (Shows inside Licenses) */}
+          {activeTab === 'licenses' && (
       <div id="faq-section" className="card" style={{ marginBottom: '40px' }}>
         <h3 style={{ marginTop: 0 }}>Centro de Ajuda / FAQ</h3>
         <p style={{ fontSize: '0.9rem', color: 'var(--text-muted)' }}>Encontre respostas rápidas para os problemas mais comuns.</p>
@@ -732,6 +863,8 @@ export default function Dashboard({ mode = 'dashboard' }) {
         </div>
       </div>
 
+          )}
+
       {/* SUPPORT MODAL */}
       {showSupportModal && (
         <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.7)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000 }}>
@@ -759,6 +892,8 @@ export default function Dashboard({ mode = 'dashboard' }) {
         </div>
       )}
 
+        </div>
+      </main>
     </div>
   );
 }

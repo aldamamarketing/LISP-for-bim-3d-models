@@ -1,0 +1,123 @@
+---
+import '../styles/global.css';
+
+interface Props {
+	title: string;
+}
+
+const { title } = Astro.props;
+---
+
+<!doctype html>
+<html lang="pt-BR" class="dark">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width" />
+		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+		<meta name="generator" content={Astro.generator} />
+		<title>{title}</title>
+
+        <meta name="description" content="Proteja sua propriedade intelectual, centralize seus LISPs na nuvem e padronize a produção da sua equipe de AutoCAD instantaneamente.">
+        <meta name="keywords" content="lisp autocad, bim manager, automação autocad, proteger lisp, cloud lisp, autocad corporativo" />
+        <link rel="canonical" href={Astro.url ? Astro.url.href : ''} />
+        
+        <!-- OpenGraph Metadata -->
+        <meta property="og:title" content="LispCentral | O Controle Total do seu AutoCAD na Nuvem" />
+        <meta property="og:description" content="Proteja sua propriedade intelectual, centralize seus LISPs na nuvem e padronize a produção da sua equipe de AutoCAD." />
+        <meta property="og:type" content="website" />
+        <meta property="og:url" content={Astro.url ? Astro.url.href : ''} />
+        <meta property="og:site_name" content="LispCentral" />
+
+        <!-- Google Search Console Verification -->
+        <meta name="google-site-verification" content="0QWLvps86pF-khU03U3Phucz_KyeIPXudO5Vll4xzaM" />
+
+        <!-- Schema.org Structured Data -->
+        <script type="application/ld+json">
+        {
+            "@context": "https://schema.org",
+            "@type": "SoftwareApplication",
+            "name": "LispCentral",
+            "applicationCategory": "BusinessApplication",
+            "operatingSystem": "Windows",
+            "description": "Plataforma SaaS na nuvem para gerenciamento, proteção e distribuição de rotinas AutoLISP para equipes de engenharia.",
+            "url": "https://lispcentral.web.app",
+            "offers": {
+            "@type": "Offer",
+            "price": "0",
+            "priceCurrency": "BRL",
+            "description": "Beta Gratuito"
+            },
+            "creator": {
+            "@type": "Organization",
+            "name": "LispCentral",
+            "url": "https://lispcentral.web.app"
+            },
+            "featureList": [
+            "Cloud LISP Management",
+            "JIT Compilation (Zero-Disk)",
+            "Intellectual Property Protection",
+            "Multi-Tenant B2B",
+            "Seat/License Management",
+            "AI-Powered Icon Generator",
+            "AI-Powered Hatch Generator",
+            "AI-Powered Linetype Generator"
+            ]
+        }
+        </script>
+
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400&display=swap" rel="stylesheet" />
+        <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet" />
+	</head>
+	<body class="bg-background text-on-surface font-body-md antialiased selection:bg-primary-container selection:text-white flex flex-col min-h-screen">
+		<slot />
+
+        <!-- Firebase Analytics -->
+        <script>
+            import { initPageTracking, trackCtaClick, trackSectionView } from '../utils/analytics.js';
+
+            // Inicializa analytics
+            initPageTracking();
+
+            // Track CTA clicks
+            document.addEventListener('click', (e) => {
+                const target = e.target as Element;
+                const link = target.closest('a');
+                if (!link) return;
+
+                const href = link.getAttribute('href');
+                if (href === '/login') {
+                    trackCtaClick('beta_signup', 'landing');
+                } else if (href && href.startsWith('#')) {
+                    trackCtaClick('anchor_click', href);
+                }
+            });
+
+            // Track scroll sections
+            const sectionsToTrack = [
+                { selector: '#solucao', name: 'pain_points' },
+                { selector: '#funcionalidades', name: 'features_jit' },
+                { selector: '.cta-section', name: 'bottom_cta' },
+            ];
+
+            const tracked = new Set();
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach((entry) => {
+                    if (entry.isIntersecting && !tracked.has(entry.target)) {
+                        tracked.add(entry.target);
+                        const section = sectionsToTrack.find(
+                            (s) => entry.target.matches(s.selector)
+                        );
+                        if (section) trackSectionView(section.name);
+                    }
+                });
+            }, { threshold: 0.3 });
+
+            sectionsToTrack.forEach(({ selector }) => {
+                const el = document.querySelector(selector);
+                if (el) observer.observe(el);
+            });
+        </script>
+	</body>
+</html>
