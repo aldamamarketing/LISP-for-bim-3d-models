@@ -17,6 +17,9 @@ export default defineConfig({
     }
   },
   vite: {
+    build: {
+      target: 'chrome65'
+    },
     resolve: {
       preserveSymlinks: true
     }
