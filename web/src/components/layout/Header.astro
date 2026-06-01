@@ -1,23 +1,63 @@
 ---
+import { translations } from '../../i18n/translations.js';
+
+const currentLocale = Astro.currentLocale || 'en';
+const t = (key) => {
+    const dict = translations[currentLocale] || translations['en'];
+    return dict[key] || key;
+};
+
+const getPath = (path) => {
+    return currentLocale === 'en' ? path : `/${currentLocale}${path}`;
+};
 ---
 <nav class="bg-background dark:bg-background w-full top-0 sticky z-50 border-b border-surface-variant dark:border-surface-variant">
     <div class="flex justify-between items-center px-8 py-4 max-w-[1200px] mx-auto">
         <div class="text-headline-md font-headline-md font-bold text-primary dark:text-primary tracking-tight">
-            LispCentral
+            <a href={getPath('/')}>LispCentral</a>
         </div>
         <div class="hidden md:flex items-center space-x-8">
-            <a class="text-primary font-bold border-b-2 border-primary pb-1 font-body-md text-body-md transition-all" href="/">Início</a>
-            <a class="text-on-surface dark:text-on-surface hover:text-primary transition-colors duration-200 font-body-md text-body-md" href="/tools/hatch">Gerador de Hatch</a>
-            <a class="text-on-surface dark:text-on-surface hover:text-primary transition-colors duration-200 font-body-md text-body-md" href="/tools/lines">Gerador de Linhas</a>
-            <a class="text-on-surface dark:text-on-surface hover:text-primary transition-colors duration-200 font-body-md text-body-md" href="/login">Portal do Cliente</a>
+            <a class="text-primary font-bold border-b-2 border-primary pb-1 font-body-md text-body-md transition-all" href={getPath('/')}>{t("header.home")}</a>
+            <a class="text-on-surface dark:text-on-surface hover:text-primary transition-colors duration-200 font-body-md text-body-md" href={getPath('/tools/hatch-generator')}>{t("header.hatch")}</a>
+            <a class="text-on-surface dark:text-on-surface hover:text-primary transition-colors duration-200 font-body-md text-body-md" href={getPath('/tools/linetype-generator')}>{t("header.lines")}</a>
+            <a class="text-on-surface dark:text-on-surface hover:text-primary transition-colors duration-200 font-body-md text-body-md" href={getPath('/tools/icon-generator')}>{t("header.icons")}</a>
+            <a class="text-on-surface dark:text-on-surface hover:text-primary transition-colors duration-200 font-body-md text-body-md" href={getPath('/tools/calc-viga')}>{t("header.profiles")}</a>
+            <a class="text-on-surface dark:text-on-surface hover:text-primary transition-colors duration-200 font-body-md text-body-md" href={getPath('/dashboard')}>{t("header.portal")}</a>
         </div>
         <div class="hidden md:flex items-center space-x-4">
-            <a href="/login" class="font-label-md text-label-md text-on-surface hover:text-primary transition-colors px-4 py-2">
-                Login
+            <select id="lang-selector" class="bg-surface-variant text-on-surface text-label-md px-2 py-1 rounded border border-surface outline-none cursor-pointer">
+                <option value="en" selected={currentLocale === 'en'}>EN</option>
+                <option value="es" selected={currentLocale === 'es'}>ES</option>
+                <option value="pt" selected={currentLocale === 'pt'}>PT</option>
+            </select>
+            <a href={getPath('/login')} class="font-label-md text-label-md text-on-surface hover:text-primary transition-colors px-4 py-2">
+                {t("header.login")}
             </a>
-            <a href="#contato" class="bg-primary-container text-white hover:bg-[#e66000] transition-all font-label-md text-label-md font-bold px-6 py-2.5 rounded shadow-[0_0_15px_rgba(255,107,0,0.2)]">
-                Falar com Especialista
+            <a href={getPath('/help')} class="bg-primary-container text-white hover:bg-[#e66000] transition-all font-label-md text-label-md font-bold px-6 py-2.5 rounded shadow-[0_0_15px_rgba(255,107,0,0.2)]">
+                {t("header.help")}
             </a>
         </div>
     </div>
 </nav>
+
+<script>
+  const langSelector = document.getElementById('lang-selector');
+  if(langSelector) {
+      langSelector.addEventListener('change', (e) => {
+        const newLang = e.target.value;
+        const currentPath = window.location.pathname;
+        
+        // Remove current lang prefix if exists
+        let pathWithoutLang = currentPath;
+        if (currentPath.startsWith('/es/')) pathWithoutLang = currentPath.replace('/es/', '/');
+        else if (currentPath.startsWith('/pt/')) pathWithoutLang = currentPath.replace('/pt/', '/');
+        
+        if (newLang === 'en') {
+            window.location.href = pathWithoutLang;
+        } else {
+            const separator = pathWithoutLang.startsWith('/') ? '' : '/';
+            window.location.href = `/${newLang}${pathWithoutLang}`;
+        }
+      });
+  }
+</script>

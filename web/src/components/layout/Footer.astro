@@ -1,15 +1,26 @@
 ---
+import { translations } from '../../i18n/translations.js';
+
+const currentLocale = Astro.currentLocale || 'en';
+const t = (key) => {
+    const dict = translations[currentLocale] || translations['en'];
+    return dict[key] || key;
+};
+
+const getPath = (path) => {
+    return currentLocale === 'en' ? path : `/${currentLocale}${path}`;
+};
 ---
 <footer class="bg-surface-container-lowest dark:bg-surface-container-lowest w-full mt-auto border-t border-surface-variant dark:border-surface-variant">
     <div class="grid grid-cols-1 md:grid-cols-4 gap-gutter px-8 py-section-padding max-w-[1200px] mx-auto">
         <div class="md:col-span-1">
             <div class="text-headline-md font-headline-md font-bold text-on-surface mb-4">LispCentral</div>
-            <p class="font-label-md text-label-md text-on-secondary-container">© 2024 LispCentral. Infraestrutura robusta para engenharia de software BIM.</p>
+            <p class="font-label-md text-label-md text-on-secondary-container">{t("footer.desc")}</p>
         </div>
         <div class="md:col-span-3 flex flex-wrap justify-md-end gap-x-8 gap-y-4 md:ml-auto">
-            <a class="font-label-md text-label-md text-on-secondary-container hover:text-primary transition-colors" href="#">Privacidade</a>
-            <a class="font-label-md text-label-md text-on-secondary-container hover:text-primary transition-colors" href="#">Segurança</a>
-            <a class="font-label-md text-label-md text-on-secondary-container hover:text-primary transition-colors" href="#">Termos de Uso</a>
+            <a class="font-label-md text-label-md text-on-secondary-container hover:text-primary transition-colors" href={getPath('/privacidade')}>{t("footer.privacy")}</a>
+            <a class="font-label-md text-label-md text-on-secondary-container hover:text-primary transition-colors" href={getPath('/security')}>{t("footer.security")}</a>
+            <a class="font-label-md text-label-md text-on-secondary-container hover:text-primary transition-colors" href={getPath('/termos')}>{t("footer.terms")}</a>
         </div>
     </div>
 </footer>

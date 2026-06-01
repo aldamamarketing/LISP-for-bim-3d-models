@@ -1,6 +1,7 @@
 import React, { useRef, useEffect } from 'react';
 
 const parsePat = (code) => {
+  if (!code || typeof code !== 'string') return [];
   const lines = code.split('\n');
   const patterns = [];
   for (const line of lines) {
@@ -21,102 +22,138 @@ const parsePat = (code) => {
   return patterns;
 };
 
-export default function HatchPreview({ patCode, scale = 1 }) {
+export default function HatchPreview({ patCode, scale = 1, width = 150, height = 150 }) {
   const canvasRef = useRef(null);
 
   useEffect(() => {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-    const ctx = canvas.getContext('2d');
-    const width = canvas.width;
-    const height = canvas.height;
+    if (!canvasRef.current || !patCode) return;
 
-    // Clear background
-    ctx.fillStyle = '#0f0f0f';
-    ctx.fillRect(0, 0, width, height);
+    let rafId;
+    const draw = () => {
+      try {
+        const canvas = canvasRef.current;
+        const ctx = canvas.getContext('2d', { alpha: false });
+        
+        ctx.fillStyle = '#3b4654'; 
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-    if (!patCode) return;
+        const patterns = parsePat(patCode);
+        if (patterns.length === 0) return;
 
-    const patterns = parsePat(patCode);
-    
-    // Configurar estilo de línea
-    ctx.strokeStyle = '#f26d21'; // tmd-orange
-    ctx.lineWidth = 1;
+        // Normalize origins relative to first line to prevent huge coordinate hallucinations
+        const baseOx = patterns[0].ox;
+        const baseOy = patterns[0].oy;
+        patterns.forEach(p => {
+          p.ox -= baseOx;
+          p.oy -= baseOy;
+        });
 
-    // Calcular escala dinámica para que el patrón se repita ~4 veces (3x3 garantizado)
-    const maxSpacing = Math.max(...patterns.map(p => {
-      const dashSum = p.dashes.reduce((sum, d) => sum + Math.abs(d), 0);
-      return Math.max(Math.abs(p.dx), Math.abs(p.dy), dashSum);
-    })) || 10;
-    const baseScale = (height / 4) / maxSpacing;
-    const finalScale = baseScale * scale;
+        ctx.strokeStyle = '#ffffff'; 
+        ctx.lineWidth = 1;
 
-    // Suficiente para cubrir el área
-    const maxDist = Math.max(width, height) * 3; 
-
-    patterns.forEach(pat => {
-      const angleRad = pat.angle * Math.PI / 180;
-      
-      // Preparar guiones. En AutoCAD: + es línea, - es espacio, 0 es punto.
-      // Math.abs convierte los espacios negativos en distancias de canvas válidas.
-      // Canvas ignora el dash 0, así que lo convertimos a un valor muy pequeño (0.5) para que sea un punto.
-      const canvasDashes = pat.dashes.map(d => d === 0 ? 0.5 : Math.abs(d) * finalScale);
-      
-      ctx.save();
-      // Origen en el centro para facilitar la visualización
-      ctx.translate(width / 2, height / 2);
-      
-      // AutoCAD Y crece hacia arriba, Canvas Y crece hacia abajo
-      ctx.translate(pat.ox * finalScale, -pat.oy * finalScale); 
-      ctx.rotate(-angleRad); 
-      
-      ctx.beginPath();
-      if (canvasDashes.length > 0) {
-        ctx.setLineDash(canvasDashes);
-      } else {
-        ctx.setLineDash([]);
-      }
-      
-      const dy = pat.dy * finalScale;
-      const dx = pat.dx * finalScale;
-      
-      // Si dy es 0, dibujamos una sola línea en el centro
-      if (Math.abs(dy) < 0.001) {
-        ctx.moveTo(-maxDist, 0);
-        ctx.lineTo(maxDist, 0);
-      } else {
-        const numLines = Math.ceil(maxDist / Math.abs(dy));
-        for (let i = -numLines; i <= numLines; i++) {
-          const yPos = i * dy;
-          const xOffset = i * dx;
-          
-          // Desfase del dash para que el patrón se escalone correctamente
-          ctx.lineDashOffset = -xOffset;
-          
-          ctx.moveTo(-maxDist, yPos);
-          ctx.lineTo(maxDist, yPos);
+        let validDys = [];
+        patterns.forEach(p => {
+            if (Math.abs(p.dy) > 0.0001) validDys.push(Math.abs(p.dy));
+        });
+        validDys.sort((a,b) => a - b);
+        
+        let targetDy;
+        if (validDys.length > 0) {
+            targetDy = validDys[Math.floor(validDys.length / 2)];
+        } else {
+            let validDashes = [];
+            patterns.forEach(p => {
+                let dSum = p.dashes.reduce((sum, d) => sum + Math.abs(d), 0);
+                if (dSum > 0.0001) validDashes.push(dSum);
+            });
+            validDashes.sort((a,b) => a - b);
+            targetDy = validDashes.length > 0 ? validDashes[Math.floor(validDashes.length / 2)] : 1;
         }
-      }
-      
-      ctx.stroke();
-      ctx.restore();
-    });
 
-  }, [patCode, scale]);
+        let minX = Infinity, maxX = -Infinity;
+        let minY = Infinity, maxY = -Infinity;
+        patterns.forEach(p => {
+           if (p.ox < minX) minX = p.ox;
+           if (p.ox > maxX) maxX = p.ox;
+           if (p.oy < minY) minY = p.oy;
+           if (p.oy > maxY) maxY = p.oy;
+        });
+        const bboxSize = Math.max(maxX - minX, maxY - minY);
+        if (bboxSize > targetDy) {
+            targetDy = bboxSize;
+        }
+
+        // HEURÍSTICA DE COMPLEJIDAD: 
+        // Hachuras simples (1-5 líneas) necesitan 3-4 repeticiones para verse bien como una malla
+        // Hachuras complejas (600 líneas, ej. piedras) necesitan hacer ZOOM a ~1 sola repetición.
+        let targetRepetitions = Math.max(0.5, 4 - Math.log10(patterns.length) * 1.5);
+        
+        let finalScale = (canvas.height / targetRepetitions) / targetDy;
+        
+        if (finalScale > 5000) finalScale = 5000;
+        if (finalScale < 0.0001) finalScale = 0.0001;
+
+        finalScale = finalScale * scale;
+        const maxDist = Math.max(canvas.width, canvas.height) * 1.5; 
+
+        patterns.forEach(pat => {
+          const angleRad = pat.angle * Math.PI / 180;
+          const canvasDashes = pat.dashes.map(d => d === 0 ? 0.5 : Math.abs(d) * finalScale);
+          
+          ctx.save();
+          ctx.translate(canvas.width / 2, canvas.height / 2);
+          let ox = pat.ox * finalScale;
+          let oy = pat.oy * finalScale;
+          
+          ctx.translate(ox, -oy); 
+          ctx.rotate(-angleRad); 
+          
+          if (canvasDashes.length > 0) {
+            ctx.setLineDash(canvasDashes);
+          } else {
+            ctx.setLineDash([]);
+          }
+          
+          let currentMaxDist = Math.max(canvas.width, canvas.height) * 1.5 + Math.abs(ox) + Math.abs(oy);
+          if (currentMaxDist > 3000) currentMaxDist = 3000;
+          
+          const dy = pat.dy * finalScale;
+          const dx = pat.dx * finalScale;
+          
+          if (Math.abs(dy) < 0.001) {
+            ctx.beginPath();
+            ctx.moveTo(-currentMaxDist, 0);
+            ctx.lineTo(currentMaxDist, 0);
+            ctx.stroke();
+          } else {
+            const rawNumLines = Math.ceil(currentMaxDist / Math.abs(dy));
+            const numLines = Math.min(rawNumLines, 2000); 
+            
+            for (let i = -numLines; i <= numLines; i++) {
+              ctx.beginPath();
+              const yPos = i * dy;
+              const xOffset = i * dx;
+              ctx.lineDashOffset = -xOffset;
+              ctx.moveTo(-currentMaxDist, yPos);
+              ctx.lineTo(currentMaxDist, yPos);
+              ctx.stroke();
+            }
+          }
+          ctx.restore();
+        });
+        
+      } catch (e) {
+        console.error("Canvas draw error", e);
+      }
+    };
+
+    rafId = requestAnimationFrame(draw);
+    return () => cancelAnimationFrame(rafId);
+  }, [patCode, scale, width, height]);
 
   return (
-    <canvas 
-      ref={canvasRef} 
-      width={600} 
-      height={300} 
-      style={{ 
-        width: '100%', 
-        height: 'auto', 
-        maxHeight: '200px',
-        border: '1px solid #333', 
-        borderRadius: '6px',
-        marginBottom: '15px'
-      }} 
-    />
+    <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+      <canvas ref={canvasRef} width={width} height={height} style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
+    </div>
   );
 }

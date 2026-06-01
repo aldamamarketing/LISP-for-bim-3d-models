@@ -9,6 +9,13 @@ import tailwind from '@astrojs/tailwind';
 export default defineConfig({
   site: 'https://lispcentral.web.app',
   integrations: [react(), sitemap(), tailwind()],
+  i18n: {
+    defaultLocale: 'en',
+    locales: ['en', 'es', 'pt'],
+    routing: {
+      prefixDefaultLocale: false
+    }
+  },
   vite: {
     resolve: {
       preserveSymlinks: true

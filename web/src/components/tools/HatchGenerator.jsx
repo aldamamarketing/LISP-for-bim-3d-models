@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import './IconGenerator.css'; 
 import { saveToGlobalLibrary, addToFavorites } from '../../utils/library';
 import { auth } from '../../firebase';
@@ -6,21 +6,21 @@ import { onAuthStateChanged } from 'firebase/auth';
 import HatchPreview from './HatchPreview';
 import LibraryPanel from './LibraryPanel';
 import ToastContainer, { showToast } from '../Toast';
+import { hatchTranslations } from '../../i18n/translations.js';
 
-export default function HatchGenerator() {
+export default function HatchGenerator({ lang = 'en' }) {
+  const t = (key) => { const dict = hatchTranslations[lang] || hatchTranslations['en']; return dict[key] || key; };
   const [theme, setTheme] = useState('Arquitectura');
   const [prompts, setPrompts] = useState('Ladrillo en espina de pez\nMadera entramada');
   const [isGenerating, setIsGenerating] = useState(false);
   const [results, setResults] = useState([]);
   const [selectedHatches, setSelectedHatches] = useState([]);
   const [isExporting, setIsExporting] = useState(false);
-  const [isRevitFormat, setIsRevitFormat] = useState(false);
-  const [zoomScale, setZoomScale] = useState(1);
-  const [activeTab, setActiveTab] = useState('library');
+  const [activeTab, setActiveTab] = useState('library'); // 'library' | 'generator'
   const [saving, setSaving] = useState(null);
   const [user, setUser] = useState(null);
 
-  React.useEffect(() => {
+  useEffect(() => {
     const unsub = onAuthStateChanged(auth, u => setUser(u));
     return unsub;
   }, []);
@@ -49,7 +49,6 @@ export default function HatchGenerator() {
       const data = await response.json();
       const parsedResults = Array.isArray(data.results) ? data.results : [];
       setResults(parsedResults);
-      if (parsedResults.length > 0) setActiveTab('ai');
     } catch (error) {
       console.error(error);
       showToast("Instabilidade nos serviços de IA. Tente novamente em instantes.", "error");
@@ -58,28 +57,35 @@ export default function HatchGenerator() {
     }
   };
 
-  const handleSaveToFavorites = async (hatch) => {
+  const handleSaveFavorites = async () => {
     if (!user) {
       showToast(
-        'Crie uma conta gratuita para salvar nos favoritos e usar direto no AutoCAD. <a href="/login?redirect=' + encodeURIComponent(window.location.pathname) + '" style="color:#f26d21;font-weight:bold;text-decoration:underline">Criar conta →</a>',
+        'Crie uma conta gratuita para salvar nos favoritos. <a href="/login?redirect=' + encodeURIComponent(window.location.pathname) + '" style="color:#f26d21;font-weight:bold;text-decoration:underline">Criar conta →</a>',
         'warning',
         6000
       );
       return;
     }
-    setSaving(hatch.id);
+    
+    setSaving('all');
     try {
-      const assetData = {
-        id: hatch.id,
-        type: 'hatch',
-        name: hatch.name || hatch.filename,
-        description: hatch.description,
-        category: hatch.category || 'General',
-        code: hatch.patCode
-      };
-      await saveToGlobalLibrary(assetData);
-      await addToFavorites(hatch.id);
-      showToast('Adicionado aos Favoritos com sucesso! ⭐', 'success');
+      for (const hatch of selectedHatches) {
+        // Generados por IA puede que no estén en BD pública, guardarlos primero.
+        if (results.some(r => r.id === hatch.id)) {
+          const assetData = {
+            id: hatch.id,
+            type: 'hatch',
+            name: hatch.name || hatch.filename || 'HATCH',
+            description: hatch.description,
+            category: hatch.category || 'General',
+            code: hatch.patCode || hatch.code
+          };
+          await saveToGlobalLibrary(assetData);
+        }
+        await addToFavorites(hatch.id);
+      }
+      showToast('Adicionados aos Favoritos com sucesso! ⭐', 'success');
+      setSelectedHatches([]); // Limpiar selección tras añadir? o mantener.
     } catch (error) {
       showToast(error.message, 'error');
     }
@@ -91,7 +97,13 @@ export default function HatchGenerator() {
     if (isSelected) {
       setSelectedHatches(selectedHatches.filter(h => h.id !== hatch.id));
     } else {
-      setSelectedHatches([...selectedHatches, hatch]);
+      // Normalizar para que library items y result items tengan misma estructura básica
+      const normalizedHatch = {
+        ...hatch,
+        filename: hatch.name || hatch.filename || 'HATCH',
+        patCode: hatch.code || hatch.patCode
+      };
+      setSelectedHatches([...selectedHatches, normalizedHatch]);
     }
   };
 
@@ -99,12 +111,8 @@ export default function HatchGenerator() {
     setIsExporting(true);
     let combinedContent = "";
     
-    if (isRevitFormat) {
-      combinedContent += ";%TYPE=MODEL\n;%UNITS=MM\n\n";
-    }
-
     selectedHatches.forEach(h => {
-      combinedContent += `*${h.filename}, ${h.description}\n`;
+      combinedContent += `*${h.filename}, ${h.description || ''}\n`;
       combinedContent += h.patCode + "\n\n";
     });
 
@@ -112,7 +120,7 @@ export default function HatchGenerator() {
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = "TMD_Hatches.pat";
+    a.download = "LispCentral_Hatches.pat";
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
@@ -120,9 +128,8 @@ export default function HatchGenerator() {
     
     setIsExporting(false);
 
-    // CTA cloud post-descarga
     showToast(
-      '📥 Download concluído! <strong>Dica:</strong> Com o LispCentral Loader, você usa esses hatches direto no AutoCAD sem baixar arquivos. <a href="/dashboard" style="color:#f26d21;font-weight:bold;text-decoration:underline">Saiba mais →</a>',
+      '📥 Download concluído! <strong>Dica:</strong> Com o LispCentral Loader, você usa esses hatches direto no AutoCAD sem baixar arquivos.',
       'info',
       8000
     );
@@ -130,208 +137,228 @@ export default function HatchGenerator() {
 
   return (
     <>
-    <div className="icon-gen-container" style={{ '--preview-bg': '#1a1a1a', '--preview-fg': '#ffffff' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', height: '100%', position: 'relative' }}>
       
-      {/* 1. CONFIGURACIÓN */}
-      <div className="panel col-settings">
-        <div className="panel-header">Configuração</div>
-        <div className="panel-body">
-          <div className="form-group">
-            <label>Contexto / Categoria</label>
-            <select className="form-control" value={theme} onChange={(e) => setTheme(e.target.value)}>
-              <option value="Arquitectura">Arquitetura (Paredes, Pisos)</option>
-              <option value="Topografía">Topografia (Terrenos)</option>
-              <option value="Materiales">Materiais (Aço, Madeira)</option>
-            </select>
-          </div>
-
-          <div className="form-group">
-            <label>Hachuras a Gerar (uma por linha)</label>
-            <textarea 
-              className="form-control" 
-              rows="6" 
-              value={prompts}
-              onChange={(e) => setPrompts(e.target.value)}
-              placeholder="Ex: Tijolo 20x40&#10;Padrão hexagonal"
-            ></textarea>
-          </div>
-
-          <button 
-            className="btn-primary" 
-            style={{ width: '100%', marginTop: '10px' }}
-            onClick={handleGenerate}
-            disabled={isGenerating}
-          >
-            {isGenerating ? 'Calculando Geometria...' : 'Gerar Padrões'}
-          </button>
-        </div>
+      {/* Pestañas de Navegación */}
+      <div style={{ display: 'flex', borderBottom: '1px solid #333', marginBottom: '15px' }}>
+        <button 
+          onClick={() => setActiveTab('library')}
+          style={{ 
+            padding: '10px 20px', 
+            backgroundColor: activeTab === 'library' ? '#222' : 'transparent', 
+            color: activeTab === 'library' ? '#fff' : 'var(--text-muted)', 
+            border: '1px solid #333',
+            borderBottom: activeTab === 'library' ? '1px solid #222' : '1px solid #333',
+            borderRadius: '8px 8px 0 0',
+            cursor: 'pointer', 
+            fontWeight: 'bold',
+            marginBottom: '-1px'
+          }}
+        >
+          {t('hatch.factory')}
+        </button>
+        <button 
+          onClick={() => setActiveTab('generator')}
+          style={{ 
+            padding: '10px 20px', 
+            backgroundColor: activeTab === 'generator' ? '#222' : 'transparent', 
+            color: activeTab === 'generator' ? 'var(--tmd-orange)' : 'var(--text-muted)', 
+            border: '1px solid #333',
+            borderBottom: activeTab === 'generator' ? '1px solid #222' : '1px solid #333',
+            borderRadius: '8px 8px 0 0',
+            cursor: 'pointer', 
+            fontWeight: 'bold',
+            marginBottom: '-1px',
+            marginLeft: '5px'
+          }}
+        >
+          ✨ {t('hatch.title')}
+        </button>
       </div>
 
-      {/* 2. RESULTADOS */}
-      <div className="panel col-preview">
-        <div className="panel-header">
-          Fábrica de Hachuras (.pat)
-        </div>
-        <div className="panel-body">
-          <div style={{ flex: 1, backgroundColor: '#222', borderRadius: '8px', display: 'flex', flexDirection: 'column', height: '100%', overflow: 'hidden' }}>
-            
-            {/* Tabs Header */}
-            <div style={{ display: 'flex', borderBottom: '1px solid #333' }}>
-              <button 
-                onClick={() => setActiveTab('library')}
-                style={{ flex: 1, padding: '15px', backgroundColor: activeTab === 'library' ? '#333' : 'transparent', color: activeTab === 'library' ? '#fff' : 'var(--text-muted)', border: 'none', cursor: 'pointer', fontWeight: 'bold' }}
-              >
-                Biblioteca Pública
-              </button>
-              <button 
-                onClick={() => setActiveTab('ai')}
-                style={{ flex: 1, padding: '15px', backgroundColor: activeTab === 'ai' ? '#333' : 'transparent', color: activeTab === 'ai' ? 'var(--tmd-orange)' : 'var(--text-muted)', border: 'none', cursor: 'pointer', fontWeight: 'bold' }}
-              >
-                Resultados ({results.length})
-              </button>
-            </div>
+      {/* Contenido Principal */}
+      <div style={{ flex: 1, overflow: 'hidden', display: 'flex', gap: '20px' }}>
+        
+        {/* Pestaña: Biblioteca */}
+        {activeTab === 'library' && (
+          <LibraryPanel 
+            currentType="hatch" 
+            selectedItems={selectedHatches} 
+            onToggleSelect={toggleSelectHatch} 
+          />
+        )}
 
-            <div style={{ flex: 1, overflowY: 'auto', display: 'flex', flexDirection: 'column' }}>
-              {activeTab === 'library' ? (
-                <LibraryPanel currentType="hatch" searchQuery={prompts} />
-              ) : (
-                <div style={{ padding: '15px', display: 'flex', flexDirection: 'column', gap: '15px' }}>
-                  {results.length > 0 && (
-                    <div style={{ padding: '15px', backgroundColor: '#1a1a1a', borderRadius: '8px', marginBottom: '5px' }}>
-                      <label style={{ color: 'var(--text-muted)', display: 'block', marginBottom: '10px', fontSize: '0.9rem' }}>
-                        Zoom da Previsão: {zoomScale.toFixed(1)}x
-                      </label>
-                      <input 
-                        type="range" min="0.1" max="5" step="0.1" value={zoomScale} 
-                        onChange={(e) => setZoomScale(parseFloat(e.target.value))}
-                        style={{ width: '100%', accentColor: 'var(--tmd-orange)' }}
-                      />
-                    </div>
-                  )}
-
-                  {results.length === 0 && !isGenerating && (
-                    <div className="empty-state" style={{ padding: '20px' }}>
-                      Escreva seus comandos à esquerda e clique em Gerar, ou busque na Biblioteca Pública.
-                    </div>
-                  )}
-
-                  {isGenerating && (
-                    <div className="loading-state" style={{ padding: '20px', textAlign: 'center' }}>
-                      <div className="spinner" style={{ margin: '0 auto 15px auto', width: '40px', height: '40px', border: '3px solid rgba(242, 109, 33, 0.3)', borderTop: '3px solid var(--tmd-orange)', borderRadius: '50%', animation: 'spin 1s linear infinite' }}></div>
-                      <p>Gerando padrões... (aprox 10-15s)</p>
-                    </div>
-                  )}
-
-                  {!isGenerating && results.map((hatch) => (
-                    <div key={hatch.id} style={{ display: 'flex', backgroundColor: '#1a1a1a', borderRadius: '8px', overflow: 'hidden', border: '1px solid #333', flexDirection: 'column', padding: '15px', alignItems: 'flex-start' }}>
-                      <strong style={{ color: 'var(--tmd-orange)', marginBottom: '10px' }}>*{hatch.filename || hatch.name}, {hatch.description}</strong>
-                      <HatchPreview patCode={hatch.patCode} scale={zoomScale} />
-                      <pre style={{ margin: 0, fontSize: '0.8rem', color: 'var(--preview-fg)', whiteSpace: 'pre-wrap', wordBreak: 'break-all', fontFamily: 'monospace', backgroundColor: 'rgba(0,0,0,0.2)', padding: '10px', borderRadius: '4px', width: '100%' }}>
-                        {hatch.patCode}
-                      </pre>
-                      
-                      <button 
-                        onClick={() => handleSaveToFavorites(hatch)}
-                        disabled={saving === hatch.id}
-                        style={{ width: '100%', padding: '10px', backgroundColor: '#333', color: '#fff', border: 'none', borderRadius: '4px', cursor: 'pointer', marginTop: '15px', fontWeight: 'bold' }}
-                      >
-                        {saving === hatch.id ? 'Salvando...' : '⭐ Adicionar aos Favoritos'}
-                      </button>
-                    </div>
-                  ))}
+        {/* Pestaña: Generador IA */}
+        {activeTab === 'generator' && (
+          <div style={{ display: 'flex', width: '100%', gap: '20px' }}>
+            <div className="panel col-settings" style={{ width: '300px', flexShrink: 0 }}>
+              <div className="panel-header">{t('hatch.config')}</div>
+              <div className="panel-body">
+                <div className="form-group">
+                  <label>{t('hatch.context')}</label>
+                  <select className="form-control" value={theme} onChange={(e) => setTheme(e.target.value)}>
+                    <option value="Arquitectura">Arquitetura (Paredes, Pisos)</option>
+                    <option value="Topografía">Topografia (Terrenos)</option>
+                    <option value="Materiales">Materiais (Aço, Madeira)</option>
+                  </select>
                 </div>
-              )}
-            </div>
-          </div>
-        </div>
-      </div>
 
-      {/* 3. CARRITO */}
-      <div className="panel col-cart">
-        <div className="panel-header">
-          Hachuras Selecionadas
-          <span className="badge">{selectedHatches.length}</span>
-        </div>
-        <div className="panel-body">
-          {selectedHatches.length === 0 ? (
-            <div className="empty-state">
-              Clique nos padrões ao centro para adicionar ao pacote.
-            </div>
-          ) : (
-            <div className="cart-list">
-              {selectedHatches.map((hatch) => (
-                <div key={hatch.id} className="cart-item">
-                  <div className="cart-item-preview" style={{ background: '#333', color: '#fff', fontSize: '10px', padding: '2px' }}>PAT</div>
-                  <div className="cart-item-info">
-                    <input 
-                      type="text" 
-                      className="form-control" 
-                      style={{ padding: '4px', fontSize: '0.85rem' }} 
-                      value={hatch.filename}
-                      onChange={(e) => {
-                        const newArr = [...selectedHatches];
-                        const idx = newArr.findIndex(x => x.id === hatch.id);
-                        newArr[idx].filename = e.target.value;
-                        setSelectedHatches(newArr);
-                      }}
-                    />
-                    <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }} className="truncate-text">{hatch.description}</span>
-                  </div>
-                  <button className="btn-remove" onClick={() => toggleSelectHatch(hatch)}>×</button>
+                <div className="form-group">
+                  <label>{t('hatch.toGenerate')}</label>
+                  <textarea 
+                    className="form-control" 
+                    rows="6" 
+                    value={prompts}
+                    onChange={(e) => setPrompts(e.target.value)}
+                    placeholder="Ex: Tijolo 20x40&#10;Padrão hexagonal"
+                  ></textarea>
                 </div>
-              ))}
-            </div>
-          )}
-        </div>
-        {selectedHatches.length > 0 && (
-          <div style={{ padding: '15px', borderTop: '1px solid var(--border-color)', background: 'var(--bg-dark)' }}>
-            <div style={{ marginBottom: '15px', padding: '10px', backgroundColor: '#1a1a1a', border: '1px solid #333', borderRadius: '4px', fontSize: '0.85rem' }}>
-              <strong style={{ color: 'var(--tmd-orange)', display: 'block', marginBottom: '5px' }}>
-                Detalhes da hachura selecionada ({selectedHatches[selectedHatches.length - 1].name || selectedHatches[selectedHatches.length - 1].filename}):
-              </strong>
-              <span style={{ color: '#ccc' }}>{selectedHatches[selectedHatches.length - 1].description}</span>
-            </div>
-            
-            <div style={{ marginBottom: '15px', display: 'flex', alignItems: 'center', gap: '8px' }}>
-              <input 
-                type="checkbox" 
-                id="revitFormat" 
-                checked={isRevitFormat}
-                onChange={(e) => setIsRevitFormat(e.target.checked)}
-                style={{ cursor: 'pointer', width: '16px', height: '16px' }}
-              />
-              <label htmlFor="revitFormat" style={{ color: '#fff', fontSize: '0.85rem', cursor: 'pointer' }}>
-                Exportar para Revit (;%TYPE=MODEL)
-              </label>
-            </div>
 
-            {user ? (
-              <button 
-                className="btn-primary" 
-                style={{ width: '100%' }}
-                onClick={handleExport}
-                disabled={isExporting}
-              >
-                {isExporting ? 'Empacotando...' : 'Baixar Arquivo .PAT'}
-              </button>
-            ) : (
-              <>
                 <button 
                   className="btn-primary" 
-                  style={{ width: '100%' }}
-                  onClick={handleExport}
-                  disabled={isExporting}
+                  style={{ width: '100%', marginTop: '10px' }}
+                  onClick={handleGenerate}
+                  disabled={isGenerating}
                 >
-                  {isExporting ? 'Empacotando...' : 'Baixar Arquivo .PAT'}
+                  {isGenerating ? 'Calculando...' : t('hatch.generateBtn')}
                 </button>
-                <div style={{ marginTop: '8px', padding: '8px 12px', backgroundColor: 'rgba(242,109,33,0.08)', border: '1px solid rgba(242,109,33,0.2)', borderRadius: '6px', fontSize: '0.8rem', color: '#ccc', textAlign: 'center' }}>
-                  💡 <a href={'/login?redirect=' + encodeURIComponent('/pt/tools/hatch-generator')} style={{ color: '#f26d21', textDecoration: 'none', fontWeight: 'bold' }}>Crie uma conta</a> para salvar nos favoritos e usar direto no AutoCAD.
-                </div>
-              </>
-            )}
+              </div>
+            </div>
+
+            <div style={{ flex: 1, backgroundColor: '#222', borderRadius: '8px', padding: '15px', display: 'flex', flexDirection: 'column', height: '100%' }}>
+              <h3 style={{ margin: 0, color: '#fff', fontSize: '1.1rem', marginBottom: '15px' }}>Resultados IA ({results.length})</h3>
+              
+              <div style={{ 
+                flex: 1, 
+                overflowY: 'auto', 
+                display: 'grid', 
+                gridTemplateColumns: 'repeat(auto-fill, minmax(90px, 1fr))', 
+                gap: '10px', 
+                alignContent: 'start'
+              }}>
+                {isGenerating && <p style={{ color: 'var(--tmd-orange)' }}>Gerando padrões, aguarde...</p>}
+                
+                {!isGenerating && results.map(item => {
+                  const isSelected = selectedHatches.some(i => i.id === item.id);
+                  return (
+                    <div 
+                      key={item.id} 
+                      onClick={() => toggleSelectHatch(item)}
+                      style={{ 
+                        backgroundColor: isSelected ? 'rgba(242, 109, 33, 0.2)' : 'transparent', 
+                        padding: '5px', 
+                        borderRadius: '4px', 
+                        border: isSelected ? '2px solid var(--tmd-orange)' : '2px solid transparent',
+                        cursor: 'pointer',
+                        display: 'flex', 
+                        flexDirection: 'column',
+                        alignItems: 'center',
+                        transition: 'all 0.1s ease',
+                      }}
+                      onMouseOver={(e) => {
+                        if (!isSelected) {
+                          e.currentTarget.style.backgroundColor = '#3b4654';
+                          e.currentTarget.style.border = '2px solid #5a6b82';
+                        }
+                      }}
+                      onMouseOut={(e) => {
+                        if (!isSelected) {
+                          e.currentTarget.style.backgroundColor = 'transparent';
+                          e.currentTarget.style.border = '2px solid transparent';
+                        }
+                      }}
+                    >
+                      <div style={{ width: '64px', height: '64px', backgroundColor: '#3b4654', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+                        <HatchPreview patCode={item.patCode} scale={1} width={64} height={64} />
+                      </div>
+                      <span style={{ 
+                        color: '#fff', 
+                        fontSize: '0.7rem', 
+                        marginTop: '6px', 
+                        textAlign: 'center', 
+                        width: '100%',
+                        whiteSpace: 'nowrap', 
+                        overflow: 'hidden', 
+                        textOverflow: 'ellipsis' 
+                      }} title={item.filename || item.name}>
+                        {item.filename || item.name || 'HATCH'}
+                      </span>
+                    </div>
+                  );
+                })}
+                
+                {!isGenerating && results.length === 0 && (
+                  <p style={{ color: 'var(--text-muted)' }}>Escreva os comandos à esquerda e clique em Gerar.</p>
+                )}
+              </div>
+            </div>
           </div>
         )}
       </div>
+
+      {/* Floating Action Bar (Sticky Bottom) */}
+      {selectedHatches.length > 0 && (
+        <div style={{
+          position: 'fixed',
+          bottom: '20px',
+          left: '50%',
+          transform: 'translateX(-50%)',
+          backgroundColor: '#1a1a1a',
+          border: '1px solid #333',
+          borderRadius: '30px',
+          padding: '10px 20px',
+          display: 'flex',
+          alignItems: 'center',
+          gap: '20px',
+          boxShadow: '0 10px 25px rgba(0,0,0,0.5)',
+          zIndex: 1000
+        }}>
+          <span style={{ color: '#fff', fontWeight: 'bold' }}>
+            <span style={{ color: 'var(--tmd-orange)', fontSize: '1.2rem', marginRight: '5px' }}>{selectedHatches.length}</span>
+            hachuras selecionadas
+          </span>
+          
+          <div style={{ width: '1px', height: '30px', backgroundColor: '#333' }}></div>
+
+          <button 
+            onClick={handleSaveFavorites}
+            disabled={saving === 'all'}
+            style={{
+              padding: '10px 20px',
+              backgroundColor: '#333',
+              color: '#fff',
+              border: 'none',
+              borderRadius: '20px',
+              cursor: 'pointer',
+              fontWeight: 'bold',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '8px'
+            }}
+          >
+            ⭐ {saving === 'all' ? 'Salvando...' : 'Adicionar à Paleta'}
+          </button>
+
+          <button 
+            onClick={handleExport}
+            disabled={isExporting}
+            style={{
+              padding: '10px 20px',
+              backgroundColor: 'var(--tmd-orange)',
+              color: '#fff',
+              border: 'none',
+              borderRadius: '20px',
+              cursor: 'pointer',
+              fontWeight: 'bold',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '8px'
+            }}
+          >
+            ⬇️ {isExporting ? 'Processando...' : 'Baixar .PAT'}
+          </button>
+        </div>
+      )}
 
     </div>
     <ToastContainer />

@@ -1,0 +1,27 @@
+---
+export function getStaticPaths() { return [{params: {lang: 'es'}}, {params: {lang: 'pt'}}]; }
+const { lang } = Astro.params;
+import Layout from '../../layouts/Layout.astro';
+import Header from '../../components/layout/Header.astro';
+import Footer from '../../components/layout/Footer.astro';
+---
+
+<Layout title="Help & Docs - LispCentral">
+  <Header />
+  <main class="min-h-screen bg-background text-on-surface py-12 px-8 max-w-[1200px] mx-auto">
+    <h1 class="text-display-sm font-display-sm font-bold text-primary mb-4" data-i18n="help.title">Help & Documentation</h1>
+    <p class="text-body-lg mb-8" data-i18n="help.desc">Find answers and guides for LispCentral.</p>
+    
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+        <div class="bg-surface-container p-6 rounded-lg border border-surface-variant">
+            <h2 class="text-title-lg font-bold mb-2">Getting Started</h2>
+            <p class="text-body-md text-on-surface-variant">Learn the basics of LispCentral and how to configure your AutoCAD environment.</p>
+        </div>
+        <div class="bg-surface-container p-6 rounded-lg border border-surface-variant">
+            <h2 class="text-title-lg font-bold mb-2">Hatch Generator</h2>
+            <p class="text-body-md text-on-surface-variant">How to use the AI-powered hatch generator and import patterns directly.</p>
+        </div>
+    </div>
+  </main>
+  <Footer />
+</Layout>

@@ -1,0 +1,62 @@
+---
+import DocsLayout from '../../layouts/DocsLayout.astro';
+import HatchGenerator from '../../components/tools/HatchGenerator.jsx';
+---
+
+<DocsLayout 
+  title="Gerador de Hatch AutoCAD — Criar Padrões .PAT | LispCentral" 
+  description="Crie padrões de hachura complexos (.pat) para AutoCAD usando IA. Insira descrições e gere hachuras personalizadas instantaneamente."
+  keywords="autocad hatch generator, criar hatch autocad, pat generator, lisp hatch, autocad patterns, gerador de hachura IA"
+>
+  <div class="tool-container">
+    <div class="tool-header">
+      <h1>Gerador de Hachuras (Hatch) <span class="badge">BETA</span></h1>
+      <p>Desenhe e compile padrões complexos (.pat) para AutoCAD usando comandos textuais y Inteligência Artificial.</p>
+    </div>
+
+    <!-- Carga del componente React en el cliente -->
+    <HatchGenerator client:load />
+
+  </div>
+</DocsLayout>
+
+<style>
+  .tool-container {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 20px;
+    height: calc(100vh - 140px); /* Restar header y padding aproximado */
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .tool-header {
+    margin-bottom: 20px;
+    flex-shrink: 0;
+  }
+  
+  .tool-header h1 {
+    font-size: 2rem;
+    color: var(--text-main);
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+  }
+  
+  .tool-header p {
+    color: var(--text-muted);
+    font-size: 1.1rem;
+    max-width: 800px;
+  }
+  
+  .badge {
+    background-color: rgba(242, 109, 33, 0.2);
+    color: var(--tmd-orange);
+    font-size: 0.8rem;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-weight: 600;
+    vertical-align: middle;
+  }
+</style>

@@ -13,7 +13,7 @@ const SvgPreview = ({ svgString }) => (
   />
 );
 
-export default function LibraryPanel({ currentType, searchQuery = '' }) {
+export default function LibraryPanel({ currentType, searchQuery = '', selectedItems = [], onToggleSelect }) {
   const [assets, setAssets] = useState([]);
   const [loading, setLoading] = useState(true);
   const [activeCategory, setActiveCategory] = useState('Todas');
@@ -111,7 +111,6 @@ export default function LibraryPanel({ currentType, searchQuery = '' }) {
   });
 
   return (
-    <>
     <div style={{ flex: 1, backgroundColor: '#222', borderRadius: '8px', padding: '15px', display: 'flex', flexDirection: 'column', height: '100%' }}>
       <div style={{ marginBottom: '15px' }}>
         <h3 style={{ margin: 0, color: '#fff', fontSize: '1.1rem' }}>Biblioteca Pública ({filtered.length})</h3>
@@ -141,63 +140,73 @@ export default function LibraryPanel({ currentType, searchQuery = '' }) {
         ))}
       </div>
 
-      <div style={{ flex: 1, overflowY: 'auto', display: 'grid', gridTemplateColumns: '1fr', gap: '15px' }}>
+      <div style={{ 
+        flex: 1, 
+        overflowY: 'auto', 
+        display: 'grid', 
+        gridTemplateColumns: 'repeat(auto-fill, minmax(90px, 1fr))', 
+        gap: '10px', 
+        alignContent: 'start'
+      }}>
         {loading ? (
           <p style={{ color: 'var(--text-muted)' }}>Carregando biblioteca...</p>
         ) : filtered.length === 0 ? (
-          <div style={{ textAlign: 'center', padding: '20px' }}>
-            <p style={{ color: 'var(--text-muted)' }}>Nenhum recurso encontrado no banco de dados.</p>
-            <p style={{ color: '#fff', fontSize: '0.9rem' }}>Use o botão laranja para gerar novos recursos!</p>
+          <div style={{ textAlign: 'center', gridColumn: '1 / -1', padding: '20px' }}>
+            <p style={{ color: 'var(--text-muted)' }}>Nenhum recurso encontrado.</p>
           </div>
         ) : (
-          filtered.map(item => (
-            <div key={item.id} style={{ backgroundColor: '#2a2a2a', padding: '15px', borderRadius: '8px', border: '1px solid #333' }}>
-              <strong style={{ color: 'var(--tmd-orange)', display: 'block', marginBottom: '5px' }}>{item.name}</strong>
-              <p style={{ fontSize: '0.8rem', color: '#ccc', margin: '0 0 10px 0' }}>{item.description}</p>
-              
-              {currentType === 'hatch' && <HatchPreview patCode={item.code} scale={1} />}
-              {currentType === 'lin' && <LinetypePreview linCode={item.code} scale={1} />}
-              {currentType === 'icon' && <SvgPreview svgString={item.svgCode || item.code} />}
-              
-              <div style={{ display: 'flex', gap: '8px', marginTop: '10px' }}>
-              <button 
-                onClick={() => handleSave(item.id)}
-                disabled={saving === item.id}
-                style={{
-                  flex: 1,
-                  padding: '10px',
-                  backgroundColor: '#444',
-                  color: '#fff',
-                  border: 'none',
-                  borderRadius: '4px',
+          filtered.map(item => {
+            const isSelected = selectedItems.some(i => i.id === item.id);
+            return (
+              <div 
+                key={item.id} 
+                onClick={() => onToggleSelect && onToggleSelect(item)}
+                style={{ 
+                  backgroundColor: isSelected ? 'rgba(242, 109, 33, 0.2)' : 'transparent', 
+                  padding: '5px', 
+                  borderRadius: '4px', 
+                  border: isSelected ? '2px solid var(--tmd-orange)' : '2px solid transparent',
                   cursor: 'pointer',
-                  fontWeight: 'bold'
+                  display: 'flex', 
+                  flexDirection: 'column',
+                  alignItems: 'center',
+                  transition: 'all 0.1s ease',
+                }}
+                onMouseOver={(e) => {
+                  if (!isSelected) {
+                    e.currentTarget.style.backgroundColor = '#3b4654';
+                    e.currentTarget.style.border = '2px solid #5a6b82';
+                  }
+                }}
+                onMouseOut={(e) => {
+                  if (!isSelected) {
+                    e.currentTarget.style.backgroundColor = 'transparent';
+                    e.currentTarget.style.border = '2px solid transparent';
+                  }
                 }}
               >
-                {saving === item.id ? 'Salvando...' : '⭐ Favoritos'}
-              </button>
-              <button 
-                onClick={() => handleDirectDownload(item)}
-                style={{
-                  flex: 1,
-                  padding: '10px',
-                  backgroundColor: 'var(--tmd-orange)',
-                  color: '#fff',
-                  border: 'none',
-                  borderRadius: '4px',
-                  cursor: 'pointer',
-                  fontWeight: 'bold'
-                }}
-              >
-                ⬇ Baixar
-              </button>
+                <div style={{ width: '64px', height: '64px', backgroundColor: '#3b4654', display: 'flex', justifyContent: 'center', alignItems: 'center', overflow: 'hidden' }}>
+                  {currentType === 'icon' && <IconGenerator iconName={item.name} size={64} color="var(--tmd-orange)" />}
+                  {currentType === 'hatch' && <HatchPreview patCode={item.code} scale={1} width={64} height={64} />}
+                  {currentType === 'lin' && <LinetypePreview linCode={item.code} scale={1} width={64} height={64} />}
+                </div>
+                <span style={{ 
+                  color: '#fff', 
+                  fontSize: '0.7rem', 
+                  marginTop: '6px', 
+                  textAlign: 'center', 
+                  width: '100%',
+                  whiteSpace: 'nowrap', 
+                  overflow: 'hidden', 
+                  textOverflow: 'ellipsis' 
+                }} title={item.name}>
+                  {item.name || 'ITEM'}
+                </span>
               </div>
-            </div>
-          ))
+            );
+          })
         )}
       </div>
-      </div>
-      <ToastContainer />
-    </>
+    </div>
   );
 }

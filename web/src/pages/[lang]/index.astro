@@ -1,0 +1,28 @@
+---
+export function getStaticPaths() { return [{params: {lang: 'es'}}, {params: {lang: 'pt'}}]; }
+const { lang } = Astro.params;
+import Layout from '../../layouts/Layout.astro';
+import Header from '../../components/layout/Header.astro';
+import Footer from '../../components/layout/Footer.astro';
+import Hero from '../../components/landing/Hero.astro';
+import Features from '../../components/landing/Features.astro';
+import Libraries from '../../components/landing/Libraries.astro';
+import WebPalettes from '../../components/landing/WebPalettes.astro';
+import FAQ from '../../components/landing/FAQ.astro';
+import CTA from '../../components/landing/CTA.astro';
+---
+
+<Layout title="LispCentral | A Plataforma Definitiva para BIM Managers e Engenheiros">
+    <Header />
+    
+    <main>
+        <Hero />
+        <Features />
+        <Libraries />
+        <WebPalettes />
+        <FAQ />
+        <CTA />
+    </main>
+
+    <Footer />
+</Layout>

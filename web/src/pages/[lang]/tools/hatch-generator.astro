@@ -1,21 +1,29 @@
 ---
+export function getStaticPaths() { return [{params: {lang: 'es'}}, {params: {lang: 'pt'}}]; }
+const { lang } = Astro.params;
 import DocsLayout from '../../../layouts/DocsLayout.astro';
-import IconGenerator from '../../../components/tools/IconGenerator.jsx';
+import HatchGenerator from '../../../components/tools/HatchGenerator.jsx';
+import { hatchTranslations } from '../../../i18n/translations.js';
+
+const t = (key) => {
+    const dict = hatchTranslations[lang || 'en'] || hatchTranslations['en'];
+    return dict[key] || key;
+};
 ---
 
 <DocsLayout 
-  title="Gerador de Ícones AutoCAD — Criar SVG e PNG | LispCentral" 
-  description="Gere ícones SVG e PNG perfeitos para suas paletas, Ribbon e plugins LISP do AutoCAD usando Inteligência Artificial. Totalmente grátis e em segundos."
-  keywords="autocad icon generator, criar icones autocad, svg para autocad, lisp icon, cuix icon, gerador de icones IA, autocad ribbon icons"
+  title="Gerador de Hatch AutoCAD — Criar Padrões .PAT | LispCentral" 
+  description="Crie padrões de hachura complexos (.pat) para AutoCAD usando IA. Insira descrições e gere hachuras personalizadas instantaneamente."
+  keywords="autocad hatch generator, criar hatch autocad, pat generator, lisp hatch, autocad patterns, gerador de hachura IA"
 >
   <div class="tool-container">
     <div class="tool-header">
-      <h1>Gerador de Ícones <span class="badge">BETA</span></h1>
-      <p>Crie pacotes de ícones consistentes para suas paletas e Ribbon do AutoCAD em segundos.</p>
+      <h1>{t("hatch.title")} <span class="badge">BETA</span></h1>
+      <p>{t("hatch.desc")}</p>
     </div>
 
     <!-- Carga del componente React en el cliente -->
-    <IconGenerator client:load />
+    <HatchGenerator lang={lang || 'en'} client:load />
 
   </div>
 </DocsLayout>
