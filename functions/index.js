@@ -431,40 +431,17 @@ exports.generateLoader = onRequest({ cors: true }, async (req, res) => {
       (princ (strcat "\\\\n[LC] Linha '" linName "' carregada."))
     )
     (princ "\\\\n[LC] Erro ao salvar linha temp.")
-  )
-  (princ)
-)
-
-;; Comando Principal de la Paleta Unificada (CP1)
-(defun c:CP1 (/ doc find-path bridge-dir html-path loader-js f-js)
+ ;; Comando Principal de la Paleta Unificada (CP1)
+(defun c:CP1 (/ doc loader-js f-js)
   (vl-load-com)
   (setq doc (vla-get-ActiveDocument (vlax-get-acad-object)))
   (vla-StartUndoMark doc)
   
   (princ "\\n[⚙] Abrindo LispCentral Palette...")
   
-  (setq find-path (findfile "LC_Loader.lsp"))
-  (if find-path
-    (setq bridge-dir (vl-filename-directory find-path))
-    (setq bridge-dir (getenv "USERPROFILE"))
-  )
-  
   ;; Cachear URL (previene duplicados)
   (if (not (boundp '*LC-PALETTE-URL*))
-    (progn
-      (setq html-path (strcat bridge-dir "/web/inspector_unified.html"))
-      (setq html-path (vl-string-translate "\\\\" "/" html-path))
-      (if (not (vl-string-search "file:///" html-path))
-        (if (= (substr html-path 1 1) "/")
-          (setq html-path (strcat "file://" html-path))
-          (setq html-path (strcat "file:///" html-path))
-        )
-      )
-      (while (vl-string-search " " html-path)
-        (setq html-path (vl-string-subst "%20" " " html-path))
-      )
-      (setq *LC-PALETTE-URL* (strcat html-path "?token=" *LC-SEAT-TOKEN* "&hwid=" *LC-HWID*))
-    )
+    (setq *LC-PALETTE-URL* (strcat "https://lispcentral.web.app/palette?token=" *LC-SEAT-TOKEN* "&hwid=" *LC-HWID*))
   )
   
   ;; Solo inyectar si la paleta NO fue creada (previene duplicados)
@@ -479,7 +456,7 @@ exports.generateLoader = onRequest({ cors: true }, async (req, res) => {
           (write-line (strcat "    Acad.Application.addPalette(\"Command Palette\", \"" *LC-PALETTE-URL* "\");") f-js)
           (write-line "}" f-js)
           (close f-js)
-          (vl-cmdf "_.WEBLOAD" "_L" (strcat "\"" loader-js "\""))
+          (vl-cmdf "_.WEBLOAD" "_L" (strcat "\\"" loader-js "\\""))
           (setq *LC-PALETTE-ACTIVE* T)
           (LC:Init-EventHub)
           (princ "\\n[✔] LispCentral Palette pronta.")
@@ -494,6 +471,43 @@ exports.generateLoader = onRequest({ cors: true }, async (req, res) => {
   (princ)
 )
 
+;; Comando da Paleta de Recursos
+(defun c:LC_RES (/ doc loader-js f-js)
+  (vl-load-com)
+  (setq doc (vla-get-ActiveDocument (vlax-get-acad-object)))
+  (vla-StartUndoMark doc)
+  
+  (princ "\\n[⚙] Abrindo Resource Palette...")
+  
+  (if (not (boundp '*LC-RESOURCE-URL*))
+    (setq *LC-RESOURCE-URL* (strcat "https://lispcentral.web.app/resource-palette?token=" *LC-SEAT-TOKEN* "&hwid=" *LC-HWID*))
+  )
+  
+  (if (not (boundp '*LC-RESOURCE-ACTIVE*))
+    (progn
+      (setq loader-js (strcat (getenv "TEMP") "/LC_Resource_Loader.js"))
+      (setq loader-js (vl-string-translate "\\\\" "/" loader-js))
+      (setq f-js (open loader-js "w"))
+      (if f-js
+        (progn
+          (write-line "if (typeof Acad !== 'undefined') {" f-js)
+          (write-line (strcat "    Acad.Application.addPalette(\"LispCentral Recursos\", \"" *LC-RESOURCE-URL* "\");") f-js)
+          (write-line "}" f-js)
+          (close f-js)
+          (vl-cmdf "_.WEBLOAD" "_L" (strcat "\\"" loader-js "\\""))
+          (setq *LC-RESOURCE-ACTIVE* T)
+          (princ "\\n[✔] Resource Palette pronta.")
+        )
+        (princ "\\n[❌] Erro ao criar arquivo JS da paleta de recursos.")
+      )
+    )
+    (princ "\\n[✔] Paleta de Recursos já ativa. LC_RESET para forçar.")
+  )
+  
+  (vla-EndUndoMark doc)
+  (princ)
+)
+
 ;; Alias Oficiales
 (defun c:LC_INSPECT () (c:CP1))
 (defun c:TMD_INSPECT () (c:CP1))
@@ -501,19 +515,29 @@ exports.generateLoader = onRequest({ cors: true }, async (req, res) => {
 (defun c:PALETA () (c:CP1))
 (defun c:PALETTE () (c:CP1))
 
+(defun c:RECURSOS () (c:LC_RES))
+(defun c:HATCHES () (c:LC_RES))
+(defun c:LINHAS () (c:LC_RES))
+
 ;; Reset: fuerza reabrir paleta
 (defun c:LC_RESET ()
   (setq *LC-PALETTE-ACTIVE* nil)
   (setq *LC-PALETTE-URL* nil)
-  (princ "\\n[LC] Paleta resetada.")
+  (setq *LC-RESOURCE-ACTIVE* nil)
+  (setq *LC-RESOURCE-URL* nil)
+  (princ "\\n[LC] Paletas resetadas.")
   (c:CP1)
 )
 
 ;; Ajuda
 (defun c:LC_HELP ()
   (princ "\\n  LC / PALETA / CP1 .. Abrir Palette")
-  (princ "\\n  LC_RESET .......... Reabrir paleta")
+  (princ "\\n  LC_RES / RECURSOS .. Abrir Paleta de Recursos")
+  (princ "\\n  LC_RESET .......... Reabrir paletas")
   (princ "\\n  LC_HELP ........... Esta ajuda")
+  (princ "\\n")
+  (princ)
+)
   (princ "\\n")
   (princ)
 )

@@ -44,3 +44,11 @@ Suite_*/
 functions/lisp/
 *.fas
 *.vlx
+
+# Assets and test images
+assets/
+*.png
+*.zip
+
+# Secrets
+serviceAccountKey.json

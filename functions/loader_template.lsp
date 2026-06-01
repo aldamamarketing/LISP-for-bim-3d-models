@@ -358,47 +358,20 @@
 )
 
 ;; Comando Principal de la Paleta Unificada (CP1)
-;; addPalette ya maneja singleton: si existe la enfoca, si fue cerrada la reabre
-(defun c:CP1 (/ doc find-path bridge-dir html-path loader-js f-js) 
+(defun c:CP1 (/ doc loader-js f-js) 
   (vl-load-com)
   (setq doc (vla-get-ActiveDocument (vlax-get-acad-object)))
   (vla-StartUndoMark doc)
 
   (princ "\n[⚙] Abrindo LispCentral Palette...")
 
-  ;; 1. Localizar o diretório
-  (setq find-path (findfile "LC_Loader.lsp"))
-  (if find-path 
-    (setq bridge-dir (vl-filename-directory find-path))
-    (if (vl-file-directory-p "Z:/Autocad Config/LISP") 
-      (setq bridge-dir "Z:/Autocad Config/LISP")
-      (setq bridge-dir "C:/Users/TM PROJETOS/Downloads")
-    )
-  )
-
-  ;; 2. Construir o caminho (URL)
-  (setq html-path (strcat bridge-dir "/web/inspector_unified.html"))
-  (setq html-path (vl-string-translate "\\" "/" html-path))
-
-  (if (not (vl-string-search "file:///" html-path)) 
-    (if (= (substr html-path 1 1) "/") 
-      (setq html-path (strcat "file://" html-path))
-      (setq html-path (strcat "file:///" html-path))
-    )
-  )
-
-  (while (vl-string-search " " html-path) 
-    (setq html-path (vl-string-subst "%20" " " html-path))
-  )
-
   ;; Cachear la URL para que siempre sea idéntica (previene duplicados)
   (if (not (boundp '*LC-PALETTE-URL*))
-    (setq *LC-PALETTE-URL* (strcat html-path "?token=" *TMD-SEAT-TOKEN* "&hwid=" *TMD-HWID*))
+    (setq *LC-PALETTE-URL* (strcat "https://lispcentral.web.app/palette?token=" *TMD-SEAT-TOKEN* "&hwid=" *TMD-HWID*))
   )
 
   ;; 3. Inyectar/Reabrir Palette via JS
-  (setq loader-js (strcat bridge-dir "/web/LC_Palette_Loader.js"))
-  (setq loader-js (vl-string-translate "\\" "/" loader-js))
+  (setq loader-js (strcat (getenv "TEMP") "\\LC_Palette_Loader.js"))
 
   (setq f-js (open loader-js "w"))
   (if f-js 
@@ -440,12 +413,59 @@
   (princ)
 )
 
+;; Comando da Paleta de Recursos
+(defun c:LC_RES (/ doc loader-js f-js) 
+  (vl-load-com)
+  (setq doc (vla-get-ActiveDocument (vlax-get-acad-object)))
+  (vla-StartUndoMark doc)
+
+  (princ "\n[⚙] Abrindo Resource Palette...")
+
+  (if (not (boundp '*LC-RESOURCE-URL*))
+    (setq *LC-RESOURCE-URL* (strcat "https://lispcentral.web.app/resource-palette?token=" *TMD-SEAT-TOKEN* "&hwid=" *TMD-HWID*))
+  )
+
+  (setq loader-js (strcat (getenv "TEMP") "\\LC_Resource_Loader.js"))
+
+  (setq f-js (open loader-js "w"))
+  (if f-js 
+    (progn 
+      (write-line "if (typeof Acad !== 'undefined') {" f-js)
+      (write-line "    try { Acad.Application.removePalette('LispCentral Recursos'); } catch(e) {}" f-js)
+      (write-line 
+        (strcat "    Acad.Application.addPalette(\"LispCentral Recursos\", \"" 
+                *LC-RESOURCE-URL*
+                "\");"
+        )
+        f-js
+      )
+      (write-line "    Acad.Editor.writeMessage(\"\\n[✔] Resource Palette pronta.\\n\");" 
+                  f-js
+      )
+      (write-line "} else {" f-js)
+      (write-line "    console.error(\"[❌] API de JavaScript não detectada.\");" f-js)
+      (write-line "}" f-js)
+      (close f-js)
+
+      (vl-cmdf "_.WEBLOAD" "_L" (strcat "\"" loader-js "\""))
+    )
+    (princ "\n[❌] Erro ao criar arquivo JS da paleta de recursos.")
+  )
+
+  (vla-EndUndoMark doc)
+  (princ)
+)
+
 ;; Alias Oficiales (comandos intuitivos para reabrir la paleta)
 (defun c:LC_INSPECT () (c:CP1))
 (defun c:TMD_INSPECT () (c:CP1))
 (defun c:LC () (c:CP1))
 (defun c:PALETA () (c:CP1))
 (defun c:PALETTE () (c:CP1))
+
+(defun c:RECURSOS () (c:LC_RES))
+(defun c:HATCHES () (c:LC_RES))
+(defun c:LINHAS () (c:LC_RES))
 
 ;; Comando de ajuda
 (defun c:LC_HELP () 
@@ -455,10 +475,11 @@
   (princ "\n  ╠══════════════════════════════════════════════════╣")
   (princ "\n  ║                                                  ║")
   (princ "\n  ║  LC / PALETA / CP1 .. Abrir Command Palette      ║")
+  (princ "\n  ║  LC_RES / RECURSOS .. Abrir Paleta de Recursos   ║")
   (princ "\n  ║  LC_HELP ........... Mostrar esta ajuda          ║")
   (princ "\n  ║                                                  ║")
-  (princ "\n  ║  Dica: Se fechou a paleta, basta digitar LC      ║")
-  (princ "\n  ║  na linha de comando para reabri-la.             ║")
+  (princ "\n  ║  Dica: Se fechou a paleta, digite o comando      ║")
+  (princ "\n  ║  novamente para reabri-la.                       ║")
   (princ "\n  ║                                                  ║")
   (princ "\n  ╚══════════════════════════════════════════════════╝")
   (princ "\n")

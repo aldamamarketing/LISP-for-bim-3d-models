@@ -119,15 +119,15 @@ export default function FavoritesManager() {
     <div className="card" style={{ margin: 0, minHeight: '600px' }}>
       <div className="flex justify-between items-center flex-wrap gap-4 mb-6">
         <h2 className="text-xl font-bold m-0 text-white">Minha Coleção</h2>
-        <div className="flex gap-4 items-center">
+        <div className="flex flex-wrap gap-4 items-center w-full sm:w-auto">
           <input 
             type="text" 
             placeholder="Pesquisar..." 
             value={searchQuery}
             onChange={e => setSearchQuery(e.target.value)}
-            className="w-[250px] bg-[#0A0A0A] border border-[#262626] rounded text-white text-sm p-2 focus:border-primary-container focus:outline-none"
+            className="w-full sm:w-[250px] bg-[#0A0A0A] border border-[#262626] rounded text-white text-sm p-2 focus:border-primary-container focus:outline-none"
           />
-          <a href="/pt/tools/hatch-generator" className="bg-[#1a1c1c] text-white border border-[#262626] hover:border-primary-container hover:text-primary-container px-4 py-2 rounded text-sm transition-colors flex items-center gap-2">
+          <a href="/pt/tools/hatch-generator" className="w-full sm:w-auto bg-[#1a1c1c] text-white border border-[#262626] hover:border-primary-container hover:text-primary-container px-4 py-2 rounded text-sm transition-colors flex justify-center items-center gap-2">
             <span className="material-symbols-outlined text-[18px]">add</span> Explorar Biblioteca
           </a>
         </div>
