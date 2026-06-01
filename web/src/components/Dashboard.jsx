@@ -685,7 +685,7 @@ export default function Dashboard({ mode = 'dashboard' }) {
                   <div className="flex gap-2 items-center">
                     <div className="w-8 h-8 bg-white/5 rounded flex items-center justify-center text-primary-container" dangerouslySetInnerHTML={{ __html: draft.svgIcon || '' }} />
                     <input type="file" accept=".svg" id={`svg-upload-draft-${i}`} className="hidden" onChange={(e) => handleSvgUpload(e, i, true)} />
-                    <button className="text-on-secondary-container hover:text-primary transition-colors" onClick={() => document.getElementById(`svg-upload-draft-${i}`).click()} title="Upload SVG"><span className="material-symbols-outlined text-[18px]">folder_open</span></button>
+                    <button className="text-on-secondary-container hover:text-primary transition-colors" onClick={() => document.getElementById(`svg-upload-draft-${i}`).click()} title="Upload SVG" aria-label="Upload SVG"><span className="material-symbols-outlined text-[18px]">folder_open</span></button>
                   </div>
                   <input type="text" value={draft.svgIcon} onChange={e => updateDraft(i, 'svgIcon', e.target.value)} className="w-full mt-2 bg-[#0A0A0A] border border-[#262626] rounded text-[#888] text-[10px] p-1 font-mono" placeholder="<svg..." />
                 </td>
@@ -703,7 +703,7 @@ export default function Dashboard({ mode = 'dashboard' }) {
                 </td>
                 <td className="py-4 pr-4 text-right">
                   <span className="text-[11px] text-primary-container block mb-1">Aguardando Upload</span>
-                  <button className="text-on-secondary-container hover:text-error transition-colors" onClick={() => removeDraft(i)}><span className="material-symbols-outlined text-[18px]">delete</span></button>
+                  <button className="text-on-secondary-container hover:text-error transition-colors" onClick={() => removeDraft(i)} aria-label="Delete draft"><span className="material-symbols-outlined text-[18px]">delete</span></button>
                 </td>
               </tr>
             ))}
@@ -720,7 +720,7 @@ export default function Dashboard({ mode = 'dashboard' }) {
                       <div className="flex gap-2 items-center">
                         <div className="w-8 h-8 bg-white/5 rounded flex items-center justify-center text-primary-container" dangerouslySetInnerHTML={{ __html: editLispData.svgIcon || '' }} />
                         <input type="file" accept=".svg" id={`svg-upload-edit-${lisp.id}`} className="hidden" onChange={(e) => handleSvgUpload(e, null, false)} />
-                        <button className="text-on-secondary-container hover:text-primary transition-colors" onClick={() => document.getElementById(`svg-upload-edit-${lisp.id}`).click()} title="Upload SVG"><span className="material-symbols-outlined text-[18px]">folder_open</span></button>
+                        <button className="text-on-secondary-container hover:text-primary transition-colors" onClick={() => document.getElementById(`svg-upload-edit-${lisp.id}`).click()} title="Upload SVG" aria-label="Upload SVG"><span className="material-symbols-outlined text-[18px]">folder_open</span></button>
                       </div>
                       <input type="text" value={editLispData.svgIcon} onChange={e => setEditLispData({...editLispData, svgIcon: e.target.value})} className="w-full mt-2 bg-[#0A0A0A] border border-primary-container/50 rounded text-[#888] text-[10px] p-1 font-mono" placeholder="<svg..." />
                     </td>
@@ -764,8 +764,8 @@ export default function Dashboard({ mode = 'dashboard' }) {
                   </td>
                   <td className="py-4 pr-4 text-right">
                     <div className="flex justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                      <button className="w-8 h-8 flex items-center justify-center rounded border border-[#262626] text-on-secondary-container hover:text-white hover:border-primary-container transition-colors" onClick={() => handleEditClick(lisp)} title="Editar"><span className="material-symbols-outlined text-[16px]">edit</span></button>
-                      <button className="w-8 h-8 flex items-center justify-center rounded border border-[#262626] text-on-secondary-container hover:text-error hover:border-error/50 transition-colors" onClick={() => handleDeleteLisp(lisp)} title="Excluir"><span className="material-symbols-outlined text-[16px]">delete</span></button>
+                      <button className="w-8 h-8 flex items-center justify-center rounded border border-[#262626] text-on-secondary-container hover:text-white hover:border-primary-container transition-colors" onClick={() => handleEditClick(lisp)} title="Editar" aria-label="Editar lisp"><span className="material-symbols-outlined text-[16px]">edit</span></button>
+                      <button className="w-8 h-8 flex items-center justify-center rounded border border-[#262626] text-on-secondary-container hover:text-error hover:border-error/50 transition-colors" onClick={() => handleDeleteLisp(lisp)} title="Excluir" aria-label="Excluir lisp"><span className="material-symbols-outlined text-[16px]">delete</span></button>
                     </div>
                   </td>
                 </tr>
