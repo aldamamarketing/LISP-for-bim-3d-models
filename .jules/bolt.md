@@ -1,0 +1,3 @@
+## 2026-06-01 - Avoid overfetching all collections when filtering by specific IDs
+**Learning:** In the `web/src/utils/library.js` module, `getUserFavorites` was fetching the entire `publicAssets` collection of a given type and filtering them in memory by ID. Because Firestore `in` queries are limited to 30 items, the correct optimization pattern is to chunk the `favIds` array into batches of up to 30 and use `where(documentId(), 'in', chunk)` queries in parallel using `Promise.all`. This prevents massive over-fetching while staying within Firestore query limits.
+**Action:** When seeing arrays of IDs that need to be fetched from a collection, always chunk them and use `in` queries with `documentId()` instead of fetching everything and filtering on the client.
