@@ -1,6 +1,14 @@
 const { onRequest } = require("firebase-functions/v2/https");
 const logger = require("firebase-functions/logger");
-const OpenAI = require("openai");
+
+// Lazy imports de módulos nativos
+function getOpenAI() {
+  const OpenAI = require("openai");
+  return new OpenAI({
+    baseURL: 'https://api.deepseek.com',
+    apiKey: process.env.DEEPSEEK_API_KEY
+  });
+}
 
 // Lazy imports de módulos nativos
 function getDeps() {
@@ -431,6 +439,10 @@ exports.generateLoader = onRequest({ cors: true }, async (req, res) => {
       (princ (strcat "\\\\n[LC] Linha '" linName "' carregada."))
     )
     (princ "\\\\n[LC] Erro ao salvar linha temp.")
+  )
+  (princ)
+)
+
  ;; Comando Principal de la Paleta Unificada (CP1)
 (defun c:CP1 (/ doc loader-js f-js)
   (vl-load-com)
@@ -439,10 +451,8 @@ exports.generateLoader = onRequest({ cors: true }, async (req, res) => {
   
   (princ "\\n[⚙] Abrindo LispCentral Palette...")
   
-  ;; Cachear URL (previene duplicados)
-  (if (not (boundp '*LC-PALETTE-URL*))
-    (setq *LC-PALETTE-URL* (strcat "https://lispcentral.web.app/palette?token=" *LC-SEAT-TOKEN* "&hwid=" *LC-HWID*))
-  )
+  ;; Construir URL
+  (setq *LC-PALETTE-URL* (strcat "https://lispcentral.web.app/palette?token=" *LC-SEAT-TOKEN* "&hwid=" *LC-HWID*))
   
   ;; Solo inyectar si la paleta NO fue creada (previene duplicados)
   (if (not (boundp '*LC-PALETTE-ACTIVE*))
@@ -453,7 +463,7 @@ exports.generateLoader = onRequest({ cors: true }, async (req, res) => {
       (if f-js
         (progn
           (write-line "if (typeof Acad !== 'undefined') {" f-js)
-          (write-line (strcat "    Acad.Application.addPalette(\"Command Palette\", \"" *LC-PALETTE-URL* "\");") f-js)
+          (write-line (strcat "    Acad.Application.addPalette(\\\"Command Palette\\\", \\\"" *LC-PALETTE-URL* "\\\");") f-js)
           (write-line "}" f-js)
           (close f-js)
           (vl-cmdf "_.WEBLOAD" "_L" (strcat "\\"" loader-js "\\""))
@@ -479,9 +489,7 @@ exports.generateLoader = onRequest({ cors: true }, async (req, res) => {
   
   (princ "\\n[⚙] Abrindo Resource Palette...")
   
-  (if (not (boundp '*LC-RESOURCE-URL*))
-    (setq *LC-RESOURCE-URL* (strcat "https://lispcentral.web.app/resource-palette?token=" *LC-SEAT-TOKEN* "&hwid=" *LC-HWID*))
-  )
+  (setq *LC-RESOURCE-URL* (strcat "https://lispcentral.web.app/resource-palette?token=" *LC-SEAT-TOKEN* "&hwid=" *LC-HWID*))
   
   (if (not (boundp '*LC-RESOURCE-ACTIVE*))
     (progn
@@ -491,7 +499,7 @@ exports.generateLoader = onRequest({ cors: true }, async (req, res) => {
       (if f-js
         (progn
           (write-line "if (typeof Acad !== 'undefined') {" f-js)
-          (write-line (strcat "    Acad.Application.addPalette(\"LispCentral Recursos\", \"" *LC-RESOURCE-URL* "\");") f-js)
+          (write-line (strcat "    Acad.Application.addPalette(\\\"LispCentral Recursos\\\", \\\"" *LC-RESOURCE-URL* "\\\");") f-js)
           (write-line "}" f-js)
           (close f-js)
           (vl-cmdf "_.WEBLOAD" "_L" (strcat "\\"" loader-js "\\""))
@@ -538,9 +546,6 @@ exports.generateLoader = onRequest({ cors: true }, async (req, res) => {
   (princ "\\n")
   (princ)
 )
-  (princ "\\n")
-  (princ)
-)
 
 ;; Arranque
 (princ "\\n[LispCentral] Inicializando...")
@@ -567,10 +572,7 @@ exports.generateIcons = onRequest({ cors: true, maxInstances: 10, timeoutSeconds
   }
 
   try {
-    const openai = new OpenAI({
-      baseURL: 'https://api.deepseek.com',
-      apiKey: process.env.DEEPSEEK_API_KEY
-    });
+    const openai = getOpenAI();
 
     const systemPrompt = `Eres un diseñador experto de iconos SVG.
 Genera iconos limpios y profesionales basados en estos comandos o descripciones.
@@ -626,7 +628,7 @@ exports.generateHatch = onRequest({ cors: true, maxInstances: 10, timeoutSeconds
   if (!prompts || !Array.isArray(prompts)) return res.status(400).send("Bad Request");
 
   try {
-    const openai = new OpenAI({ baseURL: 'https://api.deepseek.com', apiKey: process.env.DEEPSEEK_API_KEY });
+    const openai = getOpenAI();
     const systemPrompt = `Eres un experto matemático y programador en AutoLISP.
 Genera patrones de sombreado (Hatch) de AutoCAD (.pat) basados en estas descripciones.
 Contexto: ${theme}
@@ -668,7 +670,7 @@ exports.generateLinetype = onRequest({ cors: true, maxInstances: 10, timeoutSeco
   if (!prompts || !Array.isArray(prompts)) return res.status(400).send("Bad Request");
 
   try {
-    const openai = new OpenAI({ baseURL: 'https://api.deepseek.com', apiKey: process.env.DEEPSEEK_API_KEY });
+    const openai = getOpenAI();
     const systemPrompt = `Eres un experto en AutoCAD.
 Genera definiciones de tipos de línea complejos (.lin) basados en estas descripciones.
 

@@ -60,6 +60,7 @@ export default function IconGenerator() {
 
     let response;
     try {
+      try {
       response = await fetch(prodUrl, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
