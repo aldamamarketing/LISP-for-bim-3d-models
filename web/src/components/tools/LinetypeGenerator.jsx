@@ -30,22 +30,32 @@ export default function LinetypeGenerator() {
     const lines = prompts.split('\n').filter(p => p.trim() !== '');
     
     try {
-      const isDev = import.meta.env.DEV;
-      const baseUrl = isDev 
-        ? 'http://127.0.0.1:5001/lispcentral/us-central1'
-        : 'https://us-central1-lispcentral.cloudfunctions.net';
-      const apiUrl = `${baseUrl}/generateLinetype`;
+      const prodUrl = 'https://us-central1-lispcentral.cloudfunctions.net/generateLinetype';
+      const localUrl = 'http://127.0.0.1:5001/lispcentral/us-central1/generateLinetype';
 
-      const response = await fetch(apiUrl, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ prompts: lines })
-      });
+      let response;
+      try {
+        response = await fetch(prodUrl, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ prompts: lines })
+        });
+      } catch (err) {
+        response = await fetch(localUrl, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ prompts: lines })
+        });
+      }
 
       if (!response.ok) throw new Error("Error del servidor");
 
       const data = await response.json();
-      const parsedResults = Array.isArray(data.results) ? data.results : [];
+      const parsedResults = (Array.isArray(data.results) ? data.results : []).map(r => {
+        const nameToUse = r.name || r.filename || 'linetype';
+        r.id = "lin_" + nameToUse.replace(/[^a-zA-Z0-9]/g, "_").toLowerCase();
+        return r;
+      });
       setResults(parsedResults);
       if (parsedResults.length > 0) setActiveTab('ai');
     } catch (error) {

@@ -32,22 +32,33 @@ export default function HatchGenerator({ lang = 'en' }) {
     const lines = prompts.split('\n').filter(p => p.trim() !== '');
     
     try {
-      const isDev = import.meta.env.DEV;
-      const baseUrl = isDev 
-        ? 'http://127.0.0.1:5001/lispcentral/us-central1'
-        : 'https://us-central1-lispcentral.cloudfunctions.net';
-      const apiUrl = `${baseUrl}/generateHatch`;
-
-      const response = await fetch(apiUrl, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ theme, prompts: lines })
-      });
+      const prodUrl = 'https://us-central1-lispcentral.cloudfunctions.net/generateHatch';
+      const localUrl = 'http://127.0.0.1:5001/lispcentral/us-central1/generateHatch';
+      
+      let response;
+      try {
+        response = await fetch(prodUrl, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ theme, prompts: lines })
+        });
+      } catch (err) {
+        // Fallback to local emulator
+        response = await fetch(localUrl, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ theme, prompts: lines })
+        });
+      }
 
       if (!response.ok) throw new Error("Error del servidor");
 
       const data = await response.json();
-      const parsedResults = Array.isArray(data.results) ? data.results : [];
+      const parsedResults = (Array.isArray(data.results) ? data.results : []).map(r => {
+        const nameToUse = r.name || r.filename || 'hatch';
+        r.id = "hatch_" + nameToUse.replace(/[^a-zA-Z0-9]/g, "_").toLowerCase();
+        return r;
+      });
       setResults(parsedResults);
     } catch (error) {
       console.error(error);

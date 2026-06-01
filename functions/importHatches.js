@@ -69,9 +69,26 @@ async function importHatches() {
       
       const safeId = "hatch_" + name.replace(/[^a-zA-Z0-9]/g, "_").toLowerCase();
       
+      const searchString = (name + " " + description).toLowerCase();
+      let category = "General";
+      if (searchString.includes("wood") || searchString.includes("timber")) {
+        category = "Madera";
+      } else if (searchString.includes("brick") || searchString.includes("block")) {
+        category = "Ladrillos";
+      } else if (searchString.includes("stone") || searchString.includes("rock") || searchString.includes("rubble")) {
+        category = "Piedra";
+      } else if (searchString.includes("gravel") || searchString.includes("sand") || searchString.includes("earth") || searchString.includes("ground")) {
+        category = "Terreno / Grava";
+      } else if (searchString.includes("tile") || searchString.includes("roof")) {
+        category = "Tejas / Revestimientos";
+      } else if (searchString.includes("concrete") || searchString.includes("ar-conc")) {
+        category = "Concreto";
+      }
+      
       const docData = {
         name: name,
         description: description,
+        category: category,
         code: data,
         type: "hatch",
         source: "https://www.cadhatch.com",

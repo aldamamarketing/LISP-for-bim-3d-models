@@ -55,22 +55,32 @@ export default function IconGenerator() {
       return;
     }
     
-    try {
-      const isDev = import.meta.env.DEV;
-      const baseUrl = isDev 
-        ? 'http://127.0.0.1:5001/lispcentral/us-central1'
-        : 'https://us-central1-lispcentral.cloudfunctions.net';
-      const apiUrl = `${baseUrl}/generateIcons`;
+    const prodUrl = 'https://us-central1-lispcentral.cloudfunctions.net/generateIcons';
+    const localUrl = 'http://127.0.0.1:5001/lispcentral/us-central1/generateIcons';
 
-      const response = await fetch(apiUrl, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          theme: finalTheme,
-          styleOption: finalStyle,
-          prompts: lines
-        })
-      });
+    let response;
+    try {
+      response = await fetch(prodUrl, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            theme: finalTheme,
+            styleOption: finalStyle,
+            prompts: lines
+          })
+        });
+      } catch (err) {
+        // Fallback to local emulator
+        response = await fetch(localUrl, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            theme: finalTheme,
+            styleOption: finalStyle,
+            prompts: lines
+          })
+        });
+      }
 
       if (!response.ok) {
         throw new Error('Erro ao gerar ícones');
@@ -78,11 +88,15 @@ export default function IconGenerator() {
 
       const data = await response.json();
       
-      // Aseguramos un ID único por si el modelo devuelve formatos genéricos
-      const parsedResults = Array.isArray(data) ? data.map((icon, idx) => ({
-        ...icon,
-        id: `gen-${Date.now()}-${idx}`
-      })) : [];
+      // Aseguramos un ID único y descriptivo
+      const parsedResults = Array.isArray(data) ? data.map((icon, idx) => {
+        const nameToUse = icon.name || icon.filename || icon.prompt || 'icon';
+        const slug = nameToUse.replace(/[^a-zA-Z0-9]/g, "_").toLowerCase();
+        return {
+          ...icon,
+          id: `icon_${slug}_${idx}`
+        };
+      }) : [];
 
       setGeneratedIcons(parsedResults);
       if (parsedResults.length > 0) setActiveTab('ai');

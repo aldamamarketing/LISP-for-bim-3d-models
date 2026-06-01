@@ -67,7 +67,7 @@ export default function HatchPreview({ patCode, scale = 1, width = 150, height =
                 if (dSum > 0.0001) validDashes.push(dSum);
             });
             validDashes.sort((a,b) => a - b);
-            targetDy = validDashes.length > 0 ? validDashes[Math.floor(validDashes.length / 2)] : 1;
+            targetDy = validDashes.length > 0 ? validDashes[Math.floor(validDashes.length / 2)] : 20;
         }
 
         let minX = Infinity, maxX = -Infinity;
@@ -85,8 +85,8 @@ export default function HatchPreview({ patCode, scale = 1, width = 150, height =
 
         // HEURÍSTICA DE COMPLEJIDAD: 
         // Hachuras simples (1-5 líneas) necesitan 3-4 repeticiones para verse bien como una malla
-        // Hachuras complejas (600 líneas, ej. piedras) necesitan hacer ZOOM a ~1 sola repetición.
-        let targetRepetitions = Math.max(0.5, 4 - Math.log10(patterns.length) * 1.5);
+        // Hachuras complejas (600 líneas, ej. piedras) necesitan hacer ZOOM a ~0.25 repetición.
+        let targetRepetitions = Math.max(0.25, 4 - Math.log10(patterns.length) * 1.5);
         
         let finalScale = (canvas.height / targetRepetitions) / targetDy;
         
