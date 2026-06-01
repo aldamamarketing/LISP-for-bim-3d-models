@@ -31,16 +31,16 @@ export default function AutoCADPalette() {
   }, [activeTab]);
 
   const handleApply = (item) => {
-    // Comunicar con AutoCAD a través de window.external
+    // Comunicar con AutoCAD a traves de window.external
     if (window.external && typeof window.external.ExecuteAutoCADCommand === 'function') {
-      // Codificamos en Base64 para evitar problemas con las comillas y saltos de línea en AutoLISP
+      // Codificamos en Base64 para evitar problemas con las comillas y saltos de linea en AutoLISP
       const codeB64 = btoa(item.code);
       const name = item.name ? item.name.replace(/[^a-zA-Z0-9_-]/g, '') : 'LC_ASSET';
       
       const lispCommand = `(LC_ApplyAsset "${item.type}" "${name}" "${codeB64}")\n`;
       window.external.ExecuteAutoCADCommand(lispCommand);
     } else {
-      console.warn("[LC] Função disponível apenas na Paleta do AutoCAD.");
+      console.warn("[LC] Funcao disponivel apenas na Paleta do AutoCAD.");
     }
   };
 
@@ -71,7 +71,7 @@ export default function AutoCADPalette() {
         <p style={{ textAlign: 'center', color: '#777', fontSize: '0.9rem' }}>Cargando paleta...</p>
       ) : favorites.length === 0 ? (
         <div style={{ textAlign: 'center', padding: '20px' }}>
-          <p style={{ color: 'var(--text-muted)', fontSize: '0.85rem' }}>No hay favoritos en esta categoría.</p>
+          <p style={{ color: 'var(--text-muted)', fontSize: '0.85rem' }}>No hay favoritos en esta categoria.</p>
         </div>
       ) : (
         <div style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>

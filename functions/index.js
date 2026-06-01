@@ -359,16 +359,10 @@ exports.generateLoader = onRequest({ cors: true }, async (req, res) => {
 ;; --------------------------------------------------------------------------
 ;; EVENT HUB: Reactor de Cambio de Documento para Paletas Web (LC_SESSION_HUB)
 ;; --------------------------------------------------------------------------
-(defun LC:DocChanged-Callback (reactorObj eventList / activeDoc f-js event-js bridge-dir find-path)
+(defun LC:DocChanged-Callback (reactorObj eventList / activeDoc f-js event-js)
   (vl-catch-all-apply
     '(lambda ()
-       (setq find-path (findfile "LC_Loader.lsp"))
-       (if find-path
-         (setq bridge-dir (vl-filename-directory find-path))
-         (setq bridge-dir "Z:/Autocad Config/LISP")
-       )
-       
-       (setq event-js (strcat bridge-dir "/web/LC_DocEvent.js"))
+       (setq event-js (strcat (getenv "TEMP") "\\\\LC_DocEvent.js"))
        (setq event-js (vl-string-translate "\\\\" "/" event-js))
        
        (setq f-js (open event-js "w"))
@@ -399,6 +393,36 @@ exports.generateLoader = onRequest({ cors: true }, async (req, res) => {
     )
   )
   (princ "\\n[LC Event Hub] Reactor Global de Sesión Inicializado.")
+)
+
+;; --------------------------------------------------------------------------
+;; BASE64 DECODER
+;; --------------------------------------------------------------------------
+(defun LC:b64d (str / xmlNode stream txt)
+  (setq xmlNode (vlax-create-object "MSXML2.DOMDocument.6.0"))
+  (if xmlNode
+    (progn
+      (setq xmlNode (vlax-invoke-method xmlNode 'createElement "b64"))
+      (vlax-put-property xmlNode 'dataType "bin.base64")
+      (vlax-put-property xmlNode 'text str)
+      (setq stream (vlax-create-object "ADODB.Stream"))
+      (if stream
+        (progn
+          (vlax-put-property stream 'Type 1) ; adTypeBinary
+          (vlax-invoke-method stream 'Open)
+          (vlax-invoke-method stream 'Write (vlax-get-property xmlNode 'nodeTypedValue))
+          (vlax-put-property stream 'Position 0)
+          (vlax-put-property stream 'Type 2) ; adTypeText
+          (vlax-put-property stream 'Charset "utf-8")
+          (setq txt (vlax-invoke-method stream 'ReadText -1))
+          (vlax-invoke-method stream 'Close)
+          (vlax-release-object stream)
+        )
+      )
+      (vlax-release-object xmlNode)
+    )
+  )
+  (if txt txt "")
 )
 
 ;; --------------------------------------------------------------------------

@@ -300,21 +300,12 @@
 ;; --------------------------------------------------------------------------
 ;; EVENT HUB: Reactor de Cambio de Documento para Paletas Web (LC_SESSION_HUB)
 ;; --------------------------------------------------------------------------
-(defun LC:DocChanged-Callback (reactorObj eventList / activeDoc f-js event-js 
-                               bridge-dir find-path
-                              ) 
+(defun LC:DocChanged-Callback (reactorObj eventList / activeDoc f-js event-js) 
   ;; Se dispara cuando el usuario cambia de pestaña de dibujo
   (vl-catch-all-apply 
     '(lambda () 
-       ;; Encontramos la ruta para crear el archivo temporal de inyección
-       (setq find-path (findfile "LC_Loader.lsp"))
-       (if find-path 
-         (setq bridge-dir (vl-filename-directory find-path))
-         (setq bridge-dir "Z:/Autocad Config/LISP")
-       )
-
        ;; Inyectamos un pequeño script JS que dispara el evento global
-       (setq event-js (strcat bridge-dir "/web/LC_DocEvent.js"))
+       (setq event-js (strcat (getenv "TEMP") "\\LC_DocEvent.js"))
        (setq event-js (vl-string-translate "\\" "/" event-js))
 
        (setq f-js (open event-js "w"))

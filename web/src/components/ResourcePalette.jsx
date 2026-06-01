@@ -86,8 +86,8 @@ export default function ResourcePalette() {
 
       window.external.ExecuteAutoCADCommand(lispCommand);
     } else {
-      // Fallback: mostrar instrucciones si no está en AutoCAD
-      console.warn('[LC] window.external não disponível — não está dentro do AutoCAD.');
+      // Fallback: mostrar instrucciones si no esta en AutoCAD
+      console.warn('[LC] window.external nao disponivel - nao esta dentro do AutoCAD.');
     }
   };
 
@@ -125,14 +125,14 @@ export default function ResourcePalette() {
       {/* Header */}
       <div style={{ padding: '8px 10px', backgroundColor: '#111', borderBottom: '2px solid var(--tmd-orange)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <span style={{ fontSize: '0.75rem', fontWeight: 'bold', color: 'var(--tmd-orange)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
-          📦 Meus Recursos
+          Meus Recursos
         </span>
         <button
           onClick={fetchResources}
           style={{ background: 'transparent', border: '1px solid #444', color: '#aaa', borderRadius: '4px', cursor: 'pointer', padding: '3px 8px', fontSize: '0.7rem' }}
           title="Atualizar recursos"
         >
-          ↻ Sync
+          Sync
         </button>
       </div>
 
@@ -226,7 +226,7 @@ export default function ResourcePalette() {
                     }}
                     title={isPinned ? 'Desafixar' : 'Fixar no topo'}
                   >
-                    {isPinned ? '📌' : '•'}
+                    {isPinned ? '[FIXADO]' : '[FIXAR]'}
                   </button>
 
                   {/* Preview */}
@@ -276,7 +276,7 @@ export default function ResourcePalette() {
 
       {/* Footer info */}
       <div style={{ padding: '6px 10px', borderTop: '1px solid #333', fontSize: '0.65rem', color: '#555', textAlign: 'center' }}>
-        {filteredResources.length} {activeTab === 'hatch' ? 'hachuras' : 'linhas'} • Duplo-clique = aplicar
+        {filteredResources.length} {activeTab === 'hatch' ? 'hachuras' : 'linhas'} - Duplo-clique = aplicar
       </div>
 
       <style>{`
