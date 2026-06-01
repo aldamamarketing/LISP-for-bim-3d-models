@@ -96,7 +96,9 @@ export default function ResourcePalette() {
     .filter(item => {
       if (!searchQuery) return true;
       const q = searchQuery.toLowerCase();
-      return (item.name?.toLowerCase().includes(q) || item.description?.toLowerCase().includes(q));
+      const nameMatch = item.name ? item.name.toLowerCase().includes(q) : false;
+      const descMatch = item.description ? item.description.toLowerCase().includes(q) : false;
+      return nameMatch || descMatch;
     })
     .sort((a, b) => {
       const aPinned = pinnedIds.includes(a.id) ? 0 : 1;
