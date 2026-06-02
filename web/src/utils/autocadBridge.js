@@ -33,13 +33,24 @@ export const executeInAutoCAD = (cmdStr) => {
     }
   }
   
-  if (typeof window.external !== 'undefined' && typeof window.external.ExecuteAutoCADCommand === 'function') {
-    // Último fallback para versiones muy antiguas o integraciones .NET
-    window.external.ExecuteAutoCADCommand(formattedCmd);
-    return true;
+  // Último fallback para versiones antiguas o integraciones .NET
+  if (typeof window.external !== 'undefined') {
+    try {
+      window.external.ExecuteAutoCADCommand(formattedCmd);
+      return true;
+    } catch (e) {
+      console.warn("[LC] window.external.ExecuteAutoCADCommand falló:", e);
+    }
   }
 
   console.error("[LC] No se encontró ningún método válido para ejecutar comandos en AutoCAD.");
+  
+  // Extra Fallback: Copy to clipboard!
+  try {
+    navigator.clipboard.writeText(cmdStr.trim());
+    console.log("[LC] Comando copiado al portapapeles: " + cmdStr);
+  } catch (e) {}
+
   return false;
 };
 
