@@ -163,7 +163,7 @@ export default function LispCommandPalette() {
                 <div style={{ fontSize: '0.75rem', color: '#888', textTransform: 'uppercase', marginBottom: '6px', fontWeight: 'bold' }}>
                   📌 Favoritos
                 </div>
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(140px, 1fr))', gap: '6px' }}>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(75px, 1fr))', gap: '6px' }}>
                   {commands.filter(c => favorites.includes(c.name)).map(cmd => (
                     <CommandItem key={`fav-${cmd.name}`} cmd={cmd} isPinned={true} togglePin={togglePin} onRun={handleRunCommand} />
                   ))}
@@ -178,7 +178,7 @@ export default function LispCommandPalette() {
                   <span>{group}</span>
                   <span>{grouped[group].length}</span>
                 </div>
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(140px, 1fr))', gap: '6px' }}>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(75px, 1fr))', gap: '6px' }}>
                   {grouped[group].map(cmd => (
                     <CommandItem key={`cmd-${cmd.name}`} cmd={cmd} isPinned={favorites.includes(cmd.name)} togglePin={togglePin} onRun={handleRunCommand} />
                   ))}

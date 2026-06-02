@@ -245,24 +245,7 @@ export default function ResourcePalette() {
                     {item.name}
                   </span>
 
-                  {/* Apply button */}
-                  <button
-                    onClick={(e) => { e.stopPropagation(); handleApply(item); }}
-                    style={{
-                      width: '100%',
-                      marginTop: '4px',
-                      padding: '4px',
-                      backgroundColor: 'var(--tmd-orange)',
-                      color: '#fff',
-                      border: 'none',
-                      borderRadius: '3px',
-                      cursor: 'pointer',
-                      fontSize: '0.6rem',
-                      fontWeight: 'bold',
-                    }}
-                  >
-                    Aplicar
-                  </button>
+                  {/* Aplicación al doble click */}
                 </div>
               );
             })}
