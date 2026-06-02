@@ -18,8 +18,8 @@ export default defineConfig({
     emptyOutDir: true,
     rollupOptions: {
       input: {
-        'palette': 'palette.html',
-        'resource-palette': 'resource-palette.html'
+        'palette': path.resolve(__dirname, 'src/palettes-entry/palette.html'),
+        'resource-palette': path.resolve(__dirname, 'src/palettes-entry/resource-palette.html')
       }
     }
   }
