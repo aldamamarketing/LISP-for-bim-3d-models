@@ -28,9 +28,9 @@ const GROUP_ORDER = [
 
 const SvgIcon = ({ svgString, fallback }) => {
   if (svgString) {
-    return <span style={{ width: '24px', height: '24px', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--tmd-orange)' }} dangerouslySetInnerHTML={{ __html: svgString }} />;
+    return <span style={{ width: '32px', height: '32px', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--tmd-orange)' }} dangerouslySetInnerHTML={{ __html: svgString }} />;
   }
-  return <span style={{ width: '24px', height: '24px', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--tmd-orange)' }} dangerouslySetInnerHTML={{ __html: fallback }} />;
+  return <span style={{ width: '32px', height: '32px', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--tmd-orange)' }} dangerouslySetInnerHTML={{ __html: fallback }} />;
 };
 
 export default function LispCommandPalette() {
