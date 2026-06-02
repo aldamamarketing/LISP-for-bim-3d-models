@@ -36,12 +36,28 @@ export const executeInAutoCAD = (cmdStr) => {
   // Último fallback para versiones antiguas o integraciones .NET
   if (typeof window.external !== 'undefined') {
     try {
-      window.external.ExecuteAutoCADCommand(formattedCmd);
-      return true;
+      console.log("[LC] Propiedades de window.external:", Object.keys(window.external));
+      // Intentar llamar si existe
+      if (typeof window.external.ExecuteAutoCADCommand === 'function') {
+        window.external.ExecuteAutoCADCommand(formattedCmd);
+        return true;
+      }
     } catch (e) {
-      console.warn("[LC] window.external.ExecuteAutoCADCommand falló:", e);
+      console.warn("[LC] Error al explorar window.external:", e);
     }
   }
+
+  // Explorar el objeto window buscando inyecciones de AutoCAD
+  try {
+    const keys = Object.keys(window).filter(k => k.toLowerCase().includes('acad') || k.toLowerCase().includes('cef') || k.toLowerCase().includes('exec'));
+    console.log("[LC] Propiedades globales sospechosas de AutoCAD:", keys);
+  } catch (e) {}
+
+  // Intento de protocolo acad:
+  try {
+    console.log("[LC] Intentando protocolo acad: ...");
+    window.location.href = "acad:" + cmdStr;
+  } catch (e) {}
 
   console.error("[LC] No se encontró ningún método válido para ejecutar comandos en AutoCAD.");
   
