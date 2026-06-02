@@ -3,7 +3,6 @@ import { defineConfig } from 'astro/config';
 import react from '@astrojs/react';
 import sitemap from '@astrojs/sitemap';
 import tailwind from '@astrojs/tailwind';
-import legacy from '@vitejs/plugin-legacy';
 
 // https://astro.build/config
 export default defineConfig({
@@ -17,13 +16,6 @@ export default defineConfig({
     }
   },
   vite: {
-    plugins: [
-      legacy({
-        targets: ['chrome >= 65'],
-        additionalLegacyPolyfills: ['regenerator-runtime/runtime'],
-        renderLegacyChunks: true
-      })
-    ],
     build: {
       target: 'chrome65'
     },
