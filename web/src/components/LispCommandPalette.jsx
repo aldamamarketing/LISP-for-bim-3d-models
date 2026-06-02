@@ -48,7 +48,7 @@ export default function LispCommandPalette() {
     setLoading(true);
     setError(null);
     try {
-      const url = `${API_BASE}/getRoutine?token=${encodeURIComponent(token)}`;
+      const url = `${API_BASE}?token=${encodeURIComponent(token)}&routine=INDEX`;
       console.log('[LispCommandPalette] Fetching from:', url);
       const response = await fetch(url);
       console.log('[LispCommandPalette] Fetch response status:', response.status);
