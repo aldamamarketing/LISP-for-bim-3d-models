@@ -6,7 +6,17 @@
       "**/.*",
       "**/node_modules/**"
     ],
-    "cleanUrls": true
+    "cleanUrls": true,
+    "rewrites": [
+      {
+        "source": "/palette",
+        "destination": "/palette-builds/palette.html"
+      },
+      {
+        "source": "/resource-palette",
+        "destination": "/palette-builds/resource-palette.html"
+      }
+    ]
   },
   "functions": {
     "source": "functions",

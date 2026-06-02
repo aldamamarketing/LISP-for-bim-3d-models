@@ -4,6 +4,7 @@ import legacy from '@vitejs/plugin-legacy';
 import path from 'path';
 
 export default defineConfig({
+  root: 'src/palettes-entry',
   plugins: [
     react(),
     legacy({
@@ -13,12 +14,12 @@ export default defineConfig({
     })
   ],
   build: {
-    outDir: 'public',
-    emptyOutDir: false, // Don't delete the rest of the public folder
+    outDir: '../../public/palette-builds',
+    emptyOutDir: true,
     rollupOptions: {
       input: {
-        'palette/index': 'src/palettes-entry/palette.html',
-        'resource-palette/index': 'src/palettes-entry/resource-palette.html'
+        'palette': 'palette.html',
+        'resource-palette': 'resource-palette.html'
       }
     }
   }
