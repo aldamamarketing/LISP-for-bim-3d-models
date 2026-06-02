@@ -99,7 +99,7 @@ export default function LispCommandPalette() {
   };
 
   const handleRunCommand = (cmdName) => {
-    executeInAutoCAD(`(C:${cmdName})\n`);
+    executeInAutoCAD(`(C:${cmdName}) `);
   };
 
   // Filter and group

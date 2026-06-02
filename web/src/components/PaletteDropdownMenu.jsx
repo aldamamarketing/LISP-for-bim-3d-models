@@ -10,9 +10,9 @@ export default function PaletteDropdownMenu({ myId }) {
   const activePalettes = usePalettePresence(myId);
 
   const palettes = [
-    { id: 'commands', label: 'Command Palette', acadName: 'Command Palette', openCmd: '(C:LC)\n' },
-    { id: 'resources', label: 'LispCentral Recursos', acadName: 'LispCentral Recursos', openCmd: '(C:RECURSOS)\n' },
-    { id: 'properties', label: 'LispCentral Propiedades', acadName: 'LispCentral Propiedades', openCmd: '(C:LC_PROP)\n' }
+    { id: 'commands', label: 'Command Palette', acadName: 'Command Palette', openCmd: '(C:LC) ' },
+    { id: 'resources', label: 'LispCentral Recursos', acadName: 'LispCentral Recursos', openCmd: '(C:RECURSOS) ' },
+    { id: 'properties', label: 'LispCentral Propiedades', acadName: 'LispCentral Propiedades', openCmd: '(C:LC_PROP) ' }
   ];
 
   // Cerrar si se clickea fuera del menu

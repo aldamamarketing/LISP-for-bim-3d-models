@@ -20,8 +20,8 @@ export const executeInAutoCAD = (cmdStr) => {
     }
   }
 
-  // Fallback a ejecución como si fuera la línea de comandos
-  const formattedCmd = cmdStr.endsWith('\n') ? cmdStr : cmdStr + '\n';
+  // Fallback a ejecución como si fuera la línea de comandos (usando espacio final para simular Enter)
+  const formattedCmd = cmdStr.endsWith(' ') ? cmdStr : cmdStr.replace(/\n$/, '') + ' ';
   
   if (typeof Acad !== 'undefined' && Acad.Editor) {
     if (typeof Acad.Editor.executeCommandAsync === 'function') {
