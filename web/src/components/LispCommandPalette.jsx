@@ -27,10 +27,24 @@ const GROUP_ORDER = [
 ];
 
 const SvgIcon = ({ svgString, fallback }) => {
-  if (svgString) {
-    return <span style={{ width: '32px', height: '32px', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--tmd-orange)' }} dangerouslySetInnerHTML={{ __html: svgString }} />;
-  }
-  return <span style={{ width: '32px', height: '32px', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--tmd-orange)' }} dangerouslySetInnerHTML={{ __html: fallback }} />;
+  const iconHtml = svgString || fallback;
+  return (
+    <span 
+      style={{ 
+        width: '32px', 
+        height: '32px', 
+        display: 'flex', 
+        alignItems: 'center', 
+        justifyContent: 'center', 
+        color: 'var(--tmd-orange)',
+        backgroundColor: 'rgba(242,109,33,0.1)',
+        border: '1px solid rgba(242,109,33,0.3)',
+        borderRadius: '4px',
+        padding: '4px'
+      }} 
+      dangerouslySetInnerHTML={{ __html: iconHtml }} 
+    />
+  );
 };
 
 export default function LispCommandPalette() {
@@ -200,20 +214,26 @@ export default function LispCommandPalette() {
           from { transform: rotate(0deg); }
           to { transform: rotate(360deg); }
         }
+        .cmd-item svg {
+          width: 100%;
+          height: 100%;
+          display: block;
+        }
         .cmd-item {
           background-color: #222;
           border: 1px solid #333;
-          border-radius: 6px;
-          padding: 8px;
+          border-radius: 4px;
+          padding: 8px 6px;
           cursor: pointer;
           display: flex;
           flex-direction: column;
           align-items: center;
-          justify-content: center;
+          justify-content: flex-start;
           gap: 6px;
           transition: all 0.15s;
           position: relative;
           text-align: center;
+          min-height: 85px;
         }
         .cmd-item:hover {
           background-color: #2a2a2a;
