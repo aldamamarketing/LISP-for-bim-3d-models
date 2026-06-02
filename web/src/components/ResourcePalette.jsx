@@ -12,6 +12,7 @@ import LinetypePreview from './tools/LinetypePreview';
 const API_BASE = 'https://us-central1-lispcentral.cloudfunctions.net';
 
 export default function ResourcePalette() {
+  console.log('[ResourcePalette] Inicializando componente...');
   const [activeTab, setActiveTab] = useState('hatch');
   const [resources, setResources] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -25,9 +26,11 @@ export default function ResourcePalette() {
   );
   const token = urlParams.get('token') || '';
   const hwid = urlParams.get('hwid') || '';
+  console.log('[ResourcePalette] URL Params capturados:', { token: token ? 'OK' : 'MISSING', hwid });
 
   // Cargar favoritos desde la API
   const fetchResources = useCallback(async () => {
+    console.log('[ResourcePalette] Ejecutando fetchResources para type:', activeTab);
     if (!token) {
       setError('Token não encontrado. Recarregue o Loader.');
       setLoading(false);
@@ -37,11 +40,13 @@ export default function ResourcePalette() {
     setLoading(true);
     setError(null);
     try {
-      const response = await fetch(
-        `${API_BASE}/getUserResources?token=${encodeURIComponent(token)}&type=${activeTab}`
-      );
+      const url = `${API_BASE}/getUserResources?token=${encodeURIComponent(token)}&type=${activeTab}`;
+      console.log('[ResourcePalette] Fetching from:', url);
+      const response = await fetch(url);
+      console.log('[ResourcePalette] Fetch response status:', response.status);
       if (!response.ok) throw new Error(`Erro ${response.status}`);
       const data = await response.json();
+      console.log('[ResourcePalette] Dados recebidos:', data.length, 'items');
       setResources(Array.isArray(data) ? data : []);
     } catch (err) {
       console.error('Erro ao carregar recursos:', err);
@@ -52,6 +57,7 @@ export default function ResourcePalette() {
   }, [token, activeTab]);
 
   useEffect(() => {
+    console.log('[ResourcePalette] useEffect (activeTab change). activeTab:', activeTab);
     fetchResources();
   }, [fetchResources]);
 
@@ -73,7 +79,9 @@ export default function ResourcePalette() {
 
   // Aplicar recurso en AutoCAD
   const handleApply = (item) => {
+    console.log('[ResourcePalette] handleApply item:', item.name);
     if (window.external && typeof window.external.ExecuteAutoCADCommand === 'function') {
+      console.log('[ResourcePalette] window.external.ExecuteAutoCADCommand IS available. Preparando lisp command...');
       const codeB64 = btoa(unescape(encodeURIComponent(item.code)));
       const safeName = (item.name || 'LC_ASSET').replace(/[^a-zA-Z0-9_-]/g, '');
 
@@ -84,10 +92,11 @@ export default function ResourcePalette() {
         lispCommand = `(LC_ApplyLinetype "${safeName}" "${codeB64}")\n`;
       }
 
+      console.log('[ResourcePalette] Executando:', lispCommand.trim());
       window.external.ExecuteAutoCADCommand(lispCommand);
     } else {
       // Fallback: mostrar instrucciones si no esta en AutoCAD
-      console.warn('[LC] window.external nao disponivel - nao esta dentro do AutoCAD.');
+      console.warn('[LC] window.external nao disponivel - nao esta dentro do AutoCAD. Cannot apply:', item.name);
     }
   };
 

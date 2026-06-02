@@ -31,6 +31,7 @@ const SvgIcon = ({ svgString, fallback }) => {
 };
 
 export default function LispCommandPalette() {
+  console.log('[LispCommandPalette] Inicializando componente...');
   const [commands, setCommands] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -39,8 +40,28 @@ export default function LispCommandPalette() {
 
   // Get credentials from URL
   const urlParams = new URLSearchParams(typeof window !== 'undefined' ? window.location.search : '');
-  const apiKey = urlParams.get('token') || urlParams.get('key') || 'lc_key_S5ggQl1Gk4f3';
-  const hwId = urlParams.get('hwid') || 'unknown';
+  const token = urlParams.get('token') || 'lc_key_S5ggQl1Gk4f3';
+  const hwid = urlParams.get('hwid') || '';
+  console.log('[LispCommandPalette] URL Params capturados:', { token: token ? 'OK' : 'MISSING', hwid });
+
+  const fetchCommands = useCallback(async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const url = `${API_BASE}/getRoutine?token=${encodeURIComponent(token)}`;
+      console.log('[LispCommandPalette] Fetching from:', url);
+      const response = await fetch(url);
+      console.log('[LispCommandPalette] Fetch response status:', response.status);
+      if (!response.ok) throw new Error(`Erro ${response.status}`);
+      const data = await response.json();
+      console.log('[LispCommandPalette] Comandos recebidos:', Array.isArray(data) ? data.length : 0);
+      setCommands(Array.isArray(data) ? data : []);
+    } catch (err) {
+      console.error('Error fetching commands:', err);
+      setError('Falha ao carregar funções LISP. Verifique a conexão.');
+    }
+    setLoading(false);
+  }, [token]);
 
   useEffect(() => {
     try {
@@ -49,23 +70,7 @@ export default function LispCommandPalette() {
     } catch { /* ignore */ }
     
     fetchCommands();
-  }, []);
-
-  const fetchCommands = async () => {
-    setLoading(true);
-    setError(null);
-    try {
-      const url = `${API_BASE}?apiKey=${encodeURIComponent(apiKey)}&hwId=${encodeURIComponent(hwId)}&routine=INDEX&t=${Date.now()}`;
-      const response = await fetch(url, { cache: "no-store" });
-      if (!response.ok) throw new Error(`HTTP ${response.status}`);
-      const data = await response.json();
-      setCommands(Array.isArray(data) ? data : []);
-    } catch (err) {
-      console.error('Error fetching commands:', err);
-      setError('Falha ao carregar funções LISP. Verifique a conexão.');
-    }
-    setLoading(false);
-  };
+  }, [fetchCommands]);
 
   const togglePin = (cmdName, e) => {
     e.stopPropagation();
@@ -77,14 +82,12 @@ export default function LispCommandPalette() {
   };
 
   const handleRunCommand = (cmdName) => {
+    console.log('[LispCommandPalette] handleRunCommand:', cmdName);
     if (typeof window !== 'undefined' && window.external && typeof window.external.ExecuteAutoCADCommand === 'function') {
-      window.external.ExecuteAutoCADCommand(`(LC:run-or-load "${cmdName}")\n`);
+      console.log('[LispCommandPalette] window.external.ExecuteAutoCADCommand IS available. Executando...');
+      window.external.ExecuteAutoCADCommand(`(C:${cmdName})\n`);
     } else {
-      console.warn(`[AutoCAD Sim] Ejecutando comando LISP: (LC:run-or-load "${cmdName}")`);
-      // Fallback for simulation in browser
-      if (typeof Acad !== 'undefined' && Acad.Editor && typeof Acad.Editor.executeCommand === 'function') {
-        Acad.Editor.executeCommand(`(LC:run-or-load "${cmdName}")\n`);
-      }
+      console.warn('[LC] window.external nao disponivel - nao esta dentro do AutoCAD. Comando:', cmdName);
     }
   };
 
