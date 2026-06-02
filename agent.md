@@ -64,7 +64,9 @@ Los comandos de arquitectura 2D utilizan una firma semántica bajo el formato: `
 ---
 
 ## Paleta de Propiedades Contextuales Dinámicas
-El sistema cuenta con un panel de propiedades dinámico lateral (`web/properties_unified.html` y `web/properties_unified.js`) diseñado para operar en paralelo a la paleta de comandos.
+
+### Scaffolding (Fase 1 - Dual Build)
+Actualmente, el esqueleto (UI) está preparado e integrado en el entorno de producción (`web/src/palettes-entry/properties-palette.jsx`) a través del sistema **Dual-Build** de Vite (target `chrome65`). La paleta cuenta con el componente `PaletteNavBar` para cambiar rápidamente a las otras paletas usando comandos LISP transparentes (`(C:LC)`, `(C:RECURSOS)`, `(C:LC_PROP)`). Esto deja la plataforma 100% lista para programar la lógica del Inspector (detectar objetos seleccionados, modificar parámetros, etc.) sin preocuparse por la compatibilidad de Chromium.
 
 ### Sincronización Bidireccional (IPC):
 1. **AutoCAD -> Web (Detección de Comando)**:

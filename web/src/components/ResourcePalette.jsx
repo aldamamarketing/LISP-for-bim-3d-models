@@ -100,7 +100,7 @@ export default function ResourcePalette() {
     .filter(item => {
       if (activeFilters.length === 0) return true;
       const searchableText = `${item.name || ''} ${item.description || ''}`.toLowerCase();
-      return activeFilters.every(tag => searchableText.includes(tag.toLowerCase()));
+      return activeFilters.some(tag => searchableText.includes(tag.toLowerCase()));
     })
     .sort((a, b) => {
       const aPinned = pinnedIds.includes(a.id) ? 0 : 1;

@@ -92,8 +92,8 @@ export default function LispCommandPalette() {
   const filteredCmds = commands.filter(cmd => {
     if (activeFilters.length === 0) return true;
     const searchableText = `${cmd.name || ''} ${cmd.friendly || ''} ${cmd.desc || ''} ${cmd.group || ''}`.toLowerCase();
-    // Must match ALL tags
-    return activeFilters.every(tag => searchableText.includes(tag.toLowerCase()));
+    // Must match at least ONE tag (OR logic)
+    return activeFilters.some(tag => searchableText.includes(tag.toLowerCase()));
   });
 
   const grouped = {};
