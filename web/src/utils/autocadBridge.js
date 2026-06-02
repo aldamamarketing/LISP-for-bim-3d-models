@@ -24,12 +24,16 @@ export const executeInAutoCAD = (cmdStr) => {
   const formattedCmd = cmdStr.endsWith(' ') ? cmdStr : cmdStr.replace(/\n$/, '') + ' ';
   
   if (typeof Acad !== 'undefined' && Acad.Editor) {
-    if (typeof Acad.Editor.executeCommandAsync === 'function') {
-      Acad.Editor.executeCommandAsync(formattedCmd);
-      return true;
-    } else if (typeof Acad.Editor.executeCommand === 'function') {
-      Acad.Editor.executeCommand(formattedCmd);
-      return true;
+    try {
+      if (typeof Acad.Editor.executeCommandAsync === 'function') {
+        Acad.Editor.executeCommandAsync(formattedCmd);
+        return true;
+      } else if (typeof Acad.Editor.executeCommand === 'function') {
+        Acad.Editor.executeCommand(formattedCmd);
+        return true;
+      }
+    } catch (error) {
+      console.warn("[LC] La API nativa de Acad falló (probablemente 'exec is not defined'). Usando fallback...", error);
     }
   }
   
