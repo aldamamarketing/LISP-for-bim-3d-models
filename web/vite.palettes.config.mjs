@@ -8,15 +8,18 @@ export default defineConfig({
   plugins: [
     react()
   ],
+  resolve: {
+    preserveSymlinks: true
+  },
   build: {
     target: 'chrome65',
     outDir: '../../public/palette-builds',
     emptyOutDir: true,
     rollupOptions: {
       input: {
-        'palette': path.resolve(__dirname, 'src/palettes-entry/palette.html'),
-        'resource-palette': path.resolve(__dirname, 'src/palettes-entry/resource-palette.html'),
-        'properties-palette': path.resolve(__dirname, 'src/palettes-entry/properties-palette.html')
+        'palette': 'src/palettes-entry/palette.html',
+        'resource-palette': 'src/palettes-entry/resource-palette.html',
+        'properties-palette': 'src/palettes-entry/properties-palette.html'
       }
     }
   }
