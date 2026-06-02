@@ -7,15 +7,15 @@
 export const executeInAutoCAD = (cmdStr) => {
   console.log('[autocadBridge] executeInAutoCAD:', cmdStr);
 
-  if (typeof window.Acad === 'undefined' || !window.Acad.Editor) {
+  if (typeof Acad === 'undefined' || !Acad.Editor) {
     console.warn("[LC] Objeto Acad no disponible. Intentando fallback...");
   }
 
   // Si es un comando puro LISP definido con defun c:XXX
   // lo podemos llamar como LISP (C:XXX)
   if (cmdStr.startsWith('(C:') || cmdStr.startsWith('(LC_')) {
-    if (typeof window.Acad !== 'undefined' && window.Acad.Editor && typeof window.Acad.Editor.evaluateLisp === 'function') {
-      window.Acad.Editor.evaluateLisp(cmdStr);
+    if (typeof Acad !== 'undefined' && Acad.Editor && typeof Acad.Editor.evaluateLisp === 'function') {
+      Acad.Editor.evaluateLisp(cmdStr);
       return true;
     }
   }
@@ -23,12 +23,12 @@ export const executeInAutoCAD = (cmdStr) => {
   // Fallback a ejecución como si fuera la línea de comandos
   const formattedCmd = cmdStr.endsWith('\n') ? cmdStr : cmdStr + '\n';
   
-  if (typeof window.Acad !== 'undefined' && window.Acad.Editor) {
-    if (typeof window.Acad.Editor.executeCommandAsync === 'function') {
-      window.Acad.Editor.executeCommandAsync(formattedCmd);
+  if (typeof Acad !== 'undefined' && Acad.Editor) {
+    if (typeof Acad.Editor.executeCommandAsync === 'function') {
+      Acad.Editor.executeCommandAsync(formattedCmd);
       return true;
-    } else if (typeof window.Acad.Editor.executeCommand === 'function') {
-      window.Acad.Editor.executeCommand(formattedCmd);
+    } else if (typeof Acad.Editor.executeCommand === 'function') {
+      Acad.Editor.executeCommand(formattedCmd);
       return true;
     }
   }
@@ -49,8 +49,8 @@ export const executeInAutoCAD = (cmdStr) => {
 export const closePaletteInAutoCAD = (paletteName) => {
   console.log('[autocadBridge] closePaletteInAutoCAD:', paletteName);
   try {
-    if (typeof window.Acad !== 'undefined' && window.Acad.Application) {
-      window.Acad.Application.removePalette(paletteName);
+    if (typeof Acad !== 'undefined' && Acad.Application) {
+      Acad.Application.removePalette(paletteName);
       return true;
     }
   } catch (e) {

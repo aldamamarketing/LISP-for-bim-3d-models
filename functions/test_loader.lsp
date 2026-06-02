@@ -333,8 +333,12 @@
   (setq *LC-RESOURCE-ACTIVE* nil)
   (setq *LC-RESOURCE-URL* nil)
   (setq *LC-PROPERTIES-URL* nil)
+  (setq *LC-FORCE-RELOAD* T)
   (princ "\n[LC] Paletas resetadas.")
   (c:CP1)
+  (c:LC_RES)
+  (c:LC_PROP)
+  (setq *LC-FORCE-RELOAD* nil)
 )
 
 ;; Ajuda
