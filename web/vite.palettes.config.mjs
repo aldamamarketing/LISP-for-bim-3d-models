@@ -3,7 +3,7 @@ import react from '@vitejs/plugin-react';
 import path from 'path';
 
 export default defineConfig({
-  root: 'src/palettes-entry',
+  root: '.',
   base: '/palette-builds/',
   plugins: [
     react()
@@ -14,8 +14,9 @@ export default defineConfig({
     emptyOutDir: true,
     rollupOptions: {
       input: {
-        'palette': path.resolve(__dirname, 'src/palettes-entry/palette.html'),
-        'resource-palette': path.resolve(__dirname, 'src/palettes-entry/resource-palette.html')
+        'palette': 'src/palettes-entry/palette.html',
+        'resource-palette': 'src/palettes-entry/resource-palette.html',
+        'properties-palette': 'src/palettes-entry/properties-palette.html'
       }
     }
   }

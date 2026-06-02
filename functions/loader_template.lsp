@@ -448,6 +448,43 @@
 )
 
 ;; Alias Oficiales (comandos intuitivos para reabrir la paleta)
+;; Comando da Paleta de Propriedades
+(defun c:LC_PROP (/ doc loader-js f-js) 
+  (vl-load-com)
+  (if (not (boundp '*LC-PROPERTIES-URL*))
+    (setq *LC-PROPERTIES-URL* (strcat "https://lispcentral.web.app/properties-palette?token=" *LC-SEAT-TOKEN* "&hwid=" *LC-HWID*))
+  )
+  (setq doc (vla-get-activedocument (vlax-get-acad-object)))
+  (if (not (member "LispCentral Propriedades" (LC_GetPaletteNames)))
+    (progn
+      (princ "\n[\u2699] Abrindo Paleta de Propriedades...")
+      (setq loader-js (strcat (getenv "TEMP") "\\LC_Prop_Loader.js"))
+      (if (setq f-js (open loader-js "w"))
+        (progn
+          (write-line "if (typeof Acad !== 'undefined') {" f-js)
+          (write-line "    try { Acad.Application.removePalette('LispCentral Propriedades'); } catch(e) {}" f-js)
+          (write-line 
+            (strcat "    Acad.Application.addPalette(\"LispCentral Propriedades\", \"" 
+                    *LC-PROPERTIES-URL*
+                    "\");"
+            ) f-js
+          )
+          (write-line "    Acad.Editor.writeMessage(\"\\n[\\u2714] Paleta de Propriedades pronta.\\n\");" f-js)
+          (write-line "} else {" f-js)
+          (write-line "    console.error(\"[LC] AutoCAD JS API n\u00e3o detectada.\");" f-js)
+          (write-line "}" f-js)
+          (close f-js)
+          
+          (command "_.WEBLOAD" "_L" loader-js)
+        )
+        (princ "\n[?] Erro ao criar arquivo JS da paleta de propriedades.")
+      )
+    )
+    (princ "\n[?] Paleta de Propriedades j\u00e1 ativa.")
+  )
+  (princ)
+)
+
 (defun c:LC_INSPECT () (c:CP1))
 (defun c:TMD_INSPECT () (c:CP1))
 (defun c:LC () (c:CP1))
@@ -465,10 +502,11 @@
   (princ "\n  ║       LISPCENTRAL — COMANDOS DISPONÍVEIS         ║")
   (princ "\n  ╠══════════════════════════════════════════════════╣")
   (princ "\n  ║                                                  ║")
-  (princ "\n  ║  LC / PALETA / CP1 .. Abrir Command Palette      ║")
-  (princ "\n  ║  LC_RES / RECURSOS .. Abrir Paleta de Recursos   ║")
-  (princ "\n  ║  LC_HELP ........... Mostrar esta ajuda          ║")
-  (princ "\n  ║                                                  ║")
+  (princ "\n  •  LC / PALETA / CP1 .. Abrir Command Palette      •")
+  (princ "\n  •  LC_RES / RECURSOS .. Abrir Paleta de Recursos   •")
+  (princ "\n  •  LC_PROP ............ Abrir Paleta de Propriedades •")
+  (princ "\n  •  LC_HELP ........... Mostrar esta ajuda          •")
+  (princ "\n  •                                                  •")
   (princ "\n  ║  Dica: Se fechou a paleta, digite o comando      ║")
   (princ "\n  ║  novamente para reabri-la.                       ║")
   (princ "\n  ║                                                  ║")

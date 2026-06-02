@@ -1,6 +1,9 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import HatchPreview from './tools/HatchPreview';
 import LinetypePreview from './tools/LinetypePreview';
+import PaletteNavBar from './PaletteNavBar';
+import MultiFilter from './MultiFilter';
+import { executeInAutoCAD } from '../utils/autocadBridge';
 
 /**
  * ResourcePalette: paleta embebida en AutoCAD para aplicar Hatches y Linetypes
@@ -16,7 +19,7 @@ export default function ResourcePalette() {
   const [activeTab, setActiveTab] = useState('hatch');
   const [resources, setResources] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [searchQuery, setSearchQuery] = useState('');
+  const [activeFilters, setActiveFilters] = useState([]);
   const [pinnedIds, setPinnedIds] = useState([]);
   const [error, setError] = useState(null);
 
@@ -79,35 +82,25 @@ export default function ResourcePalette() {
 
   // Aplicar recurso en AutoCAD
   const handleApply = (item) => {
-    console.log('[ResourcePalette] handleApply item:', item.name);
-    if (window.external && typeof window.external.ExecuteAutoCADCommand === 'function') {
-      console.log('[ResourcePalette] window.external.ExecuteAutoCADCommand IS available. Preparando lisp command...');
-      const codeB64 = btoa(unescape(encodeURIComponent(item.code)));
-      const safeName = (item.name || 'LC_ASSET').replace(/[^a-zA-Z0-9_-]/g, '');
+    const codeB64 = btoa(unescape(encodeURIComponent(item.code)));
+    const safeName = (item.name || 'LC_ASSET').replace(/[^a-zA-Z0-9_-]/g, '');
 
-      let lispCommand = '';
-      if (activeTab === 'hatch') {
-        lispCommand = `(LC_ApplyHatch "${safeName}" "${codeB64}")\n`;
-      } else if (activeTab === 'lin') {
-        lispCommand = `(LC_ApplyLinetype "${safeName}" "${codeB64}")\n`;
-      }
-
-      console.log('[ResourcePalette] Executando:', lispCommand.trim());
-      window.external.ExecuteAutoCADCommand(lispCommand);
-    } else {
-      // Fallback: mostrar instrucciones si no esta en AutoCAD
-      console.warn('[LC] window.external nao disponivel - nao esta dentro do AutoCAD. Cannot apply:', item.name);
+    let lispCommand = '';
+    if (activeTab === 'hatch') {
+      lispCommand = `(LC_ApplyHatch "${safeName}" "${codeB64}")\n`;
+    } else if (activeTab === 'lin') {
+      lispCommand = `(LC_ApplyLinetype "${safeName}" "${codeB64}")\n`;
     }
+
+    executeInAutoCAD(lispCommand);
   };
 
   // Filtrar y ordenar: pinned primero, luego búsqueda
   const filteredResources = resources
     .filter(item => {
-      if (!searchQuery) return true;
-      const q = searchQuery.toLowerCase();
-      const nameMatch = item.name ? item.name.toLowerCase().includes(q) : false;
-      const descMatch = item.description ? item.description.toLowerCase().includes(q) : false;
-      return nameMatch || descMatch;
+      if (activeFilters.length === 0) return true;
+      const searchableText = `${item.name || ''} ${item.description || ''}`.toLowerCase();
+      return activeFilters.every(tag => searchableText.includes(tag.toLowerCase()));
     })
     .sort((a, b) => {
       const aPinned = pinnedIds.includes(a.id) ? 0 : 1;
@@ -131,48 +124,42 @@ export default function ResourcePalette() {
   return (
     <div style={{ backgroundColor: '#181818', color: '#fff', minHeight: '100vh', fontFamily: "'Inter', sans-serif", display: 'flex', flexDirection: 'column' }}>
       
-      {/* Header */}
-      <div style={{ padding: '8px 10px', backgroundColor: '#111', borderBottom: '2px solid var(--tmd-orange)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <span style={{ fontSize: '0.75rem', fontWeight: 'bold', color: 'var(--tmd-orange)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
-          Meus Recursos
-        </span>
-        <button
-          onClick={fetchResources}
-          style={{ background: 'transparent', border: '1px solid #444', color: '#aaa', borderRadius: '4px', cursor: 'pointer', padding: '3px 8px', fontSize: '0.7rem' }}
-          title="Atualizar recursos"
-        >
-          Sync
-        </button>
-      </div>
+      {/* Top Navigation */}
+      <PaletteNavBar activePalette="resources" />
 
-      {/* Tabs */}
-      <div style={{ display: 'flex', gap: '2px', padding: '8px 8px 0' }}>
-        <button onClick={() => setActiveTab('hatch')} style={tabStyle(activeTab === 'hatch')}>
-          Hachuras
-        </button>
-        <button onClick={() => setActiveTab('lin')} style={tabStyle(activeTab === 'lin')}>
-          Linhas
-        </button>
-      </div>
+      {/* Header & Tabs Container (Max Width to prevent over-stretching) */}
+      <div style={{ margin: '0 auto', width: '100%', maxWidth: '600px' }}>
+        <div style={{ padding: '8px 10px', backgroundColor: '#111', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <span style={{ fontSize: '0.75rem', fontWeight: 'bold', color: 'var(--tmd-orange)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+            Meus Recursos
+          </span>
+          <button
+            onClick={fetchResources}
+            style={{ background: 'transparent', border: '1px solid #444', color: '#aaa', borderRadius: '4px', cursor: 'pointer', padding: '3px 8px', fontSize: '0.7rem' }}
+            title="Atualizar recursos"
+          >
+            Sync
+          </button>
+        </div>
 
-      {/* Search */}
-      <div style={{ padding: '8px' }}>
-        <input
-          type="text"
-          placeholder="Buscar..."
-          value={searchQuery}
-          onChange={e => setSearchQuery(e.target.value)}
-          style={{
-            width: '100%',
-            padding: '7px 10px',
-            backgroundColor: '#222',
-            border: '1px solid #333',
-            borderRadius: '4px',
-            color: '#fff',
-            fontSize: '0.8rem',
-            outline: 'none',
-          }}
-        />
+        {/* Tabs */}
+        <div style={{ display: 'flex', gap: '2px', padding: '8px 8px 0' }}>
+          <button onClick={() => setActiveTab('hatch')} style={tabStyle(activeTab === 'hatch')}>
+            Hachuras
+          </button>
+          <button onClick={() => setActiveTab('lin')} style={tabStyle(activeTab === 'lin')}>
+            Linhas
+          </button>
+        </div>
+
+        {/* Search */}
+        <div style={{ padding: '8px' }}>
+          <MultiFilter
+            storageKey="lc_active_filters_res"
+            placeholder="Buscar..."
+            onFilterChange={setActiveFilters}
+          />
+        </div>
       </div>
 
       {/* Content */}

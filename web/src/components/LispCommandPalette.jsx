@@ -1,4 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
+import PaletteNavBar from './PaletteNavBar';
+import MultiFilter from './MultiFilter';
+import { executeInAutoCAD } from '../utils/autocadBridge';
 
 const API_BASE = 'https://getroutine-wgpjjgorxa-uc.a.run.app/getRoutine';
 
@@ -35,7 +38,7 @@ export default function LispCommandPalette() {
   const [commands, setCommands] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [searchQuery, setSearchQuery] = useState('');
+  const [activeFilters, setActiveFilters] = useState([]);
   const [favorites, setFavorites] = useState([]);
 
   // Get credentials from URL
@@ -82,25 +85,15 @@ export default function LispCommandPalette() {
   };
 
   const handleRunCommand = (cmdName) => {
-    console.log('[LispCommandPalette] handleRunCommand:', cmdName);
-    if (typeof window !== 'undefined' && window.external && typeof window.external.ExecuteAutoCADCommand === 'function') {
-      console.log('[LispCommandPalette] window.external.ExecuteAutoCADCommand IS available. Executando...');
-      window.external.ExecuteAutoCADCommand(`(C:${cmdName})\n`);
-    } else {
-      console.warn('[LC] window.external nao disponivel - nao esta dentro do AutoCAD. Comando:', cmdName);
-    }
+    executeInAutoCAD(`(C:${cmdName})\n`);
   };
 
   // Filter and group
   const filteredCmds = commands.filter(cmd => {
-    if (!searchQuery) return true;
-    const q = searchQuery.toLowerCase();
-    return (
-      (cmd.name || '').toLowerCase().includes(q) ||
-      (cmd.friendly || '').toLowerCase().includes(q) ||
-      (cmd.desc || '').toLowerCase().includes(q) ||
-      (cmd.group || '').toLowerCase().includes(q)
-    );
+    if (activeFilters.length === 0) return true;
+    const searchableText = `${cmd.name || ''} ${cmd.friendly || ''} ${cmd.desc || ''} ${cmd.group || ''}`.toLowerCase();
+    // Must match ALL tags
+    return activeFilters.every(tag => searchableText.includes(tag.toLowerCase()));
   });
 
   const grouped = {};
@@ -121,38 +114,31 @@ export default function LispCommandPalette() {
   return (
     <div style={{ backgroundColor: '#181818', color: '#fff', minHeight: '100vh', fontFamily: "'Inter', sans-serif", display: 'flex', flexDirection: 'column' }}>
       
-      {/* Header */}
-      <div style={{ padding: '8px 10px', backgroundColor: '#111', borderBottom: '2px solid var(--tmd-orange)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <span style={{ fontSize: '0.75rem', fontWeight: 'bold', color: 'var(--tmd-orange)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
-          LispCentral Comandos
-        </span>
-        <button
-          onClick={fetchCommands}
-          style={{ background: 'transparent', border: '1px solid #444', color: '#aaa', borderRadius: '4px', cursor: 'pointer', padding: '3px 8px', fontSize: '0.7rem' }}
-          title="Atualizar comandos"
-        >
-          Sync
-        </button>
-      </div>
+      {/* Top Navigation */}
+      <PaletteNavBar activePalette="commands" />
 
-      {/* Search */}
-      <div style={{ padding: '8px' }}>
-        <input
-          type="text"
-          placeholder="Procurar função..."
-          value={searchQuery}
-          onChange={e => setSearchQuery(e.target.value)}
-          style={{
-            width: '100%',
-            padding: '7px 10px',
-            backgroundColor: '#222',
-            border: '1px solid #333',
-            borderRadius: '4px',
-            color: '#fff',
-            fontSize: '0.8rem',
-            outline: 'none',
-          }}
-        />
+      {/* Header & Search Container (Max Width to prevent over-stretching) */}
+      <div style={{ margin: '0 auto', width: '100%', maxWidth: '600px' }}>
+        <div style={{ padding: '8px 10px', backgroundColor: '#111', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <span style={{ fontSize: '0.75rem', fontWeight: 'bold', color: 'var(--tmd-orange)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+            LispCentral Comandos
+          </span>
+          <button
+            onClick={fetchCommands}
+            style={{ background: 'transparent', border: '1px solid #444', color: '#aaa', borderRadius: '4px', cursor: 'pointer', padding: '3px 8px', fontSize: '0.7rem' }}
+            title="Atualizar comandos"
+          >
+            Sync
+          </button>
+        </div>
+
+        <div style={{ padding: '8px' }}>
+          <MultiFilter
+            storageKey="lc_active_filters_cmd"
+            placeholder="Procurar função..."
+            onFilterChange={setActiveFilters}
+          />
+        </div>
       </div>
 
       {/* Content */}
@@ -172,12 +158,12 @@ export default function LispCommandPalette() {
         ) : (
           <div>
             {/* Favorites Section */}
-            {favorites.length > 0 && !searchQuery && (
+            {favorites.length > 0 && activeFilters.length === 0 && (
               <div style={{ marginBottom: '15px' }}>
                 <div style={{ fontSize: '0.75rem', color: '#888', textTransform: 'uppercase', marginBottom: '6px', fontWeight: 'bold' }}>
                   📌 Favoritos
                 </div>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(140px, 1fr))', gap: '6px' }}>
                   {commands.filter(c => favorites.includes(c.name)).map(cmd => (
                     <CommandItem key={`fav-${cmd.name}`} cmd={cmd} isPinned={true} togglePin={togglePin} onRun={handleRunCommand} />
                   ))}
@@ -192,7 +178,7 @@ export default function LispCommandPalette() {
                   <span>{group}</span>
                   <span>{grouped[group].length}</span>
                 </div>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(140px, 1fr))', gap: '6px' }}>
                   {grouped[group].map(cmd => (
                     <CommandItem key={`cmd-${cmd.name}`} cmd={cmd} isPinned={favorites.includes(cmd.name)} togglePin={togglePin} onRun={handleRunCommand} />
                   ))}
@@ -221,9 +207,13 @@ export default function LispCommandPalette() {
           padding: 8px;
           cursor: pointer;
           display: flex;
+          flex-direction: column;
           align-items: center;
-          gap: 10px;
+          justify-content: center;
+          gap: 6px;
           transition: all 0.15s;
+          position: relative;
+          text-align: center;
         }
         .cmd-item:hover {
           background-color: #2a2a2a;
@@ -237,36 +227,65 @@ export default function LispCommandPalette() {
 function CommandItem({ cmd, isPinned, togglePin, onRun }) {
   return (
     <div className="cmd-item" onClick={() => onRun(cmd.name)} title={cmd.desc}>
-      <SvgIcon svgString={cmd.svgIcon} fallback={GROUP_ICONS[cmd.group] || GROUP_ICONS['Outros']} />
-      <div style={{ flex: 1, minWidth: 0 }}>
-        <div style={{ fontWeight: 'bold', fontSize: '0.85rem', color: '#fff', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+      
+      <button
+        onClick={(e) => togglePin(cmd.name, e)}
+        style={{
+          position: 'absolute',
+          top: '4px',
+          right: '4px',
+          background: 'none',
+          border: 'none',
+          cursor: 'pointer',
+          opacity: isPinned ? 1 : 0.3,
+          color: isPinned ? 'var(--tmd-orange)' : '#fff',
+          fontSize: '0.7rem'
+        }}
+        title={isPinned ? 'Desafixar' : 'Fixar no topo'}
+      >
+        📌
+      </button>
+
+      {cmd.doc && cmd.doc !== "#" && (
+        <a
+          href={`https://lispcentral.web.app/docs/${cmd.doc}`}
+          target="_blank"
+          rel="noopener noreferrer"
+          onClick={e => e.stopPropagation()}
+          style={{
+            position: 'absolute',
+            top: '4px',
+            left: '4px',
+            background: '#333',
+            color: '#fff',
+            textDecoration: 'none',
+            width: '16px',
+            height: '16px',
+            borderRadius: '50%',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            fontSize: '0.6rem'
+          }}
+          title="Ver documentação"
+        >
+          ?
+        </a>
+      )}
+
+      <div style={{ marginTop: '8px', marginBottom: '4px' }}>
+        <SvgIcon svgString={cmd.svgIcon} fallback={GROUP_ICONS[cmd.group] || GROUP_ICONS['Outros']} />
+      </div>
+      
+      <div style={{ width: '100%' }}>
+        <div style={{ fontWeight: 'bold', fontSize: '0.75rem', color: '#fff', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
           {cmd.name}
         </div>
-        <div style={{ fontSize: '0.7rem', color: '#aaa', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+        <div style={{ fontSize: '0.65rem', color: '#aaa', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
           {cmd.friendly || cmd.desc}
         </div>
       </div>
-      <div style={{ display: 'flex', gap: '4px' }}>
-        <button
-          onClick={(e) => togglePin(cmd.name, e)}
-          style={{ background: 'none', border: 'none', cursor: 'pointer', opacity: isPinned ? 1 : 0.3, color: isPinned ? 'var(--tmd-orange)' : '#fff' }}
-          title={isPinned ? 'Desafixar' : 'Fixar'}
-        >
-          📌
-        </button>
-        {cmd.doc && cmd.doc !== "#" && (
-          <a
-            href={`https://lispcentral.web.app/docs/${cmd.doc}`}
-            target="_blank"
-            rel="noopener noreferrer"
-            onClick={e => e.stopPropagation()}
-            style={{ background: '#333', color: '#fff', textDecoration: 'none', width: '20px', height: '20px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.7rem' }}
-            title="Ver documentação"
-          >
-            ?
-          </a>
-        )}
-      </div>
+
     </div>
   );
 }

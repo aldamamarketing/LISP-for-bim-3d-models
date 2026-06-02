@@ -15,6 +15,10 @@
       {
         "source": "/resource-palette",
         "destination": "/palette-builds/resource-palette.html"
+      },
+      {
+        "source": "/properties-palette",
+        "destination": "/palette-builds/properties-palette.html"
       }
     ]
   },
