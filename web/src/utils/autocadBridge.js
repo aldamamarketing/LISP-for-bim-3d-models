@@ -40,3 +40,19 @@ export const executeInAutoCAD = (cmdStr) => {
   console.error("[LC] No se encontró ningún método válido para ejecutar comandos en AutoCAD.");
   return false;
 };
+
+/**
+ * Cierra una paleta HTML nativa por su nombre.
+ */
+export const closePaletteInAutoCAD = (paletteName) => {
+  console.log('[autocadBridge] closePaletteInAutoCAD:', paletteName);
+  try {
+    if (typeof window.Acad !== 'undefined' && window.Acad.Application) {
+      window.Acad.Application.removePalette(paletteName);
+      return true;
+    }
+  } catch (e) {
+    console.error("[LC] Error al cerrar paleta:", e);
+  }
+  return false;
+};

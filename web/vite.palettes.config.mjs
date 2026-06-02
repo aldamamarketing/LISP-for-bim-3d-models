@@ -14,9 +14,9 @@ export default defineConfig({
     emptyOutDir: true,
     rollupOptions: {
       input: {
-        'palette': 'palette.html',
-        'resource-palette': 'resource-palette.html',
-        'properties-palette': 'properties-palette.html'
+        'palette': path.resolve(__dirname, 'src/palettes-entry/palette.html'),
+        'resource-palette': path.resolve(__dirname, 'src/palettes-entry/resource-palette.html'),
+        'properties-palette': path.resolve(__dirname, 'src/palettes-entry/properties-palette.html')
       }
     }
   }

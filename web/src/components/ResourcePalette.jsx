@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import HatchPreview from './tools/HatchPreview';
 import LinetypePreview from './tools/LinetypePreview';
-import PaletteNavBar from './PaletteNavBar';
+import PaletteDropdownMenu from './PaletteDropdownMenu';
 import MultiFilter from './MultiFilter';
 import { executeInAutoCAD } from '../utils/autocadBridge';
 
@@ -124,15 +124,15 @@ export default function ResourcePalette() {
   return (
     <div style={{ backgroundColor: '#181818', color: '#fff', minHeight: '100vh', fontFamily: "'Inter', sans-serif", display: 'flex', flexDirection: 'column' }}>
       
-      {/* Top Navigation */}
-      <PaletteNavBar activePalette="resources" />
-
       {/* Header & Tabs Container (Max Width to prevent over-stretching) */}
       <div style={{ margin: '0 auto', width: '100%', maxWidth: '600px' }}>
-        <div style={{ padding: '8px 10px', backgroundColor: '#111', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          <span style={{ fontSize: '0.75rem', fontWeight: 'bold', color: 'var(--tmd-orange)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
-            Meus Recursos
-          </span>
+        <div style={{ padding: '8px 10px', backgroundColor: '#111', display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '2px solid var(--tmd-orange)' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <PaletteDropdownMenu myId="resources" />
+            <span style={{ fontSize: '0.75rem', fontWeight: 'bold', color: 'var(--tmd-orange)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+              LispCentral Recursos
+            </span>
+          </div>
           <button
             onClick={fetchResources}
             style={{ background: 'transparent', border: '1px solid #444', color: '#aaa', borderRadius: '4px', cursor: 'pointer', padding: '3px 8px', fontSize: '0.7rem' }}
