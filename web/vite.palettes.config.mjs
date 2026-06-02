@@ -5,6 +5,7 @@ import path from 'path';
 
 export default defineConfig({
   root: 'src/palettes-entry',
+  base: '/palette-builds/',
   plugins: [
     react(),
     legacy({
