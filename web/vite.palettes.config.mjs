@@ -1,20 +1,15 @@
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
-import legacy from '@vitejs/plugin-legacy';
 import path from 'path';
 
 export default defineConfig({
   root: 'src/palettes-entry',
   base: '/palette-builds/',
   plugins: [
-    react(),
-    legacy({
-      targets: ['chrome >= 65'],
-      additionalLegacyPolyfills: ['regenerator-runtime/runtime'],
-      renderLegacyChunks: true
-    })
+    react()
   ],
   build: {
+    target: 'chrome65',
     outDir: '../../public/palette-builds',
     emptyOutDir: true,
     rollupOptions: {
