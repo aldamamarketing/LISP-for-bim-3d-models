@@ -338,9 +338,10 @@ export default function IconGenerator() {
                       type="text" 
                       value={item.filename}
                       onChange={(e) => updateFilename(item.id, e.target.value)}
+                      aria-label="Nome do arquivo"
                     />
                   </div>
-                  <button className="btn-remove" onClick={() => removeSelected(item.id)}>×</button>
+                  <button className="btn-remove" onClick={() => removeSelected(item.id)} aria-label="Remover ícone">×</button>
                 </div>
               ))
             )}

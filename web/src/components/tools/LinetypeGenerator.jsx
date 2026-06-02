@@ -270,7 +270,7 @@ export default function LinetypeGenerator() {
                     />
                     <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }} className="truncate-text">{line.description}</span>
                   </div>
-                  <button className="btn-remove" onClick={() => toggleSelectLine(line)}>×</button>
+                  <button className="btn-remove" onClick={() => toggleSelectLine(line)} aria-label="Remover linha">×</button>
                 </div>
               ))}
             </div>
