@@ -139,7 +139,10 @@ export default function LispCommandPalette() {
             </span>
           </div>
           <button
-            onClick={fetchCommands}
+            onClick={() => {
+              fetchCommands();
+              executeInAutoCAD('LC_SYNC');
+            }}
             style={{ background: 'transparent', border: '1px solid #444', color: '#aaa', borderRadius: '4px', cursor: 'pointer', padding: '3px 8px', fontSize: '0.7rem' }}
             title="Atualizar comandos"
           >
