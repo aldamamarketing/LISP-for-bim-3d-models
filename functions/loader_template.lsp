@@ -1,5 +1,6 @@
 ;;; ==========================================================================
 ;;; TM DIGITAL CLOUD LOADER (SaaS Multi-Tenant)
+;;; Licenciado para: {{TENANT_NAME}}
 ;;; Não modifique o Seat Token abaixo. Ele vincula seu assento e empresa.
 ;;; ==========================================================================
 
