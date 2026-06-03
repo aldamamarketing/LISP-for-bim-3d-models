@@ -348,6 +348,40 @@
   (princ "\n[LC Event Hub] Reactor Global de Sesión Inicializado.")
 )
 
+;; --------------------------------------------------------------------------
+;; LOCAL HTML WRAPPER (Iframe Bridge para WebView2/CEF)
+;; --------------------------------------------------------------------------
+(defun LC:Create-Palette-Wrapper (fileName url / htmlPath f-html) 
+  (setq htmlPath (strcat (getenv "TEMP") "\\" fileName))
+  (setq f-html (open htmlPath "w"))
+  (if f-html 
+    (progn 
+      (write-line "<!DOCTYPE html><html><head><style>body,html{margin:0;padding:0;height:100%;overflow:hidden;background-color:#222;}iframe{width:100%;height:100%;border:none;}</style></head><body>" f-html)
+      (write-line (strcat "<iframe src=\"" url "\" allow=\"clipboard-read; clipboard-write\"></iframe>") f-html)
+      (write-line "<script>" f-html)
+      (write-line "window.addEventListener('message', function(event) {" f-html)
+      (write-line "  if (event.data && event.data.type === 'ACAD_COMMAND') {" f-html)
+      (write-line "    var cmd = event.data.command + '\\n';" f-html)
+      (write-line "    if (typeof exec !== 'undefined') {" f-html)
+      (write-line "      exec(JSON.stringify({functionName: 'Ac_EditorInterop.executeCommand', functionParams: { commands: cmd }}));" f-html)
+      (write-line "    } else if (typeof execAsync !== 'undefined') {" f-html)
+      (write-line "      execAsync(JSON.stringify({functionName: 'Ac_EditorInterop.executeCommand', functionParams: { commands: cmd }}));" f-html)
+      (write-line "    } else if (typeof Acad !== 'undefined' && Acad.Editor) {" f-html)
+      (write-line "      if (Acad.Editor.executeCommandAsync) { Acad.Editor.executeCommandAsync(cmd); }" f-html)
+      (write-line "      else if (Acad.Editor.executeCommand) { Acad.Editor.executeCommand(cmd); }" f-html)
+      (write-line "    } else {" f-html)
+      (write-line "      console.error('LispCentral Bridge: exec no encontrado en entorno local');" f-html)
+      (write-line "    }" f-html)
+      (write-line "  }" f-html)
+      (write-line "});" f-html)
+      (write-line "</script></body></html>" f-html)
+      (close f-html)
+      (vl-string-translate "\\" "/" htmlPath)
+    )
+    nil
+  )
+)
+
 ;; Comando Principal de la Paleta Unificada (CP1)
 (defun c:CP1 (/ doc loader-js f-js) 
   (vl-load-com)
@@ -370,9 +404,10 @@
       (write-line "if (typeof Acad !== 'undefined') {" f-js)
       ;; Intentar remover la paleta existente antes de re-agregarla (previene duplicados)
       (write-line "    try { Acad.Application.removePalette('Command Palette'); } catch(e) {}" f-js)
+      (setq local-html (LC:Create-Palette-Wrapper "LC_Palette_Wrapper.html" *LC-PALETTE-URL*))
       (write-line 
         (strcat "    Acad.Application.addPalette(\"Command Palette\", \"" 
-                *LC-PALETTE-URL*
+                local-html
                 "\");"
         )
         f-js
@@ -423,9 +458,10 @@
     (progn 
       (write-line "if (typeof Acad !== 'undefined') {" f-js)
       (write-line "    try { Acad.Application.removePalette('LispCentral Recursos'); } catch(e) {}" f-js)
+      (setq local-html (LC:Create-Palette-Wrapper "LC_Resource_Wrapper.html" *LC-RESOURCE-URL*))
       (write-line 
         (strcat "    Acad.Application.addPalette(\"LispCentral Recursos\", \"" 
-                *LC-RESOURCE-URL*
+                local-html
                 "\");"
         )
         f-js
@@ -478,9 +514,10 @@
         (progn
           (write-line "if (typeof Acad !== 'undefined') {" f-js)
           (write-line "    try { Acad.Application.removePalette('LispCentral Propriedades'); } catch(e) {}" f-js)
+          (setq local-html (LC:Create-Palette-Wrapper "LC_Prop_Wrapper.html" *LC-PROPERTIES-URL*))
           (write-line 
             (strcat "    Acad.Application.addPalette(\"LispCentral Propriedades\", \"" 
-                    *LC-PROPERTIES-URL*
+                    local-html
                     "\");"
             ) f-js
           )
