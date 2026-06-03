@@ -1,0 +1,13 @@
+{
+  "id": "msg-claim-next-antigravity-mpy25bf3",
+  "from": "orchestrator-loop",
+  "to": "shared",
+  "type": "task_claim",
+  "timestamp": "2026-06-03T12:43:45.807Z",
+  "task_id": "next-antigravity",
+  "payload": {
+    "vendor": "antigravity",
+    "priority": "low"
+  },
+  "requires_response": true
+}

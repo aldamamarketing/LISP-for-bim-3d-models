@@ -4,72 +4,111 @@
  * Funciona en paletas HTML nativas (Chromium/CEF).
  */
 
+// Diagnóstico inicial del entorno AutoCAD (se ejecuta al importar el módulo)
+const _diagAcad = () => {
+  try {
+    const acadExists = typeof Acad !== 'undefined';
+    const editorExists = acadExists && !!Acad.Editor;
+    const methods = editorExists
+      ? Object.getOwnPropertyNames(Object.getPrototypeOf(Acad.Editor) || {}).concat(Object.keys(Acad.Editor))
+      : [];
+    console.log('[autocadBridge] Diagnóstico inicial:', {
+      acadExists,
+      editorExists,
+      editorMethods: methods,
+      windowExternalType: typeof window.external
+    });
+  } catch (e) {
+    console.warn('[autocadBridge] Error en diagnóstico:', e);
+  }
+};
+_diagAcad();
+
 export const executeInAutoCAD = (cmdStr) => {
   console.log('[autocadBridge] executeInAutoCAD:', cmdStr);
 
-  if (typeof Acad === 'undefined' || !Acad.Editor) {
-    console.warn("[LC] Objeto Acad no disponible. Intentando fallback...");
+  // Verificar disponibilidad del objeto Acad
+  const acadAvailable = typeof Acad !== 'undefined';
+  const editorAvailable = acadAvailable && !!Acad.Editor;
+
+  if (!acadAvailable) {
+    console.warn('[LC] Objeto Acad NO disponible en window.');
+  } else if (!editorAvailable) {
+    console.warn('[LC] Acad existe pero Acad.Editor es:', Acad.Editor);
   }
 
-  // Si es un comando puro LISP definido con defun c:XXX
-  // lo podemos llamar como LISP (C:XXX)
-  if (cmdStr.startsWith('(C:') || cmdStr.startsWith('(LC_')) {
-    if (typeof Acad !== 'undefined' && Acad.Editor && typeof Acad.Editor.evaluateLisp === 'function') {
-      Acad.Editor.evaluateLisp(cmdStr);
-      return true;
+  // Intentar evaluateLisp para expresiones LISP
+  if (cmdStr.startsWith('(')) {
+    if (editorAvailable && typeof Acad.Editor.evaluateLisp === 'function') {
+      try {
+        console.log('[LC] Ejecutando via Acad.Editor.evaluateLisp...');
+        Acad.Editor.evaluateLisp(cmdStr);
+        return true;
+      } catch (error) {
+        console.warn('[LC] evaluateLisp lanzó error:', error);
+      }
     }
   }
 
-  // Fallback a ejecución como si fuera la línea de comandos (usando espacio final para simular Enter)
+  // Fallback: ejecución como línea de comandos (espacio final = Enter)
   const formattedCmd = cmdStr.endsWith(' ') ? cmdStr : cmdStr.replace(/\n$/, '') + ' ';
-  
-  if (typeof Acad !== 'undefined' && Acad.Editor) {
+
+  if (editorAvailable) {
     try {
       if (typeof Acad.Editor.executeCommandAsync === 'function') {
+        console.log('[LC] Ejecutando via Acad.Editor.executeCommandAsync...');
         Acad.Editor.executeCommandAsync(formattedCmd);
         return true;
-      } else if (typeof Acad.Editor.executeCommand === 'function') {
+      }
+    } catch (error) {
+      console.warn('[LC] executeCommandAsync falló:', error);
+    }
+    try {
+      if (typeof Acad.Editor.executeCommand === 'function') {
+        console.log('[LC] Ejecutando via Acad.Editor.executeCommand...');
         Acad.Editor.executeCommand(formattedCmd);
         return true;
       }
     } catch (error) {
-      console.warn("[LC] La API nativa de Acad falló (probablemente 'exec is not defined'). Usando fallback...", error);
+      console.warn('[LC] executeCommand falló:', error);
     }
   }
-  
-  // Último fallback para versiones antiguas o integraciones .NET
+
+  // Fallback: window.external (integraciones .NET antiguas)
   if (typeof window.external !== 'undefined') {
     try {
-      console.log("[LC] Propiedades de window.external:", Object.keys(window.external));
-      // Intentar llamar si existe
       if (typeof window.external.ExecuteAutoCADCommand === 'function') {
+        console.log('[LC] Ejecutando via window.external.ExecuteAutoCADCommand...');
         window.external.ExecuteAutoCADCommand(formattedCmd);
         return true;
       }
     } catch (e) {
-      console.warn("[LC] Error al explorar window.external:", e);
+      console.warn('[LC] window.external falló:', e);
     }
   }
 
-  // Explorar el objeto window buscando inyecciones de AutoCAD
+  // Diagnóstico: listar propiedades globales relevantes
   try {
-    const keys = Object.keys(window).filter(k => k.toLowerCase().includes('acad') || k.toLowerCase().includes('cef') || k.toLowerCase().includes('exec'));
-    console.log("[LC] Propiedades globales sospechosas de AutoCAD:", keys);
-  } catch (e) {}
+    const keys = Object.keys(window).filter(k =>
+      k.toLowerCase().includes('acad') ||
+      k.toLowerCase().includes('cef') ||
+      k.toLowerCase().includes('exec')
+    );
+    if (keys.length > 0) {
+      console.log('[LC] Propiedades globales sospechosas:', keys);
+    }
+  } catch (e) { /* silenciar */ }
 
-  // Intento de protocolo acad:
-  try {
-    console.log("[LC] Intentando protocolo acad: ...");
-    window.location.href = "acad:" + cmdStr;
-  } catch (e) {}
+  // ⚠️ NO navegamos con window.location.href — eso destruye el DOM de React
+  console.error('[LC] No se encontró ningún método válido para ejecutar comandos en AutoCAD.');
+  console.log('[LC] Comando pendiente copiado al portapapeles como último recurso.');
 
-  console.error("[LC] No se encontró ningún método válido para ejecutar comandos en AutoCAD.");
-  
-  // Extra Fallback: Copy to clipboard!
+  // Último recurso: copiar al portapapeles
   try {
     navigator.clipboard.writeText(cmdStr.trim());
-    console.log("[LC] Comando copiado al portapapeles: " + cmdStr);
-  } catch (e) {}
+  } catch (e) {
+    console.warn('[LC] Tampoco se pudo copiar al portapapeles:', e);
+  }
 
   return false;
 };
@@ -85,7 +124,7 @@ export const closePaletteInAutoCAD = (paletteName) => {
       return true;
     }
   } catch (e) {
-    console.error("[LC] Error al cerrar paleta:", e);
+    console.error('[LC] Error al cerrar paleta:', e);
   }
   return false;
 };
