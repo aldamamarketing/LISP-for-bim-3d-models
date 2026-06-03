@@ -29,6 +29,8 @@ ui-debug.log*
 
 # Agent and temporary files
 .gemini/
+.autoclaw/
+.agent/
 agent.md
 
 # Search/research files
