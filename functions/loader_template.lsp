@@ -116,6 +116,7 @@
     ((= r-upper "PAREDEMVP") "PAREDE")
     ((= r-upper "PORTAMVP") "PORTA")
     ((= r-upper "TEJADOMVP") "TELHADO")
+    ((= r-upper "TMD_GROUPS") "TMD_GROUP")
     (t routine_name)
   )
 )
@@ -152,64 +153,83 @@
   (princ)
 )
 
-;; Registro instantaneo de Ghost Commands (Stubs) para JIT Loading Zero-Disk
-(defun LC:register-ghosts (/ cmds) 
-  (princ "\n[LispCentral] Injetando Ghost Commands (JIT)...")
-  (setq cmds '(("ABA_PARAM" "AbaParam")
-               ("ABA_PERFIL" "AbaPerfil")
-               ("ACM" "AcmMVP")
-               ("ABA_CRIAR" "AcmTools")
-               ("CORTARPAREDE" "CortarParedes")
-               ("VIGA" "EstruturaMVP")
-               ("PAREDE" "ParedeMVP")
-               ("PORTA" "PortaMVP")
-               ("TELHADO" "TejadoMVP")
-               ("BOM" "TMD_BOM")
-               ("JOINTS" "TMD_JOINTS")
-               ("BUILD" "TMD_BUILD")
-               ("WIRES" "TMD_Wires")
-               ("NIVEIS" "TMD_Niveis")
-               ("SYNC" "TMD_SYNC")
-               ("TAGS" "TMD_Tags")
-               ("MATCH" "TMD_MATCH")
-               ("ALIGN" "TMD_Align")
-               ("GROUPS" "TMD_Groups")
-               ("FACECUT" "TMD_FACE_CUT")
-               ("TABLAS" "TMD_Tablas")
-               ("CNC" "TMD_CNC")
-               ("TR25" "TMD_Teja_TR25")
-               ("UTILS" "TMD_Utils")
-               ("LC_CLEAN" "LC_CLEAN")
-               ("LC_FLATZ" "LC_FLATZ")
-               ("LC_ZLABEL" "LC_ZLABEL")
-               ("ARQ-SYS-Config" "ARQ-SYS-Config")
-               ("ARQ-GRID-Axes" "ARQ-GRID-Axes")
-               ("ARQ-GRID-Line" "ARQ-GRID-Line")
-               ("ARQ-WALL-Draw" "ARQ-WALL-Draw")
-               ("ARQ-WALL-FromAxis" "ARQ-WALL-FromAxis")
-               ("ARQ-WALL-Thickness" "ARQ-WALL-Thickness")
-               ("ARQ-WALL-Trim" "ARQ-WALL-Trim")
-               ("ARQ-COL-Insert" "ARQ-COL-Insert")
-               ("ARQ-DOOR-Insert" "ARQ-DOOR-Insert")
-               ("ARQ-WIN-Insert" "ARQ-WIN-Insert")
-               ("ARQ-WALL-MoveOpening" "ARQ-WALL-MoveOpening")
-               ("ARQ-WALL-ResizeOpening" "ARQ-WALL-ResizeOpening")
-               ("ARQ-DIM-Opening" "ARQ-DIM-Opening")
-               ("ARQ-DIM-Quick" "ARQ-DIM-Quick")
-               ("ARQ-SYM-Level" "ARQ-SYM-Level")
-              )
-  )
-  (foreach item cmds 
-    (eval 
-      (list 'defun 
-            (read (strcat "c:" (car item)))
-            '()
-            (list 'LC:run-or-load (cadr item))
+;; Función para parsear los "name" del JSON
+(defun LC:parse-json-names (jsonStr / pos start end cmd-list name)
+  (setq cmd-list nil)
+  (setq pos 0)
+  (while (setq start (vl-string-search "\"name\":\"" jsonStr pos))
+    (setq start (+ start 8)) ; length of "\"name\":\""
+    (setq end (vl-string-search "\"" jsonStr start))
+    (if end
+      (progn
+        (setq name (substr jsonStr (1+ start) (- end start)))
+        (setq cmd-list (append cmd-list (list (list name name))))
+        (setq pos end)
       )
+      (setq pos (strlen jsonStr))
     )
   )
-  (princ " OK.")
+  cmd-list
 )
+
+;; Registro instantaneo de Ghost Commands (Stubs) desde la nube (Handshake)
+(defun LC:register-ghosts (/ xmlhttp index-url status response cmds item)
+  (princ "\n[LispCentral] Autenticando e sincronizando comandos...")
+  
+  (setq index-url (strcat *TMD-API-ENDPOINT* 
+                          "?token=" *TMD-SEAT-TOKEN* 
+                          "&hwId=" (LC:url-encode *TMD-HWID*) 
+                          "&routine=INDEX"
+                  )
+  )
+  
+  (setq xmlhttp (vlax-create-object "MSXML2.XMLHTTP.6.0"))
+  (if xmlhttp 
+    (progn 
+      (vl-catch-all-apply 
+        '(lambda () 
+           (vlax-invoke-method xmlhttp 'open "GET" index-url :vlax-false)
+           (vlax-invoke-method xmlhttp 'send)
+         )
+      )
+      (setq status (vl-catch-all-apply 'vlax-get-property (list xmlhttp 'status)))
+      (if (= status 200) 
+        (progn 
+          (setq response (vlax-get-property xmlhttp 'responseText))
+          (setq cmds (LC:parse-json-names response))
+          (if cmds
+            (progn
+              (foreach item cmds 
+                (if (not (member (cadr item) *LC-LOADED-ROUTINES*))
+                  (eval 
+                    (list 'defun 
+                          (read (strcat "c:" (car item)))
+                          '()
+                          (list 'LC:run-or-load (cadr item))
+                    )
+                  )
+                )
+              )
+              (princ (strcat " OK. (" (itoa (length cmds)) " ghost commands in RAM)"))
+            )
+            (princ " ERRO: Nenhum comando recebido do INDEX.")
+          )
+        )
+        (princ (strcat " ERRO: HTTP " (vl-princ-to-string status)))
+      )
+      (vlax-release-object xmlhttp)
+    )
+    (princ " ERRO: Falha ao instanciar MSXML2.XMLHTTP.")
+  )
+  (princ)
+)
+
+;; Sincronización Manual (Botón Sync de la Paleta)
+(defun c:LC_SYNC ()
+  (LC:register-ghosts)
+  (princ)
+)
+
 (LC:register-ghosts)
 
 ;; --------------------------------------------------------------------------
@@ -305,7 +325,7 @@
   (vl-catch-all-apply 
     '(lambda () 
        ;; Inyectamos un pequeño script JS que dispara el evento global
-       (setq event-js (strcat (getenv "TEMP") "\\LC_DocEvent.js"))
+       (setq event-js (strcat (getenv "TEMP") "\\\\LC_DocEvent.js"))
        (setq event-js (vl-string-translate "\\" "/" event-js))
 
        (setq f-js (open event-js "w"))
@@ -352,28 +372,52 @@
 ;; LOCAL HTML WRAPPER (Iframe Bridge para WebView2/CEF)
 ;; --------------------------------------------------------------------------
 (defun LC:Create-Palette-Wrapper (fileName url / htmlPath f-html) 
-  (setq htmlPath (strcat (getenv "TEMP") "\\" fileName))
+  ;; Guardar el wrapper en la ruta de red confiable (Z:) en lugar de TEMP
+  (setq htmlPath (strcat (getenv "TEMP") "\\\\" fileName))
   (setq f-html (open htmlPath "w"))
   (if f-html 
     (progn 
       (write-line "<!DOCTYPE html><html><head><style>body,html{margin:0;padding:0;height:100%;overflow:hidden;background-color:#222;}iframe{width:100%;height:100%;border:none;}</style></head><body>" f-html)
       (write-line (strcat "<iframe src=\"" url "\" allow=\"clipboard-read; clipboard-write\"></iframe>") f-html)
       (write-line "<script>" f-html)
+      
+      ;; 1. Puente Nativo (ACAD_COMMAND)
       (write-line "window.addEventListener('message', function(event) {" f-html)
       (write-line "  if (event.data && event.data.type === 'ACAD_COMMAND') {" f-html)
-      (write-line "    var cmd = event.data.command + '\\n';" f-html)
+      ;; Eliminar cualquier \n final o espacio que ya traiga el comando. AutoCAD procesa asincronamente el final solo.
+      (write-line "    var cmd = event.data.command.replace(/[\\\\n\\\\r\\\\s]+$/, '');" f-html)
+      (write-line "    console.log('[Wrapper Local] Intentando ejecutar sin espacios/enters:', cmd);" f-html)
       (write-line "    if (typeof exec !== 'undefined') {" f-html)
       (write-line "      exec(JSON.stringify({functionName: 'Ac_EditorInterop.executeCommand', functionParams: { commands: cmd }}));" f-html)
       (write-line "    } else if (typeof execAsync !== 'undefined') {" f-html)
       (write-line "      execAsync(JSON.stringify({functionName: 'Ac_EditorInterop.executeCommand', functionParams: { commands: cmd }}));" f-html)
-      (write-line "    } else if (typeof Acad !== 'undefined' && Acad.Editor) {" f-html)
-      (write-line "      if (Acad.Editor.executeCommandAsync) { Acad.Editor.executeCommandAsync(cmd); }" f-html)
-      (write-line "      else if (Acad.Editor.executeCommand) { Acad.Editor.executeCommand(cmd); }" f-html)
       (write-line "    } else {" f-html)
       (write-line "      console.error('LispCentral Bridge: exec no encontrado en entorno local');" f-html)
       (write-line "    }" f-html)
       (write-line "  }" f-html)
       (write-line "});" f-html)
+      
+      ;; 2. Telemetria Silenciosa (Agent Eyes & Hands)
+      (write-line "async function poll() {" f-html)
+      (write-line "  try {" f-html)
+      (write-line "    const res = await fetch('http://localhost:3010/command');" f-html)
+      (write-line "    const data = await res.json();" f-html)
+      (write-line "    if (data.command) {" f-html)
+      (write-line "      let result;" f-html)
+      (write-line "      try {" f-html)
+      (write-line "        let evalRes = eval(data.command);" f-html)
+      (write-line "        if (evalRes instanceof Promise) { evalRes = await evalRes; }" f-html)
+      (write-line "        result = (evalRes === undefined) ? 'undefined' : JSON.stringify(evalRes, Object.getOwnPropertyNames(evalRes), 2);" f-html)
+      (write-line "      } catch(e) {" f-html)
+      (write-line "        result = 'Error: ' + e.message;" f-html)
+      (write-line "      }" f-html)
+      (write-line "      await fetch('http://localhost:3010/result', { method: 'POST', body: result });" f-html)
+      (write-line "    }" f-html)
+      (write-line "  } catch(e) {}" f-html)
+      (write-line "  setTimeout(poll, 1000);" f-html)
+      (write-line "}" f-html)
+      (write-line "poll();" f-html)
+
       (write-line "</script></body></html>" f-html)
       (close f-html)
       (vl-string-translate "\\" "/" htmlPath)
@@ -382,8 +426,38 @@
   )
 )
 
+;; Download Binary File to Disk (Safe for UTF-8 and Binaries)
+(defun LC:DownloadFile (url dest / xmlhttp ado result)
+  (setq result nil)
+  (setq xmlhttp (vlax-create-object "MSXML2.XMLHTTP"))
+  (if xmlhttp
+    (progn
+      (vl-catch-all-apply 'vlax-invoke-method (list xmlhttp 'open "GET" url :vlax-false))
+      (vl-catch-all-apply 'vlax-invoke-method (list xmlhttp 'send))
+      (if (= (vlax-get-property xmlhttp 'status) 200)
+        (progn
+          (setq ado (vlax-create-object "ADODB.Stream"))
+          (if ado
+            (progn
+              (vlax-put-property ado 'Type 1) ; adTypeBinary
+              (vlax-invoke-method ado 'Open)
+              (vlax-invoke-method ado 'Write (vlax-get-property xmlhttp 'responseBody))
+              (vlax-invoke-method ado 'SaveToFile dest 2) ; adSaveCreateOverWrite
+              (vlax-invoke-method ado 'Close)
+              (vlax-release-object ado)
+              (setq result t)
+            )
+          )
+        )
+      )
+      (vlax-release-object xmlhttp)
+    )
+  )
+  result
+)
+
 ;; Comando Principal de la Paleta Unificada (CP1)
-(defun c:CP1 (/ doc loader-js f-js) 
+(defun c:CP1 (/ doc loader-js f-js local-html source-url temp-html) 
   (vl-load-com)
   (setq doc (vla-get-ActiveDocument (vlax-get-acad-object)))
   (vla-StartUndoMark doc)
@@ -395,8 +469,8 @@
     (setq *LC-PALETTE-URL* (strcat "https://lispcentral.web.app/palette?token=" *TMD-SEAT-TOKEN* "&hwid=" *TMD-HWID*))
   )
 
-  ;; 3. Inyectar/Reabrir Palette via JS
-  (setq loader-js (strcat (getenv "TEMP") "\\LC_Palette_Loader.js"))
+  ;; 3. Inyectar/Reabrir Palette via JS (En TEMP para produccion)
+  (setq loader-js (strcat (getenv "TEMP") "\\\\LC_Palette_Loader.js"))
 
   (setq f-js (open loader-js "w"))
   (if f-js 
@@ -404,7 +478,15 @@
       (write-line "if (typeof Acad !== 'undefined') {" f-js)
       ;; Intentar remover la paleta existente antes de re-agregarla (previene duplicados)
       (write-line "    try { Acad.Application.removePalette('Command Palette'); } catch(e) {}" f-js)
-      (setq local-html (LC:Create-Palette-Wrapper "LC_Palette_Wrapper.html" *LC-PALETTE-URL*))
+      ;; Estrategia de Producción: Descargar la paleta desde Firebase Hosting al directorio TEMP
+      (setq source-url (strcat "https://lispcentral.web.app/palette-builds/palette.html?v=" (rtos (getvar "MILLISECS") 2 0)))
+      (setq temp-html (strcat (getenv "TEMP") "\\\\LC_Palette.html"))
+      
+      (princ "\n[TM Digital] Sincronizando paleta desde la nube...")
+      (LC:DownloadFile source-url temp-html)
+      
+      ;; Usar la ruta del TEMP y convertir barras para la URL, añadiendo un Cache-Buster local
+      (setq local-html (strcat "file:///" (vl-string-translate "\\\\" "/" temp-html) "?v=" (rtos (getvar "MILLISECS") 2 0)))
       (write-line 
         (strcat "    Acad.Application.addPalette(\"Command Palette\", \"" 
                 local-html
@@ -451,7 +533,7 @@
     (setq *LC-RESOURCE-URL* (strcat "https://lispcentral.web.app/resource-palette?token=" *TMD-SEAT-TOKEN* "&hwid=" *TMD-HWID*))
   )
 
-  (setq loader-js (strcat (getenv "TEMP") "\\LC_Resource_Loader.js"))
+  (setq loader-js (strcat (getenv "TEMP") "\\\\LC_Resource_Loader.js"))
 
   (setq f-js (open loader-js "w"))
   (if f-js 
@@ -509,7 +591,7 @@
   (if (not (member "LispCentral Propriedades" (LC_GetPaletteNames)))
     (progn
       (princ "\n[\u2699] Abrindo Paleta de Propriedades...")
-      (setq loader-js (strcat (getenv "TEMP") "\\LC_Prop_Loader.js"))
+      (setq loader-js (strcat (getenv "TEMP") "\\\\LC_Prop_Loader.js"))
       (if (setq f-js (open loader-js "w"))
         (progn
           (write-line "if (typeof Acad !== 'undefined') {" f-js)

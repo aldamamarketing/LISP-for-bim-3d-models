@@ -1,12 +1,14 @@
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 import path from 'path';
+import { viteSingleFile } from 'vite-plugin-singlefile';
 
 export default defineConfig({
   root: 'src/palettes-entry',
   base: '/palette-builds/',
   plugins: [
-    react()
+    react(),
+    viteSingleFile()
   ],
   resolve: {
     preserveSymlinks: true
@@ -17,9 +19,7 @@ export default defineConfig({
     emptyOutDir: true,
     rollupOptions: {
       input: {
-        'palette': 'src/palettes-entry/palette.html',
-        'resource-palette': 'src/palettes-entry/resource-palette.html',
-        'properties-palette': 'src/palettes-entry/properties-palette.html'
+        'palette': 'src/palettes-entry/palette.html'
       }
     }
   }

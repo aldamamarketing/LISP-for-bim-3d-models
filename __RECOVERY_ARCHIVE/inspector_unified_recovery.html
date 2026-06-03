@@ -1,0 +1,440 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>LispCentral - AutoCAD Command Palette</title>
+  
+  <!-- Carga del SDK de AutoCAD (Asíncrona) -->
+  <script src="https://df-prod.autocad360.com/jsapi/v3/Autodesk.AutoCAD.js" defer></script>
+  
+  <style>
+    /* Estilos base (Theme Oscuro nativo de AutoCAD) */
+    :root {
+      --bg-color: #222222;
+      --panel-bg: #333333;
+      --text-color: #e0e0e0;
+      --text-muted: #888888;
+      --accent-color: #0078d7;
+      --border-color: #444444;
+      --panel-border: #555555;
+      --hover-bg: #444444;
+      --success-color: #4caf50;
+    }
+
+    body {
+      background-color: var(--bg-color);
+      color: var(--text-color);
+      font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+      margin: 0;
+      padding: 12px;
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+      box-sizing: border-box;
+      overflow-x: hidden;
+      overflow-y: hidden;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    /* Buscador Spotlight */
+    .search-container {
+      position: relative;
+      margin-bottom: 16px;
+      width: 100%;
+    }
+
+    .search-input {
+      width: 100%;
+      padding: 10px 10px 10px 36px;
+      font-size: 14px;
+      background-color: var(--panel-bg);
+      border: 1px solid var(--border-color);
+      color: var(--text-color);
+      border-radius: 4px;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    .search-input:focus {
+      border-color: var(--accent-color);
+    }
+
+    .search-icon {
+      position: absolute;
+      left: 10px;
+      top: 10px;
+      width: 18px;
+      height: 18px;
+      fill: var(--text-muted);
+    }
+
+    /* Chips de filtros */
+    .chips-container {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-top: 8px;
+    }
+
+    .filter-chip {
+      background-color: var(--panel-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      padding: 4px 10px;
+      font-size: 11px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      transition: all 0.2s;
+    }
+
+    .filter-chip:hover {
+      background-color: var(--hover-bg);
+    }
+
+    .filter-chip.active {
+      background-color: var(--accent-color);
+      border-color: var(--accent-color);
+      color: white;
+    }
+
+    /* Lista de Módulos Principal */
+    .modules-list {
+      flex: 1;
+      overflow-y: auto;
+      overflow-x: hidden;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      padding-right: 4px;
+    }
+
+    .modules-list::-webkit-scrollbar {
+      width: 6px;
+    }
+    .modules-list::-webkit-scrollbar-thumb {
+      background-color: var(--border-color);
+      border-radius: 3px;
+    }
+
+    /* Cabeceras de Grupos */
+    .group-header {
+      font-size: 11px;
+      font-weight: bold;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 6px;
+      display: flex;
+      align-items: center;
+    }
+
+    .group-header span:first-child {
+      border-left: 3px solid var(--accent-color);
+      padding-left: 6px;
+    }
+
+    .group-count {
+      margin-left: auto;
+      background-color: var(--panel-bg);
+      padding: 2px 6px;
+      border-radius: 10px;
+      font-size: 10px;
+    }
+
+    /* Contenedor de Botones de Grupo */
+    .group-container {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 4px;
+      margin-bottom: 8px;
+    }
+
+    /* Item de Comando */
+    .module-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background-color: var(--panel-bg);
+      border: 1px solid transparent;
+      border-radius: 4px;
+      padding: 6px 8px;
+      cursor: pointer;
+      transition: all 0.15s ease-in-out;
+      user-select: none;
+    }
+
+    .module-item:hover {
+      background-color: var(--hover-bg);
+      border-color: var(--border-color);
+      transform: translateX(2px);
+    }
+
+    .module-item:active {
+      transform: translateX(0);
+      background-color: #555555;
+    }
+
+    .module-info-col {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      flex: 1;
+      overflow: hidden;
+    }
+
+    .module-name-wrapper {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .module-icon-container {
+      width: 24px;
+      height: 24px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background-color: rgba(255,255,255,0.05);
+      border-radius: 4px;
+      flex-shrink: 0;
+      font-size: 14px;
+    }
+
+    .module-name {
+      font-family: Consolas, monospace;
+      font-size: 12px;
+      font-weight: bold;
+      color: #7accff;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .module-friendly-name {
+      font-size: 11px;
+      color: var(--text-muted);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      margin-left: 30px;
+    }
+
+    /* Acciones Derechas */
+    .module-actions-col {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .pin-btn, .docs-btn {
+      background: none;
+      border: none;
+      color: var(--text-muted);
+      cursor: pointer;
+      padding: 4px;
+      border-radius: 4px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .pin-btn:hover {
+      background-color: rgba(255,255,255,0.1);
+      color: #ffd700;
+    }
+    
+    .pin-btn.pinned {
+      color: #ffd700;
+      opacity: 1;
+    }
+
+    .docs-btn:hover {
+      background-color: rgba(255,255,255,0.1);
+      color: white;
+    }
+
+    /* Estados de Carga IPC */
+    .module-item.loading {
+      border-left: 3px solid #ff9800;
+      opacity: 0.7;
+      pointer-events: none;
+    }
+
+    .module-item.success {
+      border-left: 3px solid var(--success-color);
+    }
+
+    .module-item.error {
+      border-left: 3px solid #f44336;
+    }
+
+    /* Estatus de Carga Global */
+    .sync-status-bar {
+      margin-bottom: 12px;
+      padding: 8px;
+      background-color: var(--panel-bg);
+      border-radius: 4px;
+      border-left: 3px solid var(--accent-color);
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      font-size: 11px;
+    }
+    
+    .sync-progress-bg {
+      height: 4px;
+      background-color: #111;
+      border-radius: 2px;
+      overflow: hidden;
+    }
+    
+    .sync-progress-fill {
+      height: 100%;
+      background-color: var(--success-color);
+      width: 0%;
+      transition: width 0.3s ease;
+    }
+
+    /* Reset/Footer */
+    .palette-footer {
+      margin-top: auto;
+      padding-top: 16px;
+      font-size: 11px;
+      color: var(--text-muted);
+      text-align: center;
+      border-top: 1px solid var(--panel-border);
+    }
+
+    .hidden {
+      display: none !important;
+    }
+
+    /* -------------------------------------------
+       RESPONSIVE RIBBON MODE (Horizontal Layout) 
+       ------------------------------------------- */
+    @media (min-width: 650px) {
+      body {
+        padding: 8px;
+        flex-direction: column;
+      }
+      
+      .top-ribbon-bar {
+        display: flex;
+        flex-direction: row;
+        align-items: flex-start;
+        gap: 16px;
+        margin-bottom: 12px;
+      }
+      
+      .search-container {
+        width: 320px;
+        flex-shrink: 0;
+        margin-bottom: 0;
+      }
+      
+      #favoritesSection {
+        flex: 1;
+        margin-bottom: 0;
+        display: flex;
+        flex-direction: column-reverse;
+        overflow: hidden;
+      }
+
+      .modules-list {
+        flex-direction: row;
+        flex-wrap: nowrap;
+        overflow-x: auto;
+        overflow-y: hidden;
+        align-items: flex-start;
+        padding-bottom: 8px;
+      }
+      
+      .ribbon-panel {
+        display: flex;
+        flex-direction: column-reverse;
+        border-right: 1px solid var(--panel-border);
+        padding-right: 12px;
+        margin-right: 12px;
+        height: 100%;
+        min-width: fit-content;
+      }
+
+      .group-header {
+        margin-top: 8px;
+        padding: 4px;
+        justify-content: center;
+      }
+
+      .group-container {
+        display: flex;
+        flex-direction: column;
+        flex-wrap: wrap;
+        align-content: flex-start;
+        gap: 4px;
+        margin-top: 0;
+        max-height: 110px; 
+      }
+      
+      .module-item {
+        height: 32px;
+        padding: 4px 6px;
+        width: 160px;
+      }
+
+      .module-icon-container { width: 20px; height: 20px; }
+      .module-name { font-size: 10px; }
+      .module-friendly-name { display: none; }
+      .palette-footer { display: none; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- TOP RIBBON BAR -->
+  <div class="top-ribbon-bar">
+    <div class="search-container">
+      <input type="text" class="search-input" id="searchInput" placeholder="Escriba tags (ej: arq, pared) y presione Enter">
+      <svg class="search-icon" viewBox="0 0 24 24">
+        <path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/>
+      </svg>
+      <div class="chips-container" id="chipsContainer"></div>
+    </div>
+
+    <!-- Favoritos -->
+    <div id="favoritesSection" class="hidden">
+      <div class="group-header">
+        <span>FAVORITOS (PINNED)</span>
+      </div>
+      <div class="group-container" id="favoritesList"></div>
+    </div>
+  </div>
+
+  <!-- Estatus del Sincronizador -->
+  <div class="sync-status-bar" id="syncStatus">
+    <div style="display: flex; justify-content: space-between;">
+      <span>Sincronizando Módulos...</span>
+      <span id="progressVal">0%</span>
+    </div>
+    <div class="sync-progress-bg">
+      <div class="sync-progress-fill" id="progressBar"></div>
+    </div>
+  </div>
+
+  <!-- Lista de Comandos Principal -->
+  <div class="modules-list" id="modulesList">
+    <!-- Generado dinámicamente -->
+  </div>
+
+  <div class="palette-footer">
+    LispCentral Hub v2.1 • Carga Asíncrona (IPC)
+  </div>
+
+  <script src="palette_unified_recovery.js"></script>
+</body>
+</html>

@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>AutoCAD Agent Bridge Tester</title>
+    <style>
+        body { 
+            font-family: 'Consolas', monospace; 
+            background: #1e1e1e; 
+            color: #4caf50; 
+            padding: 15px; 
+            font-size: 12px;
+        }
+        h2 { color: #fff; margin-top: 0; font-family: sans-serif;}
+        #log { white-space: pre-wrap; word-wrap: break-word; }
+        .cmd { color: #56b6c2; font-weight: bold;}
+        .err { color: #e06c75; }
+        .ok { color: #98c379; }
+    </style>
+</head>
+<body>
+    <h2>📡 AutoCAD Agent Bridge</h2>
+    <div style="color:#aaa; margin-bottom:10px;">Esperando instrucciones telemetrizadas... v2</div>
+    <div id="log"></div>
+    
+    <script>
+        const API = 'http://localhost:3010';
+        
+        function log(msg, type) {
+            const l = document.getElementById('log');
+            const colorClass = type === 'cmd' ? 'cmd' : (type === 'err' ? 'err' : 'ok');
+            l.innerHTML += `<span class="${colorClass}">${msg}</span><br><br>`;
+            window.scrollTo(0, document.body.scrollHeight);
+        }
+
+        function safeStringify(obj) {
+            if (obj === undefined) return "undefined";
+            if (obj === null) return "null";
+            if (typeof obj === 'function') return `[Function: ${obj.name || 'anonymous'}]`;
+            if (typeof obj === 'string') return obj;
+            try {
+                return JSON.stringify(obj, Object.getOwnPropertyNames(obj), 2);
+            } catch (e) {
+                return String(obj);
+            }
+        }
+
+        async function poll() {
+            try {
+                const res = await fetch(`${API}/command`);
+                const data = await res.json();
+                
+                if (data.command) {
+                    log(`> ${data.command}`, 'cmd');
+                    let result;
+                    try {
+                        let evalRes = eval(data.command);
+                        if (evalRes instanceof Promise) {
+                            evalRes = await evalRes;
+                        }
+                        result = safeStringify(evalRes);
+                        log(`[OK]\n${result}`, 'ok');
+                    } catch (e) {
+                        result = `Error: ${e.name} - ${e.message}\n${e.stack}`;
+                        log(`[ERR]\n${result}`, 'err');
+                    }
+                    
+                    await fetch(`${API}/result`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'text/plain' },
+                        body: result
+                    });
+                }
+            } catch(e) {
+            }
+            
+            setTimeout(poll, 1000);
+        }
+        
+        poll();
+    </script>
+</body>
+</html>

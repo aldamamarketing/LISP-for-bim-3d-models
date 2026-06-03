@@ -1,0 +1,36 @@
+<!DOCTYPE html><html><head><style>body,html{margin:0;padding:0;height:100%;overflow:hidden;background-color:#222;}iframe{width:100%;height:100%;border:none;}</style></head><body>
+<iframe src="https://lispcentral.web.app/resource-palette?token=lc_key_S5ggQl1Gk4f3&hwid=DESKTOP-UAMQ784@TM PROJETOS" allow="clipboard-read; clipboard-write"></iframe>
+<script>
+window.addEventListener('message', function(event) {
+  if (event.data && event.data.type === 'ACAD_COMMAND') {
+    var cmd = event.data.command.replace(/[\\n\\r\\s]+$/, '');
+    console.log('[Wrapper Local] Intentando ejecutar sin espacios/enters:', cmd);
+    if (typeof exec !== 'undefined') {
+      exec(JSON.stringify({functionName: 'Ac_EditorInterop.executeCommand', functionParams: { commands: cmd }}));
+    } else if (typeof execAsync !== 'undefined') {
+      execAsync(JSON.stringify({functionName: 'Ac_EditorInterop.executeCommand', functionParams: { commands: cmd }}));
+    } else {
+      console.error('LispCentral Bridge: exec no encontrado en entorno local');
+    }
+  }
+});
+async function poll() {
+  try {
+    const res = await fetch('http://localhost:3010/command');
+    const data = await res.json();
+    if (data.command) {
+      let result;
+      try {
+        let evalRes = eval(data.command);
+        if (evalRes instanceof Promise) { evalRes = await evalRes; }
+        result = (evalRes === undefined) ? 'undefined' : JSON.stringify(evalRes, Object.getOwnPropertyNames(evalRes), 2);
+      } catch(e) {
+        result = 'Error: ' + e.message;
+      }
+      await fetch('http://localhost:3010/result', { method: 'POST', body: result });
+    }
+  } catch(e) {}
+  setTimeout(poll, 1000);
+}
+poll();
+</script></body></html>

@@ -177,110 +177,47 @@ Para acelerar la creación de comandos en la plataforma B2B, se migró el stack 
 
 ---
 
-## 🚨 PROBLEMA CRÍTICO: Bridge JavaScript ↔ AutoCAD en Paletas Web (Junio 2026)
+## 🚨 ARQUITECTURA DE PALETAS WEB Y COMUNICACIÓN LISP ↔ JS
 
-### Contexto del Problema
-Las paletas web de LispCentral se sirven desde Firebase Hosting (`lispcentral.web.app/palette`) y se cargan dentro de AutoCAD como paneles laterales HTML usando la API `Acad.Application.addPalette()`. El objetivo es que al hacer clic en una card de comando, la paleta ejecute la función LISP correspondiente en AutoCAD.
+A lo largo del proyecto, enfrentamos problemas críticos al intentar comunicar las Paletas Web (React) con AutoCAD, específicamente el error `exec is not defined` al intentar enviar comandos desde el navegador hacia AutoCAD.
 
-### Problema 1: Pantalla Blanca al Clicar (RESUELTO ✅)
-**Causa raíz:** En `autocadBridge.js`, cuando ningún método de ejecución funcionaba, existía un fallback destructivo:
-```javascript
-window.location.href = "acad:" + cmdStr; // ESTO MATA EL DOM DE REACT
-```
-Esto navegaba la página del panel a un protocolo inexistente, destruyendo React → pantalla blanca.
+### 1. El Problema (AutoCAD 2021 y el Sandbox HTTPS)
+AutoCAD 2021 (y versiones posteriores) utiliza un motor Chromium (CEF/WebView2) para sus paletas. Para que el JavaScript de la paleta pueda enviar comandos a AutoCAD, el motor inyecta un puente nativo invisible (las funciones `exec` o `execAsync`).
 
-**Fix aplicado:** Se eliminó esa línea. El último fallback ahora es copiar al portapapeles. Commit `ab6ceee`.
+**El bloqueo de seguridad:** Si AutoCAD carga una paleta desde una URL remota (`https://lispcentral.web.app/...`), por motivos de seguridad **se niega a inyectar el puente**. Esto causaba que la API oficial (`Autodesk.AutoCAD.js`) crasheara con `exec is not defined`.
 
-### Problema 2: `exec is not defined` (EN INVESTIGACIÓN 🔍)
-**Síntoma:** Al clicar un comando, el bridge intenta `Acad.Editor.executeCommandAsync()` y `Acad.Editor.executeCommand()`, pero ambos fallan con:
-```
-ReferenceError: exec is not defined
-    at Object.executeCommand (Autodesk.AutoCAD.js:6010)
-```
+### 2. La Solución Actual: Paleta de Archivo Local (Single-File HTML)
+Para evadir el bloqueo de seguridad, la regla de oro es: **AutoCAD solo confía en archivos locales (`file:///`)**.
 
-**Causa raíz identificada:** La API JavaScript cargada desde CDN (`https://df-prod.autocad360.com/jsapi/v3/Autodesk.AutoCAD.js`) internamente usa una función global `exec()` para comunicarse con el engine nativo de AutoCAD. Esta función `exec()` es **inyectada por el engine CEF/WebView2 de AutoCAD** en el contexto del navegador embebido. Sin `exec()`, NINGUNA función de la API puede comunicarse con AutoCAD.
+**¿Dónde está la paleta actualmente en desarrollo?**
+1. Usamos Vite (en la carpeta `web/`) para compilar todo el proyecto de React en **un único archivo HTML independiente** (Single-File Build) sin dependencias externas.
+2. Ese archivo se genera en: `Z:\Autocad Config\LISP\web\public\palette-builds\palette.html`.
+3. El comando `CP1` (definido en `LC_Loader.lsp`) le dice a AutoCAD que cargue la paleta **apuntando directamente a ese archivo local** en tu disco Z:.
+4. Al ser un archivo local, AutoCAD 2021 "confía" en él y **sí inyecta** `execAsync`. React ahora puede hablar con AutoCAD libremente.
 
-### Análisis de la API `Autodesk.AutoCAD.js` v3 (CDN)
+**¿Cómo es el flujo SaaS End-to-End para el Usuario Final?**
+El sistema opera bajo una arquitectura 100% *Serverless*, *Zero-Disk-Install* y con protección total de la Propiedad Intelectual:
 
-#### Hallazgos clave del código fuente:
-1. **`evaluateLisp` NO EXISTE** en esta API. No está definido en ninguna parte del archivo. La documentación del `agent.md` anterior que mencionaba `Acad.Editor.evaluateLisp` era incorrecta — esa función simplemente no existe en la API v3.
+1. **Dashboard & Configuración:** El cliente inicia sesión en la web-app y sube/configura sus archivos `.lsp`.
+2. **Indexación Backend:** El servidor de LispCentral procesa y actualiza la base de datos de rutinas (el `INDEX`) para ese usuario.
+3. **Descarga Dinámica:** El cliente hace clic en "Descargar Loader". El backend inyecta los tokens únicos del cliente (`*TMD-SEAT-TOKEN*`) en el `loader_template.lsp`, lo compila y le entrega el Loader final.
+4. **Carga en AutoCAD:** El cliente arrastra el Loader a AutoCAD (no necesita configurar rutas ni instalar nada en su disco duro).
+5. **Magia JIT y UI:**
+   - AutoCAD lee el Loader.
+   - El Loader descarga la Paleta React compilada (el HTML) desde Firebase directamente a su carpeta temporal `%TEMP%\LC_Palette.html`.
+   - La Paleta lee el `INDEX` del servidor y dibuja los botones con los comandos del cliente.
+   - El Loader registra silenciosamente "Comandos Fantasmas" (Stubs) en la RAM de AutoCAD.
+6. **Ejecución Protegida:** Al hacer clic en un botón de la paleta, AutoCAD dispara el Comando Fantasma. Este comando descarga en un milisegundo el código LISP real desde el servidor a la RAM y lo ejecuta. El LISP nunca toca permanentemente el disco duro del cliente.
 
-2. **`exec()` es la ÚNICA puerta de comunicación.** Toda función interop (`EditorInterop.executeCommand`, `ApplicationInterop.addPalette`, `EditorInterop.getPoint`, etc.) internamente llama a:
-   ```javascript
-   var jsonStr = exec(JSON.stringify({
-       functionName: 'Ac_EditorInterop.executeCommand',
-       functionParams: { commands: commands, onSuccess: onSuccess, onError: onError }
-   }));
-   ```
+### 3. Reglas Estrictas para el Envío de Comandos (autocadBridge.js)
+Incluso con la paleta funcionando localmente, descubrimos bugs severos al comunicarnos con la API `executeCommandAsync`. **Todo Agente de IA debe seguir estas reglas al modificar la UI:**
 
-3. **La API del CDN tiene Copyright 2012** y fue diseñada para la era CEF (Chromium Embedded Framework). Es **legacy**.
-
-4. **`Acad.Application.addPalette` SÍ FUNCIONA** (las paletas se crean correctamente), porque esta llamada se ejecuta desde un archivo JS cargado por `WEBLOAD` en el contexto principal de AutoCAD (donde `exec` SÍ existe), NO desde la paleta HTML.
-
-#### Tabla de Compatibilidad por Versión de AutoCAD:
-
-| Versión AutoCAD | Engine de Navegador | `exec()` disponible | Estado |
-|---|---|---|---|
-| 2018-2020 | CEF (viejo) | ✅ Inyectada como global | Funciona con API v3 CDN |
-| 2021-2022 | CEF (actualizado) | ✅ Inyectada como global | Funciona con API v3 CDN |
-| 2023+ | Microsoft Edge WebView2 | ❌ `exec` sincrónico eliminado | `exec is not defined` |
-| 2024-2026 | WebView2 | ❌ Requiere `execAsync()` | Requiere migración |
-
-### Diagnóstico en el Entorno del Desarrollador (AutoCAD 2021)
-- AutoCAD 2021 usa **CEF**, por lo que `exec` DEBERÍA estar disponible.
-- Pero el error `exec is not defined` OCURRE → esto indica que **la paleta HTML cargada vía `addPalette(url)` desde una URL remota (HTTPS) probablemente NO recibe la inyección de `exec`**.
-- **Hipótesis principal:** AutoCAD solo inyecta `exec` en contextos "locales" (archivos cargados vía `WEBLOAD` desde disco o temp). Las paletas que cargan URLs HTTPS externas corren en un sandbox más restrictivo donde `exec` no se expone.
-
-### Posibles Soluciones (Por Prioridad)
-
-#### Solución A: Archivo JS Temporal como Puente (RECOMENDADA — Sin Dependencia de API)
-En lugar de llamar `exec` directamente desde la paleta HTML, la paleta escribe su intención en un mecanismo intermedio y un reactor LISP la ejecuta:
-
-1. **La paleta web** escribe el comando deseado en `localStorage` con una key específica (ej: `lc_pending_command`).
-2. **Un reactor LISP** (ya existe `LC:DocChanged-Callback`) o un timer periódico lee un archivo JS temporal que el propio LISP genera/inyecta vía `WEBLOAD`.
-3. **Variante más simple:** La paleta escribe el comando en una variable de sistema (`USERS1`-`USERS5`) usando `Acad.Editor.setSystemVariable()` (si funciona sin `exec`), y un reactor LISP lo detecta.
-
-**Problema:** Si `setSystemVariable` también usa `exec` internamente (probable), esta vía también falla.
-
-#### Solución B: Servir Paleta desde Archivo Local (Temporal)
-En vez de cargar `https://lispcentral.web.app/palette`, servir la paleta desde un archivo HTML local generado en TEMP:
-
-1. El loader LISP descarga el HTML compilado de la paleta a `%TEMP%/LC_Palette.html`.
-2. `addPalette("Command Palette", tempFilePath)` carga un archivo LOCAL.
-3. Los archivos locales SÍ reciben la inyección de `exec` por parte de AutoCAD.
-4. El HTML local hace fetch a la API cloud para datos pero ejecuta comandos vía `exec` local.
-
-**Ventaja:** Compatibilidad con TODAS las versiones de AutoCAD (2018-2026).
-**Desventaja:** Requiere que el LISP loader descargue el HTML y sus assets JS en cada sesión (o cachee).
-
-#### Solución C: `execAsync` para AutoCAD 2023+ (Solo versiones nuevas)
-Para AutoCAD 2023+, reemplazar `exec()` por `execAsync()` que es la versión Promise-based del bridge:
-```javascript
-execAsync(JSON.stringify({
-    functionName: 'Ac_EditorInterop.executeCommand',
-    functionParams: { commands: commands }
-})).then(result => { ... });
-```
-**Problema:** No resuelve AutoCAD 2021-2022 donde `exec` no se inyecta en paletas remotas.
-
-#### Solución D: Proxy LISP vía Variable de Sistema + Polling (Workaround)
-1. La paleta web escribe el nombre del comando en `USERS1` usando algún mecanismo que funcione.
-2. Un timer LISP periódico (via `vl-catch-all-apply`) lee `USERS1` y ejecuta `LC:run-or-load` si encuentra un valor.
-3. **Problema:** No hay garantía de que la paleta pueda escribir USERS1 sin `exec`.
-
-### Archivos Relevantes
-- `web/src/utils/autocadBridge.js` — Bridge JS principal (ya corregido para no crashear)
-- `web/src/components/LispCommandPalette.jsx` — Paleta de comandos (usa `LC:run-or-load`)
-- `web/src/palettes-entry/palette.html` — Entry point HTML de la paleta
-- `web/vite.palettes.config.mjs` — Config de build Vite para paletas (target chrome65)
-- `C:\Users\TM PROJETOS\Downloads\LC_Loader.lsp` — Loader LISP compilado que corre en AutoCAD
-- API CDN: `https://df-prod.autocad360.com/jsapi/v3/Autodesk.AutoCAD.js` (legacy, copyright 2012)
-
-### Estado Actual (Junio 2026)
-- ✅ Paleta NO crashea al clicar (fix aplicado)
-- ✅ Paleta carga correctamente desde la nube (30 comandos)
-- ✅ Los comandos LISP funcionan desde la consola de AutoCAD
-- ✅ `LC:run-or-load` descarga y ejecuta rutinas JIT correctamente
-- ❌ La paleta NO puede enviar comandos a AutoCAD (bridge `exec` no disponible)
-- 🔍 Próximo paso: Implementar Solución B (paleta local desde TEMP) como la más compatible
-
+- **NUNCA envíes expresiones LISP a la línea de comandos:**
+  Si envías `(LC:run-or-load "Muro")` vía JS, AutoCAD 2021 lo evalúa asíncronamente. Si esa evaluación termina sin interacciones visuales, AutoCAD emite un salto de línea en blanco al final. Ese salto de línea **repite el último comando interactivo que el usuario haya usado** (causando que el comando `LINE` u otros se activen solos e infinitamente).
+  
+- **SIEMPRE envía el Alias del Comando LISP:**
+  En React, llama a `executeInAutoCAD("ARQ-SYS-Config");`. 
+  AutoCAD lo procesará limpiamente porque es el nombre de un "Ghost Command" (registrado previamente por LISP mediante `LC:register-ghosts`).
+  
+- **NUNCA añadas espacios ni `\n` al final en JavaScript:**
+  AutoCAD inyecta automáticamente el Enter necesario. Si en JS hacemos `cmdStr + ' '`, AutoCAD recibirá dos instrucciones de terminación, causando doble ejecución o repetición de comandos. `autocadBridge.js` ya está configurado con una Regex para podar cualquier espacio residual (`.replace(/[\\n\\r\\s]+$/, '')`).

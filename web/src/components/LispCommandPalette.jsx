@@ -100,7 +100,7 @@ export default function LispCommandPalette() {
 
   const handleRunCommand = (cmdName) => {
     // Usa LC:run-or-load para garantizar carga JIT desde la nube
-    executeInAutoCAD(`(LC:run-or-load "${cmdName}") `);
+    executeInAutoCAD(cmdName);
   };
 
   // Filter and group
