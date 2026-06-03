@@ -73,3 +73,10 @@ La plataforma ha evolucionado para no solo servir nuestras propias herramientas 
 ### Por qué lo haremos (Decisiones Críticas):
 *   **Seguridad Online-Only (Zero-Offline):** Hemos descartado el acceso Offline mediante JWT locales para la fase inicial. **¿Por qué?** El riesgo de fuga de código (IP) es inaceptable en esta etapa temprana. Todo comando exigirá ping al servidor para asegurar control total de vida/muerte sobre la llave de acceso.
 *   **Base de datos Multi-Tenant desde el inicio:** **¿Por qué?** Previene tener que reescribir toda la aplicación (Back y Front) cuando pasemos de vender nuestro LISP a vender la Plataforma. Un dibujante independiente simplemente es un Tenant con un solo asiento.
+
+### E. Arquitectura Zero-Disk JIT (Dynamic Handshake y Ghost Commands)
+El núcleo del SaaS se basa en una inicialización invisible y de latencia cero, evitando cualquier escritura en el disco del usuario (Zero-Disk) y protegiendo el código fuente.
+1. **Handshake Silencioso:** Al iniciar AutoCAD, el Loader nativo hace un HTTP Request ligero (`?routine=INDEX`) que retorna el índice de comandos a los que el usuario tiene acceso según su suscripción.
+2. **Inyección de "Ghost Commands":** El Loader parsea el índice y registra instantáneamente en la RAM "Fantasmas" de cada rutina. Esto le enseña a AutoCAD la existencia del comando, permitiendo el **Autocompletado Nativo** en la consola, pero sin descargar el código fuente.
+3. **Lazy Execution (JIT):** Cuando el usuario ejecuta un comando fantasma (ya sea tecleándolo o haciendo clic en la Paleta Web), el Fantasma intercepta la acción, descarga el archivo real `.lsp` minificado, lo inyecta en RAM sobrescribiéndose a sí mismo, y finalmente lo evalúa.
+4. **Sincronización en Caliente:** Un comando nativo (`LC_SYNC`) permite rehacer el Handshake, inyectando nuevos Ghost Commands en tiempo real si el administrador web asignó nuevas rutinas a la cuenta, todo sin necesidad de reiniciar AutoCAD ni bajar actualizaciones de software.
