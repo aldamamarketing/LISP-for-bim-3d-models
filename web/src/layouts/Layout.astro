@@ -4,14 +4,15 @@ import { getLangFromUrl } from '../i18n/utils';
 
 interface Props {
 	title: string;
+    description?: string;
 }
 
-const { title } = Astro.props;
+const { title, description = "Proteja sua propriedade intelectual, centralize seus LISPs na nuvem e padronize a produção da sua equipe de AutoCAD." } = Astro.props;
 const lang = getLangFromUrl(Astro.url);
 ---
 
 <!doctype html>
-<html lang={lang} class="dark">
+<html lang={lang} class="dark" style="scroll-behavior: smooth;">
 	<head>
 		<meta charset="UTF-8" />
 		<meta name="viewport" content="width=device-width" />
@@ -19,13 +20,14 @@ const lang = getLangFromUrl(Astro.url);
 		<meta name="generator" content={Astro.generator} />
 		<title>{title}</title>
 
-        <meta name="description" content="Proteja sua propriedade intelectual, centralize seus LISPs na nuvem e padronize a produção da sua equipe de AutoCAD instantaneamente.">
+        <meta name="robots" content="index, follow" />
+        <meta name="description" content={description}>
         <meta name="keywords" content="lisp autocad, bim manager, automação autocad, proteger lisp, cloud lisp, autocad corporativo" />
         <link rel="canonical" href={Astro.url ? Astro.url.href : ''} />
         
         <!-- OpenGraph Metadata -->
-        <meta property="og:title" content="LispCentral | O Controle Total do seu AutoCAD na Nuvem" />
-        <meta property="og:description" content="Proteja sua propriedade intelectual, centralize seus LISPs na nuvem e padronize a produção da sua equipe de AutoCAD." />
+        <meta property="og:title" content={title} />
+        <meta property="og:description" content={description} />
         <meta property="og:type" content="website" />
         <meta property="og:url" content={Astro.url ? Astro.url.href : ''} />
         <meta property="og:site_name" content="LispCentral" />
@@ -119,6 +121,19 @@ const lang = getLangFromUrl(Astro.url);
             sectionsToTrack.forEach(({ selector }) => {
                 const el = document.querySelector(selector);
                 if (el) observer.observe(el);
+            });
+
+            // Reveal Animation Observer
+            const revealObserver = new IntersectionObserver((entries) => {
+                entries.forEach((entry) => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('visible');
+                    }
+                });
+            }, { threshold: 0.1 });
+
+            document.querySelectorAll('.reveal').forEach((el) => {
+                revealObserver.observe(el);
             });
         </script>
 	</body>

@@ -1,68 +1,67 @@
 ---
-import '../styles/styles.css';
-import Logo from '../components/Logo.astro';
+import Layout from '../layouts/Layout.astro';
+import Header from '../components/layout/Header.astro';
+import Footer from '../components/layout/Footer.astro';
 ---
 
-<!DOCTYPE html>
-<html lang="pt-BR">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Política de Privacidade — LispCentral</title>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
-  <style>
-    body { font-family: 'Inter', sans-serif; background: #0a0a0a; color: #ddd; line-height: 1.8; margin: 0; }
-    .legal-header { padding: 20px 40px; border-bottom: 1px solid #1a1a1a; }
-    .legal-content { max-width: 760px; margin: 60px auto; padding: 0 20px; }
-    .legal-content h1 { color: var(--tmd-orange); font-size: 2rem; margin-bottom: 30px; }
-    .legal-content h2 { color: #f0f0f0; font-size: 1.2rem; margin-top: 40px; margin-bottom: 10px; }
-    .legal-content p, .legal-content li { color: #aaa; font-size: 0.95rem; }
-    .legal-content ul { padding-left: 20px; }
-    .legal-content a { color: var(--tmd-orange); }
-    .back-link { display: inline-block; margin-bottom: 30px; color: var(--tmd-orange); text-decoration: none; font-size: 0.9rem; }
-  </style>
-</head>
-<body>
-  <div class="legal-header"><a href="/" style="text-decoration:none;"><Logo /></a></div>
-  <div class="legal-content">
-    <a href="/" class="back-link">← Voltar ao início</a>
-    <h1>Política de Privacidade</h1>
-    <p><strong>Última atualização:</strong> 25 de maio de 2026</p>
+<Layout title="Política de Privacidade — LispCentral">
+  <Header />
 
-    <h2>1. Informações que Coletamos</h2>
-    <p>Ao usar o LispCentral, coletamos as seguintes informações:</p>
-    <ul>
-      <li><strong>Dados de cadastro:</strong> Nome, e-mail e senha (armazenados de forma segura via Firebase Authentication).</li>
-      <li><strong>Identificação de hardware:</strong> Nome do computador e nome de usuário do Windows (COMPUTERNAME@USERNAME), exclusivamente para vincular a licença ao equipamento autorizado.</li>
-      <li><strong>Dados de telemetria:</strong> Versão do AutoCAD utilizada, comandos executados e status de carregamento dos módulos. Esses dados são usados para diagnóstico técnico e melhoria do serviço.</li>
-    </ul>
+  <main class="flex-1 max-w-[800px] mx-auto px-6 py-20 w-full mt-24">
+    <a href="/" class="text-primary-container font-label-md text-label-md hover:underline mb-8 inline-block transition-all">← Voltar ao início</a>
+    
+    <h1 class="text-headline-lg font-headline-lg text-primary-container font-bold mb-8">Política de Privacidade</h1>
+    <p class="text-on-surface-variant font-body-md text-body-md mb-12"><strong>Última atualização:</strong> 25 de maio de 2026</p>
 
-    <h2>2. Como Usamos seus Dados</h2>
-    <ul>
-      <li>Validar sua licença e controlar o acesso ao serviço.</li>
-      <li>Garantir que o serviço funcione corretamente no seu ambiente.</li>
-      <li>Melhorar a qualidade e estabilidade dos nossos módulos.</li>
-      <li>Enviar comunicações relevantes sobre atualizações e novidades.</li>
-    </ul>
+    <div class="space-y-12">
+      <section>
+        <h2 class="text-title-lg font-title-lg text-white font-bold mb-4">1. Informações que Coletamos</h2>
+        <p class="text-on-surface-variant font-body-md text-body-md mb-4">Ao usar o LispCentral, coletamos as seguintes informações:</p>
+        <ul class="list-disc pl-6 space-y-2 text-on-surface-variant font-body-md text-body-md">
+          <li><strong>Dados de cadastro:</strong> Nome, e-mail e senha (armazenados de forma segura via Firebase Authentication).</li>
+          <li><strong>Identificação de hardware:</strong> Nome do computador e nome de usuário do Windows (COMPUTERNAME@USERNAME), exclusivamente para vincular a licença ao equipamento autorizado.</li>
+          <li><strong>Dados de telemetria:</strong> Versão do AutoCAD utilizada, comandos executados e status de carregamento dos módulos. Esses dados são usados para diagnóstico técnico e melhoria do serviço.</li>
+        </ul>
+      </section>
 
-    <h2>3. Armazenamento e Segurança</h2>
-    <p>Seus dados são armazenados em servidores seguros do Google Cloud Platform (Firebase/Firestore) com criptografia em trânsito e em repouso. Não compartilhamos seus dados com terceiros, exceto quando exigido por lei.</p>
+      <section>
+        <h2 class="text-title-lg font-title-lg text-white font-bold mb-4">2. Como Usamos seus Dados</h2>
+        <ul class="list-disc pl-6 space-y-2 text-on-surface-variant font-body-md text-body-md">
+          <li>Validar sua licença e controlar o acesso ao serviço.</li>
+          <li>Garantir que o serviço funcione corretamente no seu ambiente.</li>
+          <li>Melhorar a qualidade e estabilidade dos nossos módulos.</li>
+          <li>Enviar comunicações relevantes sobre atualizações e novidades.</li>
+        </ul>
+      </section>
 
-    <h2>4. Seus Direitos (LGPD)</h2>
-    <p>Em conformidade com a Lei Geral de Proteção de Dados (Lei nº 13.709/2018), você tem o direito de:</p>
-    <ul>
-      <li>Solicitar acesso aos seus dados pessoais.</li>
-      <li>Corrigir dados incompletos ou desatualizados.</li>
-      <li>Solicitar a exclusão dos seus dados.</li>
-      <li>Revogar o consentimento a qualquer momento.</li>
-    </ul>
-    <p>Para exercer seus direitos, entre em contato pelo e-mail: <a href="mailto:contato@lispcentral.com">contato@lispcentral.com</a>.</p>
+      <section>
+        <h2 class="text-title-lg font-title-lg text-white font-bold mb-4">3. Armazenamento e Segurança</h2>
+        <p class="text-on-surface-variant font-body-md text-body-md">Seus dados são armazenados em servidores seguros do Google Cloud Platform (Firebase/Firestore) com criptografia em trânsito e em repouso. Não compartilhamos seus dados com terceiros, exceto quando exigido por lei.</p>
+      </section>
 
-    <h2>5. Cookies</h2>
-    <p>O LispCentral utiliza cookies essenciais para manter sua sessão autenticada. Não utilizamos cookies de rastreamento publicitário.</p>
+      <section>
+        <h2 class="text-title-lg font-title-lg text-white font-bold mb-4">4. Seus Direitos (LGPD)</h2>
+        <p class="text-on-surface-variant font-body-md text-body-md mb-4">Em conformidade com a Lei Geral de Proteção de Dados (Lei nº 13.709/2018), você tem o direito de:</p>
+        <ul class="list-disc pl-6 space-y-2 text-on-surface-variant font-body-md text-body-md mb-4">
+          <li>Solicitar acesso aos seus dados pessoais.</li>
+          <li>Corrigir dados incompletos ou desatualizados.</li>
+          <li>Solicitar a exclusão dos seus dados.</li>
+          <li>Revogar o consentimento a qualquer momento.</li>
+        </ul>
+        <p class="text-on-surface-variant font-body-md text-body-md">Para exercer seus direitos, entre em contato pelo e-mail: <a href="mailto:contato@lispcentral.com" class="text-primary-container hover:underline">contato@lispcentral.com</a>.</p>
+      </section>
 
-    <h2>6. Alterações</h2>
-    <p>Esta política pode ser atualizada periodicamente. Notificaremos os usuários sobre mudanças significativas por e-mail ou através do Portal do Cliente.</p>
-  </div>
-</body>
-</html>
+      <section>
+        <h2 class="text-title-lg font-title-lg text-white font-bold mb-4">5. Cookies</h2>
+        <p class="text-on-surface-variant font-body-md text-body-md">O LispCentral utiliza cookies essenciais para manter sua sessão autenticada. Não utilizamos cookies de rastreamento publicitário.</p>
+      </section>
+
+      <section>
+        <h2 class="text-title-lg font-title-lg text-white font-bold mb-4">6. Alterações</h2>
+        <p class="text-on-surface-variant font-body-md text-body-md">Esta política pode ser atualizada periodicamente. Notificaremos os usuários sobre mudanças significativas por e-mail ou através do Portal do Cliente.</p>
+      </section>
+    </div>
+  </main>
+
+  <Footer />
+</Layout>

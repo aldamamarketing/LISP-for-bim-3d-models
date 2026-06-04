@@ -11,53 +11,178 @@ const getPath = (path) => {
     return currentLocale === 'en' ? path : `/${currentLocale}${path}`;
 };
 ---
-<nav class="bg-background dark:bg-background w-full top-0 sticky z-50 border-b border-surface-variant dark:border-surface-variant">
-    <div class="flex justify-between items-center px-8 py-4 max-w-[1200px] mx-auto">
-        <div class="text-headline-md font-headline-md font-bold text-primary dark:text-primary tracking-tight">
-            <a href={getPath('/')}>LispCentral</a>
+
+<nav class="fixed w-full top-0 z-50 transition-all duration-300" style="background: rgba(18,20,20,0.85); backdrop-filter: blur(12px); border-bottom: 1px solid var(--surface-variant, #343535);">
+    <div class="flex justify-between items-center px-6 py-3 max-w-[1400px] mx-auto">
+        
+        <!-- Logo -->
+        <a href={getPath('/')} class="flex items-center gap-2 text-white hover:text-primary-container transition-colors group">
+            <span class="material-symbols-outlined text-primary-container group-hover:text-white transition-colors">code_blocks</span>
+            <span class="font-bold text-xl tracking-tight">LispCentral</span>
+        </a>
+
+        <!-- Desktop Nav -->
+        <div class="hidden md:flex items-center gap-8">
+            <!-- Herramientas Dropdown -->
+            <div class="group relative py-2">
+                <button class="flex items-center gap-1 text-on-surface-variant hover:text-white font-medium transition-colors text-sm">
+                    {t("header.tools") || "Tools"} <span class="material-symbols-outlined text-[18px]">expand_more</span>
+                </button>
+                <div class="invisible group-hover:visible opacity-0 group-hover:opacity-100 translate-y-2 group-hover:translate-y-0 transition-all duration-200 absolute top-full left-0 mt-1 w-64 bg-surface-container border border-surface-variant rounded-xl shadow-elevation-3 overflow-hidden flex flex-col p-2">
+                    <a href={getPath('/tools/hatch-generator')} class="flex items-start gap-3 p-3 rounded-lg hover:bg-surface-container-high transition-colors">
+                        <span class="material-symbols-outlined text-primary-container mt-0.5">grid_view</span>
+                        <div>
+                            <strong class="block text-white text-sm font-semibold">{t("header.hatch")}</strong>
+                            <span class="block text-on-surface-variant text-xs mt-0.5">Create .PAT patterns with AI</span>
+                        </div>
+                    </a>
+                    <a href={getPath('/tools/linetype-generator')} class="flex items-start gap-3 p-3 rounded-lg hover:bg-surface-container-high transition-colors">
+                        <span class="material-symbols-outlined text-primary-container mt-0.5">line_style</span>
+                        <div>
+                            <strong class="block text-white text-sm font-semibold">{t("header.lines")}</strong>
+                            <span class="block text-on-surface-variant text-xs mt-0.5">Design custom line types</span>
+                        </div>
+                    </a>
+                    <a href={getPath('/tools/icon-generator')} class="flex items-start gap-3 p-3 rounded-lg hover:bg-surface-container-high transition-colors">
+                        <span class="material-symbols-outlined text-primary-container mt-0.5">image</span>
+                        <div>
+                            <strong class="block text-white text-sm font-semibold">{t("header.icons")}</strong>
+                            <span class="block text-on-surface-variant text-xs mt-0.5">Generate 16x16 / 32x32 icons</span>
+                        </div>
+                    </a>
+                    <a href={getPath('/tools/calc-viga')} class="flex items-start gap-3 p-3 rounded-lg hover:bg-surface-container-high transition-colors">
+                        <span class="material-symbols-outlined text-primary-container mt-0.5">architecture</span>
+                        <div>
+                            <strong class="block text-white text-sm font-semibold">{t("header.profiles")}</strong>
+                            <span class="block text-on-surface-variant text-xs mt-0.5">Beam & profile calculators</span>
+                        </div>
+                    </a>
+                </div>
+            </div>
+
+            <a class="text-on-surface-variant hover:text-white font-medium transition-colors text-sm" href={getPath('/dashboard')}>{t("header.portal")}</a>
+            <a class="text-on-surface-variant hover:text-white font-medium transition-colors text-sm" href={getPath('/blog')}>{t("header.blog") || "Blog"}</a>
         </div>
-        <div class="hidden md:flex items-center space-x-8">
-            <a class="text-primary font-bold border-b-2 border-primary pb-1 font-body-md text-body-md transition-all" href={getPath('/')}>{t("header.home")}</a>
-            <a class="text-on-surface dark:text-on-surface hover:text-primary transition-colors duration-200 font-body-md text-body-md" href={getPath('/tools/hatch-generator')}>{t("header.hatch")}</a>
-            <a class="text-on-surface dark:text-on-surface hover:text-primary transition-colors duration-200 font-body-md text-body-md" href={getPath('/tools/linetype-generator')}>{t("header.lines")}</a>
-            <a class="text-on-surface dark:text-on-surface hover:text-primary transition-colors duration-200 font-body-md text-body-md" href={getPath('/tools/icon-generator')}>{t("header.icons")}</a>
-            <a class="text-on-surface dark:text-on-surface hover:text-primary transition-colors duration-200 font-body-md text-body-md" href={getPath('/tools/calc-viga')}>{t("header.profiles")}</a>
-            <a class="text-on-surface dark:text-on-surface hover:text-primary transition-colors duration-200 font-body-md text-body-md" href={getPath('/dashboard')}>{t("header.portal")}</a>
-        </div>
-        <div class="hidden md:flex items-center space-x-4">
-            <select id="lang-selector" class="bg-surface-variant text-on-surface text-label-md px-2 py-1 rounded border border-surface outline-none cursor-pointer">
-                <option value="en" selected={currentLocale === 'en'}>EN</option>
-                <option value="es" selected={currentLocale === 'es'}>ES</option>
-                <option value="pt" selected={currentLocale === 'pt'}>PT</option>
-            </select>
-            <a href={getPath('/login')} class="font-label-md text-label-md text-on-surface hover:text-primary transition-colors px-4 py-2">
+
+        <!-- Desktop Actions -->
+        <div class="hidden md:flex items-center gap-4">
+            <div class="flex items-center gap-1 bg-[#0D0D0D] border border-surface-variant rounded-lg px-2 py-1">
+                <span class="material-symbols-outlined text-[16px] text-on-surface-variant">translate</span>
+                <select id="lang-selector-desktop" class="bg-transparent text-white text-sm outline-none cursor-pointer border-none py-1 pr-1">
+                    <option value="en" selected={currentLocale === 'en'} class="bg-[#0D0D0D]">EN</option>
+                    <option value="es" selected={currentLocale === 'es'} class="bg-[#0D0D0D]">ES</option>
+                    <option value="pt" selected={currentLocale === 'pt'} class="bg-[#0D0D0D]">PT</option>
+                </select>
+            </div>
+            <a href={getPath('/login')} class="text-on-surface-variant hover:text-white font-medium transition-colors text-sm">
                 {t("header.login")}
             </a>
-            <a href={getPath('/help')} class="bg-primary-container text-white hover:bg-[#e66000] transition-all font-label-md text-label-md font-bold px-6 py-2.5 rounded shadow-[0_0_15px_rgba(255,107,0,0.2)]">
+            <a href={getPath('/help')} class="bg-primary-container text-white hover:bg-[#e66000] hover:-translate-y-0.5 transition-all duration-normal text-sm font-bold px-5 py-2 rounded-lg shadow-glow-orange">
                 {t("header.help")}
             </a>
         </div>
+
+        <!-- Mobile Menu Button -->
+        <button id="mobile-menu-btn" class="md:hidden flex items-center justify-center text-on-surface-variant hover:text-white p-2 rounded-lg bg-transparent hover:bg-surface-container transition-colors" aria-label="Menu">
+            <span class="material-symbols-outlined text-[28px]">menu</span>
+        </button>
     </div>
 </nav>
 
+<!-- Mobile Navigation Panel -->
+<div id="mobile-overlay" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-[90] opacity-0 pointer-events-none transition-opacity duration-300 md:hidden"></div>
+<div id="mobile-panel" class="fixed top-0 right-0 h-full w-[280px] bg-surface-container border-l border-surface-variant z-[100] transform translate-x-full transition-transform duration-300 md:hidden flex flex-col shadow-elevation-3">
+    <div class="p-6 border-b border-surface-variant flex justify-between items-center">
+        <span class="font-bold text-lg text-white">Menu</span>
+        <button id="mobile-close-btn" class="text-on-surface-variant hover:text-white p-1 rounded-lg hover:bg-surface-container-high transition-colors" aria-label="Close">
+            <span class="material-symbols-outlined text-[24px]">close</span>
+        </button>
+    </div>
+    <div class="flex-1 overflow-y-auto p-6 flex flex-col gap-6">
+        <nav class="flex flex-col gap-4">
+            <a href={getPath('/')} class="text-white font-medium text-lg border-l-2 border-primary-container pl-3">{t("header.home")}</a>
+            
+            <div class="flex flex-col gap-2 mt-2">
+                <span class="text-primary-container text-xs font-bold uppercase tracking-wider pl-3">{t("header.tools") || "Tools"}</span>
+                <a href={getPath('/tools/hatch-generator')} class="flex items-center gap-3 text-on-surface-variant hover:text-white pl-3 py-2 rounded-lg hover:bg-surface-container-high transition-colors">
+                    <span class="material-symbols-outlined text-[20px]">grid_view</span> {t("header.hatch")}
+                </a>
+                <a href={getPath('/tools/linetype-generator')} class="flex items-center gap-3 text-on-surface-variant hover:text-white pl-3 py-2 rounded-lg hover:bg-surface-container-high transition-colors">
+                    <span class="material-symbols-outlined text-[20px]">line_style</span> {t("header.lines")}
+                </a>
+                <a href={getPath('/tools/icon-generator')} class="flex items-center gap-3 text-on-surface-variant hover:text-white pl-3 py-2 rounded-lg hover:bg-surface-container-high transition-colors">
+                    <span class="material-symbols-outlined text-[20px]">image</span> {t("header.icons")}
+                </a>
+                <a href={getPath('/tools/calc-viga')} class="flex items-center gap-3 text-on-surface-variant hover:text-white pl-3 py-2 rounded-lg hover:bg-surface-container-high transition-colors">
+                    <span class="material-symbols-outlined text-[20px]">architecture</span> {t("header.profiles")}
+                </a>
+            </div>
+
+            <a href={getPath('/dashboard')} class="text-on-surface-variant hover:text-white font-medium text-base pl-3 mt-2">{t("header.portal")}</a>
+            <a href={getPath('/blog')} class="text-on-surface-variant hover:text-white font-medium text-base pl-3">{t("header.blog") || "Blog"}</a>
+        </nav>
+        
+        <div class="mt-auto pt-6 border-t border-surface-variant flex flex-col gap-4">
+            <a href={getPath('/login')} class="text-center font-medium text-white bg-surface-container-high py-3 rounded-lg hover:bg-surface-variant transition-colors">
+                {t("header.login")}
+            </a>
+            <a href={getPath('/help')} class="text-center font-bold text-white bg-primary-container py-3 rounded-lg hover:bg-[#e66000] shadow-glow-orange transition-all">
+                {t("header.help")}
+            </a>
+            <div class="flex items-center justify-center gap-2 mt-4">
+                <span class="material-symbols-outlined text-[18px] text-on-surface-variant">translate</span>
+                <select id="lang-selector-mobile" class="bg-[#0D0D0D] border border-surface-variant rounded-lg text-white text-sm px-3 py-2 outline-none">
+                    <option value="en" selected={currentLocale === 'en'}>English (EN)</option>
+                    <option value="es" selected={currentLocale === 'es'}>Español (ES)</option>
+                    <option value="pt" selected={currentLocale === 'pt'}>Português (PT)</option>
+                </select>
+            </div>
+        </div>
+    </div>
+</div>
+
 <script>
-  const langSelector = document.getElementById('lang-selector');
-  if(langSelector) {
-      langSelector.addEventListener('change', (e) => {
-        const newLang = e.target.value;
-        const currentPath = window.location.pathname;
-        
-        // Remove current lang prefix if exists
-        let pathWithoutLang = currentPath;
-        if (currentPath.startsWith('/es/')) pathWithoutLang = currentPath.replace('/es/', '/');
-        else if (currentPath.startsWith('/pt/')) pathWithoutLang = currentPath.replace('/pt/', '/');
-        
-        if (newLang === 'en') {
-            window.location.href = pathWithoutLang;
-        } else {
-            const separator = pathWithoutLang.startsWith('/') ? '' : '/';
-            window.location.href = `/${newLang}${pathWithoutLang}`;
-        }
-      });
-  }
+  // Language Selector Logic
+  const handleLangChange = (e) => {
+    const newLang = e.target.value;
+    const currentPath = window.location.pathname;
+    
+    let pathWithoutLang = currentPath;
+    if (currentPath.startsWith('/es/')) pathWithoutLang = currentPath.replace('/es/', '/');
+    else if (currentPath.startsWith('/pt/')) pathWithoutLang = currentPath.replace('/pt/', '/');
+    
+    if (newLang === 'en') {
+        window.location.href = pathWithoutLang;
+    } else {
+        const separator = pathWithoutLang.startsWith('/') ? '' : '/';
+        window.location.href = `/${newLang}${pathWithoutLang}`;
+    }
+  };
+
+  const langDesktop = document.getElementById('lang-selector-desktop');
+  const langMobile = document.getElementById('lang-selector-mobile');
+  if(langDesktop) langDesktop.addEventListener('change', handleLangChange);
+  if(langMobile) langMobile.addEventListener('change', handleLangChange);
+
+  // Mobile Menu Logic
+  const menuBtn = document.getElementById('mobile-menu-btn');
+  const closeBtn = document.getElementById('mobile-close-btn');
+  const overlay = document.getElementById('mobile-overlay');
+  const panel = document.getElementById('mobile-panel');
+
+  const openMenu = () => {
+      overlay.classList.remove('opacity-0', 'pointer-events-none');
+      panel.classList.remove('translate-x-full');
+      document.body.style.overflow = 'hidden';
+  };
+
+  const closeMenu = () => {
+      overlay.classList.add('opacity-0', 'pointer-events-none');
+      panel.classList.add('translate-x-full');
+      document.body.style.overflow = '';
+  };
+
+  if(menuBtn) menuBtn.addEventListener('click', openMenu);
+  if(closeBtn) closeBtn.addEventListener('click', closeMenu);
+  if(overlay) overlay.addEventListener('click', closeMenu);
 </script>

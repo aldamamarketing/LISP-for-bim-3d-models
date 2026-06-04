@@ -1,8 +1,9 @@
 ---
 import '../styles/global.css';
 import '../styles/styles.css';
-import Logo from '../components/Logo.astro';
-import Footer from '../components/Footer.astro';
+import Header from '../components/layout/Header.astro';
+import Footer from '../components/layout/Footer.astro';
+import { getLangFromUrl } from '../i18n/utils';
 
 const { 
   title = "LispCentral Docs — Superpoderes para seu AutoCAD",
@@ -10,9 +11,11 @@ const {
   keywords = "lisp autocad, autolisp, rotinas lisp, autocad lisp download, autocad lt lisp, lisp viga, lisp civil 3d",
   canonicalUrl = Astro.url.href
 } = Astro.props;
+
+const lang = getLangFromUrl(Astro.url);
 ---
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang={lang} class="dark">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -21,159 +24,120 @@ const {
   <meta name="keywords" content={keywords} />
   <link rel="canonical" href={canonicalUrl} />
   <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-  <meta name="google-site-verification" content="0QWLvps86pF-khU03U3Phucz_KyeIPXudO5Vll4xzaM" />
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400&display=swap" rel="stylesheet" />
   <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet" />
-  <!-- OpenGraph Metadata -->
+  
   <meta property="og:title" content={title} />
   <meta property="og:description" content={description} />
   <meta property="og:type" content="website" />
   <meta property="og:url" content={canonicalUrl} />
   <meta property="og:site_name" content="LispCentral" />
   
-  <!-- Twitter Card Metadata -->
   <meta name="twitter:card" content="summary_large_image" />
   <meta name="twitter:title" content={title} />
   <meta name="twitter:description" content={description} />
 </head>
-<body>
-  <header class="topbar">
-    <div style="display: flex; align-items: center; gap: 15px;">
-      <!-- Botón de Hamburguesa para Móvil -->
-      <button id="mobile-menu-btn" class="mobile-menu-btn" aria-label="Abrir menu">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <line x1="3" y1="12" x2="21" y2="12"></line>
-          <line x1="3" y1="6" x2="21" y2="6"></line>
-          <line x1="3" y1="18" x2="21" y2="18"></line>
-        </svg>
-      </button>
-      <a href="/" style="text-decoration: none;">
-        <Logo />
-      </a>
-      <a href="/" class="btn-topbar hide-mobile">Home</a>
-    </div>
-    <div class="topbar-actions">
-      <select class="lang-selector" aria-label="Selecionar idioma">
-        <option value="pt">Português</option>
-        <option value="es">Español</option>
-        <option value="en">English</option>
-      </select>
-      <a href="/login" class="btn-topbar active" id="btn-login-portal">Portal do Cliente</a>
-    </div>
-  </header>
+<body class="bg-background text-on-surface m-0 p-0 flex flex-col h-screen overflow-hidden">
+  
+  <Header />
 
-  <div class="layout-container">
-    <!-- Overlay/Fondo semitransparente para cerrar el menú móvil al hacer click fuera -->
-    <div class="sidebar-overlay" id="sidebar-overlay"></div>
+  <!-- The layout container below the fixed header -->
+  <div class="layout-container flex flex-1 overflow-hidden relative pt-[60px]">
+    
+    <!-- Sidebar Overlay for mobile -->
+    <div class="sidebar-overlay fixed inset-0 bg-black/60 backdrop-blur-sm z-[80] hidden md:hidden opacity-0 transition-opacity" id="sidebar-overlay"></div>
 
-    <aside class="sidebar">
+    <aside class="sidebar w-[260px] bg-surface-container border-r border-surface-variant overflow-y-auto p-5 shrink-0 z-[85] absolute md:relative h-full transform -translate-x-full md:translate-x-0 transition-transform duration-300">
       <nav class="sidebar-nav">
-        <h4>Meu Painel</h4>
-        <ul>
-          <li><a href="/dashboard">Minha Assinatura</a></li>
-          <li><a href="/pt/docs/install">Instalação</a></li>
+        <h4 class="text-primary-container uppercase text-xs font-bold tracking-wider mb-2 mt-0">Meu Painel</h4>
+        <ul class="list-none p-0 m-0 mb-4">
+          <li class="mb-1"><a href="/dashboard" class="block py-1.5 px-3 text-on-surface-variant hover:text-white hover:bg-surface-container-high rounded-md transition-colors text-sm">Minha Assinatura</a></li>
+          <li class="mb-1"><a href="/pt/docs/install" class="block py-1.5 px-3 text-on-surface-variant hover:text-white hover:bg-surface-container-high rounded-md transition-colors text-sm">Instalação</a></li>
         </ul>
         
-        <hr style="border: 0; border-top: 1px dashed var(--border-color); margin: 15px 0;" />
+        <hr class="border-0 border-t border-dashed border-surface-variant my-4" />
 
-        <h4>Ferramentas Web</h4>
-        <ul>
-          <li><a href="/pt/tools/calc-viga">Calculadora de Vigas</a></li>
-          <li><a href="/pt/tools/icon-generator">Gerador de Ícones</a></li>
-          <li><a href="/pt/tools/hatch-generator">Gerador de Hatch</a></li>
-          <li><a href="/pt/tools/linetype-generator">Gerador de Linetype</a></li>
-        </ul>
-
-        <hr style="border: 0; border-top: 1px dashed var(--border-color); margin: 15px 0;" />
-
-        <h4>LispCentral Core</h4>
-        <ul>
-          <li><a href="/pt/docs/lc-clean">LC_CLEAN</a></li>
-          <li><a href="/pt/docs/lc-flatz">LC_FLATZ</a></li>
-        </ul>
-
-        <h4>Estruturas Metálicas</h4>
-        <ul>
-          <li><a href="/pt/docs/lc-build">LC_BUILD</a></li>
-          <li><a href="/pt/docs/lc-joints">LC_JOINTS</a></li>
-        </ul>
-
-        <h4>Arquitetura 2D (SaaS)</h4>
-        <ul class="nested-docs-list">
-          <li><a href="/pt/docs/arq-sys-config">ARQ-SYS-Config</a></li>
-          <li><a href="/pt/docs/arq-grid-axes">ARQ-GRID-Axes</a></li>
-          <li><a href="/pt/docs/arq-grid-line">ARQ-GRID-Line</a></li>
-          <li><a href="/pt/docs/arq-wall-draw">ARQ-WALL-Draw</a></li>
-          <li><a href="/pt/docs/arq-wall-fromaxis">ARQ-WALL-FromAxis</a></li>
-          <li><a href="/pt/docs/arq-wall-thickness">ARQ-WALL-Thickness</a></li>
-          <li><a href="/pt/docs/arq-wall-trim">ARQ-WALL-Trim</a></li>
-          <li><a href="/pt/docs/arq-col-insert">ARQ-COL-Insert</a></li>
-          <li><a href="/pt/docs/arq-door-insert">ARQ-DOOR-Insert</a></li>
-          <li><a href="/pt/docs/arq-win-insert">ARQ-WIN-Insert</a></li>
-          <li><a href="/pt/docs/arq-wall-moveopening">ARQ-WALL-MoveOpening</a></li>
-          <li><a href="/pt/docs/arq-wall-resizeopening">ARQ-WALL-ResizeOpening</a></li>
-          <li><a href="/pt/docs/arq-dim-opening">ARQ-DIM-Opening</a></li>
-          <li><a href="/pt/docs/arq-dim-quick">ARQ-DIM-Quick</a></li>
-          <li><a href="/pt/docs/arq-sym-level">ARQ-SYM-Level</a></li>
+        <h4 class="text-primary-container uppercase text-xs font-bold tracking-wider mb-2">Ferramentas Web</h4>
+        <ul class="list-none p-0 m-0 mb-4">
+          <li class="mb-1"><a href="/tools/calc-viga" class="block py-1.5 px-3 text-on-surface-variant hover:text-white hover:bg-surface-container-high rounded-md transition-colors text-sm">Calculadora de Vigas</a></li>
+          <li class="mb-1"><a href="/tools/icon-generator" class="block py-1.5 px-3 text-on-surface-variant hover:text-white hover:bg-surface-container-high rounded-md transition-colors text-sm">Gerador de Ícones</a></li>
+          <li class="mb-1"><a href="/tools/hatch-generator" class="block py-1.5 px-3 text-on-surface-variant hover:text-white hover:bg-surface-container-high rounded-md transition-colors text-sm">Gerador de Hatch</a></li>
+          <li class="mb-1"><a href="/tools/linetype-generator" class="block py-1.5 px-3 text-on-surface-variant hover:text-white hover:bg-surface-container-high rounded-md transition-colors text-sm">Gerador de Linetype</a></li>
         </ul>
       </nav>
     </aside>
 
-    <main class="content-area">
-      <!-- Slot for Markdown content or React Dashboard -->
-      <slot />
+    <main class="content-area flex-1 overflow-y-auto bg-background relative flex flex-col">
+      <!-- Mobile Sidebar Toggle -->
+      <div class="md:hidden flex items-center p-3 border-b border-surface-variant bg-surface-container-low shrink-0">
+        <button id="sidebar-menu-btn" class="flex items-center gap-2 text-on-surface-variant hover:text-primary-container transition-colors">
+          <span class="material-symbols-outlined text-[20px]">menu_open</span>
+          <span class="font-medium text-sm">Menu do Painel</span>
+        </button>
+      </div>
+
+      <div class="flex-1 p-4 md:p-8 overflow-y-auto">
+        <slot />
+      </div>
+      
+      <!-- Unified Footer -->
+      <div class="mt-auto">
+        <Footer />
+      </div>
     </main>
   </div>
 
-  <Footer />
-
-  <!-- Script para el funcionamiento del Menú en Móvil -->
   <script is:inline>
     document.addEventListener('DOMContentLoaded', () => {
-      const menuBtn = document.getElementById('mobile-menu-btn');
+      const menuBtn = document.getElementById('sidebar-menu-btn');
       const sidebar = document.querySelector('.sidebar');
       const overlay = document.getElementById('sidebar-overlay');
 
       if (menuBtn && sidebar && overlay) {
         const toggleMenu = () => {
-          sidebar.classList.toggle('active');
-          overlay.classList.toggle('active');
+          const isClosed = sidebar.classList.contains('-translate-x-full');
+          if (isClosed) {
+            sidebar.classList.remove('-translate-x-full');
+            overlay.classList.remove('hidden');
+            // Small timeout to allow display:block to apply before changing opacity
+            setTimeout(() => overlay.classList.remove('opacity-0'), 10);
+          } else {
+            sidebar.classList.add('-translate-x-full');
+            overlay.classList.add('opacity-0');
+            setTimeout(() => overlay.classList.add('hidden'), 300);
+          }
         };
 
         menuBtn.addEventListener('click', toggleMenu);
         overlay.addEventListener('click', toggleMenu);
 
-        // Cerrar menú al hacer click en cualquier link de la navegación
         const links = sidebar.querySelectorAll('a');
         links.forEach(link => {
           link.addEventListener('click', () => {
-            sidebar.classList.remove('active');
-            overlay.classList.remove('active');
+            if (window.innerWidth < 768) {
+                sidebar.classList.add('-translate-x-full');
+                overlay.classList.add('opacity-0');
+                setTimeout(() => overlay.classList.add('hidden'), 300);
+            }
           });
         });
       }
     });
   </script>
 
-  <!-- Firebase Analytics para Docs/Tools -->
   <script>
     import { initPageTracking, trackDocView, trackCtaClick } from '../utils/analytics.js';
-
     initPageTracking();
-
-    // Track doc/tool page view por slug
     const path = window.location.pathname;
     if (path.includes('/docs/')) {
-      const slug = path.split('/docs/').pop().replace(/\/$/, '');
+      const slug = path.split('/docs/').pop()?.replace(/\/$/, '');
       if (slug) trackDocView(slug);
     } else if (path.includes('/tools/')) {
-      const slug = path.split('/tools/').pop().replace(/\/$/, '');
+      const slug = path.split('/tools/').pop()?.replace(/\/$/, '');
       if (slug) trackDocView('tool_' + slug);
     }
-
-    // Track clicks en sidebar navigation
     const sidebarLinks = document.querySelectorAll('.sidebar-nav a');
     sidebarLinks.forEach(link => {
       link.addEventListener('click', () => {
@@ -181,185 +145,17 @@ const {
         trackCtaClick('sidebar_nav', href);
       });
     });
-
-    // Track click en "Portal do Cliente"
-    const portalBtn = document.getElementById('btn-login-portal');
-    if (portalBtn) {
-      portalBtn.addEventListener('click', () => {
-        trackCtaClick('portal_cliente', 'topbar');
-      });
-    }
   </script>
 
   <style>
-    /* Layout Framework */
-    body {
-      margin: 0; padding: 0;
-      background-color: var(--bg-darker);
-      display: flex; flex-direction: column;
-      height: 100vh; overflow: hidden;
-    }
-    
-    .topbar {
-      height: 60px;
-      background-color: var(--bg-dark);
-      border-bottom: 1px solid var(--border-color);
-      display: flex; justify-content: space-between; align-items: center;
-      padding: 0 20px;
-      flex-shrink: 0;
-    }
-
-    .topbar-actions {
-      display: flex; align-items: center; gap: 15px;
-    }
-
-    .lang-selector {
-      background: var(--bg-card); color: var(--text-main);
-      border: 1px solid var(--border-color); border-radius: 4px;
-      padding: 5px 10px; font-size: 0.9rem;
-    }
-
-    .btn-topbar {
-      color: var(--text-main); text-decoration: none; font-size: 0.9rem;
-      padding: 5px 10px; border-radius: 4px; transition: background 0.2s;
-    }
-    .btn-topbar:hover, .btn-topbar.active {
-      background: var(--bg-card); color: var(--tmd-orange);
-    }
-
-    /* Botón de Menú Móvil */
-    .mobile-menu-btn {
-      display: none;
-      background: none;
-      border: none;
-      color: var(--text-main);
-      cursor: pointer;
-      padding: 5px;
-      align-items: center;
-      justify-content: center;
-      border-radius: 4px;
-    }
-
-    .mobile-menu-btn:hover {
-      background-color: var(--bg-card);
-      color: var(--tmd-orange);
-    }
-
-    .mobile-menu-btn svg {
-      width: 22px;
-      height: 22px;
-    }
-
-    .layout-container {
-      display: flex;
-      flex: 1;
-      overflow: hidden;
-      position: relative;
-    }
-
-    .sidebar {
-      width: 260px; background-color: var(--bg-card);
-      border-right: 1px solid var(--border-color);
-      overflow-y: auto; padding: 20px; flex-shrink: 0;
-      z-index: 10;
-    }
-
-    /* Lista anidada más compacta para arquitectura */
-    .nested-docs-list li {
-      margin-bottom: 2px;
-    }
-
-    .nested-docs-list a {
-      font-size: 0.88rem;
-      padding: 4px 8px;
-    }
-    
-    body.hide-sidebar .sidebar {
-      display: none;
-    }
-
-    .sidebar h4 { color: var(--tmd-orange); margin: 20px 0 10px 0; font-size: 0.85rem; text-transform: uppercase; }
-    .sidebar h4:first-child { margin-top: 0; }
-    
-    .sidebar-nav ul { list-style: none; padding: 0; margin: 0; }
-    .sidebar-nav li { margin-bottom: 5px; }
-    .sidebar-nav a {
-      color: #ffffff; text-decoration: none; font-size: 0.95rem;
-      display: block; padding: 5px 10px; border-radius: 4px;
-    }
-    .sidebar-nav a:hover { background-color: rgba(242, 109, 33, 0.1); color: var(--text-main); }
-
-    .sidebar-overlay {
-      display: none;
-    }
-
-    .content-area {
-      flex: 1; overflow-y: auto; padding: 40px;
-      background-color: var(--bg-darker);
-    }
-
-    /* Column layout for docs */
+    /* Keep doc layout column styles */
     :global(.doc-content) {
       column-count: 2;
       column-gap: 40px;
       column-rule: 1px solid var(--border-color);
       text-align: justify;
     }
-
-    /* Ocultar elementos en móvil */
     @media (max-width: 900px) {
-      .hide-mobile {
-        display: none !important;
-      }
-
-      .mobile-menu-btn {
-        display: flex;
-      }
-
-      /* Sidebar Off-Canvas overlay */
-      .sidebar {
-        position: absolute;
-        top: 0;
-        left: 0;
-        bottom: 0;
-        width: 270px;
-        transform: translateX(-100%);
-        transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        z-index: 1000;
-        box-shadow: none;
-        border-right: 1px solid var(--border-color);
-      }
-
-      .sidebar.active {
-        transform: translateX(0);
-        box-shadow: 10px 0 30px rgba(0, 0, 0, 0.7);
-      }
-
-      /* Superposición translúcida */
-      .sidebar-overlay {
-        display: block;
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        background: rgba(0, 0, 0, 0.6);
-        backdrop-filter: blur(4px);
-        z-index: 999;
-        pointer-events: none;
-        opacity: 0;
-        transition: opacity 0.3s ease;
-      }
-
-      .sidebar-overlay.active {
-        pointer-events: auto;
-        opacity: 1;
-      }
-
-      .content-area {
-        padding: 24px 16px;
-      }
-
       :global(.doc-content) { 
         column-count: 1; 
         text-align: left; 

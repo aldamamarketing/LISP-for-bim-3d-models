@@ -9,6 +9,8 @@ export const translations = {
     "header.portal": "Client Portal",
     "header.login": "Login",
     "header.help": "Help & Docs",
+    "header.tools": "Tools",
+    "header.blog": "Blog",
 
     // Footer
     "footer.privacy": "Privacy",
@@ -16,10 +18,6 @@ export const translations = {
     "footer.terms": "Terms of Use",
     "footer.desc": "© 2026 LispCentral. Robust infrastructure for BIM software engineering.",
 
-    // Dashboard
-    "dashboard.title": "Client Portal",
-    "dashboard.welcome": "Welcome",
-    
     // Tools General
     "tools.download": "Download",
     "tools.loginToDownload": "Login to Download",
@@ -32,7 +30,147 @@ export const translations = {
     
     // Help Page
     "help.title": "Help & Documentation",
-    "help.desc": "Find answers and guides for LispCentral."
+    "help.desc": "Find answers and guides for LispCentral.",
+
+    // Dashboard Sidebar
+    "dashboard.sidebar.manager": "LISP Manager",
+    "dashboard.sidebar.collection": "My Collection",
+    "dashboard.sidebar.profile": "My Profile",
+    "dashboard.sidebar.licenses": "Licenses & Access",
+    "dashboard.sidebar.notifications": "Notifications",
+    "dashboard.sidebar.reportBug": "Report Bug",
+    "dashboard.sidebar.logout": "Sign Out",
+    "dashboard.sidebar.sectionMain": "Main",
+    "dashboard.sidebar.sectionAccount": "Account & Settings",
+    "dashboard.sidebar.sectionHelp": "Help",
+
+    // Dashboard
+    "dashboard.title": "Client Portal",
+    "dashboard.welcome": "Welcome",
+    "dashboard.breadcrumb.panel": "Client Portal",
+
+    // Profile
+    "dashboard.profile.editProfile": "Edit Profile",
+    "dashboard.profile.save": "Save",
+    "dashboard.profile.cancel": "Cancel",
+
+    // Licenses
+    "dashboard.licenses.title": "Subscription & Licenses",
+    "dashboard.licenses.desc": "Configure your seats and billing plan.",
+    "dashboard.licenses.currentPlan": "Current Plan:",
+    "dashboard.licenses.betaTester": "Beta Tester (Unlimited)",
+    "dashboard.licenses.basePrice": "Base Price:",
+    "dashboard.licenses.seatsNeeded": "Seats Needed:",
+    "dashboard.licenses.updatePlan": "Update Plan via Stripe",
+    "dashboard.licenses.stripeWarning": "⚠️ Plan must be updated via Stripe to activate more seats.",
+    "dashboard.licenses.accessKey": "Your Access Key (Loader)",
+    "dashboard.licenses.download": "Download",
+
+    // Equipment
+    "dashboard.equipment.title": "Linked Equipment",
+    "dashboard.equipment.desc": "Currently connected PCs.",
+    "dashboard.equipment.unlink": "Unlink",
+    "dashboard.equipment.placeholder": "Notes (e.g. Marcos' engineering PC)",
+    "dashboard.equipment.empty": "No equipment connected. Load the Loader in AutoCAD.",
+
+    // LISP Manager
+    "dashboard.lisp.workspace": "Workspace LISPs",
+    "dashboard.lisp.addLisps": "+ Add LISPs",
+    "dashboard.lisp.desc": "Manage routines in the cloud. Edit icons, names, and groups.",
+    "dashboard.lisp.awaitingUpload": "Awaiting Upload",
+    "dashboard.lisp.readyForUpload": "routines ready for upload.",
+    "dashboard.lisp.confirmUpload": "Confirm Upload",
+    "dashboard.lisp.uploading": "Sending to Server...",
+
+    // Notifications
+    "dashboard.notifications.title": "System Notifications",
+    "dashboard.notifications.empty": "No notifications.",
+    "dashboard.notifications.markRead": "✔ Mark as Read",
+
+    // FAQ
+    "dashboard.faq.title": "Help Center / FAQ",
+    "dashboard.faq.desc": "Find quick answers to the most common problems.",
+
+    // Support Modal
+    "dashboard.support.title": "Report Bug / Send Feedback",
+    "dashboard.support.bug": "🐛 Report a Bug",
+    "dashboard.support.feature": "✨ Suggest Improvement",
+    "dashboard.support.help": "❓ Need Technical Help",
+    "dashboard.support.placeholder": "Describe your issue or suggestion in detail...",
+    "dashboard.support.send": "Send Message",
+
+    // Auth
+    "auth.welcomeBack": "Welcome back",
+    "auth.createAccount": "Create Account",
+    "auth.joinBeta": "Join the LispCentral Beta platform.",
+    "auth.manageRoutines": "Sign in to manage your LISP routines.",
+    "auth.corporateEmail": "Corporate E-mail",
+    "auth.password": "Password",
+    "auth.confirmPassword": "Confirm Password",
+    "auth.signIn": "Sign In to Dashboard",
+    "auth.or": "or",
+    "auth.continueGoogle": "Continue with Google",
+    "auth.haveAccount": "Already have an account?",
+    "auth.noAccount": "Don't have an account?",
+    "auth.doLogin": "Sign In",
+    "auth.createFree": "Create Free Account",
+    "auth.backToSite": "Back to site",
+
+    // Loading
+    "common.loading": "Loading data...",
+
+    // Landing Hero
+    "landing.hero.tag": "CLOUD BIM INFRASTRUCTURE",
+    "landing.hero.title1": "Take full control of your",
+    "landing.hero.title2": "LISP codes",
+    "landing.hero.desc": "The ultimate corporate platform for management, security, and distribution of LISP routines. Protect your intellectual property and standardize engineering workflows in real time.",
+    "landing.hero.cta1": "Start Now",
+    "landing.hero.cta2": "View Demo",
+
+    // Landing Features
+    "features.crypto.title": "HTTPS Encryption",
+    "features.crypto.desc": "End-to-end secure transfer. Your routines are encrypted at rest and in transit, ensuring maximum integrity.",
+    "features.ip.title": "IP Protection",
+    "features.ip.desc": "Prevent code theft. Distribute LISP routines compiled or obfuscated, controlling access to the source.",
+    "features.access.title": "Direct Access",
+    "features.access.desc": "Native integration. Load routines directly from the cloud into the CAD environment without complex intermediate steps.",
+
+    // Landing Libraries
+    "libraries.title1": "More than LISP,",
+    "libraries.title2": "a tool hub",
+    "libraries.desc": "Expand your CAD environment's capabilities with cloud-managed visual libraries and UI customization tools.",
+    "libraries.hatch.title": "Hatch Library",
+    "libraries.hatch.desc": "Synchronize hundreds of custom hatch patterns company-wide instantly. Stop wasting time looking for lost .pat files.",
+    "libraries.hatch.btn": "Access Free Generator",
+    "libraries.lines.title": "Line Library",
+    "libraries.lines.desc": "Standardize line types across all projects. Distribute complex line libraries globally with strict version control.",
+    "libraries.lines.btn": "Access Free Generator",
+
+    // Landing Palettes
+    "palettes.title": "Integrated Web Palettes",
+    "palettes.desc": "Modernize the interface of your routines. The platform provides your tools through advanced, responsive web panels that communicate seamlessly with AutoCAD, replacing legacy LISP dialog boxes.",
+    "palettes.sync.title": "Real-Time Sync",
+    "palettes.sync.desc": "UI updates reflect immediately on clients without restart.",
+    "palettes.search.title": "Smart Search",
+    "palettes.search.desc": "Filter hundreds of commands and blocks instantly via web interface.",
+
+    // Landing FAQ
+    "faq.title": "Frequently Asked Questions",
+    "faq.desc": "Everything you need to know about platform security, integration, and architecture.",
+    "faq.q1.q": "How does LispCentral integrate with my AutoCAD?",
+    "faq.q1.a": "Integration is done through a lightweight connector in AutoCAD. This connector communicates securely and encrypted (HTTPS) with the LispCentral cloud, receiving routines and updates in real-time, without complex installations.",
+    "faq.q2.q": "Is my intellectual LISP code exposed on clients?",
+    "faq.q2.a": "Never. LispCentral uses JIT (Just-In-Time) compilation with Zero-Disk injection. LISP routines are transferred encrypted and compiled directly into the client's AutoCAD memory. No .LSP file is saved to the hard drive.",
+    "faq.q3.q": "Do I need to know HTML to use Web Palettes?",
+    "faq.q3.a": "Absolutely not. The platform takes care of rendering and making your native AutoCAD tools available through ready, responsive, and modern Web Palettes. You focus on engineering, we manage the visual interface.",
+    "faq.q4.q": "Can I sell or manage access for other companies?",
+    "faq.q4.a": "Yes. The architecture was designed for Multi-Tenant B2B. Through the SaaS Portal, you can create temporary licenses, revoke access instantly, and manage seats per engineering office.",
+
+    // Landing CTA
+    "cta.title": "Ready to centralize your engineering?",
+    "cta.desc": "Join the leading companies that have already modernized the management of their LISP routines and CAD standards. Request early access today.",
+    "cta.button": "Create Free Account (Beta)",
+    "cta.disclaimer": "No credit card required for demonstration."
   },
   es: {
     // Header
@@ -44,16 +182,14 @@ export const translations = {
     "header.portal": "Portal del Cliente",
     "header.login": "Iniciar Sesión",
     "header.help": "Ayuda y Docs",
+    "header.tools": "Herramientas",
+    "header.blog": "Blog",
 
     // Footer
     "footer.privacy": "Privacidad",
     "footer.security": "Seguridad",
     "footer.terms": "Términos de Uso",
     "footer.desc": "© 2026 LispCentral. Infraestructura robusta para ingeniería de software BIM.",
-
-    // Dashboard
-    "dashboard.title": "Portal del Cliente",
-    "dashboard.welcome": "Bienvenido",
 
     // Tools General
     "tools.download": "Descargar",
@@ -67,7 +203,147 @@ export const translations = {
 
     // Help Page
     "help.title": "Ayuda y Documentación",
-    "help.desc": "Encuentra respuestas y guías para LispCentral."
+    "help.desc": "Encuentra respuestas y guías para LispCentral.",
+
+    // Dashboard Sidebar
+    "dashboard.sidebar.manager": "Gestor de LISP",
+    "dashboard.sidebar.collection": "Mi Colección",
+    "dashboard.sidebar.profile": "Mi Perfil",
+    "dashboard.sidebar.licenses": "Licencias y Acceso",
+    "dashboard.sidebar.notifications": "Notificaciones",
+    "dashboard.sidebar.reportBug": "Reportar Error",
+    "dashboard.sidebar.logout": "Cerrar Sesión",
+    "dashboard.sidebar.sectionMain": "Principal",
+    "dashboard.sidebar.sectionAccount": "Cuenta y Ajustes",
+    "dashboard.sidebar.sectionHelp": "Ayuda",
+
+    // Dashboard
+    "dashboard.title": "Portal del Cliente",
+    "dashboard.welcome": "Bienvenido",
+    "dashboard.breadcrumb.panel": "Portal del Cliente",
+
+    // Profile
+    "dashboard.profile.editProfile": "Editar Perfil",
+    "dashboard.profile.save": "Guardar",
+    "dashboard.profile.cancel": "Cancelar",
+
+    // Licenses
+    "dashboard.licenses.title": "Suscripción y Licencias",
+    "dashboard.licenses.desc": "Configura tus accesos y plan de facturación.",
+    "dashboard.licenses.currentPlan": "Plan Actual:",
+    "dashboard.licenses.betaTester": "Beta Tester (Ilimitado)",
+    "dashboard.licenses.basePrice": "Precio Base:",
+    "dashboard.licenses.seatsNeeded": "Accesos Necesarios:",
+    "dashboard.licenses.updatePlan": "Actualizar Plan vía Stripe",
+    "dashboard.licenses.stripeWarning": "⚠️ El plan debe actualizarse vía Stripe para activar más accesos.",
+    "dashboard.licenses.accessKey": "Tu Clave de Acceso (Loader)",
+    "dashboard.licenses.download": "Descargar",
+
+    // Equipment
+    "dashboard.equipment.title": "Equipos Vinculados",
+    "dashboard.equipment.desc": "PCs conectados actualmente.",
+    "dashboard.equipment.unlink": "Desvincular",
+    "dashboard.equipment.placeholder": "Notas (ej. PC de ingeniería de Marcos)",
+    "dashboard.equipment.empty": "No hay equipos conectados. Carga el Loader en AutoCAD.",
+
+    // LISP Manager
+    "dashboard.lisp.workspace": "LISPs del Espacio de Trabajo",
+    "dashboard.lisp.addLisps": "+ Añadir LISPs",
+    "dashboard.lisp.desc": "Gestiona rutinas en la nube. Edita ícones, nombres y grupos.",
+    "dashboard.lisp.awaitingUpload": "Esperando Subida",
+    "dashboard.lisp.readyForUpload": "rutinas listas para subir.",
+    "dashboard.lisp.confirmUpload": "Confirmar Subida",
+    "dashboard.lisp.uploading": "Enviando al Servidor...",
+
+    // Notifications
+    "dashboard.notifications.title": "Notificaciones del Sistema",
+    "dashboard.notifications.empty": "No hay notificaciones.",
+    "dashboard.notifications.markRead": "✔ Marcar como Leído",
+
+    // FAQ
+    "dashboard.faq.title": "Centro de Ayuda / FAQ",
+    "dashboard.faq.desc": "Encuentra respuestas rápidas a los problemas más comunes.",
+
+    // Support Modal
+    "dashboard.support.title": "Reportar Error / Enviar Comentarios",
+    "dashboard.support.bug": "🐛 Reportar un Error",
+    "dashboard.support.feature": "✨ Sugerir Mejora",
+    "dashboard.support.help": "❓ Necesito Ayuda Técnica",
+    "dashboard.support.placeholder": "Describe tu problema o sugerencia en detalle...",
+    "dashboard.support.send": "Enviar Mensaje",
+
+    // Auth
+    "auth.welcomeBack": "Bienvenido de nuevo",
+    "auth.createAccount": "Crear Cuenta",
+    "auth.joinBeta": "Únete a la plataforma LispCentral Beta.",
+    "auth.manageRoutines": "Inicia sesión para gestionar tus rutinas LISP.",
+    "auth.corporateEmail": "Correo Corporativo",
+    "auth.password": "Contraseña",
+    "auth.confirmPassword": "Confirmar Contraseña",
+    "auth.signIn": "Entrar al Portal",
+    "auth.or": "o",
+    "auth.continueGoogle": "Continuar con Google",
+    "auth.haveAccount": "¿Ya tienes una cuenta?",
+    "auth.noAccount": "¿No tienes una cuenta?",
+    "auth.doLogin": "Iniciar Sesión",
+    "auth.createFree": "Crear Cuenta Gratis",
+    "auth.backToSite": "Volver al sitio",
+
+    // Loading
+    "common.loading": "Cargando datos...",
+
+    // Landing Hero
+    "landing.hero.tag": "INFRAESTRUCTURA BIM CLOUD",
+    "landing.hero.title1": "Asuma el control total de sus",
+    "landing.hero.title2": "códigos LISP",
+    "landing.hero.desc": "La plataforma corporativa definitiva para gestión, seguridad y distribución de rutinas LISP. Proteja su propiedad intelectual y estandarice flujos de ingeniería en tiempo real.",
+    "landing.hero.cta1": "Empezar Ahora",
+    "landing.hero.cta2": "Ver Demostración",
+
+    // Landing Features
+    "features.crypto.title": "Criptografía HTTPS",
+    "features.crypto.desc": "Transferencia segura de extremo a extremo. Sus rutinas se cifran en reposo y en tránsito, garantizando máxima integridad.",
+    "features.ip.title": "Protección de IP",
+    "features.ip.desc": "Impida el robo de código. Distribuya rutinas LISP de forma compilada u ofuscada, controlando el acceso a la fuente.",
+    "features.access.title": "Acceso Directo",
+    "features.access.desc": "Integración nativa. Cargue rutinas directamente desde la nube al entorno CAD sin pasos intermedios complejos.",
+
+    // Landing Libraries
+    "libraries.title1": "Más que LISP,",
+    "libraries.title2": "un centro de herramientas",
+    "libraries.desc": "Expanda las capacidades de su entorno CAD con bibliotecas visuales gestionadas en la nube y herramientas de personalización de interfaz.",
+    "libraries.hatch.title": "Librería de Hatch",
+    "libraries.hatch.desc": "Sincronice cientos de patrones de sombreado personalizados en toda la empresa al instante. Deje de perder tiempo buscando archivos .pat perdidos.",
+    "libraries.hatch.btn": "Acceder al Generador Gratuito",
+    "libraries.lines.title": "Librería de Líneas",
+    "libraries.lines.desc": "Estandarice los tipos de línea en todos los proyectos. Distribuya bibliotecas complejas globalmente con estricto control de versiones.",
+    "libraries.lines.btn": "Acceder al Generador Gratuito",
+
+    // Landing Palettes
+    "palettes.title": "Paletas Web Integradas",
+    "palettes.desc": "Modernice la interfaz de sus rutinas. La plataforma ofrece sus herramientas a través de paneles web avanzados y responsivos que se comunican perfectamente con AutoCAD, reemplazando cuadros de diálogo LISP heredados.",
+    "palettes.sync.title": "Sincronización en Tiempo Real",
+    "palettes.sync.desc": "Las actualizaciones de UI se reflejan inmediatamente en los clientes sin necesidad de reiniciar.",
+    "palettes.search.title": "Búsqueda Inteligente",
+    "palettes.search.desc": "Filtre cientos de comandos y bloques instantáneamente vía interfaz web.",
+
+    // Landing FAQ
+    "faq.title": "Preguntas Frecuentes",
+    "faq.desc": "Todo lo que necesita saber sobre seguridad, integración y arquitectura de la plataforma.",
+    "faq.q1.q": "¿Cómo se integra LispCentral con mi AutoCAD?",
+    "faq.q1.a": "La integración se realiza a través de un conector ligero en AutoCAD. Este conector se comunica de forma segura y cifrada (HTTPS) con la nube de LispCentral, recibiendo rutinas y actualizaciones en tiempo real, sin instalaciones complejas.",
+    "faq.q2.q": "¿Mi código intelectual LISP queda expuesto en los clientes?",
+    "faq.q2.a": "Nunca. LispCentral utiliza compilación JIT (Just-In-Time) con inyección Zero-Disk. Las rutinas LISP se transfieren cifradas y compiladas directamente a la memoria de AutoCAD del cliente. Ningún archivo .LSP se guarda en el disco duro.",
+    "faq.q3.q": "¿Necesito saber HTML para usar las Paletas Web?",
+    "faq.q3.a": "Absolutamente no. La plataforma se encarga de renderizar y poner a disposición sus herramientas nativas de AutoCAD a través de Paletas Web modernas y responsivas. Usted se centra en la ingeniería, nosotros gestionamos la interfaz visual.",
+    "faq.q4.q": "¿Puedo vender o gestionar accesos para otras empresas?",
+    "faq.q4.a": "Sí. La arquitectura fue diseñada para Multi-Tenant B2B. A través del Portal SaaS, puede crear licencias temporales, revocar accesos al instante y gestionar asientos por oficina de ingeniería.",
+
+    // Landing CTA
+    "cta.title": "¿Listo para centralizar su ingeniería?",
+    "cta.desc": "Únase a las empresas líderes que ya han modernizado la gestión de sus rutinas LISP y estándares CAD. Solicite acceso anticipado hoy.",
+    "cta.button": "Crear Cuenta Gratis (Beta)",
+    "cta.disclaimer": "No se requiere tarjeta de crédito para la demostración."
   },
   pt: {
     // Header
@@ -79,16 +355,14 @@ export const translations = {
     "header.portal": "Portal do Cliente",
     "header.login": "Login",
     "header.help": "Ajuda & Docs",
+    "header.tools": "Ferramentas",
+    "header.blog": "Blog",
 
     // Footer
     "footer.privacy": "Privacidade",
     "footer.security": "Segurança",
     "footer.terms": "Termos de Uso",
     "footer.desc": "© 2026 LispCentral. Infraestrutura robusta para engenharia de software BIM.",
-
-    // Dashboard
-    "dashboard.title": "Portal do Cliente",
-    "dashboard.welcome": "Bem-vindo",
 
     // Tools General
     "tools.download": "Baixar",
@@ -102,44 +376,146 @@ export const translations = {
 
     // Help Page
     "help.title": "Ajuda e Documentação",
-    "help.desc": "Encontre respostas e guias para LispCentral."
-  }
-};
-export const hatchTranslations = {
-  en: {
-    "hatch.title": "Hatch Generator",
-    "hatch.desc": "Design and compile complex AutoCAD patterns (.pat) using text commands and AI.",
-    "hatch.config": "Configuration",
-    "hatch.context": "Context / Category",
-    "hatch.toGenerate": "Hatches to Generate (one per line)",
-    "hatch.generateBtn": "Generate Patterns",
-    "hatch.factory": "Hatch Factory (.pat)",
-    "hatch.selected": "Selected Hatches",
-    "hatch.selectHint": "Click on patterns in the center to add them to your bundle.",
-    "hatch.loading": "Loading library..."
-  },
-  es: {
-    "hatch.title": "Generador de Hachuras (Hatch)",
-    "hatch.desc": "Dise�e y compile patrones complejos (.pat) para AutoCAD usando comandos de texto e IA.",
-    "hatch.config": "Configuraci�n",
-    "hatch.context": "Contexto / Categor�a",
-    "hatch.toGenerate": "Hachuras a Generar (una por l�nea)",
-    "hatch.generateBtn": "Generar Patrones",
-    "hatch.factory": "F�brica de Hachuras (.pat)",
-    "hatch.selected": "Hachuras Seleccionadas",
-    "hatch.selectHint": "Haga clic en los patrones en el centro para agregarlos a su paquete.",
-    "hatch.loading": "Cargando biblioteca..."
-  },
-  pt: {
-    "hatch.title": "Gerador de Hachuras (Hatch)",
-    "hatch.desc": "Desenhe e compile padr�es complexos (.pat) para AutoCAD usando comandos textuais e IA.",
-    "hatch.config": "Configura��o",
-    "hatch.context": "Contexto / Categoria",
-    "hatch.toGenerate": "Hachuras a Gerar (uma por linha)",
-    "hatch.generateBtn": "Gerar Padr�es",
-    "hatch.factory": "F�brica de Hachuras (.pat)",
-    "hatch.selected": "Hachuras Selecionadas",
-    "hatch.selectHint": "Clique nos padr�es ao centro para adicionar ao pacote.",
-    "hatch.loading": "Carregando biblioteca..."
+    "help.desc": "Encontre respostas e guias para o LispCentral.",
+
+    // Dashboard Sidebar
+    "dashboard.sidebar.manager": "Gestor de LISP",
+    "dashboard.sidebar.collection": "Minha Coleção",
+    "dashboard.sidebar.profile": "Meu Perfil",
+    "dashboard.sidebar.licenses": "Licenças & Acesso",
+    "dashboard.sidebar.notifications": "Notificações",
+    "dashboard.sidebar.reportBug": "Reportar Bug",
+    "dashboard.sidebar.logout": "Sair",
+    "dashboard.sidebar.sectionMain": "Principal",
+    "dashboard.sidebar.sectionAccount": "Conta & Configurações",
+    "dashboard.sidebar.sectionHelp": "Ajuda",
+
+    // Dashboard
+    "dashboard.title": "Portal do Cliente",
+    "dashboard.welcome": "Bem-vindo",
+    "dashboard.breadcrumb.panel": "Painel do Cliente",
+
+    // Profile
+    "dashboard.profile.editProfile": "Editar Perfil",
+    "dashboard.profile.save": "Salvar",
+    "dashboard.profile.cancel": "Cancelar",
+
+    // Licenses
+    "dashboard.licenses.title": "Assinatura & Licenças",
+    "dashboard.licenses.desc": "Configure seus assentos e plano de faturamento.",
+    "dashboard.licenses.currentPlan": "Plano Atual:",
+    "dashboard.licenses.betaTester": "Beta Tester (Ilimitado)",
+    "dashboard.licenses.basePrice": "Preço Base:",
+    "dashboard.licenses.seatsNeeded": "Assentos Necessários:",
+    "dashboard.licenses.updatePlan": "Atualizar Plano via Stripe",
+    "dashboard.licenses.stripeWarning": "⚠️ O plano deve ser atualizado via Stripe para ativar mais assentos.",
+    "dashboard.licenses.accessKey": "Sua Chave de Acesso (Loader)",
+    "dashboard.licenses.download": "Baixar",
+
+    // Equipment
+    "dashboard.equipment.title": "Equipamentos Vinculados",
+    "dashboard.equipment.desc": "PCs conectados atualmente.",
+    "dashboard.equipment.unlink": "Desvincular",
+    "dashboard.equipment.placeholder": "Notas (ex. PC de engenharia do Marcos)",
+    "dashboard.equipment.empty": "Nenhum equipamento conectado. Carregue o Loader no AutoCAD.",
+
+    // LISP Manager
+    "dashboard.lisp.workspace": "LISPs do Espaço de Trabalho",
+    "dashboard.lisp.addLisps": "+ Adicionar LISPs",
+    "dashboard.lisp.desc": "Gerencie rotinas na nuvem. Edite ícones, nomes e grupos.",
+    "dashboard.lisp.awaitingUpload": "Aguardando Upload",
+    "dashboard.lisp.readyForUpload": "rotinas prontas para envio.",
+    "dashboard.lisp.confirmUpload": "Confirmar Upload",
+    "dashboard.lisp.uploading": "Enviando ao Servidor...",
+
+    // Notifications
+    "dashboard.notifications.title": "Notificações do Sistema",
+    "dashboard.notifications.empty": "Nenhuma notificação.",
+    "dashboard.notifications.markRead": "✔ Marcar como Lido",
+
+    // FAQ
+    "dashboard.faq.title": "Central de Ajuda / FAQ",
+    "dashboard.faq.desc": "Encontre respostas rápidas para os problemas mais comuns.",
+
+    // Support Modal
+    "dashboard.support.title": "Reportar Bug / Enviar Feedback",
+    "dashboard.support.bug": "🐛 Reportar um Bug",
+    "dashboard.support.feature": "✨ Sugerir Melhoria",
+    "dashboard.support.help": "❓ Preciso de Ajuda Técnica",
+    "dashboard.support.placeholder": "Descreva seu problema ou sugestão em detalhes...",
+    "dashboard.support.send": "Enviar Mensagem",
+
+    // Auth
+    "auth.welcomeBack": "Bem-vindo de volta",
+    "auth.createAccount": "Criar Conta",
+    "auth.joinBeta": "Junte-se à plataforma LispCentral Beta.",
+    "auth.manageRoutines": "Entre para gerenciar suas rotinas LISP.",
+    "auth.corporateEmail": "E-mail Corporativo",
+    "auth.password": "Senha",
+    "auth.confirmPassword": "Confirmar Senha",
+    "auth.signIn": "Entrar no Painel",
+    "auth.or": "ou",
+    "auth.continueGoogle": "Continuar com Google",
+    "auth.haveAccount": "Já tem uma conta?",
+    "auth.noAccount": "Não tem uma conta?",
+    "auth.doLogin": "Fazer Login",
+    "auth.createFree": "Criar Conta Gratuita",
+    "auth.backToSite": "Voltar ao site",
+
+    // Loading
+    "common.loading": "Carregando dados...",
+
+    // Landing Hero
+    "landing.hero.tag": "INFRAESTRUTURA BIM CLOUD",
+    "landing.hero.title1": "Assuma o controle total dos seus",
+    "landing.hero.title2": "códigos LISP",
+    "landing.hero.desc": "A plataforma corporativa definitiva para gestão, segurança e distribuição de rotinas LISP. Proteja sua propriedade intelectual e padronize fluxos de engenharia em tempo real.",
+    "landing.hero.cta1": "Começar Agora",
+    "landing.hero.cta2": "Ver Demonstração",
+
+    // Landing Features
+    "features.crypto.title": "Criptografia HTTPS",
+    "features.crypto.desc": "Transferência segura de ponta a ponta. Suas rotinas são encriptadas em repouso e em trânsito, garantindo integridade máxima.",
+    "features.ip.title": "Proteção de IP",
+    "features.ip.desc": "Impeça o roubo de código. Distribua rotinas LISP de forma compilada ou ofuscada, controlando o acesso à fonte.",
+    "features.access.title": "Acesso Direto",
+    "features.access.desc": "Integração nativa. Carregue rotinas diretamente da nuvem para o ambiente CAD sem etapas intermediárias complexas.",
+
+    // Landing Libraries
+    "libraries.title1": "Mais que LISP,",
+    "libraries.title2": "uma central de ferramentas",
+    "libraries.desc": "Expanda as capacidades do seu ambiente CAD com bibliotecas visuais gerenciadas pela nuvem e ferramentas de personalização de interface.",
+    "libraries.hatch.title": "Hatch Library",
+    "libraries.hatch.desc": "Sincronize centenas de padrões de hachura personalizados para toda a empresa instantaneamente. Evite a perda de tempo procurando arquivos .pat perdidos.",
+    "libraries.hatch.btn": "Acessar Gerador Gratuito",
+    "libraries.lines.title": "Line Library",
+    "libraries.lines.desc": "Padronize os tipos de linha de todos os projetos. Distribua bibliotecas de linhas complexas globalmente com controle de versão rigoroso.",
+    "libraries.lines.btn": "Acessar Gerador Gratuito",
+
+    // Landing Palettes
+    "palettes.title": "Paletas Web Integradas",
+    "palettes.desc": "Modernize a interface das suas rotinas. A plataforma disponibiliza suas ferramentas através de painéis web avançados e responsivos que se comunicam perfeitamente com o AutoCAD, substituindo caixas de diálogo LISP legadas.",
+    "palettes.sync.title": "Sincronização em Tempo Real",
+    "palettes.sync.desc": "Atualizações de UI refletem imediatamente nos clientes sem reinicialização.",
+    "palettes.search.title": "Busca Inteligente",
+    "palettes.search.desc": "Filtre centenas de comandos e blocos instantaneamente via interface web.",
+
+    // Landing FAQ
+    "faq.title": "Perguntas Frequentes",
+    "faq.desc": "Tudo o que você precisa saber sobre segurança, integração e arquitetura da plataforma.",
+    "faq.q1.q": "Como o LispCentral se integra ao meu AutoCAD?",
+    "faq.q1.a": "A integração é feita através de um conector leve no AutoCAD. Esse conector se comunica de forma segura e criptografada (HTTPS) com a nuvem do LispCentral, recebendo as rotinas e atualizações em tempo real, sem necessidade de instalações complexas.",
+    "faq.q2.q": "Meu código LISP intelectual fica exposto nos clientes?",
+    "faq.q2.a": "Nunca. O LispCentral utiliza compilação JIT (Just-In-Time) com injeção Zero-Disk. As rotinas LISP são transferidas criptografadas e compiladas diretamente na memória do AutoCAD do cliente. Nenhum arquivo .LSP é salvo no disco rígido.",
+    "faq.q3.q": "Preciso saber HTML para usar as Paletas Web?",
+    "faq.q3.a": "Absolutamente não. A plataforma se encarrega de renderizar e disponibilizar suas ferramentas nativas do AutoCAD através de Paletas Web prontas, responsivas e modernas. Você foca na engenharia, nós gerenciamos a interface visual.",
+    "faq.q4.q": "Posso vender ou gerenciar acessos para outras empresas?",
+    "faq.q4.a": "Sim. A arquitetura foi desenhada para Multi-Tenant B2B. Através do Portal SaaS, você pode criar licenças temporárias, revogar acessos instantaneamente e gerenciar 'seats' por escritório de engenharia.",
+
+    // Landing CTA
+    "cta.title": "Pronto para centralizar sua engenharia?",
+    "cta.desc": "Junte-se às empresas líderes que já modernizaram a gestão de suas rotinas LISP e padrões CAD. Solicite acesso antecipado hoje.",
+    "cta.button": "Criar Conta Gratuita (Beta)",
+    "cta.disclaimer": "Sem cartão de crédito necessário para demonstração."
   }
 };

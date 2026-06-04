@@ -1,28 +1,34 @@
 ---
+import { translations } from '../../i18n/translations.js';
+import { getLangFromUrl } from '../../i18n/utils';
+
+const lang = getLangFromUrl(Astro.url);
+const t = (key) => translations[lang]?.[key] || translations['en'][key];
+
 const faqs = [
   {
-    question: "Como o LispCentral se integra ao meu AutoCAD?",
-    answer: "A integração é feita através de um conector leve no AutoCAD. Esse conector se comunica de forma segura e criptografada (HTTPS) com a nuvem do LispCentral, recebendo as rotinas e atualizações em tempo real, sem necessidade de instalações complexas."
+    question: t("faq.q1.q"),
+    answer: t("faq.q1.a")
   },
   {
-    question: "Meu código LISP intelectual fica exposto nos clientes?",
-    answer: "Nunca. O LispCentral utiliza compilação JIT (Just-In-Time) com injeção Zero-Disk. As rotinas LISP são transferidas criptografadas e compiladas diretamente na memória do AutoCAD do cliente. Nenhum arquivo .LSP é salvo no disco rígido."
+    question: t("faq.q2.q"),
+    answer: t("faq.q2.a")
   },
   {
-    question: "Preciso saber HTML para usar as Paletas Web?",
-    answer: "Absolutamente não. A plataforma se encarrega de renderizar e disponibilizar suas ferramentas nativas do AutoCAD através de Paletas Web prontas, responsivas e modernas. Você foca na engenharia, nós gerenciamos a interface visual."
+    question: t("faq.q3.q"),
+    answer: t("faq.q3.a")
   },
   {
-    question: "Posso vender ou gerenciar acessos para outras empresas?",
-    answer: "Sim. A arquitetura foi desenhada para Multi-Tenant B2B. Através do Portal SaaS, você pode criar licenças temporárias, revogar acessos instantaneamente e gerenciar 'seats' por escritório de engenharia."
+    question: t("faq.q4.q"),
+    answer: t("faq.q4.a")
   }
 ];
 ---
-<section class="py-section-padding relative overflow-hidden bg-background border-t border-surface-variant">
+<section class="py-section-padding relative overflow-hidden bg-background border-t border-surface-variant reveal">
     <div class="max-w-[800px] mx-auto px-gutter relative z-10">
         <div class="text-center mb-16">
-            <h2 class="font-headline-lg text-headline-lg text-white mb-4">Perguntas Frequentes</h2>
-            <p class="font-body-lg text-body-lg text-on-surface-variant">Tudo o que você precisa saber sobre segurança, integração e arquitetura da plataforma.</p>
+            <h2 class="font-headline-lg text-headline-lg text-white mb-4">{t("faq.title")}</h2>
+            <p class="font-body-lg text-body-lg text-on-surface-variant">{t("faq.desc")}</p>
         </div>
         
         <div class="space-y-4">

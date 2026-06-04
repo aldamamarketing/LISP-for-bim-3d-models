@@ -118,14 +118,16 @@ El proyecto ha pivotado hacia un modelo Híbrido:
 4.  **Cifrado SaaS Estándar:** Usamos encriptación en tránsito (HTTPS) y en reposo (Firebase/GCP). La ofuscación profunda queda de lado de la empresa (pueden subir `.fas` o `.vlx` a su bucket si desconfían del texto plano).
 
 ### Estado Actual del Dashboard Web (SaaS Console)
-El Dashboard web (React + Firebase) se ha reestructurado para operar como una consola SaaS profesional y "Mobile Friendly":
-*   **Jerarquía Visual:** Priorización de *Assinatura & Licenças* y *Equipamentos Vinculados* en la parte superior, seguido del *Workspace LISPs*.
+El Dashboard web (React + Firebase + Astro) se ha reestructurado para operar como una consola SaaS profesional y "Mobile Friendly". Se aplicaron las siguientes decisiones arquitectónicas UI/UX y de código:
+*   **Modularización React (Refactorización):** El monolito histórico `Dashboard.jsx` (>1200 líneas) fue dividido en componentes granulares bajo `src/components/dashboard/` (`AuthLogin`, `ProfileTab`, `LicensesTab`, `LispManagerTab`, `SupportModal`).
+*   **State Management Global:** Se implementó el patrón React Context API (`DashboardContext.jsx`) para gestionar el estado global (`userData`, `tenantLisps`, `seats`, etc.) y evitar el "prop-drilling", garantizando escalabilidad pura y mantenibilidad a largo plazo.
+*   **Internacionalización (i18n):** Todo el entorno de Landing Page y Dashboard aplica diccionarios globales (`translations.js`) a través del hook `useTranslation()` y `getLangFromUrl()`, cubriendo 100% de la interfaz web en EN, ES y PT.
+*   **Jerarquía Visual y Micro-Animaciones:** Priorización de *Assinatura & Licenças* y *Workspace LISPs*. Se integraron estados `focus-visible`, efectos `hover` (`hover:-translate-y-1`), transiciones suaves en el cambio de pestañas (`tab-enter`) y un observador de intersección global (`revealObserver`) para lograr un aspecto premium.
 *   **God Mode (Beta):** Los Beta Testers pueden incrementar sus asientos (`seats`) directamente desde el dashboard sin pasar por la pasarela de Stripe. Esta acción actualiza `maxSeats` en la base de datos instantáneamente.
 *   **Workspace Inteligente:** Los archivos cargados en la nube se ordenan automáticamente de forma alfabética por *Suite*, luego por *Grupo* y finalmente por *Nombre Amigable*. Soporta carga masiva y vinculación de iconos SVG dinámicos.
-*   **Centro de Soporte:** Incluye un menú interactivo en la cabecera para "Reportar Bug" (conectado directamente a la colección `feedback` de Firestore) y una sección de FAQ desplegable al final de la página.
-*   **Notificaciones:** Sistema de campana interactiva (Dropdown) con contador de mensajes no leídos y capacidad de cambiar el estado de lectura en tiempo real.
-*   **IDs Semánticos en Firestore:** La carga de rutinas LISP utiliza `setDoc` para forzar la creación de documentos en `lispFiles` con IDs predecibles y semánticos (`lisp_[tenantId]_[lispId]`), abandonando los UUIDs aleatorios nativos de Firebase.
-*   **Desbloqueo de Custom Suites:** El backend (Cloud Run) ahora permite que la paleta nativa recupere absolutamente todos los LISPs pertenecientes al `tenantId` del usuario activo, ignorando el filtro restrictivo de `activeSuites` (que solo aplica para los módulos base de la plataforma).
+*   **Centro de Soporte:** Incluye un menú interactivo en la cabecera para "Reportar Bug" (conectado directamente a la colección `feedback` de Firestore) y una sección de FAQ desplegable en la landing page.
+*   **IDs Semánticos en Firestore:** La carga de rutinas LISP utiliza `setDoc` para forzar la creación de documentos en `lispFiles` con IDs predecibles y semánticos (`lisp_[tenantId]_[lispId]`).
+*   **Desbloqueo de Custom Suites:** El backend (Cloud Run) ahora permite que la paleta nativa recupere absolutamente todos los LISPs pertenecientes al `tenantId` del usuario activo, ignorando el filtro restrictivo de `activeSuites`.
 
 ---
 

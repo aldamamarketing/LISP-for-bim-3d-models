@@ -54,10 +54,24 @@ export default {
                 "secondary-container": "#4a4949"
             },
             borderRadius: {
-                "DEFAULT": "0.125rem",
-                "lg": "0.25rem",
-                "xl": "0.5rem",
-                "full": "0.75rem"
+                "DEFAULT": "0.375rem",
+                "md": "0.5rem",
+                "lg": "0.75rem",
+                "xl": "1rem",
+                "2xl": "1.5rem",
+                "full": "9999px"
+            },
+            boxShadow: {
+                "elevation-1": "0 1px 3px rgba(0,0,0,0.4), 0 1px 2px rgba(0,0,0,0.3)",
+                "elevation-2": "0 4px 6px rgba(0,0,0,0.4), 0 2px 4px rgba(0,0,0,0.3)",
+                "elevation-3": "0 10px 20px rgba(0,0,0,0.4), 0 3px 6px rgba(0,0,0,0.3)",
+                "glow-orange": "0 0 20px rgba(255,107,0,0.25)",
+                "glow-orange-lg": "0 0 40px rgba(255,107,0,0.3)"
+            },
+            transitionDuration: {
+                "fast": "150ms",
+                "normal": "250ms",
+                "slow": "400ms"
             },
             spacing: {
                 "section-padding": "80px",

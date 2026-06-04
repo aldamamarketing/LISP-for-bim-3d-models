@@ -1,11 +1,16 @@
 ---
+import { translations } from '../../i18n/translations.js';
+import { getLangFromUrl } from '../../i18n/utils';
+
+const lang = getLangFromUrl(Astro.url);
+const t = (key) => translations[lang]?.[key] || translations['en'][key];
 ---
-<section class="py-section-padding bg-surface-container-lowest border-y border-surface-variant">
+<section class="py-section-padding bg-surface-container-lowest border-y border-surface-variant reveal">
     <div class="max-w-container-max-width mx-auto px-gutter">
         <div class="text-center mb-16">
-            <h2 class="font-headline-lg text-headline-lg text-white mb-4">Mais que LISP, <span class="text-primary-container">uma central de ferramentas</span></h2>
+            <h2 class="font-headline-lg text-headline-lg text-white mb-4">{t("libraries.title1")} <span class="text-primary-container">{t("libraries.title2")}</span></h2>
             <p class="font-body-lg text-body-lg text-on-surface-variant max-w-2xl mx-auto">
-                Expanda as capacidades do seu ambiente CAD com bibliotecas visuais gerenciadas pela nuvem e ferramentas de personalização de interface.
+                {t("libraries.desc")}
             </p>
         </div>
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
@@ -16,13 +21,13 @@
                 <div class="p-8">
                     <div class="flex items-center gap-3 mb-4">
                         <span class="material-symbols-outlined text-primary-container">grid_view</span>
-                        <h3 class="font-headline-md text-headline-md text-white">Hatch Library</h3>
+                        <h3 class="font-headline-md text-headline-md text-white">{t("libraries.hatch.title")}</h3>
                     </div>
                     <p class="font-body-md text-body-md text-on-surface-variant mb-6">
-                        Sincronize centenas de padrões de hachura personalizados para toda a empresa instantaneamente. Evite a perda de tempo procurando arquivos .pat perdidos.
+                        {t("libraries.hatch.desc")}
                     </p>
-                    <a class="inline-flex items-center gap-2 bg-[#262626] hover:bg-[#333] text-white font-label-md text-label-md font-bold px-6 py-3 rounded transition-colors mt-2" href="/tools/hatch">
-                        Acessar Gerador Gratuito <span class="material-symbols-outlined text-[18px]">open_in_new</span>
+                    <a class="inline-flex items-center gap-2 bg-[#262626] hover:bg-[#333] text-white font-label-md text-label-md font-bold px-6 py-3 rounded transition-colors mt-2 hover:-translate-y-1" href="/tools/hatch">
+                        {t("libraries.hatch.btn")} <span class="material-symbols-outlined text-[18px]">open_in_new</span>
                     </a>
                 </div>
             </div>
@@ -33,13 +38,13 @@
                 <div class="p-8">
                     <div class="flex items-center gap-3 mb-4">
                         <span class="material-symbols-outlined text-primary-container">horizontal_rule</span>
-                        <h3 class="font-headline-md text-headline-md text-white">Line Library</h3>
+                        <h3 class="font-headline-md text-headline-md text-white">{t("libraries.lines.title")}</h3>
                     </div>
                     <p class="font-body-md text-body-md text-on-surface-variant mb-6">
-                        Padronize os tipos de linha de todos os projetos. Distribua bibliotecas de linhas complexas globalmente com controle de versão rigoroso.
+                        {t("libraries.lines.desc")}
                     </p>
-                    <a class="inline-flex items-center gap-2 bg-[#262626] hover:bg-[#333] text-white font-label-md text-label-md font-bold px-6 py-3 rounded transition-colors mt-2" href="/tools/lines">
-                        Acessar Gerador Gratuito <span class="material-symbols-outlined text-[18px]">open_in_new</span>
+                    <a class="inline-flex items-center gap-2 bg-[#262626] hover:bg-[#333] text-white font-label-md text-label-md font-bold px-6 py-3 rounded transition-colors mt-2 hover:-translate-y-1" href="/tools/lines">
+                        {t("libraries.lines.btn")} <span class="material-symbols-outlined text-[18px]">open_in_new</span>
                     </a>
                 </div>
             </div>
