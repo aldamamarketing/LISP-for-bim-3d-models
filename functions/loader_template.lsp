@@ -164,13 +164,14 @@
     (if end
       (progn
         (setq name (substr jsonStr (1+ start) (- end start)))
-        (setq cmd-list (append cmd-list (list (list name name))))
+        ;; ⚡ Bolt Optimization: Use cons instead of append in a loop for O(N) performance vs O(N^2)
+        (setq cmd-list (cons (list name name) cmd-list))
         (setq pos end)
       )
       (setq pos (strlen jsonStr))
     )
   )
-  cmd-list
+  (reverse cmd-list) ;; reverse to maintain original order
 )
 
 ;; Registro instantaneo de Ghost Commands (Stubs) desde la nube (Handshake)
