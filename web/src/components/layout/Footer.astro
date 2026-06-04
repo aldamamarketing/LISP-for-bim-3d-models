@@ -12,12 +12,12 @@ const getPath = (path) => {
 };
 ---
 <footer class="bg-surface-container-lowest dark:bg-surface-container-lowest w-full mt-auto border-t border-surface-variant dark:border-surface-variant">
-    <div class="grid grid-cols-1 md:grid-cols-4 gap-gutter px-8 py-section-padding max-w-[1200px] mx-auto">
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-6 px-6 py-10 md:px-8 md:py-12 max-w-[1200px] mx-auto">
         <div class="md:col-span-1">
-            <div class="text-headline-md font-headline-md font-bold text-on-surface mb-4">LispCentral</div>
+            <div class="text-headline-md font-headline-md font-bold text-on-surface mb-2">LispCentral</div>
             <p class="font-label-md text-label-md text-on-secondary-container">{t("footer.desc")}</p>
         </div>
-        <div class="md:col-span-3 flex flex-wrap justify-md-end gap-x-8 gap-y-4 md:ml-auto">
+        <div class="md:col-span-3 flex flex-wrap justify-start md:justify-end gap-x-6 gap-y-3 md:ml-auto mt-6 md:mt-0 items-center">
             <a class="font-label-md text-label-md text-on-secondary-container hover:text-primary transition-colors" href={getPath('/privacidade')}>{t("footer.privacy")}</a>
             <a class="font-label-md text-label-md text-on-secondary-container hover:text-primary transition-colors" href={getPath('/security')}>{t("footer.security")}</a>
             <a class="font-label-md text-label-md text-on-secondary-container hover:text-primary transition-colors" href={getPath('/termos')}>{t("footer.terms")}</a>
