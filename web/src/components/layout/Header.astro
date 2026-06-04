@@ -118,15 +118,34 @@ const getPath = (path) => {
                 </a>
             </div>
 
-            <a href={getPath('/dashboard')} class="text-on-surface-variant hover:text-white font-medium text-base pl-3 mt-2">{t("header.portal")}</a>
-            <a href={getPath('/blog')} class="text-on-surface-variant hover:text-white font-medium text-base pl-3">{t("header.blog") || "Blog"}</a>
+            <!-- Contextual Dashboard Menu (Visible only when logged in) -->
+            <div id="mobile-dashboard-nav" class="hidden flex-col gap-2 mt-2">
+                <span class="text-primary-container text-xs font-bold uppercase tracking-wider pl-3">Dashboard</span>
+                <a href={getPath('/dashboard#lisp')} class="dashboard-link flex items-center gap-3 text-on-surface-variant hover:text-white pl-3 py-2 rounded-lg hover:bg-surface-container-high transition-colors">
+                    <span class="material-symbols-outlined text-[20px]">folder_copy</span> LISP Manager
+                </a>
+                <a href={getPath('/dashboard#favorites')} class="dashboard-link flex items-center gap-3 text-on-surface-variant hover:text-white pl-3 py-2 rounded-lg hover:bg-surface-container-high transition-colors">
+                    <span class="material-symbols-outlined text-[20px]">star</span> My Collection
+                </a>
+                <a href={getPath('/dashboard#profile')} class="dashboard-link flex items-center gap-3 text-on-surface-variant hover:text-white pl-3 py-2 rounded-lg hover:bg-surface-container-high transition-colors">
+                    <span class="material-symbols-outlined text-[20px]">person</span> My Profile
+                </a>
+                <a href={getPath('/dashboard#licenses')} class="dashboard-link flex items-center gap-3 text-on-surface-variant hover:text-white pl-3 py-2 rounded-lg hover:bg-surface-container-high transition-colors">
+                    <span class="material-symbols-outlined text-[20px]">vpn_key</span> Licenses & Access
+                </a>
+                <a href={getPath('/dashboard#notifications')} class="dashboard-link flex items-center gap-3 text-on-surface-variant hover:text-white pl-3 py-2 rounded-lg hover:bg-surface-container-high transition-colors">
+                    <span class="material-symbols-outlined text-[20px]">notifications</span> Notifications
+                </a>
+            </div>
+
+            <a href={getPath('/blog')} class="text-on-surface-variant hover:text-white font-medium text-base pl-3 mt-2">{t("header.blog") || "Blog"}</a>
         </nav>
         
         <div class="mt-auto pt-6 border-t border-surface-variant flex flex-col gap-4">
-            <a href={getPath('/login')} class="text-center font-medium text-white bg-surface-container-high py-3 rounded-lg hover:bg-surface-variant transition-colors">
+            <a id="mobile-login-btn" href={getPath('/login')} class="text-center font-medium text-white bg-surface-container-high py-3 rounded-lg hover:bg-surface-variant transition-colors">
                 {t("header.login")}
             </a>
-            <a href={getPath('/help')} class="text-center font-bold text-white bg-primary-container py-3 rounded-lg hover:bg-[#e66000] shadow-glow-orange transition-all">
+            <a id="mobile-help-btn" href={getPath('/help')} class="text-center font-bold text-white bg-primary-container py-3 rounded-lg hover:bg-[#e66000] shadow-glow-orange transition-all">
                 {t("header.help")}
             </a>
             <div class="flex items-center justify-center gap-2 mt-4">
@@ -171,18 +190,72 @@ const getPath = (path) => {
   const panel = document.getElementById('mobile-panel');
 
   const openMenu = () => {
-      overlay.classList.remove('opacity-0', 'pointer-events-none');
-      panel.classList.remove('translate-x-full');
-      document.body.style.overflow = 'hidden';
+      if(overlay && panel) {
+        overlay.classList.remove('opacity-0', 'pointer-events-none');
+        panel.classList.remove('translate-x-full');
+        document.body.style.overflow = 'hidden';
+      }
   };
 
   const closeMenu = () => {
-      overlay.classList.add('opacity-0', 'pointer-events-none');
-      panel.classList.add('translate-x-full');
-      document.body.style.overflow = '';
+      if(overlay && panel) {
+        overlay.classList.add('opacity-0', 'pointer-events-none');
+        panel.classList.add('translate-x-full');
+        document.body.style.overflow = '';
+      }
   };
 
   if(menuBtn) menuBtn.addEventListener('click', openMenu);
   if(closeBtn) closeBtn.addEventListener('click', closeMenu);
   if(overlay) overlay.addEventListener('click', closeMenu);
+
+  // Handle clicking dashboard links (close menu after click)
+  const dashboardLinks = document.querySelectorAll('.dashboard-link');
+  dashboardLinks.forEach(link => {
+      link.addEventListener('click', () => {
+          closeMenu();
+      });
+  });
+</script>
+
+<!-- Firebase Auth context for Header -->
+<script>
+    import { auth } from '../../firebase';
+    import { onAuthStateChanged, signOut } from 'firebase/auth';
+
+    document.addEventListener('DOMContentLoaded', () => {
+        const dashboardNav = document.getElementById('mobile-dashboard-nav');
+        const loginBtn = document.getElementById('mobile-login-btn');
+        const helpBtn = document.getElementById('mobile-help-btn');
+        
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                // Logged in
+                if (dashboardNav) {
+                    dashboardNav.classList.remove('hidden');
+                    dashboardNav.classList.add('flex');
+                }
+                if (loginBtn) {
+                    loginBtn.textContent = 'Sign Out';
+                    loginBtn.href = '#';
+                    loginBtn.addEventListener('click', (e) => {
+                        e.preventDefault();
+                        signOut(auth).then(() => {
+                            window.location.href = '/';
+                        });
+                    });
+                }
+                // Optionally hide help btn to save space
+                if (helpBtn) {
+                    helpBtn.classList.add('hidden');
+                }
+            } else {
+                // Not logged in
+                if (dashboardNav) {
+                    dashboardNav.classList.add('hidden');
+                    dashboardNav.classList.remove('flex');
+                }
+            }
+        });
+    });
 </script>

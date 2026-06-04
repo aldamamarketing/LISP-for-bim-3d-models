@@ -23,6 +23,20 @@ function DashboardInner({ mode }) {
     unreadCount
   } = useDashboard();
 
+  // Handle hash routing on mount and hash change
+  React.useEffect(() => {
+    const handleHashChange = () => {
+      const hash = window.location.hash.replace('#', '');
+      if (['profile', 'licenses', 'lisp', 'favorites', 'notifications'].includes(hash)) {
+        setActiveTab(hash);
+      }
+    };
+    
+    handleHashChange(); // Initial load
+    window.addEventListener('hashchange', handleHashChange);
+    return () => window.removeEventListener('hashchange', handleHashChange);
+  }, [setActiveTab]);
+
   if (loading) return (
     <div className="min-h-screen bg-background flex flex-col items-center justify-center">
       <div className="w-8 h-8 border-2 border-primary-container border-t-transparent rounded-full animate-spin mb-4"></div>
@@ -56,27 +70,8 @@ function DashboardInner({ mode }) {
       <ToastContainer />
       <SupportModal />
       
-      {/* MOBILE HEADER */}
-      <div className="md:hidden bg-[#0D0D0D] border-b border-[#262626] p-4 flex justify-between items-center z-30 sticky top-0">
-        <h2 className="text-xl font-bold text-primary-container flex items-center gap-2">
-          <span className="material-symbols-outlined" data-weight="fill">code_blocks</span>
-          LispCentral
-        </h2>
-        <button onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)} className="text-white">
-          <span className="material-symbols-outlined">{isMobileMenuOpen ? 'close' : 'menu'}</span>
-        </button>
-      </div>
-
-      {/* OVERLAY FOR MOBILE */}
-      {isMobileMenuOpen && (
-        <div 
-          className="fixed inset-0 bg-black/60 z-20 md:hidden" 
-          onClick={() => setIsMobileMenuOpen(false)}
-        />
-      )}
-
       {/* SIDEBAR */}
-      <aside className={`w-64 fixed inset-y-0 left-0 bg-[#0D0D0D] border-r border-[#262626] flex flex-col z-30 transition-transform duration-300 ${isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full'} md:translate-x-0`}>
+      <aside className={`w-64 fixed inset-y-0 left-0 bg-[#0D0D0D] border-r border-[#262626] hidden md:flex flex-col z-30 transition-transform duration-300`}>
         <div className="p-6 border-b border-[#262626] hidden md:block">
           <h2 className="text-xl font-bold text-primary-container flex items-center gap-2">
             <span className="material-symbols-outlined" data-weight="fill">code_blocks</span>

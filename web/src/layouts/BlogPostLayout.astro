@@ -1,5 +1,6 @@
 ---
 import DocsLayout from './DocsLayout.astro';
+import Footer from '../components/layout/Footer.astro';
 import { trackDocView } from '../utils/analytics.js';
 import { getCollection } from 'astro:content';
 
@@ -124,6 +125,9 @@ const formattedDate = new Date(pubDate).toLocaleDateString('pt-BR', {
     }
   })} />
 
+  <div class="mt-20">
+    <Footer />
+  </div>
 </DocsLayout>
 
 <style>

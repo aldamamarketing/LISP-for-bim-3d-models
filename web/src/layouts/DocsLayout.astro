@@ -45,10 +45,7 @@ const lang = getLangFromUrl(Astro.url);
   <!-- The layout container below the fixed header -->
   <div class="layout-container flex flex-1 overflow-hidden relative pt-[60px]">
     
-    <!-- Sidebar Overlay for mobile -->
-    <div class="sidebar-overlay fixed inset-0 bg-black/60 backdrop-blur-sm z-[80] hidden md:hidden opacity-0 transition-opacity" id="sidebar-overlay"></div>
-
-    <aside class="sidebar w-[260px] bg-surface-container border-r border-surface-variant overflow-y-auto p-5 shrink-0 z-[85] absolute md:relative h-full transform -translate-x-full md:translate-x-0 transition-transform duration-300">
+    <aside class="sidebar w-[260px] bg-surface-container border-r border-surface-variant overflow-y-auto p-5 shrink-0 z-[85] absolute md:relative h-full hidden md:block">
       <nav class="sidebar-nav">
         <h4 class="text-primary-container uppercase text-xs font-bold tracking-wider mb-2 mt-0">Meu Painel</h4>
         <ul class="list-none p-0 m-0 mb-4">
@@ -69,57 +66,11 @@ const lang = getLangFromUrl(Astro.url);
     </aside>
 
     <main class="content-area flex-1 overflow-y-auto bg-background relative flex flex-col">
-      <!-- Mobile Sidebar Toggle -->
-      <div class="md:hidden flex items-center p-3 border-b border-surface-variant bg-surface-container-low shrink-0">
-        <button id="sidebar-menu-btn" class="flex items-center gap-2 text-on-surface-variant hover:text-primary-container transition-colors">
-          <span class="material-symbols-outlined text-[20px]">menu_open</span>
-          <span class="font-medium text-sm">Menu do Painel</span>
-        </button>
-      </div>
-
       <div class="flex-1 p-4 md:p-8 overflow-y-auto">
         <slot />
       </div>
     </main>
   </div>
-
-  <script is:inline>
-    document.addEventListener('DOMContentLoaded', () => {
-      const menuBtn = document.getElementById('sidebar-menu-btn');
-      const sidebar = document.querySelector('.sidebar');
-      const overlay = document.getElementById('sidebar-overlay');
-
-      if (menuBtn && sidebar && overlay) {
-        const toggleMenu = () => {
-          const isClosed = sidebar.classList.contains('-translate-x-full');
-          if (isClosed) {
-            sidebar.classList.remove('-translate-x-full');
-            overlay.classList.remove('hidden');
-            // Small timeout to allow display:block to apply before changing opacity
-            setTimeout(() => overlay.classList.remove('opacity-0'), 10);
-          } else {
-            sidebar.classList.add('-translate-x-full');
-            overlay.classList.add('opacity-0');
-            setTimeout(() => overlay.classList.add('hidden'), 300);
-          }
-        };
-
-        menuBtn.addEventListener('click', toggleMenu);
-        overlay.addEventListener('click', toggleMenu);
-
-        const links = sidebar.querySelectorAll('a');
-        links.forEach(link => {
-          link.addEventListener('click', () => {
-            if (window.innerWidth < 768) {
-                sidebar.classList.add('-translate-x-full');
-                overlay.classList.add('opacity-0');
-                setTimeout(() => overlay.classList.add('hidden'), 300);
-            }
-          });
-        });
-      }
-    });
-  </script>
 
   <script>
     import { initPageTracking, trackDocView, trackCtaClick } from '../utils/analytics.js';
