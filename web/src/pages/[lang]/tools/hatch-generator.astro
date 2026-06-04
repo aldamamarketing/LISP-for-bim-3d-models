@@ -3,10 +3,10 @@ export function getStaticPaths() { return [{params: {lang: 'es'}}, {params: {lan
 const { lang } = Astro.params;
 import DocsLayout from '../../../layouts/DocsLayout.astro';
 import HatchGenerator from '../../../components/tools/HatchGenerator.jsx';
-import { hatchTranslations } from '../../../i18n/translations.js';
+import { translations } from '../../../i18n/translations.js';
 
 const t = (key) => {
-    const dict = hatchTranslations[lang || 'en'] || hatchTranslations['en'];
+    const dict = translations[lang || 'en'] || translations['en'];
     return dict[key] || key;
 };
 ---

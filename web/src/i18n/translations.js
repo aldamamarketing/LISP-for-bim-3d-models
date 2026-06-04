@@ -25,6 +25,15 @@ export const translations = {
     "tools.publicLibrary": "Public Library",
     "tools.aiResults": "AI Results",
 
+    // Hatch Generator
+    "hatch.factory": "Hatch Factory",
+    "hatch.title": "AI Hatch Generator",
+    "hatch.config": "Configuration",
+    "hatch.context": "Context",
+    "hatch.toGenerate": "Elements to generate",
+    "hatch.generateBtn": "Generate .PAT Patterns",
+    "hatch.desc": "Create complex hatch patterns (.pat) using AI.",
+
     // Profile Generator
     "profiles.title": "Profile Generator",
     
@@ -198,6 +207,15 @@ export const translations = {
     "tools.publicLibrary": "Biblioteca Pública",
     "tools.aiResults": "Resultados IA",
 
+    // Hatch Generator
+    "hatch.factory": "Fábrica de Hatch",
+    "hatch.title": "Generador Hatch IA",
+    "hatch.config": "Configuración",
+    "hatch.context": "Contexto",
+    "hatch.toGenerate": "Elementos a generar",
+    "hatch.generateBtn": "Generar Patrones .PAT",
+    "hatch.desc": "Crea patrones de sombreado complejos (.pat) usando IA.",
+
     // Profile Generator
     "profiles.title": "Generador de Perfiles",
 
@@ -370,6 +388,15 @@ export const translations = {
     "tools.addToFavorites": "Adicionar aos Favoritos",
     "tools.publicLibrary": "Biblioteca Pública",
     "tools.aiResults": "Resultados IA",
+
+    // Hatch Generator
+    "hatch.factory": "Fábrica de Hatch",
+    "hatch.title": "Gerador Hatch IA",
+    "hatch.config": "Configuração",
+    "hatch.context": "Contexto",
+    "hatch.toGenerate": "O que deseja gerar?",
+    "hatch.generateBtn": "Gerar Padrões .PAT",
+    "hatch.desc": "Crie padrões de hachura complexos (.pat) usando IA.",
 
     // Profile Generator
     "profiles.title": "Gerador de Perfis",

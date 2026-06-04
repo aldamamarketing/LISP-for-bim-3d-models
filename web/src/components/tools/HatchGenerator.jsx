@@ -6,10 +6,10 @@ import { onAuthStateChanged } from 'firebase/auth';
 import HatchPreview from './HatchPreview';
 import LibraryPanel from './LibraryPanel';
 import ToastContainer, { showToast } from '../Toast';
-import { hatchTranslations } from '../../i18n/translations.js';
+import { translations } from '../../i18n/translations.js';
 
 export default function HatchGenerator({ lang = 'en' }) {
-  const t = (key) => { const dict = hatchTranslations[lang] || hatchTranslations['en']; return dict[key] || key; };
+  const t = (key) => { const dict = translations[lang] || translations['en']; return dict[key] || key; };
   const [theme, setTheme] = useState('Arquitectura');
   const [prompts, setPrompts] = useState('Ladrillo en espina de pez\nMadera entramada');
   const [isGenerating, setIsGenerating] = useState(false);
