@@ -36,3 +36,17 @@ El modelo de datos se basa en relaciones NoSQL donde las UID semánticas previen
 - `suites` y `groups`: Contenedores organizativos creados por el usuario.
 - `groupCommands`: Colección puente para asignar comandos a múltiples grupos (many-to-many simplificado).
 - `publicAssets`: Favoritos e Íconos comunitarios.
+
+## 6. Ecosistema y Tienda (Ciclo de Vida de LispCentral)
+El ciclo completo desde la creación hasta el consumo en AutoCAD opera bajo una premisa fundamental: **Se empaquetan Archivos (.lsp), no comandos sueltos.**
+
+### Aclaración Técnica: Archivos vs Comandos (Las Utilidades)
+El desarrollador puede subir un archivo que contenga múltiples comandos (`defun c:XYZ`) y docenas de funciones de utilidad internas (`defun calcular_area ()`). 
+Al arrastrar "comandos" a una Suite en el Dashboard, la interfaz gráfica usa los nombres de los comandos para ser amigable. Sin embargo, el backend **siempre empaqueta el archivo `.lsp` completo**. Esto garantiza que todas las funciones de utilidad de las que dependen las rutinas principales siempre se carguen en la memoria de AutoCAD. Si subes utilidades sin comandos, debes agruparlas en el mismo archivo de los comandos que las usan, o el sistema de inyección proveerá una forma de cargar archivos puros de utilidad.
+
+### Flujo de Vida Completo
+1. **Upload:** El creador sube un `archivo.lsp` al Dashboard. El parser lee las expresiones y crea entidades virtuales de "Comandos" para la UI. El archivo intacto va a Firebase Storage.
+2. **Assign & Package:** El creador organiza una **Suite**. Crea Grupos y arrastra comandos (o las suites directamente crearan un grupo por defecto).
+3. **Publish:** La Suite se publica en la Tienda. Se le asigna Descripción, Categorías, Compatibilidad y Precio.
+4. **Filtros en Tienda (Arquitectura MVP):** Al cargar `/store`, se obtienen todas las Suites públicas. La búsqueda y filtros (Categoría, Versión) se aplican a la velocidad de la luz en la memoria del navegador (Client-side). A futuro, con catálogos masivos, se migrará a consultas indexadas nativas de Firestore.
+5. **Subscribe & Sync:** Un cliente hace clic en "Suscribirse" (o paga el precio). Su `tenantId` se liga a la Suite en la colección `subscriptions`. Inmediatamente, cuando abra su paleta web en AutoCAD, la macro descargará todos los archivos `.lsp` de esa suite y los inyectará silenciosamente en la RAM del dibujo.

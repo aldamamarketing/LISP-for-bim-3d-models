@@ -27,9 +27,11 @@ const SuiteRow = ({ suite, currentUser, initiallyExpanded }) => {
     }
   }, [expanded]);
 
-  const handleToggle = async (forceFetch = false) => {
-    const willExpand = forceFetch ? true : !expanded;
-    if (!forceFetch) setExpanded(willExpand);
+  const handleToggle = async (e) => {
+    const isProgrammatic = typeof e === 'boolean';
+    const willExpand = isProgrammatic ? e : !expanded;
+    
+    setExpanded(willExpand);
     
     if (willExpand && commands === null) {
       setLoadingDetails(true);
@@ -49,18 +51,18 @@ const SuiteRow = ({ suite, currentUser, initiallyExpanded }) => {
           
           let allAssignments = [];
           for (const chunk of chunks) {
-            const gcQ = query(collection(db, 'groupCommands'), where('groupId', 'in', chunk));
+            const gcQ = query(collection(db, 'groupFiles'), where('groupId', 'in', chunk));
             const gcSnap = await getDocs(gcQ);
             allAssignments = [...allAssignments, ...gcSnap.docs.map(d => ({ id: d.id, ...d.data() }))];
           }
 
           if (allAssignments.length > 0) {
-            const cmdIds = [...new Set(allAssignments.map(a => a.commandId))];
-            const cmdChunks = [];
-            for (let i = 0; i < cmdIds.length; i += 10) { cmdChunks.push(cmdIds.slice(i, i + 10)); }
+            const fileIds = [...new Set(allAssignments.map(a => a.fileId))];
+            const fileChunks = [];
+            for (let i = 0; i < fileIds.length; i += 10) { fileChunks.push(fileIds.slice(i, i + 10)); }
             
-            for (const chunk of cmdChunks) {
-              const cQ = query(collection(db, 'commands'), where('__name__', 'in', chunk));
+            for (const chunk of fileChunks) {
+              const cQ = query(collection(db, 'commands'), where('lispFileId', 'in', chunk));
               const cSnap = await getDocs(cQ);
               allCommands = [...allCommands, ...cSnap.docs.map(d => ({ id: d.id, ...d.data() }))];
             }
@@ -116,6 +118,10 @@ const SuiteRow = ({ suite, currentUser, initiallyExpanded }) => {
             {suite.description || 'Nenhuma descrição fornecida.'}
           </div>
           <div className="w-24 shrink-0 flex items-center text-xs text-on-surface-variant">
+            <span className="material-symbols-outlined text-[14px] mr-1">terminal</span>
+            {suite.commandCount ? `${suite.commandCount} cmds` : 'Multi'}
+          </div>
+          <div className="w-24 shrink-0 flex items-center text-xs text-on-surface-variant">
             <span className="material-symbols-outlined text-[14px] text-primary-container mr-1" style={{fontVariationSettings: "'FILL' 1"}}>star</span>
             4.9 (186)
           </div>
@@ -134,7 +140,7 @@ const SuiteRow = ({ suite, currentUser, initiallyExpanded }) => {
             onClick={hasSubscribed ? (e) => e.stopPropagation() : handleSubscribe}
             disabled={isSubscribing || hasSubscribed}
           >
-            {isSubscribing ? '...' : hasSubscribed ? 'Suscrito' : suite.price > 0 ? `R$ ${suite.price.toFixed(2)}` : 'Suscribirse'}
+            {isSubscribing ? '...' : hasSubscribed ? 'Suscrito' : 'Gratis (Beta)'}
           </button>
           
           <button className="text-on-surface-variant hover:text-on-surface w-6 flex justify-center transition-transform">
@@ -157,40 +163,40 @@ const SuiteRow = ({ suite, currentUser, initiallyExpanded }) => {
             </p>
           </div>
 
-          {/* Commands Table */}
-          <div className="border border-outline-variant rounded-md bg-surface-container-low overflow-hidden">
+          {/* Commands Table - Flat IDE Style */}
+          <div className="mt-4 border-t border-outline-variant/30">
             {loadingDetails ? (
               <div className="p-8 flex justify-center"><div className="animate-spin rounded-full h-6 w-6 border-b-2 border-primary-container"></div></div>
             ) : commands && commands.length > 0 ? (
               <div className="max-h-64 overflow-y-auto custom-scrollbar">
                 <table className="w-full text-left text-sm border-collapse">
-                  <thead className="bg-surface-container-low sticky top-0 z-10 border-b border-outline-variant shadow-sm">
+                  <thead className="bg-surface-container-lowest sticky top-0 z-10 border-b border-outline-variant/30">
                     <tr>
-                      <th className="py-2.5 px-4 font-bold text-[10px] text-on-surface-variant uppercase tracking-wider w-12">Ícono</th>
-                      <th className="py-2.5 px-4 font-bold text-[10px] text-on-surface-variant uppercase tracking-wider w-48">Comando</th>
-                      <th className="py-2.5 px-4 font-bold text-[10px] text-on-surface-variant uppercase tracking-wider">Descripción</th>
+                      <th className="py-1.5 px-2 font-code-sm text-[10px] text-on-surface-variant uppercase w-10">Ícono</th>
+                      <th className="py-1.5 px-2 font-code-sm text-[10px] text-on-surface-variant uppercase w-48">Comando</th>
+                      <th className="py-1.5 px-2 font-code-sm text-[10px] text-on-surface-variant uppercase">Descripción</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-outline-variant">
+                  <tbody className="divide-y divide-outline-variant/10">
                     {commands.map((cmd) => (
                       <tr key={cmd.id} className="hover:bg-surface-container-high transition-colors group/row">
-                        <td className="py-2.5 px-4">
-                          <div className="w-7 h-7 rounded bg-surface-container-highest flex items-center justify-center border border-outline-variant overflow-hidden group-hover/row:border-primary-container/50 transition-colors">
+                        <td className="py-1.5 px-2">
+                          <div className="w-6 h-6 flex items-center justify-center opacity-80 group-hover/row:opacity-100 transition-opacity">
                             {cmd.svgIcon ? (
                                 cmd.svgIcon.startsWith('data:image')
-                                  ? <img src={cmd.svgIcon} className="w-5 h-5 object-contain" />
-                                  : <div dangerouslySetInnerHTML={{ __html: cmd.svgIcon }} className="w-5 h-5 [&>svg]:w-full [&>svg]:h-full" />
+                                  ? <img src={cmd.svgIcon} className="w-4 h-4 object-contain" />
+                                  : <div dangerouslySetInnerHTML={{ __html: cmd.svgIcon }} className="w-4 h-4 [&>svg]:w-full [&>svg]:h-full" />
                               ) : (
-                                <span className="material-symbols-outlined text-[16px] opacity-30">terminal</span>
+                                <span className="material-symbols-outlined text-[14px] opacity-30">terminal</span>
                               )}
                           </div>
                         </td>
-                        <td className="py-2.5 px-4">
-                          <div className="font-bold text-on-surface">{cmd.friendlyName || cmd.commandName}</div>
-                          <div className="text-[10px] text-primary-container font-code-sm opacity-80">{cmd.commandName}</div>
+                        <td className="py-1.5 px-2">
+                          <div className="font-bold text-on-surface text-xs">{cmd.friendlyName || cmd.commandName}</div>
+                          <div className="text-[10px] text-primary-container font-code-sm opacity-60">{cmd.commandName}</div>
                         </td>
-                        <td className="py-2.5 px-4 text-on-surface-variant text-xs pr-8 leading-relaxed">
-                          {cmd.description || 'Sin descripción detallada.'}
+                        <td className="py-1.5 px-2 text-on-surface-variant text-[11px] pr-4 leading-snug">
+                          {cmd.description || '...'}
                         </td>
                       </tr>
                     ))}
@@ -215,6 +221,12 @@ export default function StoreFront() {
   const [loading, setLoading] = useState(true);
   const [currentUser, setCurrentUser] = useState(null);
   const [linkedSuiteId, setLinkedSuiteId] = useState(null);
+  
+  // Filters State
+  const [searchQuery, setSearchQuery] = useState('');
+  const [filterCategory, setFilterCategory] = useState('');
+  const [filterPlatform, setFilterPlatform] = useState('');
+  const [filterVersion, setFilterVersion] = useState('');
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
@@ -247,30 +259,91 @@ export default function StoreFront() {
     return <div className="flex justify-center p-12"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-container"></div></div>;
   }
 
+  // Derived Filtered State
+  const filteredSuites = suites.filter(suite => {
+    const matchesSearch = !searchQuery || 
+      suite.name?.toLowerCase().includes(searchQuery.toLowerCase()) || 
+      suite.authorName?.toLowerCase().includes(searchQuery.toLowerCase());
+      
+    const matchesCategory = !filterCategory || suite.storeCategory === filterCategory;
+    const matchesPlatform = !filterPlatform || suite.compatibility === filterPlatform;
+    const matchesVersion = !filterVersion || suite.supportedVersions === filterVersion;
+
+    return matchesSearch && matchesCategory && matchesPlatform && matchesVersion;
+  });
+
   return (
     <div className="max-w-6xl mx-auto pb-12">
-      {/* Store Header */}
-      <div className="mb-6 flex justify-between items-end border-b border-outline-variant pb-4">
-        <div>
-          <h1 className="text-2xl font-bold text-on-surface">Extension Marketplace</h1>
-          <p className="text-sm text-on-surface-variant mt-1">Busque y suscriba suites de herramientas para su flujo de trabajo.</p>
+      {/* Store Header & Filters */}
+      <div className="mb-6 border-b border-outline-variant pb-4">
+        <div className="flex justify-between items-end mb-4">
+          <div>
+            <h1 className="text-2xl font-bold text-on-surface">Extension Marketplace</h1>
+            <p className="text-sm text-on-surface-variant mt-1">Busque y suscriba suites de herramientas para su flujo de trabajo.</p>
+          </div>
+          <div className="relative">
+            <input 
+              type="text" 
+              placeholder="Search extensions..." 
+              className="bg-surface-container-low border border-outline-variant text-sm rounded pl-8 pr-3 py-1.5 w-64 focus:border-primary-container focus:outline-none transition-colors"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+            />
+            <span className="material-symbols-outlined text-[16px] absolute left-2.5 top-2 text-on-surface-variant">search</span>
+          </div>
         </div>
-        <div className="relative">
-          <input 
-            type="text" 
-            placeholder="Search extensions..." 
-            className="bg-surface-container-low border border-outline-variant text-sm rounded pl-8 pr-3 py-1.5 w-64 focus:border-primary-container focus:outline-none transition-colors"
-          />
-          <span className="material-symbols-outlined text-[16px] absolute left-2.5 top-2 text-on-surface-variant">search</span>
+
+        {/* Filters Bar */}
+        <div className="flex gap-3">
+          <select 
+            className="bg-surface border border-outline-variant rounded text-on-surface-variant text-xs py-1.5 px-2 focus:border-primary-container focus:text-on-surface outline-none"
+            value={filterCategory}
+            onChange={(e) => setFilterCategory(e.target.value)}
+          >
+            <option value="">Todas las Categorías</option>
+            {/* We dynamically extract categories from the loaded suites, plus defaults */}
+            {[...new Set([...suites.map(s => s.storeCategory).filter(Boolean), 'architecture', 'civil', 'topo', 'structure', 'mep', 'productivity', 'quantities', 'urban'])].map(cat => (
+              <option key={cat} value={cat}>{cat.charAt(0).toUpperCase() + cat.slice(1)}</option>
+            ))}
+          </select>
+
+          <select 
+            className="bg-surface border border-outline-variant rounded text-on-surface-variant text-xs py-1.5 px-2 focus:border-primary-container focus:text-on-surface outline-none"
+            value={filterPlatform}
+            onChange={(e) => setFilterPlatform(e.target.value)}
+          >
+            <option value="">Plataforma (Cualquiera)</option>
+            <option value="universal">Universal</option>
+            <option value="autocad">AutoCAD</option>
+            <option value="civil3d">Civil 3D</option>
+            <option value="autocad_vertical">AutoCAD Vertical</option>
+            <option value="bricscad">BricsCAD</option>
+            <option value="zwcad">ZWCAD</option>
+            <option value="gstarcad">GstarCAD</option>
+          </select>
+
+          <select 
+            className="bg-surface border border-outline-variant rounded text-on-surface-variant text-xs py-1.5 px-2 focus:border-primary-container focus:text-on-surface outline-none"
+            value={filterVersion}
+            onChange={(e) => setFilterVersion(e.target.value)}
+          >
+            <option value="">Versión (Cualquiera)</option>
+            <option value="all">Todas</option>
+            <option value="2025+">2025+</option>
+            <option value="2021-2024">2021-2024</option>
+            <option value="2018-2020">2018-2020</option>
+            <option value="2013-2017">2013-2017</option>
+            <option value="legacy">Legacy</option>
+          </select>
         </div>
       </div>
 
       {/* Dense List */}
       <div className="flex flex-col gap-2">
-        {suites.length === 0 ? (
-          <div className="py-12 text-center text-on-surface-variant italic">A loja está vazia no momento.</div>
+        {filteredSuites.length === 0 ? (
+          <div className="py-12 text-center text-on-surface-variant italic">No se encontraron suites con estos filtros.</div>
         ) : (
-          suites.map(suite => (
+          filteredSuites.map(suite => (
             <SuiteRow 
               key={suite.id} 
               suite={suite} 

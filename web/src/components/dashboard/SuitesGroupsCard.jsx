@@ -5,16 +5,16 @@ import { showToast } from '../Toast';
 import { useDashboard } from './DashboardContext';
 
 export default function SuitesGroupsCard() {
-  const { userData, suites, setSuites, groups, setGroups, commands } = useDashboard();
+  const { userData, suites, setSuites, groups, setGroups, commands, tenantLisps } = useDashboard();
   
-  // Commands state
+  // Files state (Left Pool)
   const [searchQuery, setSearchQuery] = useState('');
-  const [selectedCmdIds, setSelectedCmdIds] = useState([]);
+  const [selectedFileIds, setSelectedFileIds] = useState([]);
   const [bulkAssignGroupId, setBulkAssignGroupId] = useState('');
 
   // Group Assignments
   const [groupAssignments, setGroupAssignments] = useState([]); 
-  const [draggedCmdIds, setDraggedCmdIds] = useState([]);
+  const [draggedFileIds, setDraggedFileIds] = useState([]);
 
   // Modals state
   const [showSuiteModal, setShowSuiteModal] = useState(false);
@@ -36,7 +36,7 @@ export default function SuitesGroupsCard() {
         
         let allAssignments = [];
         for (const chunk of chunks) {
-          const q = query(collection(db, 'groupCommands'), where('groupId', 'in', chunk));
+          const q = query(collection(db, 'groupFiles'), where('groupId', 'in', chunk));
           const snap = await getDocs(q);
           allAssignments = [...allAssignments, ...snap.docs.map(d => ({ id: d.id, ...d.data() }))];
         }
@@ -50,7 +50,7 @@ export default function SuitesGroupsCard() {
 
   // --- SUITE LOGIC ---
   const handleAddSuite = () => {
-    setEditSuiteData({ name: '', description: '', visibility: 'private', storeCategory: '', compatibility: '', authorName: userData.name || '', price: 0, isNew: true });
+    setEditSuiteData({ name: '', description: '', visibility: 'private', storeCategory: '', compatibility: '', supportedVersions: '', authorName: userData.name || '', price: 0, isNew: true });
     setShowSuiteModal(true);
   };
 
@@ -66,6 +66,12 @@ export default function SuitesGroupsCard() {
         ? `SUITE-${tenantSlug}-${editSuiteData.name.replace(/[^a-zA-Z0-9]/g, '_').toLowerCase()}-${Date.now()}`
         : editSuiteData.id;
 
+      const suiteGroups = groups.filter(g => g.suiteId === suiteId);
+      let cmdCount = 0;
+      suiteGroups.forEach(g => {
+        cmdCount += groupAssignments.filter(a => a.groupId === g.id).length;
+      });
+
       const suiteMeta = {
         tenantId: userData.id,
         name: editSuiteData.name,
@@ -73,9 +79,11 @@ export default function SuitesGroupsCard() {
         visibility: editSuiteData.visibility,
         storeCategory: editSuiteData.storeCategory || '',
         compatibility: editSuiteData.compatibility || '',
+        supportedVersions: editSuiteData.supportedVersions || '',
         authorName: editSuiteData.authorName || '',
         price: Number(editSuiteData.price) || 0,
-        sortOrder: editSuiteData.sortOrder || 0
+        sortOrder: editSuiteData.sortOrder || 0,
+        commandCount: cmdCount
       };
 
       if (editSuiteData.visibility === 'link' && !editSuiteData.shareToken) {
@@ -153,15 +161,13 @@ export default function SuitesGroupsCard() {
   };
 
   // --- DRAG & DROP LOGIC ---
-  const handleDragStart = (e, cmdId) => {
-    // If dragging an unselected item, just drag that one.
-    // If dragging a selected item, drag all selected items.
-    let idsToDrag = [cmdId];
-    if (selectedCmdIds.includes(cmdId)) {
-      idsToDrag = [...selectedCmdIds];
+  const handleDragStart = (e, fileId) => {
+    let idsToDrag = [fileId];
+    if (selectedFileIds.includes(fileId)) {
+      idsToDrag = [...selectedFileIds];
     }
     
-    setDraggedCmdIds(idsToDrag);
+    setDraggedFileIds(idsToDrag);
     e.dataTransfer.effectAllowed = "copyMove";
     e.dataTransfer.setData("text/plain", JSON.stringify(idsToDrag));
   };
@@ -176,72 +182,103 @@ export default function SuitesGroupsCard() {
     const data = e.dataTransfer.getData("text/plain");
     if (!data) return;
     
-    let cmdIds = [];
-    try { cmdIds = JSON.parse(data); } catch(err) { return; }
+    let fileIds = [];
+    try { fileIds = JSON.parse(data); } catch(err) { return; }
 
-    assignCommandsToGroup(cmdIds, groupId);
+    assignFilesToGroup(fileIds, groupId);
   };
 
-  const assignCommandsToGroup = async (cmdIds, groupId) => {
-    if (cmdIds.length === 0 || !groupId) return;
+  const handleDropOnSuite = async (e, suiteId) => {
+    e.preventDefault();
+    const data = e.dataTransfer.getData("text/plain");
+    if (!data) return;
+    
+    let fileIds = [];
+    try { fileIds = JSON.parse(data); } catch(err) { return; }
+
+    let targetGroup = groups.find(g => g.suiteId === suiteId && g.name === 'General');
+    if (!targetGroup) {
+      targetGroup = groups.find(g => g.suiteId === suiteId);
+    }
+    
+    let groupId;
+    if (!targetGroup) {
+      groupId = `GRP-${tenantSlug}-${Date.now()}`;
+      const newGroup = {
+        tenantId: userData.id,
+        suiteId,
+        name: 'General',
+        description: '',
+        sortOrder: 0
+      };
+      await setDoc(doc(db, 'groups', groupId), newGroup);
+      setGroups(prev => [...prev, { id: groupId, ...newGroup }]);
+    } else {
+      groupId = targetGroup.id;
+    }
+
+    assignFilesToGroup(fileIds, groupId);
+  };
+
+  const assignFilesToGroup = async (fileIds, groupId) => {
+    if (fileIds.length === 0 || !groupId) return;
     try {
       let count = 0;
       let newAssignments = [];
-      for (const cmdId of cmdIds) {
-        if (!groupAssignments.find(a => a.groupId === groupId && a.commandId === cmdId)) {
-          const gcmdId = `GCMD-${groupId}-${cmdId}`;
-          const assignment = { groupId, commandId: cmdId, sortOrder: 0 };
-          await setDoc(doc(db, 'groupCommands', gcmdId), assignment);
-          newAssignments.push({ id: gcmdId, ...assignment });
+      for (const fileId of fileIds) {
+        if (!groupAssignments.find(a => a.groupId === groupId && a.fileId === fileId)) {
+          const gfileId = `GFILE-${groupId}-${fileId}`;
+          const assignment = { groupId, fileId, sortOrder: 0 };
+          await setDoc(doc(db, 'groupFiles', gfileId), assignment);
+          newAssignments.push({ id: gfileId, ...assignment });
           count++;
         }
       }
       setGroupAssignments([...groupAssignments, ...newAssignments]);
-      if (count > 0) showToast(`${count} comandos atribuídos!`, 'success');
-      setSelectedCmdIds([]);
+      if (count > 0) showToast(`${count} arquivos atribuídos!`, 'success');
+      setSelectedFileIds([]);
       setBulkAssignGroupId('');
     } catch (err) {
-      showToast('Erro ao atribuir comandos.', 'error');
+      showToast('Erro ao atribuir arquivos.', 'error');
     }
   };
 
   const handleRemoveAssignment = async (assignmentId) => {
     try {
-      await deleteDoc(doc(db, 'groupCommands', assignmentId));
+      await deleteDoc(doc(db, 'groupFiles', assignmentId));
       setGroupAssignments(groupAssignments.filter(a => a.id !== assignmentId));
-    } catch (err) { showToast('Erro ao remover comando.', 'error'); }
+    } catch (err) { showToast('Erro ao remover arquivo.', 'error'); }
   };
 
-  const filteredCommands = commands.filter(c => 
-    c.commandName.toLowerCase().includes(searchQuery.toLowerCase()) || 
-    (c.friendlyName && c.friendlyName.toLowerCase().includes(searchQuery.toLowerCase()))
+  const filteredFiles = tenantLisps.filter(f => 
+    f.originalName.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
-  const toggleSelectAllCmds = (e) => {
-    if (e.target.checked) setSelectedCmdIds(filteredCommands.map(c => c.id));
-    else setSelectedCmdIds([]);
+  const toggleSelectAllFiles = (e) => {
+    if (e.target.checked) setSelectedFileIds(filteredFiles.map(f => f.id));
+    else setSelectedFileIds([]);
   };
 
-  const toggleSelectCmd = (id) => {
-    if (selectedCmdIds.includes(id)) setSelectedCmdIds(selectedCmdIds.filter(i => i !== id));
-    else setSelectedCmdIds([...selectedCmdIds, id]);
+  const toggleSelectFile = (id) => {
+    if (selectedFileIds.includes(id)) setSelectedFileIds(selectedFileIds.filter(i => i !== id));
+    else setSelectedFileIds([...selectedFileIds, id]);
   };
 
   return (
     <div className="tab-enter">
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 h-[85vh]">
         
-        {/* PANEL 1: COMMANDS POOL (LEFT) */}
+        {/* PANEL 1: FILES POOL (LEFT) */}
         <div className="flex flex-col h-full bg-surface border border-outline-variant rounded-md overflow-hidden">
           <div className="p-3 border-b border-outline-variant bg-surface-container-low flex flex-col gap-2">
             <h3 className="m-0 text-sm font-bold uppercase tracking-wider text-on-surface-variant flex items-center gap-2">
-              <span className="material-symbols-outlined text-[18px]">terminal</span> Pool de Comandos
+              <span className="material-symbols-outlined text-[18px]">description</span> Pool de Arquivos
             </h3>
             <div className="relative">
               <span className="material-symbols-outlined absolute left-2 top-1/2 -translate-y-1/2 text-[16px] text-on-surface-variant">search</span>
               <input 
                 type="text" 
-                placeholder="Buscar comando..." 
+                placeholder="Buscar archivo LSP..." 
                 className="w-full bg-surface border border-outline-variant rounded text-xs text-on-surface py-1.5 pl-8 pr-3 focus:outline-none focus:border-primary-container"
                 value={searchQuery}
                 onChange={e => setSearchQuery(e.target.value)}
@@ -250,15 +287,15 @@ export default function SuitesGroupsCard() {
             
             {/* BULK ASSIGN ACTION */}
             <div className="flex items-center gap-2 pt-1">
-              <input type="checkbox" onChange={toggleSelectAllCmds} checked={filteredCommands.length > 0 && selectedCmdIds.length === filteredCommands.length} className="rounded border-outline-variant bg-surface" title="Selecionar Todos" />
-              {selectedCmdIds.length > 0 && (
+              <input type="checkbox" onChange={toggleSelectAllFiles} checked={filteredFiles.length > 0 && selectedFileIds.length === filteredFiles.length} className="rounded border-outline-variant bg-surface" title="Selecionar Todos" />
+              {selectedFileIds.length > 0 && (
                 <div className="flex flex-1 gap-1">
                   <select 
                     className="flex-1 bg-surface border border-outline-variant rounded text-on-surface text-xs py-1 px-1 focus:border-primary-container"
                     value={bulkAssignGroupId}
                     onChange={e => setBulkAssignGroupId(e.target.value)}
                   >
-                    <option value="">Atribuir {selectedCmdIds.length} a...</option>
+                    <option value="">Atribuir {selectedFileIds.length} a...</option>
                     {suites.map(s => (
                       <optgroup key={s.id} label={s.name}>
                         {groups.filter(g => g.suiteId === s.id).map(g => (
@@ -267,7 +304,7 @@ export default function SuitesGroupsCard() {
                       </optgroup>
                     ))}
                   </select>
-                  <button className="bg-primary-container text-white px-2 py-1 rounded text-xs font-bold" onClick={() => assignCommandsToGroup(selectedCmdIds, bulkAssignGroupId)} disabled={!bulkAssignGroupId}>OK</button>
+                  <button className="bg-primary-container text-white px-2 py-1 rounded text-xs font-bold" onClick={() => assignFilesToGroup(selectedFileIds, bulkAssignGroupId)} disabled={!bulkAssignGroupId}>OK</button>
                 </div>
               )}
             </div>
@@ -276,39 +313,34 @@ export default function SuitesGroupsCard() {
           <div className="flex-1 overflow-y-auto">
             <table className="w-full text-left border-collapse">
               <tbody>
-                {filteredCommands.length === 0 ? (
-                  <tr><td className="py-4 text-center text-xs text-on-surface-variant">Nenhum comando encontrado.</td></tr>
+                {filteredFiles.length === 0 ? (
+                  <tr><td className="py-4 text-center text-xs text-on-surface-variant">Nenhum arquivo encontrado.</td></tr>
                 ) : (
-                  filteredCommands.map(cmd => (
-                    <tr 
-                      key={cmd.id}
-                      draggable
-                      onDragStart={(e) => handleDragStart(e, cmd.id)}
-                      className={`border-b border-outline-variant hover:bg-surface-container cursor-grab active:cursor-grabbing transition-colors ${selectedCmdIds.includes(cmd.id) ? 'bg-surface-container-high' : ''}`}
-                    >
-                      <td className="py-2 pl-3 w-[30px]" onClick={(e) => e.stopPropagation()}>
-                        <input type="checkbox" checked={selectedCmdIds.includes(cmd.id)} onChange={() => toggleSelectCmd(cmd.id)} className="rounded border-outline-variant bg-surface" />
-                      </td>
-                      <td className="py-2 pr-3">
-                        <div className="flex items-center gap-3">
-                          {cmd.svgIcon ? (
-                            cmd.svgIcon.startsWith('data:image')
-                              ? <img src={cmd.svgIcon} className="w-6 h-6 object-contain p-0.5 bg-surface-container-highest rounded border border-outline-variant flex-shrink-0" />
-                              : <div className="w-6 h-6 flex items-center justify-center bg-surface-container-highest rounded border border-outline-variant flex-shrink-0" dangerouslySetInnerHTML={{ __html: cmd.svgIcon }} />
-                          ) : (
-                            <div className="w-6 h-6 flex items-center justify-center bg-surface-container-highest rounded border border-outline-variant flex-shrink-0">
-                              <span className="material-symbols-outlined text-[14px] opacity-50">image</span>
+                  filteredFiles.map(file => {
+                    const fileCommands = commands.filter(c => c.lispFileId === file.id);
+                    return (
+                      <tr 
+                        key={file.id}
+                        draggable
+                        onDragStart={(e) => handleDragStart(e, file.id)}
+                        className={`border-b border-outline-variant hover:bg-surface-container cursor-grab active:cursor-grabbing transition-colors ${selectedFileIds.includes(file.id) ? 'bg-surface-container-high' : ''}`}
+                      >
+                        <td className="py-2 pl-3 w-[30px]" onClick={(e) => e.stopPropagation()}>
+                          <input type="checkbox" checked={selectedFileIds.includes(file.id)} onChange={() => toggleSelectFile(file.id)} className="rounded border-outline-variant bg-surface" />
+                        </td>
+                        <td className="py-2 pr-3">
+                          <div className="flex items-center gap-3">
+                            <span className="material-symbols-outlined text-[20px] text-secondary">description</span>
+                            <div className="flex-1 min-w-0">
+                              <div className="text-sm font-bold text-on-surface truncate">{file.originalName}</div>
+                              <div className="text-[10px] text-on-surface-variant truncate">{fileCommands.length} comandos internos</div>
                             </div>
-                          )}
-                          <div className="flex-1 min-w-0">
-                            <div className="text-sm font-bold text-on-surface truncate">{cmd.friendlyName || cmd.commandName}</div>
-                            <div className="text-[10px] font-code-sm text-on-surface-variant truncate">{cmd.commandName}</div>
+                            <span className="material-symbols-outlined text-[14px] text-on-surface-variant opacity-30 cursor-grab">drag_indicator</span>
                           </div>
-                          <span className="material-symbols-outlined text-[14px] text-on-surface-variant opacity-30 cursor-grab">drag_indicator</span>
-                        </div>
-                      </td>
-                    </tr>
-                  ))
+                        </td>
+                      </tr>
+                    );
+                  })
                 )}
               </tbody>
             </table>
@@ -338,7 +370,12 @@ export default function SuitesGroupsCard() {
                   return (
                     <React.Fragment key={suite.id}>
                       {/* SUITE ROW */}
-                      <tr className="border-b border-outline-variant bg-surface-container-low hover:bg-surface-container-high transition-colors group/suite">
+                      <tr 
+                        className="border-b border-outline-variant bg-surface-container-low hover:bg-surface-container-high transition-colors group/suite"
+                        onDragOver={handleDragOver}
+                        onDrop={(e) => handleDropOnSuite(e, suite.id)}
+                        title="Arrastra comandos aquí para añadirlos a esta Suite (se agruparán en General)"
+                      >
                         <td className="py-2 pl-3 pr-2">
                           <div className="flex justify-between items-start">
                             <div className="flex items-center gap-2">
@@ -415,24 +452,18 @@ export default function SuitesGroupsCard() {
                                   <div className="min-h-[40px] flex flex-wrap gap-1.5 p-1.5 bg-surface-container-lowest border border-dashed border-outline-variant rounded relative">
                                     {groupCmdAssignments.length === 0 && (
                                       <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-                                        <div className="text-[10px] text-on-surface-variant/50">Solte comandos aqui</div>
+                                        <div className="text-[10px] text-on-surface-variant/50">Solte arquivos LISP aqui</div>
                                       </div>
                                     )}
                                     {groupCmdAssignments.map(assignment => {
-                                      const cmd = commands.find(c => c.id === assignment.commandId);
-                                      if (!cmd) return null;
+                                      const file = tenantLisps.find(c => c.id === assignment.fileId);
+                                      if (!file) return null;
                                       return (
                                         <div key={assignment.id} className="bg-surface-container-high border border-outline-variant rounded-full flex items-center gap-1.5 pr-1.5 h-6 group/chip shadow-sm relative z-10 hover:bg-surface-container-highest transition-colors cursor-default">
-                                      {cmd.svgIcon ? (
-                                        cmd.svgIcon.startsWith('data:image')
-                                          ? <img src={cmd.svgIcon} className="w-6 h-6 object-contain p-0.5 bg-surface-container-highest rounded-l-full border-r border-outline-variant" />
-                                          : <div className="w-6 h-6 flex items-center justify-center bg-surface-container-highest rounded-l-full border-r border-outline-variant" dangerouslySetInnerHTML={{ __html: cmd.svgIcon }} />
-                                      ) : (
-                                        <div className="w-6 h-6 flex items-center justify-center bg-surface-container-highest rounded-l-full border-r border-outline-variant">
-                                          <span className="material-symbols-outlined text-[12px] opacity-50">image</span>
-                                        </div>
-                                      )}
-                                          <span className="text-[10px] font-bold text-on-surface max-w-[100px] truncate">{cmd.friendlyName || cmd.commandName}</span>
+                                          <div className="w-6 h-6 flex items-center justify-center bg-surface-container-highest rounded-l-full border-r border-outline-variant">
+                                            <span className="material-symbols-outlined text-[12px] opacity-80 text-secondary">description</span>
+                                          </div>
+                                          <span className="text-[10px] font-bold text-on-surface max-w-[120px] truncate">{file.originalName}</span>
                                           <button className="w-3.5 h-3.5 flex items-center justify-center text-on-surface-variant hover:text-error opacity-0 group-hover/chip:opacity-100 transition-opacity" onClick={() => handleRemoveAssignment(assignment.id)}>
                                             <span className="material-symbols-outlined text-[10px]">close</span>
                                           </button>
@@ -482,23 +513,64 @@ export default function SuitesGroupsCard() {
 
               {editSuiteData.visibility === 'store' && (
                 <div className="p-4 bg-primary-container/10 border border-primary-container/30 rounded space-y-3">
-                  <div>
-                    <label className="block text-xs font-bold text-primary-container mb-1">Store: Categoria</label>
-                    <select className="w-full bg-surface border border-outline-variant rounded p-2 text-on-surface text-sm" value={editSuiteData.storeCategory} onChange={e => setEditSuiteData({...editSuiteData, storeCategory: e.target.value})}>
-                      <option value="">Selecione...</option>
-                      <option value="architecture">Architecture</option>
-                      <option value="structure">Structure / Framing</option>
-                      <option value="mep">MEP / HVAC</option>
-                      <option value="tools">Drafting Tools</option>
-                    </select>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                    <div>
+                      <label className="block text-xs font-bold text-primary-container mb-1">Categoría</label>
+                      <input 
+                        list="store-categories" 
+                        className="w-full bg-surface border border-outline-variant rounded p-2 text-on-surface text-sm focus:border-primary-container focus:outline-none" 
+                        value={editSuiteData.storeCategory} 
+                        onChange={e => setEditSuiteData({...editSuiteData, storeCategory: e.target.value})} 
+                        placeholder="Seleccione o escriba una nueva..."
+                      />
+                      <datalist id="store-categories">
+                        <option value="Arquitectura" />
+                        <option value="Ingeniería Civil" />
+                        <option value="Topografía y Cartografía" />
+                        <option value="Estructuras" />
+                        <option value="Instalaciones (MEP)" />
+                        <option value="Productividad y Dibujo" />
+                        <option value="Cantidades y Presupuestos" />
+                        <option value="Urbanismo y Paisajismo" />
+                      </datalist>
+                    </div>
+                    <div>
+                      <label className="block text-xs font-bold text-primary-container mb-1">Plataforma</label>
+                      <select className="w-full bg-surface border border-outline-variant rounded p-2 text-on-surface text-sm" value={editSuiteData.compatibility} onChange={e => setEditSuiteData({...editSuiteData, compatibility: e.target.value})}>
+                        <option value="">Selecione...</option>
+                        <option value="universal">Universal (Cualquier CAD)</option>
+                        <option value="autocad">AutoCAD Clásico</option>
+                        <option value="civil3d">Civil 3D</option>
+                        <option value="autocad_vertical">AutoCAD Architecture / MEP</option>
+                        <option value="bricscad">BricsCAD</option>
+                        <option value="zwcad">ZWCAD</option>
+                        <option value="gstarcad">GstarCAD</option>
+                      </select>
+                    </div>
                   </div>
+                  
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                    <div>
+                      <label className="block text-xs font-bold text-primary-container mb-1">Versiones Soportadas</label>
+                      <select className="w-full bg-surface border border-outline-variant rounded p-2 text-on-surface text-sm" value={editSuiteData.supportedVersions} onChange={e => setEditSuiteData({...editSuiteData, supportedVersions: e.target.value})}>
+                        <option value="">Selecione...</option>
+                        <option value="all">Todas las Versiones</option>
+                        <option value="2025+">2025 o superior</option>
+                        <option value="2021-2024">2021 - 2024</option>
+                        <option value="2018-2020">2018 - 2020</option>
+                        <option value="2013-2017">2013 - 2017</option>
+                        <option value="legacy">Legacy (2012 o anterior)</option>
+                      </select>
+                    </div>
+                    <div>
+                      <label className="block text-xs font-bold text-primary-container mb-1">Preço (R$)</label>
+                      <input type="number" step="0.01" min="0" className="w-full bg-surface border border-outline-variant rounded p-2 text-on-surface text-sm" value={editSuiteData.price !== undefined ? editSuiteData.price : 0} onChange={e => setEditSuiteData({...editSuiteData, price: e.target.value})} />
+                    </div>
+                  </div>
+                  
                   <div>
-                    <label className="block text-xs font-bold text-primary-container mb-1">Store: Autor / Empresa</label>
+                    <label className="block text-xs font-bold text-primary-container mb-1">Autor / Empresa</label>
                     <input type="text" className="w-full bg-surface border border-outline-variant rounded p-2 text-on-surface text-sm" value={editSuiteData.authorName} onChange={e => setEditSuiteData({...editSuiteData, authorName: e.target.value})} />
-                  </div>
-                  <div>
-                    <label className="block text-xs font-bold text-primary-container mb-1">Store: Preço (R$)</label>
-                    <input type="number" step="0.01" min="0" className="w-full bg-surface border border-outline-variant rounded p-2 text-on-surface text-sm" value={editSuiteData.price !== undefined ? editSuiteData.price : 0} onChange={e => setEditSuiteData({...editSuiteData, price: e.target.value})} />
                   </div>
                 </div>
               )}

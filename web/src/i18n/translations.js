@@ -96,6 +96,18 @@ export const translations = {
     "dashboard.licenses.accessKey": "Your Access Key (Loader)",
     "dashboard.licenses.download": "Download",
 
+    // Subscriptions
+    "dashboard.subscriptions.title": "My Subscriptions",
+    "dashboard.subscriptions.desc": "Manage third-party suites you have subscribed to in the store.",
+    "dashboard.subscriptions.emptyTitle": "You are not subscribed to any external suite yet.",
+    "dashboard.subscriptions.exploreStore": "Explore Store",
+    "dashboard.subscriptions.activeAccess": "Active Access",
+    "dashboard.subscriptions.unsubscribe": "Unsubscribe",
+    "dashboard.subscriptions.confirmUnsubscribe": "Are you sure you want to unsubscribe from this suite? You will lose access to its commands in AutoCAD.",
+    "dashboard.subscriptions.successUnsubscribe": "Unsubscribed successfully.",
+    "dashboard.subscriptions.errorUnsubscribe": "Error unsubscribing.",
+    "dashboard.subscriptions.subscribedOn": "Subscribed on",
+
     // Equipment
     "dashboard.equipment.title": "Linked Equipment",
     "dashboard.equipment.desc": "Currently connected PCs.",
@@ -299,6 +311,18 @@ export const translations = {
     "dashboard.licenses.accessKey": "Tu Clave de Acceso (Loader)",
     "dashboard.licenses.download": "Descargar",
 
+    // Subscriptions
+    "dashboard.subscriptions.title": "Mis Suscripciones",
+    "dashboard.subscriptions.desc": "Administra las suites de terceros a las que te has suscrito en la tienda.",
+    "dashboard.subscriptions.emptyTitle": "No estás suscrito a ninguna suite externa todavía.",
+    "dashboard.subscriptions.exploreStore": "Ir a la Tienda",
+    "dashboard.subscriptions.activeAccess": "Acceso Activo",
+    "dashboard.subscriptions.unsubscribe": "Desuscribirse",
+    "dashboard.subscriptions.confirmUnsubscribe": "¿Estás seguro de que quieres desuscribirte de esta suite? Perderás acceso a sus comandos en AutoCAD.",
+    "dashboard.subscriptions.successUnsubscribe": "Te has desuscrito correctamente.",
+    "dashboard.subscriptions.errorUnsubscribe": "Error al desuscribirse.",
+    "dashboard.subscriptions.subscribedOn": "Suscrito el",
+
     // Equipment
     "dashboard.equipment.title": "Equipos Vinculados",
     "dashboard.equipment.desc": "PCs conectados actualmente.",
@@ -501,6 +525,18 @@ export const translations = {
     "dashboard.licenses.stripeWarning": "⚠️ O plano deve ser atualizado via Stripe para ativar mais assentos.",
     "dashboard.licenses.accessKey": "Sua Chave de Acesso (Loader)",
     "dashboard.licenses.download": "Baixar",
+
+    // Subscriptions
+    "dashboard.subscriptions.title": "Minhas Assinaturas",
+    "dashboard.subscriptions.desc": "Gerencie suites de terceiros que você assinou na loja.",
+    "dashboard.subscriptions.emptyTitle": "Você ainda não assinou nenhuma suite externa.",
+    "dashboard.subscriptions.exploreStore": "Explorar Loja",
+    "dashboard.subscriptions.activeAccess": "Acesso Ativo",
+    "dashboard.subscriptions.unsubscribe": "Desinscrever",
+    "dashboard.subscriptions.confirmUnsubscribe": "Tem certeza que deseja cancelar a assinatura desta suite? Você perderá o acesso aos seus comandos no AutoCAD.",
+    "dashboard.subscriptions.successUnsubscribe": "Assinatura cancelada com sucesso.",
+    "dashboard.subscriptions.errorUnsubscribe": "Erro ao cancelar assinatura.",
+    "dashboard.subscriptions.subscribedOn": "Início em",
 
     // Equipment
     "dashboard.equipment.title": "Equipamentos Vinculados",

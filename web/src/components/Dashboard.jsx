@@ -11,6 +11,7 @@ import LicensesTab from './dashboard/LicensesTab';
 import LispFilesCard from './dashboard/LispFilesCard';
 import SuitesGroupsCard from './dashboard/SuitesGroupsCard';
 import SupportModal from './dashboard/SupportModal';
+import SubscriptionsTab from './dashboard/SubscriptionsTab';
 
 function DashboardInner({ mode }) {
   const { t } = useTranslation();
@@ -28,7 +29,7 @@ function DashboardInner({ mode }) {
   React.useEffect(() => {
     const handleHashChange = () => {
       const hash = window.location.hash.replace('#', '');
-      if (['profile', 'licenses', 'files', 'suites', 'favorites', 'notifications'].includes(hash)) {
+      if (['profile', 'licenses', 'files', 'suites', 'favorites', 'notifications', 'subscriptions'].includes(hash)) {
         setActiveTab(hash);
       }
     };
@@ -56,6 +57,7 @@ function DashboardInner({ mode }) {
       case 'files': return <LispFilesCard />;
       case 'suites': return <SuitesGroupsCard />;
       case 'favorites': return <FavoritesManager />;
+      case 'subscriptions': return <SubscriptionsTab />;
       case 'notifications': 
         return (
           <div className="tab-enter card">
@@ -86,6 +88,7 @@ function DashboardInner({ mode }) {
                activeTab === 'favorites' ? t('dashboard.sidebar.collection') : 
                activeTab === 'profile' ? t('dashboard.sidebar.profile') : 
                activeTab === 'licenses' ? t('dashboard.sidebar.licenses') : 
+               activeTab === 'subscriptions' ? 'Mis Suscripciones' :
                t('dashboard.sidebar.notifications')}
             </span>
           </div>
