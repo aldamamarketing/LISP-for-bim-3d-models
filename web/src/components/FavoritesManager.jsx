@@ -181,33 +181,41 @@ export default function FavoritesManager() {
               {filteredFavorites.map(item => {
                 const isSelected = selectedIds.includes(item.id);
                 return (
-                  <div key={item.id} onClick={() => toggleSelection(item.id)} className={`cursor-pointer rounded border transition-colors flex flex-col relative group ${isSelected ? 'bg-primary-container/10 border-primary-container' : 'bg-white/5 border-[#262626] hover:bg-[#1a1c1c] hover:border-[#343535]'}`}>
+                  <div key={item.id} className={`rounded border transition-colors flex flex-col relative group focus-within:ring-2 focus-within:ring-primary-container ${isSelected ? 'bg-primary-container/10 border-primary-container' : 'bg-white/5 border-[#262626] hover:bg-[#1a1c1c] hover:border-[#343535]'}`}>
                     
-                    <div className="absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity">
-                      <input type="checkbox" checked={isSelected} readOnly className="cursor-pointer accent-primary-container" />
+                    <button
+                      onClick={() => toggleSelection(item.id)}
+                      className="absolute inset-0 z-10 w-full h-full cursor-pointer opacity-0"
+                      aria-label={isSelected ? `Deselecionar ${item.name}` : `Selecionar ${item.name}`}
+                      aria-pressed={isSelected}
+                    />
+
+                    <div className="absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity z-0 pointer-events-none">
+                      <input type="checkbox" checked={isSelected} readOnly className="cursor-pointer accent-primary-container" tabIndex={-1} />
                     </div>
                     {(isSelected) && (
-                      <div className="absolute top-3 right-3">
+                      <div className="absolute top-3 right-3 z-0 pointer-events-none">
                         <span className="material-symbols-outlined text-primary-container text-[18px]">check_circle</span>
                       </div>
                     )}
 
-                    <div className="p-4 flex-1">
+                    <div className="p-4 flex-1 relative z-0 pointer-events-none">
                       <strong className="text-white font-bold block mb-1 pr-6 font-code-sm">{item.name}</strong>
                       <p className="text-on-surface-variant text-xs mb-4 line-clamp-2">{item.description}</p>
                       
-                      <div className="pointer-events-none bg-[#0A0A0A] rounded border border-[#262626] overflow-hidden p-2 flex items-center justify-center min-h-[80px]">
+                      <div className="bg-[#0A0A0A] rounded border border-[#262626] overflow-hidden p-2 flex items-center justify-center min-h-[80px]">
                         {activeTab === 'hatch' && <HatchPreview patCode={item.code} scale={0.5} />}
                         {activeTab === 'lin' && <LinetypePreview linCode={item.code} scale={1} />}
                         {activeTab === 'icon' && <SvgPreview svgString={item.svgCode || item.code} />}
                       </div>
                     </div>
                     
-                    <div className="p-3 border-t border-[#262626] flex justify-end">
+                    <div className="p-3 border-t border-[#262626] flex justify-end relative z-20">
                       <button 
-                        onClick={(e) => { e.stopPropagation(); handleRemove(item.id); }}
-                        className="text-on-surface-variant hover:text-error transition-colors flex items-center gap-1 text-xs"
+                        onClick={() => handleRemove(item.id)}
+                        className="text-on-surface-variant hover:text-error transition-colors flex items-center gap-1 text-xs focus:outline-none focus-visible:ring-2 focus-visible:ring-error rounded"
                         title="Apagar"
+                        aria-label={`Apagar ${item.name}`}
                       >
                         <span className="material-symbols-outlined text-[16px]">delete</span>
                       </button>
