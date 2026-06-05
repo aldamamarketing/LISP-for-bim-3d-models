@@ -1,0 +1,75 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import Header from '../../components/layout/Header.astro';
+import Footer from '../../components/layout/Footer.astro';
+
+export function getStaticPaths() {
+  return [
+    { params: { lang: 'en' } },
+    { params: { lang: 'es' } },
+    { params: { lang: 'pt' } },
+  ];
+}
+---
+
+<Layout title="Política de Privacidade — LispCentral">
+  <Header />
+
+  <main class="flex-1 max-w-[800px] mx-auto px-6 py-20 w-full mt-24">
+    <a href="/" class="text-primary-container font-label-md text-label-md hover:underline mb-8 inline-block transition-all">← Voltar ao início</a>
+    
+    <h1 class="text-headline-lg font-headline-lg text-primary-container font-bold mb-8">Política de Privacidade</h1>
+    <p class="text-on-surface-variant font-body-md text-body-md mb-12"><strong>Última atualização:</strong> 25 de maio de 2026</p>
+
+    <div class="space-y-12">
+      <section>
+        <h2 class="text-title-lg font-title-lg text-white font-bold mb-4">1. Informações que Coletamos</h2>
+        <p class="text-on-surface-variant font-body-md text-body-md mb-4">Ao usar o LispCentral, coletamos as seguintes informações:</p>
+        <ul class="list-disc pl-6 space-y-2 text-on-surface-variant font-body-md text-body-md">
+          <li><strong>Dados de cadastro:</strong> Nome, e-mail e senha (armazenados de forma segura via Firebase Authentication).</li>
+          <li><strong>Identificação de hardware:</strong> Nome do computador e nome de usuário do Windows (COMPUTERNAME@USERNAME), exclusivamente para vincular a licença ao equipamento autorizado.</li>
+          <li><strong>Dados de telemetria:</strong> Versão do AutoCAD utilizada, comandos executados e status de carregamento dos módulos. Esses dados são usados para diagnóstico técnico e melhoria do serviço.</li>
+        </ul>
+      </section>
+
+      <section>
+        <h2 class="text-title-lg font-title-lg text-white font-bold mb-4">2. Como Usamos seus Dados</h2>
+        <ul class="list-disc pl-6 space-y-2 text-on-surface-variant font-body-md text-body-md">
+          <li>Validar sua licença e controlar o acesso ao serviço.</li>
+          <li>Garantir que o serviço funcione corretamente no seu ambiente.</li>
+          <li>Melhorar a qualidade e estabilidade dos nossos módulos.</li>
+          <li>Enviar comunicações relevantes sobre atualizações e novidades.</li>
+        </ul>
+      </section>
+
+      <section>
+        <h2 class="text-title-lg font-title-lg text-white font-bold mb-4">3. Armazenamento e Segurança</h2>
+        <p class="text-on-surface-variant font-body-md text-body-md">Seus dados são armazenados em servidores seguros do Google Cloud Platform (Firebase/Firestore) com criptografia em trânsito e em repouso. Não compartilhamos seus dados com terceiros, exceto quando exigido por lei.</p>
+      </section>
+
+      <section>
+        <h2 class="text-title-lg font-title-lg text-white font-bold mb-4">4. Seus Direitos (LGPD)</h2>
+        <p class="text-on-surface-variant font-body-md text-body-md mb-4">Em conformidade com a Lei Geral de Proteção de Dados (Lei nº 13.709/2018), você tem o direito de:</p>
+        <ul class="list-disc pl-6 space-y-2 text-on-surface-variant font-body-md text-body-md mb-4">
+          <li>Solicitar acesso aos seus dados pessoais.</li>
+          <li>Corrigir dados incompletos ou desatualizados.</li>
+          <li>Solicitar a exclusão dos seus dados.</li>
+          <li>Revogar o consentimento a qualquer momento.</li>
+        </ul>
+        <p class="text-on-surface-variant font-body-md text-body-md">Para exercer seus direitos, entre em contato pelo e-mail: <a href="mailto:contato@lispcentral.com" class="text-primary-container hover:underline">contato@lispcentral.com</a>.</p>
+      </section>
+
+      <section>
+        <h2 class="text-title-lg font-title-lg text-white font-bold mb-4">5. Cookies</h2>
+        <p class="text-on-surface-variant font-body-md text-body-md">O LispCentral utiliza cookies essenciais para manter sua sessão autenticada. Não utilizamos cookies de rastreamento publicitário.</p>
+      </section>
+
+      <section>
+        <h2 class="text-title-lg font-title-lg text-white font-bold mb-4">6. Alterações</h2>
+        <p class="text-on-surface-variant font-body-md text-body-md">Esta política pode ser atualizada periodicamente. Notificaremos os usuários sobre mudanças significativas por e-mail ou através do Portal do Cliente.</p>
+      </section>
+    </div>
+  </main>
+
+  <Footer />
+</Layout>

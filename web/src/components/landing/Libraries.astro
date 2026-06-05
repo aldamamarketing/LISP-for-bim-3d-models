@@ -4,6 +4,12 @@ import { getLangFromUrl } from '../../i18n/utils';
 
 const lang = getLangFromUrl(Astro.url);
 const t = (key) => translations[lang]?.[key] || translations['en'][key];
+
+const getPath = (path) => {
+    const noI18nPages = ['/login', '/dashboard', '/favorites', '/store'];
+    if (noI18nPages.includes(path)) return path;
+    return lang === 'en' ? path : `/${lang}${path}`;
+};
 ---
 <section class="py-section-padding bg-surface-container-lowest border-y border-surface-variant reveal">
     <div class="max-w-container-max-width mx-auto px-gutter">
@@ -26,11 +32,12 @@ const t = (key) => translations[lang]?.[key] || translations['en'][key];
                     <p class="font-body-md text-body-md text-on-surface-variant mb-6">
                         {t("libraries.hatch.desc")}
                     </p>
-                    <a class="inline-flex items-center gap-2 bg-[#262626] hover:bg-[#333] text-white font-label-md text-label-md font-bold px-6 py-3 rounded transition-colors mt-2 hover:-translate-y-1" href="/tools/hatch">
-                        {t("libraries.hatch.btn")} <span class="material-symbols-outlined text-[18px]">open_in_new</span>
+                    <a class="inline-flex items-center gap-2 bg-[#262626] hover:bg-[#333] text-white font-label-md text-label-md font-bold px-6 py-3 rounded transition-colors mt-2 hover:-translate-y-1" href={getPath('/tools/hatch-generator')}>
+                        {t("libraries.hatch.cta")} <span class="material-symbols-outlined text-[18px]">arrow_forward</span>
                     </a>
                 </div>
             </div>
+
             <div class="bg-[#141414] border border-[#262626] rounded-xl overflow-hidden group">
                 <div class="h-64 overflow-hidden relative border-b border-[#262626] bg-surface-container-high flex items-center justify-center">
                     <img alt="Line Type Library" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" src="https://lh3.googleusercontent.com/aida/ADBb0uipfO9F9v3uY99ouDrhjp2Zna6RUwlmeONVRuEV2JuJ6JtBQfXFPElM2Q4FDs769bb5yffoaOjIPMKcefqZW7_eZUq_gbxa5bBWQi2WA1EcyZYHIbRu6_0j3MWd4Ip1PzlExjYFibGvmocn1G5Fcee7he76liqvDzLPGyHiyruukkQZrNnXHxylsJQVoPkpFP6LCTvOWahDapl1YejMBwEHiTqJa5TW3ASpQvq4xrmrPbcUGXExaZM1rWM"/>
@@ -43,7 +50,7 @@ const t = (key) => translations[lang]?.[key] || translations['en'][key];
                     <p class="font-body-md text-body-md text-on-surface-variant mb-6">
                         {t("libraries.lines.desc")}
                     </p>
-                    <a class="inline-flex items-center gap-2 bg-[#262626] hover:bg-[#333] text-white font-label-md text-label-md font-bold px-6 py-3 rounded transition-colors mt-2 hover:-translate-y-1" href="/tools/lines">
+                    <a class="inline-flex items-center gap-2 bg-[#262626] hover:bg-[#333] text-white font-label-md text-label-md font-bold px-6 py-3 rounded transition-colors mt-2 hover:-translate-y-1" href={getPath('/tools/linetype-generator')}>
                         {t("libraries.lines.btn")} <span class="material-symbols-outlined text-[18px]">open_in_new</span>
                     </a>
                 </div>

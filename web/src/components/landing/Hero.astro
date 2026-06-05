@@ -7,6 +7,12 @@ const t = (key) => {
     const dict = translations[lang] || translations['en'];
     return dict[key] || key;
 };
+
+const getPath = (path) => {
+    const noI18nPages = ['/login', '/dashboard', '/favorites', '/store'];
+    if (noI18nPages.includes(path)) return path;
+    return lang === 'en' ? path : `/${lang}${path}`;
+};
 ---
 <section class="relative pt-section-padding pb-section-padding overflow-hidden">
     <div class="absolute inset-0 bg-grid-pattern pointer-events-none"></div>
@@ -24,11 +30,11 @@ const t = (key) => {
                 {t('landing.hero.desc')}
             </p>
             <div class="flex flex-col sm:flex-row justify-center items-center gap-4">
-                <a href="#comecar" class="w-full sm:w-auto bg-primary-container text-white font-label-md text-label-md font-bold px-8 py-4 rounded hover:bg-[#e66000] transition-all shadow-[0_0_20px_rgba(255,107,0,0.3)] text-center">
+                <a href={getPath('/login')} class="w-full sm:w-auto bg-primary-container text-white font-label-md text-label-md font-bold px-8 py-4 rounded hover:bg-[#e66000] transition-all shadow-[0_0_20px_rgba(255,107,0,0.3)] text-center">
                     {t('landing.hero.cta1')}
                 </a>
-                <a href="#demo" class="w-full sm:w-auto border border-surface-variant text-white font-label-md text-label-md font-bold px-8 py-4 rounded hover:border-primary-container hover:text-primary-container transition-all flex items-center justify-center gap-2">
-                    <span class="material-symbols-outlined">play_circle</span>
+                <a href={getPath('/help')} class="w-full sm:w-auto border border-surface-variant text-white font-label-md text-label-md font-bold px-8 py-4 rounded hover:border-primary-container hover:text-primary-container transition-all flex items-center justify-center gap-2">
+                    <span class="material-symbols-outlined">help</span>
                     {t('landing.hero.cta2')}
                 </a>
             </div>

@@ -35,6 +35,9 @@ export const getFirebaseAnalytics = async () => {
 export const loginWithGoogle = async () => {
   try {
     const result = await signInWithPopup(auth, googleProvider);
+    if (window.location.pathname.includes('/login')) {
+      window.location.href = '/dashboard';
+    }
     return result.user;
   } catch (error) {
     console.error("Error signing in with Google", error);

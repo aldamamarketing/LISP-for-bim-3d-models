@@ -3,6 +3,7 @@ import '../styles/global.css';
 import '../styles/styles.css';
 import Header from '../components/layout/Header.astro';
 import { getLangFromUrl } from '../i18n/utils';
+import { translations } from '../i18n/translations.js';
 
 const { 
   title = "LispCentral Docs — Superpoderes para seu AutoCAD",
@@ -12,6 +13,11 @@ const {
 } = Astro.props;
 
 const lang = getLangFromUrl(Astro.url);
+const currentLocale = lang || 'en';
+const t = (key) => {
+    const dict = translations[currentLocale] || translations['en'];
+    return dict[key] || key;
+};
 ---
 <!DOCTYPE html>
 <html lang={lang} class="dark">
@@ -45,24 +51,88 @@ const lang = getLangFromUrl(Astro.url);
   <!-- The layout container below the fixed header -->
   <div class="layout-container flex flex-1 overflow-hidden relative pt-[60px]">
     
-    <aside class="sidebar w-[260px] bg-surface-container border-r border-surface-variant overflow-y-auto p-5 shrink-0 z-[85] absolute md:relative h-full hidden md:block">
-      <nav class="sidebar-nav">
-        <h4 class="text-primary-container uppercase text-xs font-bold tracking-wider mb-2 mt-0">Meu Painel</h4>
-        <ul class="list-none p-0 m-0 mb-4">
-          <li class="mb-1"><a href="/dashboard" class="block py-1.5 px-3 text-on-surface-variant hover:text-white hover:bg-surface-container-high rounded-md transition-colors text-sm">Minha Assinatura</a></li>
-          <li class="mb-1"><a href="/pt/docs/install" class="block py-1.5 px-3 text-on-surface-variant hover:text-white hover:bg-surface-container-high rounded-md transition-colors text-sm">Instalação</a></li>
-        </ul>
+    <aside id="global-sidebar" class="sidebar w-[260px] bg-[#0D0D0D] border-r border-[#262626] overflow-y-auto p-5 shrink-0 z-[85] absolute md:relative h-full hidden md:flex flex-col">
+      <nav class="flex-1 overflow-y-auto space-y-6">
         
-        <hr class="border-0 border-t border-dashed border-surface-variant my-4" />
-
-        <h4 class="text-primary-container uppercase text-xs font-bold tracking-wider mb-2">Ferramentas Web</h4>
-        <ul class="list-none p-0 m-0 mb-4">
-          <li class="mb-1"><a href="/tools/calc-viga" class="block py-1.5 px-3 text-on-surface-variant hover:text-white hover:bg-surface-container-high rounded-md transition-colors text-sm">Calculadora de Vigas</a></li>
-          <li class="mb-1"><a href="/tools/icon-generator" class="block py-1.5 px-3 text-on-surface-variant hover:text-white hover:bg-surface-container-high rounded-md transition-colors text-sm">Gerador de Ícones</a></li>
-          <li class="mb-1"><a href="/tools/hatch-generator" class="block py-1.5 px-3 text-on-surface-variant hover:text-white hover:bg-surface-container-high rounded-md transition-colors text-sm">Gerador de Hatch</a></li>
-          <li class="mb-1"><a href="/tools/linetype-generator" class="block py-1.5 px-3 text-on-surface-variant hover:text-white hover:bg-surface-container-high rounded-md transition-colors text-sm">Gerador de Linetype</a></li>
-        </ul>
+        <!-- HERRAMIENTAS (siempre visible) -->
+        <div>
+          <h4 class="text-primary-container uppercase text-xs font-bold tracking-wider mb-2 px-2">{t("header.tools") || "Tools"}</h4>
+          <ul class="list-none p-0 m-0 space-y-1">
+            <li><a href="/tools/hatch-generator" class="flex items-center gap-3 py-1.5 px-3 text-on-surface-variant hover:text-white hover:bg-[#1a1c1c] rounded-md transition-colors text-sm">
+              <span class="material-symbols-outlined text-[18px]">grid_view</span> {t("header.hatch")}
+            </a></li>
+            <li><a href="/tools/linetype-generator" class="flex items-center gap-3 py-1.5 px-3 text-on-surface-variant hover:text-white hover:bg-[#1a1c1c] rounded-md transition-colors text-sm">
+              <span class="material-symbols-outlined text-[18px]">line_style</span> {t("header.lines")}
+            </a></li>
+            <li><a href="/tools/icon-generator" class="flex items-center gap-3 py-1.5 px-3 text-on-surface-variant hover:text-white hover:bg-[#1a1c1c] rounded-md transition-colors text-sm">
+              <span class="material-symbols-outlined text-[18px]">image</span> {t("header.icons")}
+            </a></li>
+            <li><a href="/tools/calc-viga" class="flex items-center gap-3 py-1.5 px-3 text-on-surface-variant hover:text-white hover:bg-[#1a1c1c] rounded-md transition-colors text-sm">
+              <span class="material-symbols-outlined text-[18px]">architecture</span> {t("header.profiles")}
+            </a></li>
+          </ul>
+        </div>
+        
+        <!-- DASHBOARD (solo logueado, hidden por defecto) -->
+        <div id="sidebar-dashboard-section" class="hidden">
+          <hr class="border-[#262626] my-2" />
+          <h4 class="text-primary-container uppercase text-xs font-bold tracking-wider mb-2 px-2">Dashboard</h4>
+          <ul class="list-none p-0 m-0 space-y-1">
+            <li><a href="/dashboard#files" class="flex items-center gap-3 py-1.5 px-3 text-on-surface-variant hover:text-white hover:bg-[#1a1c1c] rounded-md transition-colors text-sm">
+              <span class="material-symbols-outlined text-[18px]">upload_file</span> LISP Files
+            </a></li>
+            <li><a href="/dashboard#commands" class="flex items-center gap-3 py-1.5 px-3 text-on-surface-variant hover:text-white hover:bg-[#1a1c1c] rounded-md transition-colors text-sm">
+              <span class="material-symbols-outlined text-[18px]">terminal</span> Commands
+            </a></li>
+            <li><a href="/dashboard#suites" class="flex items-center gap-3 py-1.5 px-3 text-on-surface-variant hover:text-white hover:bg-[#1a1c1c] rounded-md transition-colors text-sm">
+              <span class="material-symbols-outlined text-[18px]">folder_copy</span> Suites & Groups
+            </a></li>
+            <li><a href="/dashboard#favorites" class="flex items-center gap-3 py-1.5 px-3 text-on-surface-variant hover:text-white hover:bg-[#1a1c1c] rounded-md transition-colors text-sm">
+              <span class="material-symbols-outlined text-[18px]">star</span> {t("dashboard.sidebar.collection")}
+            </a></li>
+            <li><a href="/dashboard#profile" class="flex items-center gap-3 py-1.5 px-3 text-on-surface-variant hover:text-white hover:bg-[#1a1c1c] rounded-md transition-colors text-sm">
+              <span class="material-symbols-outlined text-[18px]">person</span> {t("dashboard.sidebar.profile")}
+            </a></li>
+            <li><a href="/dashboard#licenses" class="flex items-center gap-3 py-1.5 px-3 text-on-surface-variant hover:text-white hover:bg-[#1a1c1c] rounded-md transition-colors text-sm">
+              <span class="material-symbols-outlined text-[18px]">vpn_key</span> {t("dashboard.sidebar.licenses")}
+            </a></li>
+            <li><a href="/dashboard#notifications" class="flex items-center gap-3 py-1.5 px-3 text-on-surface-variant hover:text-white hover:bg-[#1a1c1c] rounded-md transition-colors text-sm">
+              <span class="material-symbols-outlined text-[18px]">notifications</span> {t("dashboard.sidebar.notifications")}
+            </a></li>
+          </ul>
+        </div>
+        
+        <!-- RECURSOS (siempre visible) -->
+        <div>
+          <hr class="border-[#262626] my-2" />
+          <h4 class="text-primary-container uppercase text-xs font-bold tracking-wider mb-2 px-2">Recursos</h4>
+          <ul class="list-none p-0 m-0 space-y-1">
+            <li><a href="/store" class="flex items-center gap-3 py-1.5 px-3 text-on-surface-variant hover:text-white hover:bg-[#1a1c1c] rounded-md transition-colors text-sm">
+              <span class="material-symbols-outlined text-[18px]">storefront</span> Store
+            </a></li>
+            <li><a href="/blog" class="flex items-center gap-3 py-1.5 px-3 text-on-surface-variant hover:text-white hover:bg-[#1a1c1c] rounded-md transition-colors text-sm">
+              <span class="material-symbols-outlined text-[18px]">article</span> {t("header.blog") || "Blog"}
+            </a></li>
+            <li><a href="/help" class="flex items-center gap-3 py-1.5 px-3 text-on-surface-variant hover:text-white hover:bg-[#1a1c1c] rounded-md transition-colors text-sm">
+              <span class="material-symbols-outlined text-[18px]">help</span> {t("header.help")}
+            </a></li>
+          </ul>
+        </div>
       </nav>
+      
+      <!-- USER CARD (solo logueado) -->
+      <div id="sidebar-user-card" class="hidden p-4 border-t border-[#262626] mt-auto">
+        <div class="flex items-center gap-3 mb-3">
+          <div id="sidebar-avatar" class="w-8 h-8 rounded-full bg-primary-container text-white flex items-center justify-center font-bold text-sm">U</div>
+          <div class="flex-1 overflow-hidden">
+            <div id="sidebar-user-name" class="text-sm font-bold truncate text-white"></div>
+            <div id="sidebar-user-role" class="text-xs text-on-surface-variant truncate"></div>
+          </div>
+        </div>
+        <button id="sidebar-logout-btn" class="w-full flex items-center gap-2 justify-center px-4 py-2 border border-[#262626] text-on-surface-variant hover:text-red-400 hover:border-red-400/50 rounded-lg transition-colors text-sm">
+          <span class="material-symbols-outlined text-[18px]">logout</span> {t("dashboard.sidebar.logout")}
+        </button>
+      </div>
     </aside>
 
     <main class="content-area flex-1 overflow-y-auto bg-background relative flex flex-col">
@@ -89,6 +159,40 @@ const lang = getLangFromUrl(Astro.url);
         const href = link.getAttribute('href') || '';
         trackCtaClick('sidebar_nav', href);
       });
+    });
+  </script>
+
+  <!-- Auth State for Sidebar -->
+  <script>
+    import { auth } from '../firebase';
+    import { onAuthStateChanged, signOut } from 'firebase/auth';
+
+    document.addEventListener('DOMContentLoaded', () => {
+      const dashSection = document.getElementById('sidebar-dashboard-section');
+      const userCard = document.getElementById('sidebar-user-card');
+      const avatar = document.getElementById('sidebar-avatar');
+      const nameEl = document.getElementById('sidebar-user-name');
+      const logoutBtn = document.getElementById('sidebar-logout-btn');
+
+      onAuthStateChanged(auth, (user) => {
+        if (user) {
+          dashSection?.classList.remove('hidden');
+          userCard?.classList.remove('hidden');
+          userCard?.classList.add('flex', 'flex-col');
+          if (avatar) avatar.textContent = (user.displayName || user.email || 'U').charAt(0).toUpperCase();
+          if (nameEl) nameEl.textContent = user.displayName || user.email;
+        } else {
+          dashSection?.classList.add('hidden');
+          userCard?.classList.add('hidden');
+          userCard?.classList.remove('flex', 'flex-col');
+        }
+      });
+
+      if (logoutBtn) {
+        logoutBtn.addEventListener('click', () => {
+          signOut(auth).then(() => window.location.href = '/');
+        });
+      }
     });
   </script>
 

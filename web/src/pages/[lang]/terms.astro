@@ -1,0 +1,98 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import Header from '../../components/layout/Header.astro';
+import Footer from '../../components/layout/Footer.astro';
+
+export function getStaticPaths() {
+  return [
+    { params: { lang: 'en' } },
+    { params: { lang: 'es' } },
+    { params: { lang: 'pt' } },
+  ];
+}
+---
+
+<Layout title="Termos de Uso — LispCentral">
+  <Header />
+
+  <main class="flex-1 max-w-[800px] mx-auto px-6 py-20 w-full mt-24">
+    <a href="/" class="text-primary-container font-label-md text-label-md hover:underline mb-8 inline-block transition-all">← Voltar ao início</a>
+    
+    <h1 class="text-headline-lg font-headline-lg text-primary-container font-bold mb-8">Termos de Uso</h1>
+    <p class="text-on-surface-variant font-body-md text-body-md mb-12"><strong>Última atualização:</strong> 25 de maio de 2026</p>
+
+    <div class="space-y-12">
+      <section>
+        <h2 class="text-title-lg font-title-lg text-white font-bold mb-4">1. Aceitação dos Termos</h2>
+        <p class="text-on-surface-variant font-body-md text-body-md">Ao criar uma conta e utilizar o serviço LispCentral, você concorda com os presentes Termos de Uso. Caso não concorde, não utilize o serviço.</p>
+      </section>
+
+      <section>
+        <h2 class="text-title-lg font-title-lg text-white font-bold mb-4">2. Descrição do Serviço</h2>
+        <p class="text-on-surface-variant font-body-md text-body-md">O LispCentral é uma plataforma SaaS (Software as a Service) que fornece ferramentas e automações para o software Autodesk AutoCAD. Os módulos são entregues pela nuvem e executados localmente no ambiente do AutoCAD do usuário.</p>
+      </section>
+
+      <section>
+        <h2 class="text-title-lg font-title-lg text-white font-bold mb-4">3. Conta e Licenciamento</h2>
+        <ul class="list-disc pl-6 space-y-2 text-on-surface-variant font-body-md text-body-md">
+          <li>Cada conta é pessoal e intransferível.</li>
+          <li>A licença é vinculada a um único equipamento por vez. Para trocar de máquina, o usuário deve desvincular o equipamento anterior pelo Portal do Cliente.</li>
+          <li>Compartilhar credenciais de acesso ou tentar burlar o sistema de licenciamento resultará em suspensão imediata da conta.</li>
+        </ul>
+      </section>
+
+      <section>
+        <h2 class="text-title-lg font-title-lg text-white font-bold mb-4">4. Fase Beta</h2>
+        <p class="text-on-surface-variant font-body-md text-body-md mb-4">Atualmente, o LispCentral encontra-se em <strong>fase Beta</strong>. Durante este período:</p>
+        <ul class="list-disc pl-6 space-y-2 text-on-surface-variant font-body-md text-body-md">
+          <li>O acesso a todas as funcionalidades é <strong>gratuito</strong>.</li>
+          <li>O serviço é fornecido "como está" (as-is), sem garantias de disponibilidade ininterrupta.</li>
+          <li>Funcionalidades podem ser adicionadas, alteradas ou removidas sem aviso prévio.</li>
+          <li>Ao final do período Beta, será necessário assinar um plano pago para continuar utilizando o serviço.</li>
+        </ul>
+      </section>
+
+      <section>
+        <h2 class="text-title-lg font-title-lg text-white font-bold mb-4">5. Uso Aceitável</h2>
+        <p class="text-on-surface-variant font-body-md text-body-md mb-4">Você concorda em:</p>
+        <ul class="list-disc pl-6 space-y-2 text-on-surface-variant font-body-md text-body-md">
+          <li>Não realizar engenharia reversa, descompilar ou tentar extrair o código-fonte dos módulos fornecidos.</li>
+          <li>Não redistribuir, sublicenciar ou comercializar os módulos do LispCentral.</li>
+          <li>Não utilizar o serviço para fins ilegais ou que violem direitos de terceiros.</li>
+        </ul>
+      </section>
+
+      <section>
+        <h2 class="text-title-lg font-title-lg text-white font-bold mb-4">6. Propriedade Intelectual</h2>
+        <p class="text-on-surface-variant font-body-md text-body-md">Todo o código, design, documentação e marca do LispCentral são propriedade exclusiva dos seus desenvolvedores. O uso da plataforma não concede ao usuário qualquer direito de propriedade sobre o software.</p>
+      </section>
+
+      <section>
+        <h2 class="text-title-lg font-title-lg text-white font-bold mb-4">7. Limitação de Responsabilidade</h2>
+        <p class="text-on-surface-variant font-body-md text-body-md mb-4">O LispCentral não se responsabiliza por:</p>
+        <ul class="list-disc pl-6 space-y-2 text-on-surface-variant font-body-md text-body-md">
+          <li>Perdas de dados causadas por mau uso dos comandos no AutoCAD.</li>
+          <li>Incompatibilidades com versões específicas do AutoCAD ou plugins de terceiros.</li>
+          <li>Interrupções no serviço causadas por fatores externos (internet, servidores de terceiros, etc.).</li>
+        </ul>
+      </section>
+
+      <section>
+        <h2 class="text-title-lg font-title-lg text-white font-bold mb-4">8. Rescisão</h2>
+        <p class="text-on-surface-variant font-body-md text-body-md">Reservamo-nos o direito de suspender ou cancelar contas que violem estes termos. O usuário pode encerrar sua conta a qualquer momento pelo Portal do Cliente ou solicitando via e-mail.</p>
+      </section>
+
+      <section>
+        <h2 class="text-title-lg font-title-lg text-white font-bold mb-4">9. Foro</h2>
+        <p class="text-on-surface-variant font-body-md text-body-md">Este contrato é regido pelas leis da República Federativa do Brasil. Fica eleito o foro da comarca de São Paulo/SP para dirimir quaisquer controvérsias.</p>
+      </section>
+
+      <section>
+        <h2 class="text-title-lg font-title-lg text-white font-bold mb-4">10. Contato</h2>
+        <p class="text-on-surface-variant font-body-md text-body-md">Para dúvidas sobre estes termos: <a href="mailto:contato@lispcentral.com" class="text-primary-container hover:underline">contato@lispcentral.com</a></p>
+      </section>
+    </div>
+  </main>
+
+  <Footer />
+</Layout>

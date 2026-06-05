@@ -21,64 +21,20 @@ const getPath = (path) => {
             <span class="font-bold text-xl tracking-tight">LispCentral</span>
         </a>
 
-        <!-- Desktop Nav -->
-        <div class="hidden md:flex items-center gap-8">
-            <!-- Herramientas Dropdown -->
-            <div class="group relative py-2">
-                <button class="flex items-center gap-1 text-on-surface-variant hover:text-white font-medium transition-colors text-sm">
-                    {t("header.tools") || "Tools"} <span class="material-symbols-outlined text-[18px]">expand_more</span>
-                </button>
-                <div class="invisible group-hover:visible opacity-0 group-hover:opacity-100 translate-y-2 group-hover:translate-y-0 transition-all duration-200 absolute top-full left-0 mt-1 w-64 bg-surface-container border border-surface-variant rounded-xl shadow-elevation-3 overflow-hidden flex flex-col p-2">
-                    <a href={getPath('/tools/hatch-generator')} class="flex items-start gap-3 p-3 rounded-lg hover:bg-surface-container-high transition-colors">
-                        <span class="material-symbols-outlined text-primary-container mt-0.5">grid_view</span>
-                        <div>
-                            <strong class="block text-white text-sm font-semibold">{t("header.hatch")}</strong>
-                            <span class="block text-on-surface-variant text-xs mt-0.5">Create .PAT patterns with AI</span>
-                        </div>
-                    </a>
-                    <a href={getPath('/tools/linetype-generator')} class="flex items-start gap-3 p-3 rounded-lg hover:bg-surface-container-high transition-colors">
-                        <span class="material-symbols-outlined text-primary-container mt-0.5">line_style</span>
-                        <div>
-                            <strong class="block text-white text-sm font-semibold">{t("header.lines")}</strong>
-                            <span class="block text-on-surface-variant text-xs mt-0.5">Design custom line types</span>
-                        </div>
-                    </a>
-                    <a href={getPath('/tools/icon-generator')} class="flex items-start gap-3 p-3 rounded-lg hover:bg-surface-container-high transition-colors">
-                        <span class="material-symbols-outlined text-primary-container mt-0.5">image</span>
-                        <div>
-                            <strong class="block text-white text-sm font-semibold">{t("header.icons")}</strong>
-                            <span class="block text-on-surface-variant text-xs mt-0.5">Generate 16x16 / 32x32 icons</span>
-                        </div>
-                    </a>
-                    <a href={getPath('/tools/calc-viga')} class="flex items-start gap-3 p-3 rounded-lg hover:bg-surface-container-high transition-colors">
-                        <span class="material-symbols-outlined text-primary-container mt-0.5">architecture</span>
-                        <div>
-                            <strong class="block text-white text-sm font-semibold">{t("header.profiles")}</strong>
-                            <span class="block text-on-surface-variant text-xs mt-0.5">Beam & profile calculators</span>
-                        </div>
-                    </a>
-                </div>
-            </div>
-
-            <a class="text-on-surface-variant hover:text-white font-medium transition-colors text-sm" href={getPath('/dashboard')}>{t("header.portal")}</a>
-            <a class="text-on-surface-variant hover:text-white font-medium transition-colors text-sm" href={getPath('/blog')}>{t("header.blog") || "Blog"}</a>
-        </div>
+        <!-- Desktop Nav moved to global sidebar -->
 
         <!-- Desktop Actions -->
         <div class="hidden md:flex items-center gap-4">
-            <div class="flex items-center gap-1 bg-[#0D0D0D] border border-surface-variant rounded-lg px-2 py-1">
+            <div class="flex items-center gap-1 bg-[#0D0D0D] border border-surface-variant rounded-lg px-2 py-1.5">
                 <span class="material-symbols-outlined text-[16px] text-on-surface-variant">translate</span>
-                <select id="lang-selector-desktop" class="bg-transparent text-white text-sm outline-none cursor-pointer border-none py-1 pr-1">
+                <select id="lang-selector-desktop" class="bg-transparent text-white text-sm outline-none cursor-pointer border-none py-0.5 pr-1">
                     <option value="en" selected={currentLocale === 'en'} class="bg-[#0D0D0D]">EN</option>
                     <option value="es" selected={currentLocale === 'es'} class="bg-[#0D0D0D]">ES</option>
                     <option value="pt" selected={currentLocale === 'pt'} class="bg-[#0D0D0D]">PT</option>
                 </select>
             </div>
-            <a href={getPath('/login')} class="text-on-surface-variant hover:text-white font-medium transition-colors text-sm">
+            <a id="desktop-login-btn" href={getPath('/login')} class="text-on-surface-variant hover:text-white font-medium transition-colors text-sm">
                 {t("header.login")}
-            </a>
-            <a href={getPath('/help')} class="bg-primary-container text-white hover:bg-[#e66000] hover:-translate-y-0.5 transition-all duration-normal text-sm font-bold px-5 py-2 rounded-lg shadow-glow-orange">
-                {t("header.help")}
             </a>
         </div>
 
@@ -164,7 +120,16 @@ const getPath = (path) => {
   // Language Selector Logic
   const handleLangChange = (e) => {
     const newLang = e.target.value;
+    localStorage.setItem('lc-lang', newLang);
     const currentPath = window.location.pathname;
+    
+    const noI18nPages = ['/dashboard', '/login', '/favorites', '/feedback', '/store'];
+    const isNoI18n = noI18nPages.some(p => currentPath.endsWith(p) || currentPath.endsWith(p + '/'));
+    
+    if (isNoI18n) {
+        window.location.reload();
+        return;
+    }
     
     let pathWithoutLang = currentPath;
     if (currentPath.startsWith('/es/')) pathWithoutLang = currentPath.replace('/es/', '/');
@@ -182,6 +147,12 @@ const getPath = (path) => {
   const langMobile = document.getElementById('lang-selector-mobile');
   if(langDesktop) langDesktop.addEventListener('change', handleLangChange);
   if(langMobile) langMobile.addEventListener('change', handleLangChange);
+
+  const storedLang = localStorage.getItem('lc-lang');
+  if (storedLang) {
+    if (langDesktop) langDesktop.value = storedLang;
+    if (langMobile) langMobile.value = storedLang;
+  }
 
   // Mobile Menu Logic
   const menuBtn = document.getElementById('mobile-menu-btn');
@@ -226,6 +197,7 @@ const getPath = (path) => {
     document.addEventListener('DOMContentLoaded', () => {
         const dashboardNav = document.getElementById('mobile-dashboard-nav');
         const loginBtn = document.getElementById('mobile-login-btn');
+        const desktopLoginBtn = document.getElementById('desktop-login-btn');
         const helpBtn = document.getElementById('mobile-help-btn');
         
         onAuthStateChanged(auth, (user) => {
@@ -245,6 +217,15 @@ const getPath = (path) => {
                         });
                     });
                 }
+                if (desktopLoginBtn) {
+                    // Si está en la landing u otra página sin sidebar, 
+                    // el botón "Login" cambia a "Dashboard" y lo lleva al portal.
+                    // Desde el dashboard podrá hacer logout en el sidebar.
+                    desktopLoginBtn.textContent = 'Dashboard';
+                    desktopLoginBtn.href = '/dashboard';
+                    // Removemos cualquier listener previo reemplazando el nodo si es necesario,
+                    // pero como no agregamos listeners a desktopLoginBtn, solo cambiar el href es seguro.
+                }
                 // Optionally hide help btn to save space
                 if (helpBtn) {
                     helpBtn.classList.add('hidden');
@@ -254,6 +235,10 @@ const getPath = (path) => {
                 if (dashboardNav) {
                     dashboardNav.classList.add('hidden');
                     dashboardNav.classList.remove('flex');
+                }
+                if (desktopLoginBtn) {
+                    desktopLoginBtn.textContent = 'Login';
+                    desktopLoginBtn.href = '/login';
                 }
             }
         });

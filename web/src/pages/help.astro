@@ -1,7 +1,5 @@
 ---
-import Layout from '../layouts/Layout.astro';
-import Header from '../components/layout/Header.astro';
-import Footer from '../components/layout/Footer.astro';
+import DocsLayout from '../layouts/DocsLayout.astro';
 import { translations } from '../i18n/translations.js';
 import { getLangFromUrl } from '../i18n/utils';
 
@@ -12,38 +10,36 @@ const t = (key) => {
 };
 ---
 
-<Layout title="Help & Docs - LispCentral">
-  <Header />
-  
-  <main class="min-h-screen bg-background text-white px-6 py-20 mt-20 max-w-[1000px] mx-auto">
-    <div class="text-center mb-16">
+<DocsLayout title="Help & Docs - LispCentral">
+  <main class="min-h-screen bg-background text-white px-6 py-12 max-w-[1000px]">
+    <div class="mb-16">
       <h1 class="text-headline-lg font-headline-lg font-bold text-primary-container mb-4">{t("help.title")}</h1>
-      <p class="text-body-lg text-on-surface-variant max-w-[600px] mx-auto">{t("help.desc")}</p>
+      <p class="text-body-lg text-on-surface-variant max-w-[600px]">{t("help.desc")}</p>
     </div>
     
     <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-16">
         <a href="#getting-started" class="group block bg-surface-container p-8 rounded-2xl border border-surface-variant hover:border-primary-container transition-all hover:-translate-y-1">
             <span class="material-symbols-outlined text-4xl text-primary-container mb-4 block">rocket_launch</span>
-            <h2 class="text-title-lg font-bold mb-3 text-white group-hover:text-primary-container transition-colors">Primeiros Passos</h2>
-            <p class="text-body-md text-on-surface-variant">Como instalar o LispCentral Loader no seu AutoCAD e conectar sua conta pela primeira vez.</p>
+            <h2 class="text-title-lg font-bold mb-3 text-white group-hover:text-primary-container transition-colors">{t("help.box1.title")}</h2>
+            <p class="text-body-md text-on-surface-variant">{t("help.box1.desc")}</p>
         </a>
         
         <a href="#dashboard" class="group block bg-surface-container p-8 rounded-2xl border border-surface-variant hover:border-primary-container transition-all hover:-translate-y-1">
             <span class="material-symbols-outlined text-4xl text-primary-container mb-4 block">dashboard</span>
-            <h2 class="text-title-lg font-bold mb-3 text-white group-hover:text-primary-container transition-colors">Portal do Cliente</h2>
-            <p class="text-body-md text-on-surface-variant">Entenda como gerenciar seus scripts, editar menus, organizar grupos e controlar as licenças.</p>
+            <h2 class="text-title-lg font-bold mb-3 text-white group-hover:text-primary-container transition-colors">{t("help.box2.title")}</h2>
+            <p class="text-body-md text-on-surface-variant">{t("help.box2.desc")}</p>
         </a>
         
         <a href="#ai-tools" class="group block bg-surface-container p-8 rounded-2xl border border-surface-variant hover:border-primary-container transition-all hover:-translate-y-1">
             <span class="material-symbols-outlined text-4xl text-primary-container mb-4 block">auto_awesome</span>
-            <h2 class="text-title-lg font-bold mb-3 text-white group-hover:text-primary-container transition-colors">Ferramentas de IA</h2>
-            <p class="text-body-md text-on-surface-variant">Aprenda a utilizar os geradores de Ícones, Hatch e Tipos de Linha com inteligência artificial.</p>
+            <h2 class="text-title-lg font-bold mb-3 text-white group-hover:text-primary-container transition-colors">{t("help.box3.title")}</h2>
+            <p class="text-body-md text-on-surface-variant">{t("help.box3.desc")}</p>
         </a>
         
         <a href="#troubleshooting" class="group block bg-surface-container p-8 rounded-2xl border border-surface-variant hover:border-primary-container transition-all hover:-translate-y-1">
             <span class="material-symbols-outlined text-4xl text-primary-container mb-4 block">build</span>
-            <h2 class="text-title-lg font-bold mb-3 text-white group-hover:text-primary-container transition-colors">Solução de Problemas</h2>
-            <p class="text-body-md text-on-surface-variant">Códigos de erro comuns, problemas de licenciamento e como resolvê-los rapidamente.</p>
+            <h2 class="text-title-lg font-bold mb-3 text-white group-hover:text-primary-container transition-colors">{t("help.box4.title")}</h2>
+            <p class="text-body-md text-on-surface-variant">{t("help.box4.desc")}</p>
         </a>
     </div>
 
@@ -51,17 +47,17 @@ const t = (key) => {
       <section id="getting-started" class="scroll-mt-32 border-t border-surface-variant pt-12">
         <h2 class="text-headline-md font-bold text-white mb-6 flex items-center gap-3">
           <span class="bg-primary-container/20 text-primary-container w-10 h-10 rounded-lg flex items-center justify-center">1</span>
-          Instalando o Loader
+          {t("help.sec1.title")}
         </h2>
         <div class="space-y-4 text-on-surface-variant text-body-md">
-          <p>O LispCentral não requer a instalação de arquivos pesados no seu computador. Tudo funciona através de um pequeno script LISP chamado <strong>Loader</strong>.</p>
+          <p>{t("help.sec1.p1")}</p>
           <ol class="list-decimal pl-6 space-y-3 mt-4">
-            <li>Faça login no <a href="/login" class="text-primary-container hover:underline font-bold">Portal do Cliente</a>.</li>
-            <li>Navegue até a aba <strong>Licenças & Acessos</strong>.</li>
-            <li>Role até a seção "Sua Chave de Acesso" e clique em <strong>Baixar</strong>.</li>
-            <li>No AutoCAD, digite o comando <code class="bg-[#141414] px-2 py-1 rounded text-white font-mono text-sm border border-surface-variant">APPLOAD</code>.</li>
-            <li>Selecione o arquivo baixado e clique em "Load".</li>
-            <li>Para carregar automaticamente sempre que abrir o AutoCAD, adicione-o ao "Startup Suite" (Conteúdo) na mesma janela do APPLOAD.</li>
+            <li>{t("help.sec1.li1")}</li>
+            <li>{t("help.sec1.li2")}</li>
+            <li>{t("help.sec1.li3")}</li>
+            <li>{t("help.sec1.li4")}</li>
+            <li>{t("help.sec1.li5")}</li>
+            <li>{t("help.sec1.li6")}</li>
           </ol>
         </div>
       </section>
@@ -69,19 +65,17 @@ const t = (key) => {
       <section id="dashboard" class="scroll-mt-32 border-t border-surface-variant pt-12">
         <h2 class="text-headline-md font-bold text-white mb-6 flex items-center gap-3">
           <span class="bg-primary-container/20 text-primary-container w-10 h-10 rounded-lg flex items-center justify-center">2</span>
-          Gerenciando Scripts
+          {t("help.sec2.title")}
         </h2>
         <div class="space-y-4 text-on-surface-variant text-body-md">
-          <p>Seus arquivos <code class="bg-[#141414] px-2 py-1 rounded text-white font-mono text-sm border border-surface-variant">.lsp</code> são armazenados na nuvem e baixados apenas quando necessários na memória (JIT - Just-In-Time).</p>
+          <p>{t("help.sec2.p1")}</p>
           <ul class="list-disc pl-6 space-y-3 mt-4">
-            <li><strong>Fazer Upload:</strong> No Portal, vá até "Gestor de LISPs" e clique em "+ Adicionar LISPs". Você pode selecionar vários arquivos de uma vez.</li>
-            <li><strong>Editar Metadados:</strong> Clique no ícone de lápis ao lado de uma rotina para alterar o Nome Amigável, Categoria (Suite) e Ícone (Base64).</li>
-            <li><strong>Remover:</strong> Clique na lixeira para excluir a rotina do seu Workspace. A alteração será refletida no AutoCAD no próximo carregamento.</li>
+            <li>{t("help.sec2.li1")}</li>
+            <li>{t("help.sec2.li2")}</li>
+            <li>{t("help.sec2.li3")}</li>
           </ul>
         </div>
       </section>
     </div>
   </main>
-  
-  <Footer />
-</Layout>
+</DocsLayout>

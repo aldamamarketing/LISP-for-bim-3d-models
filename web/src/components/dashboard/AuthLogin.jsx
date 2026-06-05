@@ -14,16 +14,28 @@ export default function AuthLogin() {
   const handleEmailLogin = async (e) => {
     e.preventDefault();
     setAuthError('');
-    try { await signInWithEmailAndPassword(auth, emailStr, passwordStr); } 
-    catch (err) { setAuthError('Erro: ' + err.message); }
+    try { 
+      await signInWithEmailAndPassword(auth, emailStr, passwordStr); 
+      if (window.location.pathname.includes('/login')) {
+        window.location.href = '/dashboard';
+      }
+    } catch (err) { 
+      setAuthError('Erro: ' + err.message); 
+    }
   };
 
   const handleEmailSignup = async (e) => {
     e.preventDefault();
     setAuthError('');
     if (passwordStr !== passwordConfirmStr) return setAuthError('As senhas não coincidem.');
-    try { await createUserWithEmailAndPassword(auth, emailStr, passwordStr); } 
-    catch (err) { setAuthError('Erro: ' + err.message); }
+    try { 
+      await createUserWithEmailAndPassword(auth, emailStr, passwordStr); 
+      if (window.location.pathname.includes('/login')) {
+        window.location.href = '/dashboard';
+      }
+    } catch (err) { 
+      setAuthError('Erro: ' + err.message); 
+    }
   };
 
   return (
