@@ -430,7 +430,9 @@
 ;; Download Binary File to Disk (Safe for UTF-8 and Binaries)
 (defun LC:DownloadFile (url dest / xmlhttp ado result)
   (setq result nil)
-  (setq xmlhttp (vlax-create-object "MSXML2.XMLHTTP"))
+  ;; Usar 6.0 para evitar errores de parámetros COM estrictos en algunas versiones de AutoLISP
+  (setq xmlhttp (vlax-create-object "MSXML2.XMLHTTP.6.0"))
+  (if (not xmlhttp) (setq xmlhttp (vlax-create-object "MSXML2.XMLHTTP")))
   (if xmlhttp
     (progn
       (vl-catch-all-apply 'vlax-invoke-method (list xmlhttp 'open "GET" url :vlax-false))
@@ -441,10 +443,11 @@
           (if ado
             (progn
               (vlax-put-property ado 'Type 1) ; adTypeBinary
-              (vlax-invoke-method ado 'Open)
-              (vlax-invoke-method ado 'Write (vlax-get-property xmlhttp 'responseBody))
-              (vlax-invoke-method ado 'SaveToFile dest 2) ; adSaveCreateOverWrite
-              (vlax-invoke-method ado 'Close)
+              ;; Envolvemos en catch-all para evitar "too few actual parameters" si COM exige opcionales
+              (vl-catch-all-apply 'vlax-invoke-method (list ado 'Open))
+              (vl-catch-all-apply 'vlax-invoke-method (list ado 'Write (vlax-get-property xmlhttp 'responseBody)))
+              (vl-catch-all-apply 'vlax-invoke-method (list ado 'SaveToFile dest 2)) ; adSaveCreateOverWrite
+              (vl-catch-all-apply 'vlax-invoke-method (list ado 'Close))
               (vlax-release-object ado)
               (setq result t)
             )
