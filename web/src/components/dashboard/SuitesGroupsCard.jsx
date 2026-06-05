@@ -50,7 +50,7 @@ export default function SuitesGroupsCard() {
 
   // --- SUITE LOGIC ---
   const handleAddSuite = () => {
-    setEditSuiteData({ name: '', description: '', visibility: 'private', storeCategory: '', compatibility: '', authorName: userData.name || '', isNew: true });
+    setEditSuiteData({ name: '', description: '', visibility: 'private', storeCategory: '', compatibility: '', authorName: userData.name || '', price: 0, isNew: true });
     setShowSuiteModal(true);
   };
 
@@ -74,6 +74,7 @@ export default function SuitesGroupsCard() {
         storeCategory: editSuiteData.storeCategory || '',
         compatibility: editSuiteData.compatibility || '',
         authorName: editSuiteData.authorName || '',
+        price: Number(editSuiteData.price) || 0,
         sortOrder: editSuiteData.sortOrder || 0
       };
 
@@ -494,6 +495,10 @@ export default function SuitesGroupsCard() {
                   <div>
                     <label className="block text-xs font-bold text-primary-container mb-1">Store: Autor / Empresa</label>
                     <input type="text" className="w-full bg-surface border border-outline-variant rounded p-2 text-on-surface text-sm" value={editSuiteData.authorName} onChange={e => setEditSuiteData({...editSuiteData, authorName: e.target.value})} />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-bold text-primary-container mb-1">Store: Preço (R$)</label>
+                    <input type="number" step="0.01" min="0" className="w-full bg-surface border border-outline-variant rounded p-2 text-on-surface text-sm" value={editSuiteData.price !== undefined ? editSuiteData.price : 0} onChange={e => setEditSuiteData({...editSuiteData, price: e.target.value})} />
                   </div>
                 </div>
               )}

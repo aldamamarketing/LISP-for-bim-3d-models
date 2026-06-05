@@ -3,6 +3,7 @@ import { getAuth, GoogleAuthProvider, signInWithPopup, signOut } from "firebase/
 import { getFirestore } from "firebase/firestore";
 import { getStorage } from "firebase/storage";
 import { getAnalytics, isSupported } from "firebase/analytics";
+import { initializeAppCheck, ReCaptchaEnterpriseProvider } from "firebase/app-check";
 
 const firebaseConfig = {
   apiKey: "AIzaSyADsqbH_lKKFcugqTexryO40u5VMJxzx0c",
@@ -19,6 +20,15 @@ export const auth = getAuth(app);
 export const db = getFirestore(app);
 export const storage = getStorage(app);
 export const googleProvider = new GoogleAuthProvider();
+
+// App Check Initialization
+// Bypass App Check for local development to avoid 403 Forbidden errors
+if (typeof window !== "undefined" && window.location.hostname !== "localhost") {
+  initializeAppCheck(app, {
+    provider: new ReCaptchaEnterpriseProvider('6Lcw9wkqAAAAAIL9Z_M_p_7rW-bJmG4D2M-N43Qh'), // Reemplace por su clave real de ReCAPTCHA Enterprise
+    isTokenAutoRefreshEnabled: true
+  });
+}
 
 // Analytics — inicialización lazy (solo en browser, nunca en SSR)
 let analyticsInstance = null;

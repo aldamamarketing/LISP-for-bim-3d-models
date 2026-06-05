@@ -296,7 +296,7 @@ Debes responder ÚNICAMENTE con un objeto JSON (sin markdown, sin bloques de có
         { role: "system", content: systemPrompt },
         { role: "user", content: userPrompt }
       ],
-      model: "deepseek-v4-flash",
+      model: "deepseek-chat",
       response_format: { type: "json_object" }
     });
 
@@ -338,7 +338,7 @@ REGLAS DE DISEÑO:
 
     const completion = await openai.chat.completions.create({
       messages: [{ role: "system", content: systemPrompt }, { role: "user", content: userPrompt }],
-      model: "deepseek-v4-flash",
+      model: "deepseek-chat",
       response_format: { type: "json_object" }
     });
 
@@ -372,7 +372,7 @@ REGLAS DE DISEÑO:
 
     const completion = await openai.chat.completions.create({
       messages: [{ role: "system", content: systemPrompt }, { role: "user", content: userPrompt }],
-      model: "deepseek-v4-flash",
+      model: "deepseek-chat",
       response_format: { type: "json_object" }
     });
 

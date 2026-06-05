@@ -12,25 +12,42 @@ service cloud.firestore {
     match /users/{userId}/{document=**} {
       allow read, write: if request.auth != null && request.auth.uid == userId;
     }
-    // Phase B Collections
+    
+    // Phase B & C Collections
     match /lispFiles/{fileId} {
-      allow read, write: if request.auth != null;
+      allow read: if request.auth != null && resource.data.tenantId == request.auth.uid;
+      allow create: if request.auth != null && request.resource.data.tenantId == request.auth.uid;
+      allow update, delete: if request.auth != null && resource.data.tenantId == request.auth.uid;
     }
     match /commands/{commandId} {
-      allow read, write: if request.auth != null;
+      allow read: if true; // Public store needs to read commands
+      allow create: if request.auth != null && request.resource.data.tenantId == request.auth.uid;
+      allow update, delete: if request.auth != null && resource.data.tenantId == request.auth.uid;
     }
     match /suites/{suiteId} {
-      // Public suites can be read by anyone (for store), but only modified by authenticated users
       allow read: if true;
-      allow write: if request.auth != null;
+      allow create: if request.auth != null && request.resource.data.tenantId == request.auth.uid;
+      allow update, delete: if request.auth != null && resource.data.tenantId == request.auth.uid;
     }
     match /groups/{groupId} {
       allow read: if true;
-      allow write: if request.auth != null;
+      allow create: if request.auth != null && request.resource.data.tenantId == request.auth.uid;
+      allow update, delete: if request.auth != null && resource.data.tenantId == request.auth.uid;
     }
     match /groupCommands/{gcmdId} {
       allow read: if true;
-      allow write: if request.auth != null;
+      allow create: if request.auth != null && 
+        get(/databases/$(database)/documents/groups/$(request.resource.data.groupId)).data.tenantId == request.auth.uid;
+      allow update: if request.auth != null && 
+        get(/databases/$(database)/documents/groups/$(resource.data.groupId)).data.tenantId == request.auth.uid &&
+        request.resource.data.groupId == resource.data.groupId;
+      allow delete: if request.auth != null && 
+        get(/databases/$(database)/documents/groups/$(resource.data.groupId)).data.tenantId == request.auth.uid;
+    }
+    match /subscriptions/{subId} {
+      allow read: if request.auth != null && request.auth.uid == resource.data.tenantId;
+      allow create: if request.auth != null && request.resource.data.tenantId == request.auth.uid;
+      allow update, delete: if request.auth != null && resource.data.tenantId == request.auth.uid;
     }
     match /feedback/{feedbackId} {
       allow create: if request.auth != null;

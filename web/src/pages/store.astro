@@ -1,0 +1,26 @@
+---
+import DocsLayout from '../layouts/DocsLayout.astro';
+import StoreFront from '../components/store/StoreFront.jsx';
+import { getLangFromUrl, useTranslations } from '../i18n/utils';
+
+const lang = getLangFromUrl(Astro.url);
+const t = useTranslations(lang);
+---
+
+<DocsLayout title="Store - LispCentral" description="Explore e baixe Suites B.I.M para AutoCAD">
+  <main className="p-4 md:p-8 max-w-[1200px] md:ml-[260px] min-h-screen bg-grid-pattern relative">
+    <div className="relative z-10">
+      <div className="mb-8 border-b border-outline-variant pb-4">
+        <h1 className="text-3xl font-bold text-on-surface flex items-center gap-3">
+          <span className="material-symbols-outlined text-[32px] text-primary-container">storefront</span>
+          LispCentral Store
+        </h1>
+        <p className="text-on-surface-variant mt-2 text-sm">
+          Descubra, instale e assine coleções de comandos B.I.M criadas pela comunidade.
+        </p>
+      </div>
+
+      <StoreFront client:only="react" />
+    </div>
+  </main>
+</DocsLayout>

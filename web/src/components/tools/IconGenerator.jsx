@@ -84,10 +84,12 @@ export default function IconGenerator() {
       }
 
       if (!response.ok) {
+        console.error("HTTP Error:", response.status, response.statusText);
         throw new Error('Erro ao gerar ícones');
       }
 
       const data = await response.json();
+      console.log("Datos recibidos de la API:", data);
       
       // Aseguramos un ID único y descriptivo
       const parsedResults = Array.isArray(data) ? data.map((icon, idx) => {
@@ -99,10 +101,12 @@ export default function IconGenerator() {
         };
       }) : [];
 
+      console.log("Parsed results:", parsedResults);
       setGeneratedIcons(parsedResults);
       if (parsedResults.length > 0) setActiveTab('ai');
+      else showToast("La API respondió, pero no devolvió íconos.", "warning");
     } catch (error) {
-      console.error(error);
+      console.error("Excepción en handleGenerate:", error);
       showToast("Instabilidade nos serviços de IA. Tente novamente em instantes.", "error");
     } finally {
       setIsGenerating(false);

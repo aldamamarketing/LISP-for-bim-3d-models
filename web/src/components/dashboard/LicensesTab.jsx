@@ -1,6 +1,6 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { db } from '../../firebase';
-import { doc, updateDoc } from 'firebase/firestore';
+import { doc, updateDoc, collection, query, where, getDocs, getDoc, deleteDoc } from 'firebase/firestore';
 import { showToast } from '../Toast';
 import { useTranslation } from '../../i18n/useTranslation';
 import { useDashboard } from './DashboardContext';
@@ -8,6 +8,47 @@ import { useDashboard } from './DashboardContext';
 export default function LicensesTab() {
   const { t } = useTranslation();
   const { userData, setUserData, seats, setSeats, deviceNotes, setDeviceNotes } = useDashboard();
+  
+  const [subscriptions, setSubscriptions] = useState([]);
+  const [loadingSubs, setLoadingSubs] = useState(true);
+
+  useEffect(() => {
+    const fetchSubscriptions = async () => {
+      if (!userData) return;
+      try {
+        const q = query(collection(db, 'subscriptions'), where('tenantId', '==', userData.id));
+        const snap = await getDocs(q);
+        const subs = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+        
+        // Fetch suite details for each subscription
+        const subsWithSuites = await Promise.all(subs.map(async (sub) => {
+          const sDoc = await getDoc(doc(db, 'suites', sub.suiteId));
+          if (sDoc.exists()) {
+            return { ...sub, suite: { id: sDoc.id, ...sDoc.data() } };
+          }
+          return sub;
+        }));
+        
+        setSubscriptions(subsWithSuites.filter(s => s.suite));
+      } catch (err) {
+        console.error("Error fetching subscriptions", err);
+      } finally {
+        setLoadingSubs(false);
+      }
+    };
+    fetchSubscriptions();
+  }, [userData]);
+
+  const handleUnsubscribe = async (subId) => {
+    if (!confirm('Deseja realmente remover esta suite da sua conta?')) return;
+    try {
+      await deleteDoc(doc(db, 'subscriptions', subId));
+      setSubscriptions(subscriptions.filter(s => s.id !== subId));
+      showToast('Assinatura removida.', 'success');
+    } catch (err) {
+      showToast('Erro ao remover assinatura.', 'error');
+    }
+  };
 
   const handleUpdatePlan = async () => {
     if (!userData) return;
@@ -144,6 +185,49 @@ export default function LicensesTab() {
            <div className="p-4 text-center border border-dashed border-surface-variant rounded-lg text-on-surface-variant text-sm">
              {t('dashboard.equipment.empty')}
            </div>
+        )}
+      </div>
+
+      {/* MY SUBSCRIPTIONS */}
+      <div className="md:col-span-2 bg-surface-container border border-surface-variant rounded-xl p-6">
+        <h3 className="mt-0 text-lg font-bold flex items-center gap-2">
+          <span className="material-symbols-outlined text-primary-container">shopping_bag</span>
+          Minhas Assinaturas (Store)
+        </h3>
+        <p className="text-sm text-on-surface-variant mb-4">Suites públicas de terceiros que você adicionou à sua conta.</p>
+        
+        {loadingSubs ? (
+          <div className="flex justify-center p-4">
+            <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-primary-container"></div>
+          </div>
+        ) : subscriptions.length > 0 ? (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            {subscriptions.map(sub => (
+              <div key={sub.id} className="bg-[#0D0D0D] border border-surface-variant rounded-lg p-4 flex flex-col hover:border-primary-container transition-colors">
+                <div className="flex justify-between items-start mb-2">
+                  <h4 className="font-bold text-on-surface m-0 truncate pr-2">{sub.suite.name}</h4>
+                  <button className="text-on-surface-variant hover:text-error transition-colors shrink-0" onClick={() => handleUnsubscribe(sub.id)} title="Remover da Conta">
+                    <span className="material-symbols-outlined text-[18px]">delete</span>
+                  </button>
+                </div>
+                <div className="text-xs text-on-surface-variant mb-3 flex-1 line-clamp-2">{sub.suite.description}</div>
+                <div className="flex justify-between items-center pt-3 border-t border-surface-variant">
+                  <div className="text-xs font-bold text-primary-container">{sub.suite.authorName || 'Anônimo'}</div>
+                  <a href={`/suite?id=${sub.suite.id}`} className="text-xs text-on-surface hover:text-primary-container flex items-center gap-1">
+                    Ver <span className="material-symbols-outlined text-[14px]">arrow_forward</span>
+                  </a>
+                </div>
+              </div>
+            ))}
+          </div>
+        ) : (
+          <div className="p-6 text-center border border-dashed border-surface-variant rounded-lg">
+            <span className="material-symbols-outlined text-[32px] text-on-surface-variant opacity-50 mb-2">production_quantity_limits</span>
+            <div className="text-on-surface-variant text-sm mb-3">Você ainda não assinou nenhuma suite da Store.</div>
+            <a href="/store" className="inline-block bg-surface-container-highest hover:bg-primary-container hover:text-white text-sm font-bold px-4 py-2 rounded transition-colors text-on-surface border border-outline-variant hover:border-primary-container">
+              Explorar a Store
+            </a>
+          </div>
         )}
       </div>
     </div>
