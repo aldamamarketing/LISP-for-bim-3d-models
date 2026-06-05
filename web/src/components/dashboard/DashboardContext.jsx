@@ -15,6 +15,9 @@ export function DashboardProvider({ children }) {
   const [loading, setLoading] = useState(true);
   
   const [tenantLisps, setTenantLisps] = useState([]);
+  const [commands, setCommands] = useState([]);
+  const [suites, setSuites] = useState([]);
+  const [groups, setGroups] = useState([]);
   const [draftLisps, setDraftLisps] = useState([]);
   const [isUploading, setIsUploading] = useState(false);
   
@@ -38,6 +41,9 @@ export function DashboardProvider({ children }) {
       } else {
         setUserData(null);
         setTenantLisps([]);
+        setCommands([]);
+        setSuites([]);
+        setGroups([]);
         setLoading(false);
       }
     });
@@ -68,7 +74,7 @@ export function DashboardProvider({ children }) {
         setUserData(loadedData);
         setDeviceNotes(loadedData.deviceNotes || {});
         if (loadedData.maxSeats) setSeats(loadedData.maxSeats);
-        await loadTenantLisps(loadedData.id);
+        await loadTenantData(loadedData.id);
       } else {
         const { uid, apiKey } = generateSemanticIds(user.email, user.displayName);
         const expires = new Date();
@@ -89,7 +95,7 @@ export function DashboardProvider({ children }) {
 
         await setDoc(doc(db, 'users', uid), newUser);
         setUserData({ id: uid, ...newUser });
-        await loadTenantLisps(uid);
+        await loadTenantData(uid);
       }
     } catch (error) {
       console.error("Erro:", error);
@@ -97,11 +103,36 @@ export function DashboardProvider({ children }) {
     setLoading(false);
   };
 
-  const loadTenantLisps = async (tenantId) => {
+  const loadTenantData = async (tenantId) => {
     try {
-      const q = query(collection(db, 'lispFiles'), where('tenantId', '==', tenantId));
-      const snap = await getDocs(q);
-      setTenantLisps(snap.docs.map(d => ({ id: d.id, ...d.data() })));
+      const qLisps = query(collection(db, 'lispFiles'), where('tenantId', '==', tenantId));
+      const qCommands = query(collection(db, 'commands'), where('tenantId', '==', tenantId));
+      const qSuites = query(collection(db, 'suites'), where('tenantId', '==', tenantId));
+      const qGroups = query(collection(db, 'groups'), where('tenantId', '==', tenantId));
+      // In a real multi-tenant app, we might need a separate query, but since groupCommands lacks tenantId, 
+      // we can fetch by groupId, or just add tenantId to groupCommands for easier querying.
+      // Wait, in Phase B model, groupCommands DOES NOT have tenantId. But wait, we can just fetch it if needed,
+      // or we can just fetch all groupCommands where groupId IN (my groups).
+      // Let's do it after we have groups.
+      const [snapLisps, snapCmds, snapSuites, snapGroups] = await Promise.all([
+        getDocs(qLisps), getDocs(qCommands), getDocs(qSuites), getDocs(qGroups)
+      ]);
+
+      const loadedGroups = snapGroups.docs.map(d => ({ id: d.id, ...d.data() }));
+
+      setTenantLisps(snapLisps.docs.map(d => ({ id: d.id, ...d.data() })));
+      setCommands(snapCmds.docs.map(d => ({ id: d.id, ...d.data() })));
+      setSuites(snapSuites.docs.map(d => ({ id: d.id, ...d.data() })));
+      setGroups(loadedGroups);
+
+      // Fetch groupCommands for these groups
+      if (loadedGroups.length > 0) {
+        const groupIds = loadedGroups.map(g => g.id);
+        // Firestore 'in' query supports max 10 values. If more, we need multiple queries or just fetch them by commandId.
+        // Actually, since this is a small SaaS MVP, we'll fetch all groupCommands and filter client side. Or better, fetch by chunk.
+        // For simplicity, we won't fetch them in context. CommandRegistryCard will fetch them, or we add tenantId to groupCommands.
+      }
+
     } catch (err) { console.error(err); }
   };
 
@@ -116,6 +147,9 @@ export function DashboardProvider({ children }) {
     userData, setUserData,
     loading, setLoading,
     tenantLisps, setTenantLisps,
+    commands, setCommands,
+    suites, setSuites,
+    groups, setGroups,
     draftLisps, setDraftLisps,
     isUploading, setIsUploading,
     deviceNotes, setDeviceNotes,

@@ -8,7 +8,8 @@ import { DashboardProvider, useDashboard } from './dashboard/DashboardContext';
 import AuthLogin from './dashboard/AuthLogin';
 import ProfileTab from './dashboard/ProfileTab';
 import LicensesTab from './dashboard/LicensesTab';
-import LispManagerTab from './dashboard/LispManagerTab';
+import LispFilesCard from './dashboard/LispFilesCard';
+import SuitesGroupsCard from './dashboard/SuitesGroupsCard';
 import SupportModal from './dashboard/SupportModal';
 
 function DashboardInner({ mode }) {
@@ -27,7 +28,7 @@ function DashboardInner({ mode }) {
   React.useEffect(() => {
     const handleHashChange = () => {
       const hash = window.location.hash.replace('#', '');
-      if (['profile', 'licenses', 'lisp', 'favorites', 'notifications'].includes(hash)) {
+      if (['profile', 'licenses', 'files', 'suites', 'favorites', 'notifications'].includes(hash)) {
         setActiveTab(hash);
       }
     };
@@ -52,7 +53,8 @@ function DashboardInner({ mode }) {
     switch (activeTab) {
       case 'profile': return <ProfileTab />;
       case 'licenses': return <LicensesTab />;
-      case 'lisp': return <LispManagerTab />;
+      case 'files': return <LispFilesCard />;
+      case 'suites': return <SuitesGroupsCard />;
       case 'favorites': return <FavoritesManager />;
       case 'notifications': 
         return (
@@ -61,7 +63,7 @@ function DashboardInner({ mode }) {
             <p className="text-sm text-on-surface-variant">{t('dashboard.notifications.empty')}</p>
           </div>
         );
-      default: return <LispManagerTab />;
+      default: return <LispFilesCard />;
     }
   };
 

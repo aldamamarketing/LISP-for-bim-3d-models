@@ -76,13 +76,10 @@ const t = (key) => {
         <!-- DASHBOARD (solo logueado, hidden por defecto) -->
         <div id="sidebar-dashboard-section" class="hidden">
           <hr class="border-[#262626] my-2" />
-          <h4 class="text-primary-container uppercase text-xs font-bold tracking-wider mb-2 px-2">Dashboard</h4>
+          <h4 class="text-primary-container uppercase text-xs font-bold tracking-wider mb-2 px-2">Workspace</h4>
           <ul class="list-none p-0 m-0 space-y-1">
             <li><a href="/dashboard#files" class="flex items-center gap-3 py-1.5 px-3 text-on-surface-variant hover:text-white hover:bg-[#1a1c1c] rounded-md transition-colors text-sm">
-              <span class="material-symbols-outlined text-[18px]">upload_file</span> LISP Files
-            </a></li>
-            <li><a href="/dashboard#commands" class="flex items-center gap-3 py-1.5 px-3 text-on-surface-variant hover:text-white hover:bg-[#1a1c1c] rounded-md transition-colors text-sm">
-              <span class="material-symbols-outlined text-[18px]">terminal</span> Commands
+              <span class="material-symbols-outlined text-[18px]">upload_file</span> LISP Files & Commands
             </a></li>
             <li><a href="/dashboard#suites" class="flex items-center gap-3 py-1.5 px-3 text-on-surface-variant hover:text-white hover:bg-[#1a1c1c] rounded-md transition-colors text-sm">
               <span class="material-symbols-outlined text-[18px]">folder_copy</span> Suites & Groups
@@ -90,6 +87,11 @@ const t = (key) => {
             <li><a href="/dashboard#favorites" class="flex items-center gap-3 py-1.5 px-3 text-on-surface-variant hover:text-white hover:bg-[#1a1c1c] rounded-md transition-colors text-sm">
               <span class="material-symbols-outlined text-[18px]">star</span> {t("dashboard.sidebar.collection")}
             </a></li>
+          </ul>
+
+          <hr class="border-[#262626] my-4" />
+          <h4 class="text-primary-container uppercase text-xs font-bold tracking-wider mb-2 px-2">Configurações</h4>
+          <ul class="list-none p-0 m-0 space-y-1">
             <li><a href="/dashboard#profile" class="flex items-center gap-3 py-1.5 px-3 text-on-surface-variant hover:text-white hover:bg-[#1a1c1c] rounded-md transition-colors text-sm">
               <span class="material-symbols-outlined text-[18px]">person</span> {t("dashboard.sidebar.profile")}
             </a></li>
