@@ -63,16 +63,18 @@ La plataforma ha evolucionado para no solo servir nuestras propias herramientas 
 
 ### Qué haremos:
 1.  **Fase 1 (Dogfooding B2C):** Lanzaremos usando la infraestructura Multi-Tenant, pero nosotros ("TM Digital") seremos el único Tenant. Las rutinas se descargarán desde nuestro bucket protegido en Firebase y validaremos la suscripción.
-2.  **Fase 2 (Apertura B2B):** Abriremos el panel para que CAD Managers creen sus cuentas, suban sus propios LISPs a su bucket privado y generen "Seat Tokens" para sus dibujantes.
+2.  **Fase 2 (Apertura B2B - Uso Propio):** Abriremos el panel para que CAD Managers creen sus cuentas, suban sus propios LISPs a su bucket privado y gestionen a sus dibujantes mediante un Pool Centralizado de Dispositivos (HWIDs).
+3.  **Fase 3 (El Marketplace y Entitlements):** Expandiremos a un ecosistema donde los Tenants pueden vender sus Suites a otros Tenants. Se elimina la limitación global de `maxSeats` a favor de **Licencias Granulares por Suite** (Entitlements). Cada compra dictará cuántos asientos se poseen de ese producto específico, y el CAD Manager asignará qué PC específica tiene acceso a cada Suite comprada. (Ver `docs/Reglas_Negocio_Marketplace_B2B.md` para reglas completas).
 
 ### Cómo lo haremos (Directrices Técnicas):
-*   **Firebase Firestore como Core:** Reemplazará la lógica estática. Cada petición de LISP valida: *¿El token es válido? ¿Pertenece a un usuario activo? ¿Qué Tenant_ID tiene? ¿Tiene permiso de acceder a este lisp_id?*
+*   **Firebase Firestore como Core de Licencias:** Reemplazará la lógica estática. Cada petición de LISP valida contra una colección global de `licenses` (Entitlements): *¿El token es válido? ¿El hardware de este empleado está asignado a la licencia de esta Suite específica?*
+*   **Ejecución Cruzada (Cross-Tenant):** El backend ya no restringe la lectura al propio `tenantId`. Si un cliente compró una Suite, el backend irá al Storage del creador para descargar y servir el LISP de forma segura al comprador.
 *   **Identificadores Semánticos:** Usaremos siempre slugs legibles en Firestore (`tenant_tmdigital`, `lisp_viga_mvp`, `user_carlos`). Nada de strings aleatorios inmanejables.
 *   **Cloud Storage Encriptado:** Los LISPs de las empresas se suben a Firebase Storage.
 
 ### Por qué lo haremos (Decisiones Críticas):
 *   **Seguridad Online-Only (Zero-Offline):** Hemos descartado el acceso Offline mediante JWT locales para la fase inicial. **¿Por qué?** El riesgo de fuga de código (IP) es inaceptable en esta etapa temprana. Todo comando exigirá ping al servidor para asegurar control total de vida/muerte sobre la llave de acceso.
-*   **Base de datos Multi-Tenant desde el inicio:** **¿Por qué?** Previene tener que reescribir toda la aplicación (Back y Front) cuando pasemos de vender nuestro LISP a vender la Plataforma. Un dibujante independiente simplemente es un Tenant con un solo asiento.
+*   **Base de datos basada en Entitlements (Licencias):** **¿Por qué?** Previene tener que reescribir la aplicación. El modelo de "pagar por toda tu empresa" no escala. El modelo donde "cada Suite se licencia y asigna individualmente a las máquinas de tu empresa" es el estándar moderno en plugins BIM.
 
 ### E. Arquitectura Zero-Disk JIT (Dynamic Handshake y Ghost Commands)
 El núcleo del SaaS se basa en una inicialización invisible y de latencia cero, evitando cualquier escritura en el disco del usuario (Zero-Disk) y protegiendo el código fuente.

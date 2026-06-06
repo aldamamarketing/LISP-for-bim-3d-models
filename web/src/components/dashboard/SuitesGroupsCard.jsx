@@ -3,6 +3,7 @@ import { db } from '../../firebase';
 import { doc, setDoc, deleteDoc, collection, query, where, getDocs, updateDoc } from 'firebase/firestore';
 import { showToast } from '../Toast';
 import { useDashboard } from './DashboardContext';
+import { Card, CardHeader } from '../ui/Card';
 
 export default function SuitesGroupsCard() {
   const { userData, suites, setSuites, groups, setGroups, commands, tenantLisps } = useDashboard();
@@ -269,11 +270,8 @@ export default function SuitesGroupsCard() {
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 h-[85vh]">
         
         {/* PANEL 1: FILES POOL (LEFT) */}
-        <div className="flex flex-col h-full bg-surface border border-outline-variant rounded-md overflow-hidden">
-          <div className="p-3 border-b border-outline-variant bg-surface-container-low flex flex-col gap-2">
-            <h3 className="m-0 text-sm font-bold uppercase tracking-wider text-on-surface-variant flex items-center gap-2">
-              <span className="material-symbols-outlined text-[18px]">description</span> Pool de Arquivos
-            </h3>
+        <Card noPadding={true}>
+          <CardHeader title="Pool de Arquivos" icon="description">
             <div className="relative">
               <span className="material-symbols-outlined absolute left-2 top-1/2 -translate-y-1/2 text-[16px] text-on-surface-variant">search</span>
               <input 
@@ -308,7 +306,7 @@ export default function SuitesGroupsCard() {
                 </div>
               )}
             </div>
-          </div>
+          </CardHeader>
 
           <div className="flex-1 overflow-y-auto">
             <table className="w-full text-left border-collapse">
@@ -345,20 +343,22 @@ export default function SuitesGroupsCard() {
               </tbody>
             </table>
           </div>
-        </div>
+        </Card>
 
         {/* PANEL 2: SUITES & GROUPS TREE (RIGHT) */}
-        <div className="md:col-span-2 flex flex-col h-full bg-surface border border-outline-variant rounded-md overflow-hidden">
-          <div className="p-3 border-b border-outline-variant flex justify-between items-center bg-surface-container-low">
-            <h3 className="m-0 text-sm font-bold uppercase tracking-wider text-on-surface-variant flex items-center gap-2">
-              <span className="material-symbols-outlined text-[18px]">account_tree</span> Árvore de Suites & Grupos
-            </h3>
-            <button className="btn bg-primary-container text-white text-xs py-1.5 px-3 flex items-center gap-1 font-bold" onClick={handleAddSuite}>
-              <span className="material-symbols-outlined text-[16px]">add</span> Nova Suite
-            </button>
-          </div>
-          
-          <div className="flex-1 overflow-y-auto">
+        <div className="md:col-span-2">
+          <Card noPadding={true}>
+            <CardHeader 
+              title="Árvore de Suites & Grupos" 
+              icon="account_tree"
+              action={
+                <button className="btn bg-primary-container text-white text-xs py-1.5 px-3 flex items-center gap-1 font-bold" onClick={handleAddSuite}>
+                  <span className="material-symbols-outlined text-[16px]">add</span> Nova Suite
+                </button>
+              }
+            />
+            
+            <div className="flex-1 overflow-y-auto">
             <table className="w-full text-left border-collapse">
               <tbody>
                 {suites.length === 0 && (
@@ -483,6 +483,7 @@ export default function SuitesGroupsCard() {
               </tbody>
             </table>
           </div>
+        </Card>
         </div>
 
       </div>
