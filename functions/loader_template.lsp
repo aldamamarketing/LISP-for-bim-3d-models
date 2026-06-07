@@ -155,6 +155,7 @@
 )
 
 ;; Función para parsear los "name" del JSON
+;; ⚡ Bolt Optimization: Replace O(N^2) append with O(N) cons/reverse
 (defun LC:parse-json-names (jsonStr / pos start end cmd-list name)
   (setq cmd-list nil)
   (setq pos 0)
@@ -164,13 +165,15 @@
     (if end
       (progn
         (setq name (substr jsonStr (1+ start) (- end start)))
-        (setq cmd-list (append cmd-list (list (list name name))))
+        ;; O(1) insertion at the head instead of O(N) append
+        (setq cmd-list (cons (list name name) cmd-list))
         (setq pos end)
       )
       (setq pos (strlen jsonStr))
     )
   )
-  cmd-list
+  ;; Reverse the list at the end to maintain original order in O(N) time
+  (reverse cmd-list)
 )
 
 ;; Registro instantaneo de Ghost Commands (Stubs) desde la nube (Handshake)
