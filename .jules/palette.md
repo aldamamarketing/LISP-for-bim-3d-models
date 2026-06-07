@@ -1,0 +1,3 @@
+## 2024-05-18 - SupportModal Accessibility
+**Learning:** React form elements need both `htmlFor` on labels and `id` on inputs to be properly linked. Icon-only buttons must have `aria-label` or visually hidden text, and `focus-visible` outline styles are crucial for keyboard users to navigate forms and modals effectively. Tailwind's `focus-visible:ring-2` is an effective utility for this.
+**Action:** Always verify `htmlFor` and `id` matches in forms, explicitly set focus-visible styling on interactive elements, and add `aria-label` to close buttons (and hide their svg icons via `aria-hidden="true"`).
