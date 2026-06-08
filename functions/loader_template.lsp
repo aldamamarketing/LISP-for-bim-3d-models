@@ -5,7 +5,7 @@
 ;;; ==========================================================================
 
 (setq *TMD-SEAT-TOKEN* "{{SEAT_TOKEN}}")
-(setq *TMD-API-ENDPOINT* "https://getroutine-wgpjjgorxa-uc.a.run.app/getRoutine")
+(setq *TMD-API-ENDPOINT* "https://us-central1-lispcentral.cloudfunctions.net/getRoutine")
 
 ;; Gerando Hash de Hardware (Machine ID) e Versão do AutoCAD
 (setq *TMD-HWID* (strcat (getenv "COMPUTERNAME") "@" (getenv "USERNAME")))

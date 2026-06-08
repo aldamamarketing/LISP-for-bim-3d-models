@@ -1,13 +1,25 @@
 import React, { useState, useEffect } from 'react';
 import { db } from '../../firebase';
-import { doc, updateDoc, collection, query, where, getDocs, getDoc, deleteDoc } from 'firebase/firestore';
+import { doc, updateDoc, collection, query, where, getDocs, getDoc, deleteDoc, onSnapshot, serverTimestamp } from 'firebase/firestore';
 import { showToast } from '../Toast';
 import { useTranslation } from '../../i18n/useTranslation';
 import { useDashboard } from './DashboardContext';
+import { Card, CardHeader } from '../ui/Card';
 
 export default function LicensesTab() {
   const { t } = useTranslation();
   const { userData, setUserData, seats, setSeats, deviceNotes, setDeviceNotes } = useDashboard();
+  const [devicesList, setDevicesList] = useState([]);
+
+  useEffect(() => {
+    if (!userData?.id) return;
+    const unsub = onSnapshot(collection(db, 'users', userData.id, 'devices'), (snap) => {
+      const devs = [];
+      snap.forEach(d => devs.push({ id: d.id, ...d.data() }));
+      setDevicesList(devs);
+    });
+    return () => unsub();
+  }, [userData?.id]);
 
   const handleUpdatePlan = async () => {
     if (!userData) return;
@@ -33,17 +45,57 @@ export default function LicensesTab() {
   const handleUnlink = async (device) => {
     if(!confirm(`Desvincular ${device}?`)) return;
     try {
+      // Remover compatibilidad legacy
       const updatedDevices = (userData.registeredDevices || []).filter(d => d !== device);
       const userRef = doc(db, 'users', userData.id);
-      
       const updates = { registeredDevices: updatedDevices };
       if (userData.registeredDevice === device) {
         updates.registeredDevice = updatedDevices.length > 0 ? updatedDevices[0] : null;
       }
-      
       await updateDoc(userRef, updates);
+      
+      // Regla Anti-Abuso: Guardamos que fue desvinculado AHORA
+      try {
+        await updateDoc(doc(db, 'users', userData.id, 'devices', device), { 
+          globalLinked: false,
+          globalUnlinkedAt: serverTimestamp()
+        });
+      } catch(e) { console.error("Error al desligar device de subcoleccion", e); }
+
       setUserData({ ...userData, ...updates });
+      showToast('Equipamento desvinculado com sucesso.', 'success');
     } catch(e) { showToast('Erro ao desvincular.', 'error'); }
+  };
+
+  const handleLink = async (deviceObj) => {
+    try {
+      const activeCount = devicesList.filter(d => d.globalLinked).length;
+      const legacyCount = (userData.registeredDevices || []).filter(d => !devicesList.find(dev => dev.id === d)).length;
+      const totalActive = activeCount + legacyCount;
+      const maxSeats = userData.maxSeats || 1;
+
+      if (totalActive >= maxSeats) {
+        showToast(`Limite de assentos atingido (${maxSeats}). Desvincule outro primeiro.`, 'error');
+        return;
+      }
+
+      // Regla Anti-Abuso (Penalty Box de 7 Días)
+      if (deviceObj.globalUnlinkedAt) {
+        const unlinkedDate = deviceObj.globalUnlinkedAt.toDate();
+        const daysPassed = (new Date() - unlinkedDate) / (1000 * 60 * 60 * 24);
+        if (daysPassed < 7) {
+          const daysLeft = Math.ceil(7 - daysPassed);
+          showToast(`Anti-Abuso: Este PC só pode ser vinculado novamente em ${daysLeft} dias.`, 'error');
+          return;
+        }
+      }
+
+      await updateDoc(doc(db, 'users', userData.id, 'devices', deviceObj.id), { 
+        globalLinked: true,
+        globalUnlinkedAt: null
+      });
+      showToast('Equipamento vinculado com sucesso.', 'success');
+    } catch(e) { showToast('Erro ao vincular.', 'error'); }
   };
 
   const registeredDevices = userData?.registeredDevices || (userData?.registeredDevice ? [userData.registeredDevice] : []);
@@ -52,9 +104,9 @@ export default function LicensesTab() {
     <div className="tab-enter grid grid-cols-1 md:grid-cols-2 gap-5 mb-5">
       
       {/* LICENSES & ACCESS */}
-      <div className="bg-surface-container border border-surface-variant rounded-xl p-6 border-t-[3px] border-t-primary-container">
-        <h3 className="mt-0 text-lg font-bold">{t('dashboard.licenses.title')}</h3>
-        <p className="text-sm text-on-surface-variant mb-4">{t('dashboard.licenses.desc')}</p>
+      <Card>
+        <CardHeader title={t('dashboard.licenses.title')} icon="key" />
+        <p className="text-sm text-on-surface-variant mb-4 mt-2">{t('dashboard.licenses.desc')}</p>
         
         <div className="bg-[#0D0D0D] rounded-lg p-4 mb-4 space-y-3">
           <div className="flex justify-between items-center">
@@ -99,44 +151,69 @@ export default function LicensesTab() {
               className="flex-1 bg-[#0D0D0D] border border-surface-variant text-primary-container font-mono px-3 py-2 rounded-lg" 
             />
             <button 
-              className="bg-primary-container text-white font-bold text-sm px-4 py-2 rounded-lg hover:bg-[#e66000] transition-colors" 
-              onClick={() => window.location.href = `https://generateloader-wgpjjgorxa-uc.a.run.app/?token=${userData?.apiKey}`}
+              className="bg-primary-container text-white font-bold text-sm px-4 py-2 rounded-lg hover:bg-[#e66000] transition-colors shrink-0" 
+              onClick={() => window.location.href = `https://us-central1-lispcentral.cloudfunctions.net/generateLoader?token=${userData?.apiKey}`}
             >
               {t('dashboard.licenses.download')}
             </button>
           </div>
         </div>
-      </div>
+      </Card>
 
       {/* LINKED DEVICES */}
-      <div className="bg-surface-container border border-surface-variant rounded-xl p-6">
-        <h3 className="mt-0 text-lg font-bold">
-          {t('dashboard.equipment.title')} ({registeredDevices.length} / {userData?.maxSeats || 1})
-        </h3>
-        <p className="text-sm text-on-surface-variant mb-4">{t('dashboard.equipment.desc')}</p>
+      <Card>
+        <CardHeader title={`${t('dashboard.equipment.title')} (${devicesList.filter(d => d.globalLinked).length + registeredDevices.filter(d => !devicesList.find(dev => dev.id === d)).length} / ${userData?.maxSeats || 1})`} icon="computer" />
+        <p className="text-sm text-on-surface-variant mb-4 mt-2">{t('dashboard.equipment.desc')}</p>
         
-        {registeredDevices.length > 0 ? (
+        {devicesList.length > 0 || registeredDevices.length > 0 ? (
           <div className="flex flex-col gap-3">
-            {registeredDevices.map(dev => (
+            {/* Iteramos los dispositivos de la subcolección nueva (Fase 3) */}
+            {devicesList.map(dev => (
+              <div key={dev.id} className={`p-3 rounded-lg border ${dev.globalLinked ? 'bg-[#0D0D0D] border-surface-variant' : 'bg-surface-container-low border-outline-variant/30 opacity-70'}`}>
+                <div className="flex justify-between items-center mb-2">
+                  <span className={`font-mono text-sm flex items-center gap-2 ${dev.globalLinked ? 'text-green-400' : 'text-on-surface-variant'}`}>
+                    <span className="material-symbols-outlined text-[18px]">computer</span> {dev.name || dev.id}
+                  </span>
+                  {dev.globalLinked ? (
+                    <button 
+                      className="bg-error/10 border border-error/30 text-error hover:bg-error hover:text-white font-bold text-xs px-2 py-1 rounded transition-colors" 
+                      onClick={() => handleUnlink(dev.id)}
+                    >
+                      Unlink
+                    </button>
+                  ) : (
+                    <button 
+                      className="bg-primary-container text-white hover:bg-[#e66000] font-bold text-xs px-3 py-1 rounded transition-colors" 
+                      onClick={() => handleLink(dev)}
+                    >
+                      Link
+                    </button>
+                  )}
+                </div>
+                <div className="text-xs text-on-surface-variant mb-2">Última conexión: {dev.lastActive ? new Date(dev.lastActive.toDate()).toLocaleString() : 'N/A'}</div>
+                {dev.globalUnlinkedAt && !dev.globalLinked && (
+                  <div className="text-[10px] text-error mt-1 flex items-center gap-1">
+                    <span className="material-symbols-outlined text-[12px]">timer</span>
+                    Bloqueado (Penalty de 7 dias)
+                  </div>
+                )}
+              </div>
+            ))}
+            
+            {/* Fallback Legacy */}
+            {registeredDevices.filter(d => !devicesList.find(dev => dev.id === d)).map(dev => (
               <div key={dev} className="bg-[#0D0D0D] p-3 rounded-lg border border-surface-variant">
                 <div className="flex justify-between items-center mb-2">
-                  <span className="font-mono text-green-400 text-sm flex items-center gap-2">
-                    <span className="material-symbols-outlined text-[18px]">computer</span> {dev}
+                  <span className="font-mono text-yellow-400 text-sm flex items-center gap-2">
+                    <span className="material-symbols-outlined text-[18px]">computer</span> {dev} (Legacy)
                   </span>
                   <button 
-                    className="bg-transparent border border-surface-variant text-on-surface-variant hover:text-red-400 text-xs px-2 py-1 rounded transition-colors" 
+                    className="bg-error/10 border border-error/30 text-error hover:bg-error hover:text-white font-bold text-xs px-2 py-1 rounded transition-colors" 
                     onClick={() => handleUnlink(dev)}
                   >
-                    {t('dashboard.equipment.unlink')}
+                    Unlink
                   </button>
                 </div>
-                <input 
-                  type="text" 
-                  value={deviceNotes[dev] || ''} 
-                  onChange={e => handleNoteChange(dev, e.target.value)} 
-                  placeholder={t('dashboard.equipment.placeholder')}
-                  className="w-full p-2 bg-[#141414] border border-dashed border-surface-variant text-white text-sm focus:outline-none focus:border-primary-container transition-colors"
-                />
               </div>
             ))}
           </div>
@@ -145,7 +222,7 @@ export default function LicensesTab() {
              {t('dashboard.equipment.empty')}
            </div>
         )}
-      </div>
+      </Card>
 
 
     </div>

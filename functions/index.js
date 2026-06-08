@@ -1,4 +1,5 @@
-const { onRequest } = require("firebase-functions/v2/https");
+const { onRequest, onCall, HttpsError } = require("firebase-functions/v2/https");
+const { onDocumentCreated } = require("firebase-functions/v2/firestore");
 const logger = require("firebase-functions/logger");
 
 // Lazy imports de módulos nativos
@@ -65,23 +66,96 @@ exports.getRoutine = onRequest({ cors: true }, async (req, res) => {
       userEmail = userData.email || "Cliente Registrado";
       registeredDevice = userData.registeredDevice || null;
     }
+    // 1. Registrar el equipo en el Pool y evaluar Auto-Vinculación de Suite Global
+    let isGlobalLinked = false;
+    let hasGranularLicense = false;
 
     if (hwId && userDocRef && userData) {
+      const { admin } = getDeps();
       const maxSeats = userData.maxSeats || 1;
-      const registeredDevices = userData.registeredDevices || [];
-
-      if (!registeredDevices.includes(hwId)) {
-        if (registeredDevices.length < maxSeats) {
-          registeredDevices.push(hwId);
-          await userDocRef.update({ 
-            registeredDevices: registeredDevices,
-            registeredDevice: hwId // Mantenemos compatibilidad con el Dashboard actual
-          });
+      
+      try {
+        const devRef = db.collection("users").doc(userDocRef.id).collection("devices").doc(hwId);
+        const devSnap = await devRef.get();
+        
+        if (devSnap.exists) {
+          // Mantenemos soporte al flag legacy por si acaso
+          if (devSnap.data().globalLinked === true) isGlobalLinked = true;
+          // Actualizamos lastActive
+          await devRef.update({ lastActive: admin.firestore.FieldValue.serverTimestamp() });
         } else {
-          const drmAlert = `(alert "\\n[TM Digital] PROTECAO ATIVADA:\\nLimite de assentos atingido (${maxSeats}).\\n\\nAcesse o Painel Web para desvincular um equipamento antigo ou adquirir mais assentos.")\n(princ)`;
-          res.setHeader("Content-Type", "text/plain; charset=utf-8");
-          return res.status(200).send(drmAlert);
+          // El dispositivo es nuevo en el Pool
+          await devRef.set({
+            hwId: hwId,
+            name: hwId,
+            globalLinked: false, // La vinculación real ahora es vía suscripción
+            lastActive: admin.firestore.FieldValue.serverTimestamp()
+          });
         }
+
+        // Lógica de Suite Global mediante Subscriptions
+        const globalSubId = `sub_global_${userDocRef.id}`;
+        const globalSubRef = db.collection("subscriptions").doc(globalSubId);
+        const globalSubSnap = await globalSubRef.get();
+        
+        if (globalSubSnap.exists) {
+          const subData = globalSubSnap.data();
+          const assignedDevices = subData.assignedDevices || [];
+          
+          if (assignedDevices.includes(hwId)) {
+            // Verificar si NO está en sobregiro
+            if (assignedDevices.length <= (subData.purchasedSeats || 1)) {
+              isGlobalLinked = true; // El hwId ya tiene el asiento global asignado
+            }
+          } else if (subData.isAutoAssignable && assignedDevices.length < subData.purchasedSeats) {
+            // Auto-asignar silenciosamente
+            await globalSubRef.update({
+              assignedDevices: admin.firestore.FieldValue.arrayUnion(hwId)
+            });
+            isGlobalLinked = true;
+          }
+        } else {
+          // Fallback Legacy si no existe la suscripción global (ej. usuarios no migrados)
+          if (!devSnap.exists) {
+            const activeDevsSnap = await db.collection("users").doc(userDocRef.id).collection("devices")
+              .where("globalLinked", "==", true)
+              .get();
+            let linkedCount = activeDevsSnap.size;
+            const oldDevices = userData.registeredDevices || [];
+            oldDevices.forEach(oldId => {
+              if (!activeDevsSnap.docs.find(d => d.id === oldId)) linkedCount++;
+            });
+            if (linkedCount < maxSeats) {
+              isGlobalLinked = true; 
+              await devRef.update({ globalLinked: true });
+            }
+          }
+        }
+      } catch(e) { console.error("Error managing device:", e); }
+
+      // 2. Validar Suscripciones de Terceros (Fase 3)
+      try {
+        const subSnap = await db.collection("subscriptions")
+          .where("tenantId", "==", userDocRef.id)
+          .where("assignedDevices", "array-contains", hwId)
+          .get(); // Retiramos limit(1) para buscar la primera NO sobregirada
+          
+        if (!subSnap.empty) {
+          for (const doc of subSnap.docs) {
+            const subData = doc.data();
+            if ((subData.assignedDevices || []).length <= (subData.purchasedSeats || 1)) {
+              hasGranularLicense = true;
+              break;
+            }
+          }
+        }
+      } catch(e) { console.error("Error checking subscriptions:", e); }
+
+      // 3. Bloqueo si no tiene acceso por ninguna de las vías
+      if (!isGlobalLinked && !hasGranularLicense) {
+        const drmAlert = `(alert "\\n[TM Digital] PROTECAO ATIVADA:\\nLimite de assentos atingido (${maxSeats}).\\n\\nAcesse o Painel Web para desvincular um equipamento ou vincular manualmente este PC.")\n(princ)`;
+        res.setHeader("Content-Type", "text/plain; charset=utf-8");
+        return res.status(200).send(drmAlert);
       }
     }
 
@@ -161,22 +235,42 @@ exports.getRoutine = onRequest({ cors: true }, async (req, res) => {
       let code = "";
 
       if (!fs.existsSync(filepath)) {
-        // Fallback: Buscar en el Workspace del Tenant (Firebase Storage)
+        // Búsqueda Global: Permitimos Cross-Tenant (Fase 3)
         if (!userDocRef) {
           return res.status(404).send(`Error: Rutina ${originalName} no encontrada.`);
         }
 
         const lispsSnapshot = await db.collection("lispFiles")
-          .where("tenantId", "==", userDocRef.id)
           .where("lispId", "==", safeRoutineId)
           .limit(1)
           .get();
 
         if (lispsSnapshot.empty) {
-          return res.status(404).send(`Error: Rutina ${originalName} no encontrada en el servidor ni en tu Workspace.`);
+          return res.status(404).send(`Error: Rutina ${originalName} no encontrada en el ecosistema LispCentral.`);
         }
 
         const lispData = lispsSnapshot.docs[0].data();
+        const creatorId = lispData.tenantId;
+
+        // Validar si tiene derecho a usar este código
+        let isAuthorizedForThisFile = false;
+        if (creatorId === userDocRef.id) {
+          // El propio creador. Ya pasó los checks de HWID arriba.
+          isAuthorizedForThisFile = true;
+        } else {
+          // Cross-Tenant: Debe tener una licencia granular asignada a este HWID
+          if (hasGranularLicense) {
+             // TODO: Más adelante filtraremos por suiteId específico usando lispData.suiteId
+             isAuthorizedForThisFile = true;
+          }
+        }
+
+        if (!isAuthorizedForThisFile) {
+          const authAlert = `(alert "\\n[LispCentral] ACCESO DENEGADO:\\nNo tienes una licencia asignada a este dispositivo para usar comandos de esta Suite.")\n(princ)`;
+          res.setHeader("Content-Type", "text/plain; charset=utf-8");
+          return res.status(200).send(authAlert);
+        }
+
         const { admin } = getDeps();
         const bucket = admin.storage().bucket("lispcentral.firebasestorage.app");
         const file = bucket.file(lispData.storagePath);
@@ -425,5 +519,116 @@ exports.getUserResources = onRequest({ cors: true }, async (req, res) => {
   } catch (err) {
     console.error("Error en getUserResources:", err);
     return res.status(500).json({ error: "Erro interno." });
+  }
+});
+
+// Trigger para crear la Suite Global Inicial automáticamente al registrar un nuevo usuario/tenant
+exports.onUserCreated = onDocumentCreated("users/{userId}", async (event) => {
+  const snapshot = event.data;
+  if (!snapshot) return;
+
+  const userId = event.params.userId;
+  const db = getDb();
+  const { admin } = getDeps();
+  
+  try {
+    // 1. Crear la Suite Global inmutable
+    const globalSuiteId = `global_${userId}`;
+    await db.collection("suites").doc(globalSuiteId).set({
+      ownerId: userId,
+      name: "Suite Global (Herramientas Propias)",
+      description: "Agrupa todos tus comandos LISP subidos. Creada automáticamente por el sistema.",
+      type: "global",
+      visibility: "private",
+      isEditable: false,
+      createdAt: admin.firestore.FieldValue.serverTimestamp()
+    });
+
+    // 2. Crear la Suscripción Global (Entitlement) con 1 asiento auto-asignable
+    const globalSubId = `sub_global_${userId}`;
+    await db.collection("subscriptions").doc(globalSubId).set({
+      suiteId: globalSuiteId,
+      tenantId: userId,
+      purchasedSeats: 1,
+      assignedDevices: [],
+      isGlobal: true,
+      isAutoAssignable: true,
+      status: "active",
+      createdAt: admin.firestore.FieldValue.serverTimestamp()
+    });
+
+    console.log(`Global Suite and Subscription created for user ${userId}`);
+  } catch (err) {
+    console.error(`Error creating Global Suite for user ${userId}:`, err);
+  }
+});
+
+// Endpoint Seguro para Asignar/Desasignar Equipos (Aplica Reglas de Negocio en Backend)
+exports.toggleDeviceAssignment = onCall(async (request) => {
+  if (!request.auth) {
+    throw new HttpsError("unauthenticated", "Debe estar autenticado.");
+  }
+
+  const { subId, deviceId, action } = request.data;
+  if (!subId || !deviceId || !["assign", "unassign"].includes(action)) {
+    throw new HttpsError("invalid-argument", "Parámetros inválidos.");
+  }
+
+  const db = getDb();
+  const { admin } = getDeps();
+  const subRef = db.collection("subscriptions").doc(subId);
+
+  try {
+    return await db.runTransaction(async (transaction) => {
+      const subDoc = await transaction.get(subRef);
+      if (!subDoc.exists) throw new HttpsError("not-found", "Suscripción no encontrada.");
+      
+      const subData = subDoc.data();
+      if (subData.tenantId !== request.auth.uid) {
+        throw new HttpsError("permission-denied", "No eres el dueño de esta suscripción.");
+      }
+
+      const currentAssigned = subData.assignedDevices || [];
+      const purchasedSeats = subData.purchasedSeats || 1;
+      const penaltyBox = subData.penaltyBox || {};
+
+      if (action === "assign") {
+        if (currentAssigned.includes(deviceId)) return { success: true }; // Ya asignado
+        
+        // 1. Regla de Negocio: Límite de Asientos
+        if (currentAssigned.length >= purchasedSeats) {
+          throw new HttpsError("resource-exhausted", `Límite de asientos alcanzado (${purchasedSeats}).`);
+        }
+
+        // 2. Regla de Negocio: Penalty Box (7 Días Cooldown)
+        if (penaltyBox[deviceId]) {
+          const unlinkedDate = penaltyBox[deviceId].toDate();
+          const daysPassed = (new Date() - unlinkedDate) / (1000 * 60 * 60 * 24);
+          if (daysPassed < 7) {
+            const daysLeft = Math.ceil(7 - daysPassed);
+            throw new HttpsError("failed-precondition", `Anti-Abuso: Espera ${daysLeft} días para reasignar este PC.`);
+          }
+        }
+
+        const newAssigned = [...currentAssigned, deviceId];
+        transaction.update(subRef, { assignedDevices: newAssigned });
+        return { success: true, message: "Equipo asignado con éxito." };
+      } 
+      else if (action === "unassign") {
+        if (!currentAssigned.includes(deviceId)) return { success: true };
+        
+        const newAssigned = currentAssigned.filter(id => id !== deviceId);
+        const updates = { 
+          assignedDevices: newAssigned,
+          [`penaltyBox.${deviceId}`]: admin.firestore.FieldValue.serverTimestamp()
+        };
+        transaction.update(subRef, updates);
+        return { success: true, message: "Equipo desvinculado. Bloqueado por 7 días." };
+      }
+    });
+  } catch (error) {
+    console.error("Error en toggleDeviceAssignment:", error);
+    if (error instanceof HttpsError) throw error;
+    throw new HttpsError("internal", "Error procesando la solicitud.");
   }
 });
