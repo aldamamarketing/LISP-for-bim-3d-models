@@ -1,0 +1,3 @@
+## 2024-06-08 - [O(N^2) list building anti-pattern in LISP]
+**Learning:** Found a classic LISP performance issue in the `LC:parse-json-names` function where lists were built using `(append lst (list item))` inside a `while` loop. This results in O(N^2) complexity because `append` traverses the entire list on every iteration.
+**Action:** Replace `(append lst (list item))` inside loops with `(cons item lst)` to prepend in O(1) time, and then return `(reverse lst)` at the end of the loop to achieve O(N) overall performance. This is particularly important when parsing large JSON responses in AutoLISP.
