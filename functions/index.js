@@ -11,20 +11,20 @@ function getOpenAI() {
   });
 }
 
-// Lazy imports de módulos nativos
+const admin = require("firebase-admin");
+if (admin.apps.length === 0) {
+  admin.initializeApp();
+}
+
 function getDeps() {
   return {
     fs: require("fs"),
     path: require("path"),
-    admin: require("firebase-admin")
+    admin: admin
   };
 }
 
 function getDb() {
-  const { admin } = getDeps();
-  if (admin.apps.length === 0) {
-    admin.initializeApp();
-  }
   return admin.firestore();
 }
 
