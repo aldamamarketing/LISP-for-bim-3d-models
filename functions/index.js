@@ -69,6 +69,8 @@ exports.getRoutine = onRequest({ cors: true }, async (req, res) => {
     // 1. Registrar el equipo en el Pool y evaluar Auto-Vinculación de Suite Global
     let isGlobalLinked = false;
     let hasGranularLicense = false;
+    const validSuiteIds = [];
+    const overlimitSuiteIds = [];
 
     if (hwId && userDocRef && userData) {
       const { admin } = getDeps();
@@ -133,19 +135,25 @@ exports.getRoutine = onRequest({ cors: true }, async (req, res) => {
         }
       } catch(e) { console.error("Error managing device:", e); }
 
-      // 2. Validar Suscripciones de Terceros (Fase 3)
+      // 2. Validar Suscripciones de Terceros (Extraer Suites Permitidas y Sobregiradas)
       try {
         const subSnap = await db.collection("subscriptions")
           .where("tenantId", "==", userDocRef.id)
           .where("assignedDevices", "array-contains", hwId)
-          .get(); // Retiramos limit(1) para buscar la primera NO sobregirada
+          .get(); 
           
         if (!subSnap.empty) {
           for (const doc of subSnap.docs) {
             const subData = doc.data();
-            if ((subData.assignedDevices || []).length <= (subData.purchasedSeats || 1)) {
-              hasGranularLicense = true;
-              break;
+            if (subData.isGlobal) continue; // La global ya se verificó
+            
+            if (subData.suiteId) {
+              if ((subData.assignedDevices || []).length <= (subData.purchasedSeats || 1)) {
+                hasGranularLicense = true;
+                validSuiteIds.push(subData.suiteId);
+              } else {
+                overlimitSuiteIds.push(subData.suiteId);
+              }
             }
           }
         }
@@ -164,8 +172,7 @@ exports.getRoutine = onRequest({ cors: true }, async (req, res) => {
     let routinesLoaded = [];
 
     if (routineId && routineId.toUpperCase() === "INDEX") {
-      // Si el usuario es antiguo y no tiene activeSuites, le damos acceso a las básicas de la beta
-      const activeSuites = userData.activeSuites || ["core", "structures_pro", "architecture", "quantities"];
+      // 1. Extraer comandos propios del usuario
       const lispsRef = db.collection("lispFiles").where("tenantId", "==", userDocRef.id);
       const snapshotLisps = await lispsRef.get();
       
@@ -181,6 +188,32 @@ exports.getRoutine = onRequest({ cors: true }, async (req, res) => {
           svgIcon: data.svgIcon || ""
         });
       });
+
+      // 2. Extraer comandos de la Store (Suscripciones de Terceros)
+      const allSubscribedSuites = [...validSuiteIds, ...overlimitSuiteIds];
+      if (allSubscribedSuites.length > 0) {
+        for (let i = 0; i < allSubscribedSuites.length; i += 10) {
+          const chunk = allSubscribedSuites.slice(i, i + 10);
+          const storeLispsSnap = await db.collection("lispFiles").where("suiteId", "in", chunk).get();
+          
+          storeLispsSnap.forEach(docSnap => {
+            const data = docSnap.data();
+            // Evitamos duplicar LISPs si el usuario compró su propia Suite (caso límite)
+            if (data.tenantId !== userDocRef.id) {
+               const isOverlimit = overlimitSuiteIds.includes(data.suiteId);
+               commands.push({
+                 name: data.lispId,
+                 friendly: (isOverlimit ? "⚠️ " : "") + (data.friendlyName || data.lispId),
+                 desc: isOverlimit ? "[Límite de Asientos] " + (data.description || "") : (data.description || "Herramienta Store"),
+                 group: `${data.suiteId} - ${data.group || 'Tools'}`,
+                 doc: "#",
+                 svgIcon: data.svgIcon || "",
+                 disabled: isOverlimit // Señal para el frontend webview en AutoCAD si la soporta
+               });
+            }
+          });
+        }
+      }
       
       res.setHeader("Content-Type", "application/json; charset=utf-8");
       return res.status(200).send(JSON.stringify(commands));
@@ -252,21 +285,24 @@ exports.getRoutine = onRequest({ cors: true }, async (req, res) => {
         const lispData = lispsSnapshot.docs[0].data();
         const creatorId = lispData.tenantId;
 
-        // Validar si tiene derecho a usar este código
+        // Validar si tiene derecho a usar este código (Restricción Estricta B2B)
         let isAuthorizedForThisFile = false;
         if (creatorId === userDocRef.id) {
           // El propio creador. Ya pasó los checks de HWID arriba.
           isAuthorizedForThisFile = true;
         } else {
-          // Cross-Tenant: Debe tener una licencia granular asignada a este HWID
-          if (hasGranularLicense) {
-             // TODO: Más adelante filtraremos por suiteId específico usando lispData.suiteId
+          // Cross-Tenant: Validar si la Suite está autorizada para este HWID sin sobregiro
+          if (validSuiteIds.includes(lispData.suiteId)) {
              isAuthorizedForThisFile = true;
           }
         }
 
         if (!isAuthorizedForThisFile) {
-          const authAlert = `(alert "\\n[LispCentral] ACCESO DENEGADO:\\nNo tienes una licencia asignada a este dispositivo para usar comandos de esta Suite.")\n(princ)`;
+          const isOverlimit = overlimitSuiteIds.includes(lispData.suiteId);
+          const reason = isOverlimit 
+             ? "Límite de asientos alcanzado para esta Suite. Libera un equipo en el Panel Web." 
+             : "No tienes una licencia asignada a este dispositivo para usar comandos de esta Suite.";
+          const authAlert = `(alert "\\n[LispCentral] ACCESO DENEGADO:\\n${reason}")\n(princ)`;
           res.setHeader("Content-Type", "text/plain; charset=utf-8");
           return res.status(200).send(authAlert);
         }
