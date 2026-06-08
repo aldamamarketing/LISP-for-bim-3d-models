@@ -398,13 +398,13 @@ export default function SuitesGroupsCard() {
                               </select>
 
                               <div className="flex gap-1 opacity-0 group-hover/suite:opacity-100 transition-opacity">
-                                <button className="w-6 h-6 rounded text-on-surface-variant hover:text-white hover:bg-surface-container-highest flex items-center justify-center transition-colors" title="Editar Suite" onClick={() => handleEditSuite(suite)}>
+                                <button className="w-6 h-6 rounded text-on-surface-variant hover:text-white hover:bg-surface-container-highest flex items-center justify-center transition-colors" aria-label="Editar Suite" title="Editar Suite" onClick={() => handleEditSuite(suite)}>
                                   <span className="material-symbols-outlined text-[14px]">edit</span>
                                 </button>
-                                <button className="w-6 h-6 rounded text-on-surface-variant hover:text-white hover:bg-surface-container-highest flex items-center justify-center transition-colors" title="Adicionar Grupo" onClick={() => handleAddGroup(suite.id)}>
+                                <button className="w-6 h-6 rounded text-on-surface-variant hover:text-white hover:bg-surface-container-highest flex items-center justify-center transition-colors" aria-label="Adicionar Grupo" title="Adicionar Grupo" onClick={() => handleAddGroup(suite.id)}>
                                   <span className="material-symbols-outlined text-[14px]">create_new_folder</span>
                                 </button>
-                                <button className="w-6 h-6 rounded text-on-surface-variant hover:text-error hover:bg-error/10 flex items-center justify-center transition-colors" title="Excluir Suite" onClick={() => handleDeleteSuite(suite.id)}>
+                                <button className="w-6 h-6 rounded text-on-surface-variant hover:text-error hover:bg-error/10 flex items-center justify-center transition-colors" aria-label="Excluir Suite" title="Excluir Suite" onClick={() => handleDeleteSuite(suite.id)}>
                                   <span className="material-symbols-outlined text-[14px]">delete</span>
                                 </button>
                               </div>
@@ -443,7 +443,7 @@ export default function SuitesGroupsCard() {
                                         {group.name}
                                       </div>
                                     )}
-                                    <button className="w-5 h-5 rounded text-on-surface-variant hover:text-error hover:bg-error/10 flex items-center justify-center opacity-0 group-hover/dropzone:opacity-100 transition-opacity" onClick={() => handleDeleteGroup(group.id)} title="Excluir Grupo">
+                                    <button className="w-5 h-5 rounded text-on-surface-variant hover:text-error hover:bg-error/10 flex items-center justify-center opacity-0 group-hover/dropzone:opacity-100 transition-opacity" aria-label="Excluir Grupo" onClick={() => handleDeleteGroup(group.id)} title="Excluir Grupo">
                                       <span className="material-symbols-outlined text-[14px]">delete</span>
                                     </button>
                                   </div>
@@ -464,7 +464,7 @@ export default function SuitesGroupsCard() {
                                             <span className="material-symbols-outlined text-[12px] opacity-80 text-secondary">description</span>
                                           </div>
                                           <span className="text-[10px] font-bold text-on-surface max-w-[120px] truncate">{file.originalName}</span>
-                                          <button className="w-3.5 h-3.5 flex items-center justify-center text-on-surface-variant hover:text-error opacity-0 group-hover/chip:opacity-100 transition-opacity" onClick={() => handleRemoveAssignment(assignment.id)}>
+                                          <button className="w-3.5 h-3.5 flex items-center justify-center text-on-surface-variant hover:text-error opacity-0 group-hover/chip:opacity-100 transition-opacity" aria-label="Remover atribuição" onClick={() => handleRemoveAssignment(assignment.id)}>
                                             <span className="material-symbols-outlined text-[10px]">close</span>
                                           </button>
                                         </div>
