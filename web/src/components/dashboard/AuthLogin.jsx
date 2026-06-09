@@ -53,8 +53,9 @@ export default function AuthLogin() {
           
           <form className="space-y-4" onSubmit={isRegistering ? handleEmailSignup : handleEmailLogin}>
             <div>
-              <label className="block font-label-md text-label-md text-on-surface-variant mb-1">{t('auth.corporateEmail')}</label>
+              <label htmlFor="auth-email" className="block font-label-md text-label-md text-on-surface-variant mb-1">{t('auth.corporateEmail')}</label>
               <input 
+                id="auth-email"
                 type="email" 
                 value={emailStr} 
                 onChange={(e) => setEmailStr(e.target.value)} 
@@ -65,8 +66,9 @@ export default function AuthLogin() {
             </div>
             
             <div>
-              <label className="block font-label-md text-label-md text-on-surface-variant mb-1">{t('auth.password')}</label>
+              <label htmlFor="auth-password" className="block font-label-md text-label-md text-on-surface-variant mb-1">{t('auth.password')}</label>
               <input 
+                id="auth-password"
                 type="password" 
                 value={passwordStr} 
                 onChange={(e) => setPasswordStr(e.target.value)} 
@@ -78,8 +80,9 @@ export default function AuthLogin() {
 
             {isRegistering && (
               <div>
-                <label className="block font-label-md text-label-md text-on-surface-variant mb-1">{t('auth.confirmPassword')}</label>
+                <label htmlFor="auth-confirm-password" className="block font-label-md text-label-md text-on-surface-variant mb-1">{t('auth.confirmPassword')}</label>
                 <input 
+                  id="auth-confirm-password"
                   type="password" 
                   value={passwordConfirmStr} 
                   onChange={(e) => setPasswordConfirmStr(e.target.value)} 
