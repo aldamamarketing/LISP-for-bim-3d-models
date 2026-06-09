@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import HatchPreview from './tools/HatchPreview';
 import LinetypePreview from './tools/LinetypePreview';
 import PaletteDropdownMenu from './PaletteDropdownMenu';
@@ -96,17 +96,21 @@ export default function ResourcePalette() {
   };
 
   // Filtrar y ordenar: pinned primero, luego búsqueda
-  const filteredResources = resources
-    .filter(item => {
-      if (activeFilters.length === 0) return true;
-      const searchableText = `${item.name || ''} ${item.description || ''}`.toLowerCase();
-      return activeFilters.some(tag => searchableText.includes(tag.toLowerCase()));
-    })
-    .sort((a, b) => {
-      const aPinned = pinnedIds.includes(a.id) ? 0 : 1;
-      const bPinned = pinnedIds.includes(b.id) ? 0 : 1;
-      return aPinned - bPinned;
-    });
+  const filteredResources = useMemo(() => {
+    const lowerTags = activeFilters.map(tag => tag.toLowerCase());
+
+    return resources
+      .filter(item => {
+        if (lowerTags.length === 0) return true;
+        const searchableText = `${item.name || ''} ${item.description || ''}`.toLowerCase();
+        return lowerTags.some(tag => searchableText.includes(tag));
+      })
+      .sort((a, b) => {
+        const aPinned = pinnedIds.includes(a.id) ? 0 : 1;
+        const bPinned = pinnedIds.includes(b.id) ? 0 : 1;
+        return aPinned - bPinned;
+      });
+  }, [resources, activeFilters, pinnedIds]);
 
   const tabStyle = (isActive) => ({
     flex: 1,
