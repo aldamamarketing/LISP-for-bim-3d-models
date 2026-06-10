@@ -61,6 +61,13 @@ export const translations = {
     "help.sec2.li1": "Upload: In the Portal, go to LISP Manager and click '+ Add LISPs'. You can select multiple files at once.",
     "help.sec2.li2": "Edit Metadata: Click the pencil icon next to a routine to change its Friendly Name, Suite, and Icon.",
     "help.sec2.li3": "Remove: Click the trash icon to delete the routine from your Workspace. Changes reflect in AutoCAD on the next load.",
+    "help.box5.title": "LISP Best Practices",
+    "help.box5.desc": "Learn how to structure your code for JIT delivery and manage dependencies with LC:Require.",
+    "help.sec3.title": "Best Practices & Dependencies",
+    "help.sec3.p1": "To align your legacy code to the cloud architecture and leverage Just-In-Time (JIT) loading, follow these rules:",
+    "help.sec3.li1": "Centralize Logic: A downloaded file loads all its internal commands into memory instantly. Group related commands.",
+    "help.sec3.li2": "LC:Require: If a script depends on another (e.g. math library), use `(LC:Require \"LibraryName\")` at the top of your LISP.",
+    "help.sec3.li3": "Suite Permissions: The main file and its dependencies MUST belong to the same Suite in LispCentral to pass DRM checks.",
 
     // Dashboard Sidebar
     "dashboard.sidebar.manager": "LISP Manager",
@@ -276,6 +283,13 @@ export const translations = {
     "help.sec2.li1": "Subir: En el Portal, ve a Gestor de LISPs y clic en '+ Añadir LISPs'. Puedes seleccionar varios archivos a la vez.",
     "help.sec2.li2": "Editar Metadatos: Haz clic en el ícono de lápiz para cambiar el Nombre, Categoría (Suite) e Ícono.",
     "help.sec2.li3": "Eliminar: Haz clic en la papelera para borrar la rutina de tu Workspace. El cambio se refleja en el próximo inicio.",
+    "help.box5.title": "Mejores Prácticas LISP",
+    "help.box5.desc": "Aprende a estructurar tu código para carga JIT y gestionar dependencias con LC:Require.",
+    "help.sec3.title": "Mejores Prácticas y Dependencias",
+    "help.sec3.p1": "Para alinear tu código heredado a la arquitectura en la nube y aprovechar la carga Just-In-Time (JIT), sigue estas reglas:",
+    "help.sec3.li1": "Centralizar Lógica: Un archivo descargado carga todos sus comandos en memoria al instante. Agrupa comandos relacionados.",
+    "help.sec3.li2": "LC:Require: Si un script depende de otro (ej. librería matemática), usa `(LC:Require \"NombreLibreria\")` al inicio de tu LISP.",
+    "help.sec3.li3": "Permisos de Suite: El archivo principal y sus dependencias DEBEN pertenecer a la misma Suite en LispCentral para superar las comprobaciones de DRM.",
 
     // Dashboard Sidebar
     "dashboard.sidebar.manager": "Gestor de LISP",
@@ -489,8 +503,15 @@ export const translations = {
     "help.sec2.title": "Gerenciando Scripts",
     "help.sec2.p1": "Seus arquivos .lsp são armazenados na nuvem e baixados apenas quando necessários na memória (JIT).",
     "help.sec2.li1": "Fazer Upload: No Portal, vá até Gestor de LISPs e clique em '+ Adicionar LISPs'. Você pode selecionar vários arquivos de uma vez.",
-    "help.sec2.li2": "Editar Metadados: Clique no ícone de lápis ao lado de uma rotina para alterar o Nome Amigável, Categoria (Suite) e Ícone (Base64).",
+    "help.sec2.li2": "Editar Metadatos: Clique no ícone de lápis ao lado de uma rotina para alterar o Nome Amigável, Categoria (Suite) e Ícone (Base64).",
     "help.sec2.li3": "Remover: Clique na lixeira para excluir a rotina do seu Workspace. A alteração será refletida no AutoCAD no próximo carregamento.",
+    "help.box5.title": "Melhores Práticas LISP",
+    "help.box5.desc": "Aprenda a estruturar seu código para entrega JIT e gerenciar dependências com LC:Require.",
+    "help.sec3.title": "Melhores Práticas e Dependências",
+    "help.sec3.p1": "Para alinhar seu código legado à arquitetura em nuvem e aproveitar o carregamento Just-In-Time (JIT), siga estas regras:",
+    "help.sec3.li1": "Centralizar Lógica: Um arquivo baixado carrega todos os seus comandos na memória instantaneamente. Agrupe comandos relacionados.",
+    "help.sec3.li2": "LC:Require: Se um script depende de outro (ex. biblioteca matemática), use `(LC:Require \"NomeBiblioteca\")` no topo do seu LISP.",
+    "help.sec3.li3": "Permissões de Suite: O arquivo principal e suas dependências DEVEM pertencer à mesma Suite no LispCentral para passar nas verificações de DRM.",
 
     // Dashboard Sidebar
     "dashboard.sidebar.manager": "Gestor de LISP",

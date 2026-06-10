@@ -82,3 +82,28 @@ El núcleo del SaaS se basa en una inicialización invisible y de latencia cero,
 2. **Inyección de "Ghost Commands":** El Loader parsea el índice y registra instantáneamente en la RAM "Fantasmas" de cada rutina. Esto le enseña a AutoCAD la existencia del comando, permitiendo el **Autocompletado Nativo** en la consola, pero sin descargar el código fuente.
 3. **Lazy Execution (JIT):** Cuando el usuario ejecuta un comando fantasma (ya sea tecleándolo o haciendo clic en la Paleta Web), el Fantasma intercepta la acción, descarga el archivo real `.lsp` minificado, lo inyecta en RAM sobrescribiéndose a sí mismo, y finalmente lo evalúa.
 4. **Sincronización en Caliente:** Un comando nativo (`LC_SYNC`) permite rehacer el Handshake, inyectando nuevos Ghost Commands en tiempo real si el administrador web asignó nuevas rutinas a la cuenta, todo sin necesidad de reiniciar AutoCAD ni bajar actualizaciones de software.
+
+---
+
+## 5. Mejores Prácticas y Manejo de Dependencias LISP
+
+Para alinear el código heredado o de terceros a la nueva arquitectura SaaS y aprovechar la carga JIT (Just-In-Time) sin romper el entorno, los desarrolladores (y usuarios del Portal) deben seguir estas reglas:
+
+### 1. Centralización de Archivos Lógicos
+La arquitectura asume que si AutoCAD descarga un comando (por ejemplo, `c:TMD_VIGA`), dicho archivo contiene todo lo necesario para ejecutar la viga. Puedes tener 50 comandos en el mismo archivo `TMD_Estructuras.lsp`; al llamar a uno, todo el paquete de 50 comandos quedará cargado y disponible localmente de forma instantánea.
+
+### 2. Librerías y Dependencias (LC:Require)
+En la programación modular, es común que un LISP principal dependa de un LISP auxiliar (por ejemplo, `TMD_Math.lsp`). Como AutoCAD no dispara un "Unknown Command" si falla una función auxiliar interna, el desarrollador **DEBE** declarar explícitamente la dependencia en la parte superior del archivo usando nuestra directiva nativa `LC:Require`:
+
+```lisp
+;; TMD_Align.lsp
+(LC:Require "TMD_Math") ; Descarga y carga en RAM la librería silenciosamente si no existe
+
+(defun c:TMD_AL_C ()
+  (tmd:calcular_brecha 10 5) ; Función interna de TMD_Math
+  (princ "\\nComando ejecutado con éxito")
+)
+```
+
+### 3. Asignación de Permisos de Suite (Regla de Oro B2B)
+Para que `LC:Require "TMD_Math"` funcione, tanto el archivo principal (`TMD_Align.lsp`) como el archivo de la librería (`TMD_Math.lsp`) **DEBEN** pertenecer a la misma Suite en LispCentral. Esto asegura que la validación DRM en el servidor apruebe ambas descargas bajo el mismo *Entitlement* (suscripción) del usuario final, sin generar errores de "Acceso Denegado" a mitad de la ejecución de AutoCAD.

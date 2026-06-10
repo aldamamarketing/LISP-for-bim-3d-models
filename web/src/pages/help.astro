@@ -41,6 +41,12 @@ const t = (key) => {
             <h2 class="text-title-lg font-bold mb-3 text-white group-hover:text-primary-container transition-colors">{t("help.box4.title")}</h2>
             <p class="text-body-md text-on-surface-variant">{t("help.box4.desc")}</p>
         </a>
+
+        <a href="#best-practices" class="group block bg-surface-container p-8 rounded-2xl border border-surface-variant hover:border-primary-container transition-all hover:-translate-y-1 md:col-span-2">
+            <span class="material-symbols-outlined text-4xl text-primary-container mb-4 block">code</span>
+            <h2 class="text-title-lg font-bold mb-3 text-white group-hover:text-primary-container transition-colors">{t("help.box5.title")}</h2>
+            <p class="text-body-md text-on-surface-variant">{t("help.box5.desc")}</p>
+        </a>
     </div>
 
     <div class="space-y-16">
@@ -73,6 +79,21 @@ const t = (key) => {
             <li>{t("help.sec2.li1")}</li>
             <li>{t("help.sec2.li2")}</li>
             <li>{t("help.sec2.li3")}</li>
+          </ul>
+        </div>
+      </section>
+
+      <section id="best-practices" class="scroll-mt-32 border-t border-surface-variant pt-12">
+        <h2 class="text-headline-md font-bold text-white mb-6 flex items-center gap-3">
+          <span class="bg-primary-container/20 text-primary-container w-10 h-10 rounded-lg flex items-center justify-center">3</span>
+          {t("help.sec3.title")}
+        </h2>
+        <div class="space-y-4 text-on-surface-variant text-body-md">
+          <p>{t("help.sec3.p1")}</p>
+          <ul class="list-disc pl-6 space-y-3 mt-4">
+            <li><strong>{t("help.sec3.li1").split(':')[0]}:</strong> {t("help.sec3.li1").split(':')[1]}</li>
+            <li><strong>{t("help.sec3.li2").split(':')[0]}:</strong> {t("help.sec3.li2").split(':')[1]}</li>
+            <li><strong>{t("help.sec3.li3").split(':')[0]}:</strong> {t("help.sec3.li3").split(':')[1]}</li>
           </ul>
         </div>
       </section>

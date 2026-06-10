@@ -172,51 +172,62 @@ exports.getRoutine = onRequest({ cors: true }, async (req, res) => {
     let routinesLoaded = [];
 
     if (routineId && routineId.toUpperCase() === "INDEX") {
-      // 1. Extraer comandos propios del usuario
+      const allCommands = [];
+
+      // 1. Obtener los IDs de los lispFiles autorizados (Propios)
       const lispsRef = db.collection("lispFiles").where("tenantId", "==", userDocRef.id);
       const snapshotLisps = await lispsRef.get();
-      
-      const commands = [];
-      snapshotLisps.forEach(docSnap => {
-        const data = docSnap.data();
-        commands.push({
-          name: data.lispId,
-          friendly: data.friendlyName || data.lispId,
-          desc: data.description || "Comando Cloud",
-          group: data.group || "Custom Tools",
-          doc: "#",
-          svgIcon: data.svgIcon || ""
-        });
+      const ownFileIds = snapshotLisps.docs.map(d => d.id);
+      const fileContextMap = {}; 
+      snapshotLisps.docs.forEach(d => {
+         const data = d.data();
+         fileContextMap[d.id] = { group: data.group || "Custom Tools", isOverlimit: false };
       });
 
-      // 2. Extraer comandos de la Store (Suscripciones de Terceros)
+      // 2. Obtener los IDs de lispFiles de la Store
       const allSubscribedSuites = [...validSuiteIds, ...overlimitSuiteIds];
+      const storeFileIds = [];
       if (allSubscribedSuites.length > 0) {
         for (let i = 0; i < allSubscribedSuites.length; i += 10) {
           const chunk = allSubscribedSuites.slice(i, i + 10);
           const storeLispsSnap = await db.collection("lispFiles").where("suiteId", "in", chunk).get();
-          
           storeLispsSnap.forEach(docSnap => {
             const data = docSnap.data();
-            // Evitamos duplicar LISPs si el usuario compró su propia Suite (caso límite)
             if (data.tenantId !== userDocRef.id) {
+               storeFileIds.push(docSnap.id);
                const isOverlimit = overlimitSuiteIds.includes(data.suiteId);
-               commands.push({
-                 name: data.lispId,
-                 friendly: (isOverlimit ? "⚠️ " : "") + (data.friendlyName || data.lispId),
-                 desc: isOverlimit ? "[Límite de Asientos] " + (data.description || "") : (data.description || "Herramienta Store"),
-                 group: `${data.suiteId} - ${data.group || 'Tools'}`,
-                 doc: "#",
-                 svgIcon: data.svgIcon || "",
-                 disabled: isOverlimit // Señal para el frontend webview en AutoCAD si la soporta
-               });
+               fileContextMap[docSnap.id] = { group: `${data.suiteId} - ${data.group || 'Tools'}`, isOverlimit };
             }
           });
         }
       }
-      
+
+      // 3. Obtener los comandos granulares asociados a esos archivos
+      const allowedFileIds = [...ownFileIds, ...storeFileIds];
+      if (allowedFileIds.length > 0) {
+        for (let i = 0; i < allowedFileIds.length; i += 10) {
+          const chunk = allowedFileIds.slice(i, i + 10);
+          const cmdsSnap = await db.collection("commands").where("lispFileId", "in", chunk).get();
+          cmdsSnap.forEach(cmdDoc => {
+             const cmdData = cmdDoc.data();
+             const ctx = fileContextMap[cmdData.lispFileId];
+             if (ctx) {
+               allCommands.push({
+                 name: cmdData.commandName,
+                 friendly: (ctx.isOverlimit ? "⚠️ " : "") + (cmdData.friendlyName || cmdData.commandName),
+                 desc: ctx.isOverlimit ? "[Límite de Asientos] " + (cmdData.description || "") : (cmdData.description || "Herramienta"),
+                 group: ctx.group,
+                 doc: "#",
+                 svgIcon: cmdData.svgIcon || "",
+                 disabled: ctx.isOverlimit
+               });
+             }
+          });
+        }
+      }
+
       res.setHeader("Content-Type", "application/json; charset=utf-8");
-      return res.status(200).send(JSON.stringify(commands));
+      return res.status(200).send(JSON.stringify(allCommands));
     }
 
     if (!routineId || routineId.toUpperCase() === "ALL") {
@@ -273,16 +284,34 @@ exports.getRoutine = onRequest({ cors: true }, async (req, res) => {
           return res.status(404).send(`Error: Rutina ${originalName} no encontrada.`);
         }
 
-        const lispsSnapshot = await db.collection("lispFiles")
+        let lispData = null;
+        let lispsSnapshot = await db.collection("lispFiles")
           .where("lispId", "==", safeRoutineId)
           .limit(1)
           .get();
 
-        if (lispsSnapshot.empty) {
-          return res.status(404).send(`Error: Rutina ${originalName} no encontrada en el ecosistema LispCentral.`);
+        if (!lispsSnapshot.empty) {
+          lispData = lispsSnapshot.docs[0].data();
+        } else {
+          // Búsqueda en comandos granulares
+          const cmdsSnapshot = await db.collection("commands")
+            .where("commandName", "==", safeRoutineId)
+            .limit(1)
+            .get();
+            
+          if (!cmdsSnapshot.empty) {
+            const parentFileId = cmdsSnapshot.docs[0].data().lispFileId;
+            const parentFileSnap = await db.collection("lispFiles").doc(parentFileId).get();
+            if (parentFileSnap.exists) {
+               lispData = parentFileSnap.data();
+            }
+          }
         }
 
-        const lispData = lispsSnapshot.docs[0].data();
+        if (!lispData) {
+          return res.status(404).send(`Error: Rutina o Comando ${originalName} no encontrado en el ecosistema LispCentral.`);
+        }
+
         const creatorId = lispData.tenantId;
 
         // Validar si tiene derecho a usar este código (Restricción Estricta B2B)
