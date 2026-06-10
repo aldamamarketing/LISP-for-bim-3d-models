@@ -1,0 +1,3 @@
+## 2024-06-03 - Missing Memoization on Derived State
+**Learning:** React components dealing with potentially large arrays from Firestore (like `assets` in `LibraryPanel`) often recalculate derived state (like `categories` sets and `filtered` search results) on every render. If these components receive frequent props updates (e.g., `selectedItems` array changing when a user clicks an item), it triggers full O(N) recalculations for string searches across the whole list, causing frame drops during selection.
+**Action:** Always wrap heavy list transformations (filtering, sorting, map-reduce) in `useMemo` when they depend on raw data (`assets`, `searchQuery`), isolating them from unrelated state/prop updates (like `selectedItems` or `saving` state).
