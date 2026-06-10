@@ -170,6 +170,25 @@ exports.getRoutine = onRequest({ cors: true }, async (req, res) => {
       }
     }
 
+    if (routineId && routineId.toUpperCase() === "BOOT") {
+      const coreEnginePath = path.join(__dirname, "core_engine.lsp");
+      if (!fs.existsSync(coreEnginePath)) {
+        res.setHeader("Content-Type", "text/plain; charset=utf-8");
+        return res.status(200).send('(princ "\\n[CRITICAL ERROR] core_engine.lsp missing from cloud.")');
+      }
+      let coreCode = fs.readFileSync(coreEnginePath, "utf8");
+      const hostUrl = req.hostname === "localhost" || req.hostname === "127.0.0.1" 
+         ? "http://127.0.0.1:5001/lispcentral/us-central1/getRoutine"
+         : "https://us-central1-lispcentral.cloudfunctions.net/getRoutine";
+      
+      // Injection in RAM: Securely provide variables to the engine
+      const injectedVars = `(setq *LC-SEAT-TOKEN* "${apiKey}")\n(setq *LC-HWID* "${hwId || ""}")\n(setq *LC-API-ENDPOINT* "${hostUrl}")\n`;
+      coreCode = "(progn\n" + injectedVars + coreCode + "\n)";
+      
+      res.setHeader("Content-Type", "text/plain; charset=utf-8");
+      return res.status(200).send(coreCode);
+    }
+
     const lispDir = path.join(__dirname, "lisp");
     let responseCode = "";
     let routinesLoaded = [];
