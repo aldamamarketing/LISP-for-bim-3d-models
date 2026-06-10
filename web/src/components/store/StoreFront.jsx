@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { db, auth } from '../../firebase';
+import { useTranslation } from '../../i18n/useTranslation';
 import { collection, query, where, getDocs, doc, setDoc, getDoc } from 'firebase/firestore';
 import { onAuthStateChanged } from 'firebase/auth';
 import { addDoc, serverTimestamp, increment, updateDoc } from 'firebase/firestore';
 
 const SuiteRow = ({ suite, currentUser, initiallyExpanded }) => {
+  const { t } = useTranslation();
   const [expanded, setExpanded] = useState(initiallyExpanded || false);
   const [loadingDetails, setLoadingDetails] = useState(false);
   const [commands, setCommands] = useState(null);
@@ -200,9 +202,9 @@ const SuiteRow = ({ suite, currentUser, initiallyExpanded }) => {
           {/* Detailed Description */}
           <div className="mb-5 flex justify-between items-start">
             <div>
-              <h4 className="text-xs font-bold text-on-surface uppercase tracking-wider mb-2">Acerca de esta Suite</h4>
+              <h4 className="text-xs font-bold text-on-surface uppercase tracking-wider mb-2">{t('store.about_suite', 'Acerca de esta Suite')}</h4>
               <p className="text-sm text-on-surface-variant max-w-3xl leading-relaxed">
-                {suite.description || 'Esta suite no posee una descripción extendida. Comuníquese con el desarrollador para más detalles.'}
+                {suite.description || t('store.no_desc', 'Esta suite no posee una descripción extendida. Comuníquese con el desarrollador para más detalles.')}
               </p>
             </div>
             {hasSubscribed && (
@@ -211,7 +213,7 @@ const SuiteRow = ({ suite, currentUser, initiallyExpanded }) => {
                 className="px-3 py-1.5 bg-surface border border-outline-variant rounded text-xs font-bold text-on-surface hover:bg-surface-container-high transition-colors flex items-center gap-2"
               >
                 <span className="material-symbols-outlined text-[16px]">star_rate</span>
-                Valorar
+                {t('store.rate', 'Valorar')}
               </button>
             )}
           </div>
@@ -270,9 +272,9 @@ const SuiteRow = ({ suite, currentUser, initiallyExpanded }) => {
                 <table className="w-full text-left text-sm border-collapse">
                   <thead className="bg-surface-container-lowest sticky top-0 z-10 border-b border-outline-variant/30">
                     <tr>
-                      <th className="py-1.5 px-2 font-code-sm text-[10px] text-on-surface-variant uppercase w-10">Ícono</th>
-                      <th className="py-1.5 px-2 font-code-sm text-[10px] text-on-surface-variant uppercase w-48">Comando</th>
-                      <th className="py-1.5 px-2 font-code-sm text-[10px] text-on-surface-variant uppercase">Descripción</th>
+                      <th className="py-1.5 px-2 font-code-sm text-[10px] text-on-surface-variant uppercase w-10">{t('store.icon', 'Ícono')}</th>
+                      <th className="py-1.5 px-2 font-code-sm text-[10px] text-on-surface-variant uppercase w-48">{t('store.command', 'Comando')}</th>
+                      <th className="py-1.5 px-2 font-code-sm text-[10px] text-on-surface-variant uppercase">{t('store.description', 'Descripción')}</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-outline-variant/10">
@@ -304,7 +306,7 @@ const SuiteRow = ({ suite, currentUser, initiallyExpanded }) => {
             ) : (
               <div className="p-6 flex flex-col items-center justify-center text-on-surface-variant opacity-70">
                 <span className="material-symbols-outlined text-[32px] mb-2">extension_off</span>
-                <span className="text-sm">Nenhum comando encontrado nesta suite.</span>
+                <span className="text-sm">{t('store.no_commands', 'Ningún comando encontrado en esta suite.')}</span>
               </div>
             )}
           </div>
@@ -315,6 +317,7 @@ const SuiteRow = ({ suite, currentUser, initiallyExpanded }) => {
 };
 
 export default function StoreFront() {
+  const { t } = useTranslation();
   const [suites, setSuites] = useState([]);
   const [loading, setLoading] = useState(true);
   const [currentUser, setCurrentUser] = useState(null);
@@ -376,13 +379,13 @@ export default function StoreFront() {
       <div className="mb-6 border-b border-outline-variant pb-4">
         <div className="flex justify-between items-end mb-4">
           <div>
-            <h1 className="text-2xl font-bold text-on-surface">Extension Marketplace</h1>
-            <p className="text-sm text-on-surface-variant mt-1">Busque y suscriba suites de herramientas para su flujo de trabajo.</p>
+            <h1 className="text-2xl font-bold text-on-surface">{t('store.marketplace_title', 'Extension Marketplace')}</h1>
+            <p className="text-sm text-on-surface-variant mt-1">{t('store.marketplace_subtitle', 'Busque y suscriba suites de herramientas para su flujo de trabajo.')}</p>
           </div>
           <div className="relative">
             <input 
               type="text" 
-              placeholder="Search extensions..." 
+              placeholder={t('store.search_ph', 'Search extensions...')}
               className="bg-surface-container-low border border-outline-variant text-sm rounded pl-8 pr-3 py-1.5 w-64 focus:border-primary-container focus:outline-none transition-colors"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
@@ -398,7 +401,7 @@ export default function StoreFront() {
             value={filterCategory}
             onChange={(e) => setFilterCategory(e.target.value)}
           >
-            <option value="">Todas las Categorías</option>
+            <option value="">{t('store.all_categories', 'Todas las Categorías')}</option>
             {/* We dynamically extract categories from the loaded suites, plus defaults */}
             {[...new Set([...suites.map(s => s.storeCategory).filter(Boolean), 'architecture', 'civil', 'topo', 'structure', 'mep', 'productivity', 'quantities', 'urban'])].map(cat => (
               <option key={cat} value={cat}>{cat.charAt(0).toUpperCase() + cat.slice(1)}</option>
@@ -410,7 +413,7 @@ export default function StoreFront() {
             value={filterPlatform}
             onChange={(e) => setFilterPlatform(e.target.value)}
           >
-            <option value="">Plataforma (Cualquiera)</option>
+            <option value="">{t('store.platform_any', 'Plataforma (Cualquiera)')}</option>
             <option value="universal">Universal</option>
             <option value="autocad">AutoCAD</option>
             <option value="civil3d">Civil 3D</option>
@@ -425,8 +428,8 @@ export default function StoreFront() {
             value={filterVersion}
             onChange={(e) => setFilterVersion(e.target.value)}
           >
-            <option value="">Versión (Cualquiera)</option>
-            <option value="all">Todas</option>
+            <option value="">{t('store.version_any', 'Versión (Cualquiera)')}</option>
+            <option value="all">{t('store.all', 'Todas')}</option>
             <option value="2025+">2025+</option>
             <option value="2021-2024">2021-2024</option>
             <option value="2018-2020">2018-2020</option>
@@ -439,7 +442,7 @@ export default function StoreFront() {
       {/* Dense List */}
       <div className="flex flex-col gap-2">
         {filteredSuites.length === 0 ? (
-          <div className="py-12 text-center text-on-surface-variant italic">No se encontraron suites con estos filtros.</div>
+          <div className="py-12 text-center text-on-surface-variant italic">{t('store.no_results', 'No se encontraron suites con estos filtros.')}</div>
         ) : (
           filteredSuites.map(suite => (
             <SuiteRow 

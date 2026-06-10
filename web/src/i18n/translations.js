@@ -237,7 +237,24 @@ export const translations = {
     "cta.title": "Ready to centralize your engineering?",
     "cta.desc": "Join the leading companies that have already modernized the management of their LISP routines and CAD standards. Request early access today.",
     "cta.button": "Create Free Account (Beta)",
-    "cta.disclaimer": "No credit card required for demonstration."
+    "cta.disclaimer": "No credit card required for demonstration.",
+
+    // Store / Marketplace
+    "store.about_suite": "About this Suite",
+    "store.no_desc": "This suite does not have an extended description. Contact the developer for more details.",
+    "store.rate": "Rate",
+    "store.icon": "Icon",
+    "store.command": "Command",
+    "store.description": "Description",
+    "store.no_commands": "No commands found in this suite.",
+    "store.marketplace_title": "Extension Marketplace",
+    "store.marketplace_subtitle": "Search and subscribe to tool suites for your workflow.",
+    "store.search_ph": "Search extensions...",
+    "store.all_categories": "All Categories",
+    "store.platform_any": "Platform (Any)",
+    "store.version_any": "Version (Any)",
+    "store.all": "All",
+    "store.no_results": "No suites found with these filters."
   },
   es: {
     // Header
@@ -477,7 +494,24 @@ export const translations = {
     "cta.title": "¿Listo para centralizar su ingeniería?",
     "cta.desc": "Únase a las empresas líderes que ya han modernizado la gestión de sus rutinas LISP y estándares CAD. Solicite acceso anticipado hoy.",
     "cta.button": "Crear Cuenta Gratis (Beta)",
-    "cta.disclaimer": "No se requiere tarjeta de crédito para la demostración."
+    "cta.disclaimer": "No se requiere tarjeta de crédito para la demostración.",
+
+    // Store / Marketplace
+    "store.about_suite": "Acerca de esta Suite",
+    "store.no_desc": "Esta suite no posee una descripción extendida. Comuníquese con el desarrollador para más detalles.",
+    "store.rate": "Valorar",
+    "store.icon": "Ícono",
+    "store.command": "Comando",
+    "store.description": "Descripción",
+    "store.no_commands": "Ningún comando encontrado en esta suite.",
+    "store.marketplace_title": "Marketplace de Extensiones",
+    "store.marketplace_subtitle": "Busque y suscriba suites de herramientas para su flujo de trabajo.",
+    "store.search_ph": "Buscar extensiones...",
+    "store.all_categories": "Todas las Categorías",
+    "store.platform_any": "Plataforma (Cualquiera)",
+    "store.version_any": "Versión (Cualquiera)",
+    "store.all": "Todas",
+    "store.no_results": "No se encontraron suites con estos filtros."
   },
   pt: {
     // Header
@@ -717,6 +751,23 @@ export const translations = {
     "cta.title": "Pronto para centralizar sua engenharia?",
     "cta.desc": "Junte-se às empresas líderes que já modernizaram a gestão de suas rotinas LISP e padrões CAD. Solicite acesso antecipado hoje.",
     "cta.button": "Criar Conta Gratuita (Beta)",
-    "cta.disclaimer": "Sem cartão de crédito necessário para demonstração."
+    "cta.disclaimer": "Sem cartão de crédito necessário para demonstração.",
+
+    // Store / Marketplace
+    "store.about_suite": "Sobre esta Suite",
+    "store.no_desc": "Esta suite não possui uma descrição detalhada. Entre em contato com o desenvolvedor para mais informações.",
+    "store.rate": "Avaliar",
+    "store.icon": "Ícone",
+    "store.command": "Comando",
+    "store.description": "Descrição",
+    "store.no_commands": "Nenhum comando encontrado nesta suite.",
+    "store.marketplace_title": "Marketplace de Extensões",
+    "store.marketplace_subtitle": "Busque e assine suites de ferramentas para o seu fluxo de trabalho.",
+    "store.search_ph": "Buscar extensões...",
+    "store.all_categories": "Todas as Categorias",
+    "store.platform_any": "Plataforma (Qualquer)",
+    "store.version_any": "Versão (Qualquer)",
+    "store.all": "Todas",
+    "store.no_results": "Nenhuma suite encontrada com estes filtros."
   }
 };
