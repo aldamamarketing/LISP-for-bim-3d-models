@@ -181,7 +181,7 @@ export default function FavoritesManager() {
               {filteredFavorites.map(item => {
                 const isSelected = selectedIds.includes(item.id);
                 return (
-                  <div key={item.id} onClick={() => toggleSelection(item.id)} className={`cursor-pointer rounded border transition-colors flex flex-col relative group ${isSelected ? 'bg-primary-container/10 border-primary-container' : 'bg-white/5 border-[#262626] hover:bg-[#1a1c1c] hover:border-[#343535]'}`}>
+                  <button type="button" key={item.id} onClick={() => toggleSelection(item.id)} className={`cursor-pointer rounded border transition-colors flex flex-col relative text-left group ${isSelected ? 'bg-primary-container/10 border-primary-container focus-visible:ring-2 focus-visible:ring-primary-container outline-none' : 'bg-white/5 border-[#262626] hover:bg-[#1a1c1c] hover:border-[#343535] focus-visible:ring-2 focus-visible:ring-white/50 outline-none'}`}>
                     
                     <div className="absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity">
                       <input type="checkbox" checked={isSelected} readOnly className="cursor-pointer accent-primary-container" />
@@ -205,14 +205,16 @@ export default function FavoritesManager() {
                     
                     <div className="p-3 border-t border-[#262626] flex justify-end">
                       <button 
+                        type="button"
                         onClick={(e) => { e.stopPropagation(); handleRemove(item.id); }}
-                        className="text-on-surface-variant hover:text-error transition-colors flex items-center gap-1 text-xs"
+                        className="text-on-surface-variant hover:text-error transition-colors flex items-center gap-1 text-xs focus-visible:ring-2 focus-visible:ring-error outline-none rounded"
                         title="Apagar"
+                        aria-label="Apagar favorito"
                       >
-                        <span className="material-symbols-outlined text-[16px]">delete</span>
+                        <span className="material-symbols-outlined text-[16px]" aria-hidden="true">delete</span>
                       </button>
                     </div>
-                  </div>
+                  </button>
                 );
               })}
             </div>

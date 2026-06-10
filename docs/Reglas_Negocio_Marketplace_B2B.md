@@ -60,6 +60,21 @@ Para garantizar un modelo de suscripción empresarial justo y sin fricciones, se
 
 ---
 
+## 5. Dinámicas de la Tienda (StoreFront) y Metadatos
+
+Para el listado público de Suites (`store`), el sistema expone métricas dinámicas para ayudar a la conversión de usuarios.
+
+1. **Auto-Incremento de Descargas:** 
+   Cada vez que un usuario se suscribe o adquiere una Suite (creación de documento `subscriptions`), un trigger del backend (`onSubscriptionCreated`) incrementa automáticamente el contador `downloads` de la suite. Las suscripciones "Globales" (las propias del creador) son ignoradas en este conteo para evitar distorsión de los datos.
+2. **Sistema de Valoraciones (Reviews):**
+   Las reseñas solo pueden ser emitidas por clientes que **hayan adquirido la Suite**. 
+   - **Identificador Semántico (Anti-fraude):** El ID del documento de valoración sigue el formato `REV-{suiteId}-{tenantId}`. Esto asegura (a nivel de base de datos) que un usuario solo pueda tener un voto activo por suite. Si vuelve a valorar, se sobreescribe el voto anterior.
+   - **Cálculo en Tiempo Real:** Un trigger del backend (`onReviewWritten`) se dispara al añadir, modificar o eliminar una reseña. El backend vuelve a promediar todas las estrellas (`rating`) y suma la cantidad (`ratingCount`), guardándolos de forma desnormalizada en el documento de la suite para consultas ultra-rápidas en el frontend.
+3. **Descripciones de Comandos:**
+   Al expandir una Suite en el StoreFront, se leen los datos de la colección `commands` pertenecientes a esa suite. La interfaz soporta íconos vectoriales SVG y rasterizados (Base64 JPG/PNG) bajo el campo `svgIcon`, además de su descripción nativa.
+
+---
+
 ## 5. Ejecución Cruzada y Namespaces (Resolución de Colisiones)
 
 Para asegurar que un cliente pueda consumir código de múltiples creadores sin que los comandos de AutoCAD entren en conflicto:

@@ -1,5 +1,5 @@
 const { onRequest, onCall, HttpsError } = require("firebase-functions/v2/https");
-const { onDocumentCreated } = require("firebase-functions/v2/firestore");
+const { onDocumentCreated, onDocumentWritten } = require("firebase-functions/v2/firestore");
 const logger = require("firebase-functions/logger");
 
 // Lazy imports de módulos nativos
@@ -666,5 +666,63 @@ exports.toggleDeviceAssignment = onCall(async (request) => {
     console.error("Error en toggleDeviceAssignment:", error);
     if (error instanceof HttpsError) throw error;
     throw new HttpsError("internal", "Error procesando la solicitud.");
+  }
+});
+
+// Incrementar contador de descargas cuando alguien adquiere/suscribe una Suite
+exports.onSubscriptionCreated = onDocumentCreated("subscriptions/{subId}", async (event) => {
+  const snapshot = event.data;
+  if (!snapshot) return;
+
+  const data = snapshot.data();
+  if (data.isGlobal || !data.suiteId) return; // Ignorar la suscripción global del propio usuario
+
+  const db = getDb();
+  const { admin } = getDeps();
+  
+  try {
+    const suiteRef = db.collection("suites").doc(data.suiteId);
+    await suiteRef.update({
+      downloads: admin.firestore.FieldValue.increment(1)
+    });
+    console.log(`Downloads incremented for suite ${data.suiteId}`);
+  } catch (err) {
+    console.error(`Error incrementing downloads for suite ${data.suiteId}:`, err);
+  }
+});
+
+// Recalcular el rating de la suite cuando hay una nueva o modificada reseña
+exports.onReviewWritten = onDocumentWritten("reviews/{reviewId}", async (event) => {
+  const db = getDb();
+  
+  // Si se borró, el doc posterior no existe. Tomamos el previo para saber qué suiteId es.
+  const docData = event.data.after.exists ? event.data.after.data() : event.data.before.data();
+  if (!docData || !docData.suiteId) return;
+
+  const suiteId = docData.suiteId;
+
+  try {
+    const reviewsSnap = await db.collection("reviews").where("suiteId", "==", suiteId).get();
+    
+    let totalRating = 0;
+    let count = 0;
+    
+    reviewsSnap.forEach(doc => {
+      const rData = doc.data();
+      if (typeof rData.rating === "number") {
+        totalRating += rData.rating;
+        count++;
+      }
+    });
+
+    const averageRating = count > 0 ? (totalRating / count) : 0;
+
+    await db.collection("suites").doc(suiteId).update({
+      rating: averageRating,
+      ratingCount: count
+    });
+    console.log(`Recalculated rating for suite ${suiteId}: ${averageRating} (${count} reviews)`);
+  } catch (err) {
+    console.error(`Error recalculating rating for suite ${suiteId}:`, err);
   }
 });

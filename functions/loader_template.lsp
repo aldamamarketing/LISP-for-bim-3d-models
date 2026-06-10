@@ -490,7 +490,7 @@
       (LC:DownloadFile source-url temp-html)
       
       ;; Usar la ruta del TEMP y convertir barras para la URL, añadiendo un Cache-Buster local
-      (setq local-html (strcat "file:///" (vl-string-translate "\\\\" "/" temp-html) "?v=" (rtos (getvar "MILLISECS") 2 0)))
+      (setq local-html (strcat "file:///" (vl-string-translate "\\\\" "/" temp-html) "?token=" *TMD-SEAT-TOKEN* "&hwId=" (LC:url-encode *TMD-HWID*) "&v=" (rtos (getvar "MILLISECS") 2 0)))
       (write-line 
         (strcat "    Acad.Application.addPalette(\"Command Palette\", \"" 
                 local-html
@@ -589,7 +589,7 @@
 (defun c:LC_PROP (/ doc loader-js f-js) 
   (vl-load-com)
   (if (not (boundp '*LC-PROPERTIES-URL*))
-    (setq *LC-PROPERTIES-URL* (strcat "https://lispcentral.web.app/properties-palette?token=" *LC-SEAT-TOKEN* "&hwid=" *LC-HWID*))
+    (setq *LC-PROPERTIES-URL* (strcat "https://lispcentral.web.app/properties-palette?token=" *TMD-SEAT-TOKEN* "&hwid=" (LC:url-encode *TMD-HWID*)))
   )
   (setq doc (vla-get-activedocument (vlax-get-acad-object)))
   (if (not (member "LispCentral Propriedades" (LC_GetPaletteNames)))

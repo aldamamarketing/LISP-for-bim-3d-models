@@ -398,15 +398,15 @@ export default function SuitesGroupsCard() {
                               </select>
 
                               <div className="flex gap-1 opacity-0 group-hover/suite:opacity-100 transition-opacity">
-                                <button className="w-6 h-6 rounded text-on-surface-variant hover:text-white hover:bg-surface-container-highest flex items-center justify-center transition-colors" title="Editar Suite" onClick={() => handleEditSuite(suite)}>
-                                  <span className="material-symbols-outlined text-[14px]">edit</span>
-                                </button>
-                                <button className="w-6 h-6 rounded text-on-surface-variant hover:text-white hover:bg-surface-container-highest flex items-center justify-center transition-colors" title="Adicionar Grupo" onClick={() => handleAddGroup(suite.id)}>
-                                  <span className="material-symbols-outlined text-[14px]">create_new_folder</span>
-                                </button>
-                                <button className="w-6 h-6 rounded text-on-surface-variant hover:text-error hover:bg-error/10 flex items-center justify-center transition-colors" title="Excluir Suite" onClick={() => handleDeleteSuite(suite.id)}>
-                                  <span className="material-symbols-outlined text-[14px]">delete</span>
-                                </button>
+                                  <button type="button" className="w-6 h-6 rounded text-on-surface-variant hover:text-white hover:bg-surface-container-highest flex items-center justify-center transition-colors focus-visible:ring-2 focus-visible:ring-primary-container outline-none" title="Editar Suite" aria-label="Editar Suite" onClick={() => handleEditSuite(suite)}>
+                                    <span className="material-symbols-outlined text-[14px]" aria-hidden="true">edit</span>
+                                  </button>
+                                  <button type="button" className="w-6 h-6 rounded text-on-surface-variant hover:text-white hover:bg-surface-container-highest flex items-center justify-center transition-colors focus-visible:ring-2 focus-visible:ring-primary-container outline-none" title="Adicionar Grupo" aria-label="Adicionar Grupo" onClick={() => handleAddGroup(suite.id)}>
+                                    <span className="material-symbols-outlined text-[14px]" aria-hidden="true">create_new_folder</span>
+                                  </button>
+                                  <button type="button" className="w-6 h-6 rounded text-on-surface-variant hover:text-error hover:bg-error/10 flex items-center justify-center transition-colors focus-visible:ring-2 focus-visible:ring-error outline-none" title="Excluir Suite" aria-label="Excluir Suite" onClick={() => handleDeleteSuite(suite.id)}>
+                                    <span className="material-symbols-outlined text-[14px]" aria-hidden="true">delete</span>
+                                  </button>
                               </div>
                             </div>
                           </div>
@@ -439,12 +439,12 @@ export default function SuitesGroupsCard() {
                                         onKeyDown={e => e.key === 'Enter' && setEditingGroupId(null)}
                                       />
                                     ) : (
-                                      <div className="font-bold text-on-surface text-xs cursor-text hover:text-primary-container transition-colors" onClick={() => setEditingGroupId(group.id)}>
+                                      <button type="button" className="font-bold text-on-surface text-xs cursor-text hover:text-primary-container transition-colors text-left focus-visible:ring-2 focus-visible:ring-primary-container outline-none" aria-label={`Renomear grupo ${group.name}`} onClick={() => setEditingGroupId(group.id)}>
                                         {group.name}
-                                      </div>
+                                      </button>
                                     )}
-                                    <button className="w-5 h-5 rounded text-on-surface-variant hover:text-error hover:bg-error/10 flex items-center justify-center opacity-0 group-hover/dropzone:opacity-100 transition-opacity" onClick={() => handleDeleteGroup(group.id)} title="Excluir Grupo">
-                                      <span className="material-symbols-outlined text-[14px]">delete</span>
+                                    <button type="button" className="w-5 h-5 rounded text-on-surface-variant hover:text-error hover:bg-error/10 flex items-center justify-center opacity-0 group-hover/dropzone:opacity-100 transition-opacity focus-visible:ring-2 focus-visible:ring-error outline-none" onClick={() => handleDeleteGroup(group.id)} title="Excluir Grupo" aria-label="Excluir Grupo">
+                                      <span className="material-symbols-outlined text-[14px]" aria-hidden="true">delete</span>
                                     </button>
                                   </div>
                                   
@@ -464,8 +464,8 @@ export default function SuitesGroupsCard() {
                                             <span className="material-symbols-outlined text-[12px] opacity-80 text-secondary">description</span>
                                           </div>
                                           <span className="text-[10px] font-bold text-on-surface max-w-[120px] truncate">{file.originalName}</span>
-                                          <button className="w-3.5 h-3.5 flex items-center justify-center text-on-surface-variant hover:text-error opacity-0 group-hover/chip:opacity-100 transition-opacity" onClick={() => handleRemoveAssignment(assignment.id)}>
-                                            <span className="material-symbols-outlined text-[10px]">close</span>
+                                          <button type="button" className="w-3.5 h-3.5 flex items-center justify-center text-on-surface-variant hover:text-error opacity-0 group-hover/chip:opacity-100 transition-opacity focus-visible:ring-2 focus-visible:ring-error outline-none" title="Remover" aria-label="Remover atribuição" onClick={() => handleRemoveAssignment(assignment.id)}>
+                                            <span className="material-symbols-outlined text-[10px]" aria-hidden="true">close</span>
                                           </button>
                                         </div>
                                       );

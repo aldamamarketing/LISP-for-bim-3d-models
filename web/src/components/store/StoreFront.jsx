@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { db, auth } from '../../firebase';
 import { collection, query, where, getDocs, doc, setDoc, getDoc } from 'firebase/firestore';
 import { onAuthStateChanged } from 'firebase/auth';
+import { addDoc, serverTimestamp, increment, updateDoc } from 'firebase/firestore';
 
 const SuiteRow = ({ suite, currentUser, initiallyExpanded }) => {
   const [expanded, setExpanded] = useState(initiallyExpanded || false);
@@ -9,6 +10,10 @@ const SuiteRow = ({ suite, currentUser, initiallyExpanded }) => {
   const [commands, setCommands] = useState(null);
   const [hasSubscribed, setHasSubscribed] = useState(false);
   const [isSubscribing, setIsSubscribing] = useState(false);
+  const [reviewModalOpen, setReviewModalOpen] = useState(false);
+  const [reviewRating, setReviewRating] = useState(5);
+  const [reviewComment, setReviewComment] = useState('');
+  const [isSubmittingReview, setIsSubmittingReview] = useState(false);
 
   useEffect(() => {
     if (currentUser) {
@@ -92,12 +97,49 @@ const SuiteRow = ({ suite, currentUser, initiallyExpanded }) => {
         subscribedAt: new Date(),
         pricePaid: 0
       });
+      
+      // Increment downloads count for the suite
+      await updateDoc(doc(db, 'suites', suite.id), {
+        downloads: increment(1)
+      });
+      
       setHasSubscribed(true);
     } catch (err) {
       console.error(err);
       alert('Erro ao assinar a suite.');
     } finally {
       setIsSubscribing(false);
+    }
+  };
+
+  const handleReviewSubmit = async () => {
+    if (!currentUser) return;
+    if (reviewRating < 1 || reviewRating > 5) return;
+    setIsSubmittingReview(true);
+    try {
+      const reviewRef = collection(db, 'reviews');
+      await addDoc(reviewRef, {
+        suiteId: suite.id,
+        tenantId: currentUser.uid,
+        rating: reviewRating,
+        comment: reviewComment,
+        createdAt: serverTimestamp()
+      });
+      
+      // Increment rating count for the suite
+      await updateDoc(doc(db, 'suites', suite.id), {
+        ratingCount: increment(1),
+        // For accurate rating math we need a Cloud Function or transaction, 
+        // this is a simple fallback for the count.
+      });
+      
+      setReviewModalOpen(false);
+      alert("¡Gracias por tu valoración!");
+    } catch (err) {
+      console.error(err);
+      alert("Error al enviar valoración.");
+    } finally {
+      setIsSubmittingReview(false);
     }
   };
 
@@ -123,14 +165,14 @@ const SuiteRow = ({ suite, currentUser, initiallyExpanded }) => {
           </div>
           <div className="w-24 shrink-0 flex items-center text-xs text-on-surface-variant">
             <span className="material-symbols-outlined text-[14px] text-primary-container mr-1" style={{fontVariationSettings: "'FILL' 1"}}>star</span>
-            4.9 (186)
+            {suite.rating ? suite.rating.toFixed(1) : 'N/A'} ({suite.ratingCount || 0})
           </div>
           <div className="w-32 shrink-0 text-xs text-on-surface-variant truncate">
             {suite.authorName || 'Anônimo'}
           </div>
           <div className="w-24 shrink-0 flex items-center text-xs text-on-surface-variant">
             <span className="material-symbols-outlined text-[14px] mr-1">download</span>
-            +500
+            +{suite.downloads || 0}
           </div>
         </div>
 
@@ -156,12 +198,68 @@ const SuiteRow = ({ suite, currentUser, initiallyExpanded }) => {
         <div className="border-t border-outline-variant bg-surface-container-lowest p-5 animate-in slide-in-from-top-2 fade-in duration-300">
           
           {/* Detailed Description */}
-          <div className="mb-5">
-            <h4 className="text-xs font-bold text-on-surface uppercase tracking-wider mb-2">Acerca de esta Suite</h4>
-            <p className="text-sm text-on-surface-variant max-w-4xl leading-relaxed">
-              {suite.description || 'Esta suite no posee una descripción extendida. Comuníquese con el desarrollador para más detalles.'}
-            </p>
+          <div className="mb-5 flex justify-between items-start">
+            <div>
+              <h4 className="text-xs font-bold text-on-surface uppercase tracking-wider mb-2">Acerca de esta Suite</h4>
+              <p className="text-sm text-on-surface-variant max-w-3xl leading-relaxed">
+                {suite.description || 'Esta suite no posee una descripción extendida. Comuníquese con el desarrollador para más detalles.'}
+              </p>
+            </div>
+            {hasSubscribed && (
+              <button 
+                onClick={() => setReviewModalOpen(true)}
+                className="px-3 py-1.5 bg-surface border border-outline-variant rounded text-xs font-bold text-on-surface hover:bg-surface-container-high transition-colors flex items-center gap-2"
+              >
+                <span className="material-symbols-outlined text-[16px]">star_rate</span>
+                Valorar
+              </button>
+            )}
           </div>
+
+          {/* Review Modal inline */}
+          {reviewModalOpen && (
+            <div className="mb-5 p-4 bg-surface border border-primary-container/30 rounded-md max-w-xl animate-in fade-in zoom-in-95">
+              <h5 className="text-sm font-bold text-on-surface mb-3">Deja tu valoración para {suite.name}</h5>
+              <div className="flex gap-2 mb-3">
+                {[1,2,3,4,5].map(star => (
+                  <button 
+                    key={star}
+                    onClick={() => setReviewRating(star)}
+                    className="focus:outline-none transition-transform hover:scale-110"
+                  >
+                    <span 
+                      className={`material-symbols-outlined text-[24px] ${star <= reviewRating ? 'text-primary-container' : 'text-outline-variant'}`}
+                      style={{fontVariationSettings: star <= reviewRating ? "'FILL' 1" : "'FILL' 0"}}
+                    >
+                      star
+                    </span>
+                  </button>
+                ))}
+              </div>
+              <textarea 
+                className="w-full bg-surface-container-low border border-outline-variant rounded p-2 text-sm text-on-surface focus:border-primary-container focus:outline-none mb-3 resize-none"
+                rows="2"
+                placeholder="Cuenta tu experiencia (opcional)..."
+                value={reviewComment}
+                onChange={(e) => setReviewComment(e.target.value)}
+              />
+              <div className="flex justify-end gap-2">
+                <button 
+                  onClick={() => setReviewModalOpen(false)}
+                  className="px-3 py-1.5 text-xs text-on-surface-variant hover:text-on-surface font-bold"
+                >
+                  Cancelar
+                </button>
+                <button 
+                  onClick={handleReviewSubmit}
+                  disabled={isSubmittingReview}
+                  className="px-3 py-1.5 bg-primary-container text-white rounded text-xs font-bold hover:bg-[#e66000] disabled:opacity-50"
+                >
+                  {isSubmittingReview ? 'Enviando...' : 'Enviar Valoración'}
+                </button>
+              </div>
+            </div>
+          )}
 
           {/* Commands Table - Flat IDE Style */}
           <div className="mt-4 border-t border-outline-variant/30">

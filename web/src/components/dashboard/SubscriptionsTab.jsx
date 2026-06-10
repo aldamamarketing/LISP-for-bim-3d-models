@@ -23,8 +23,18 @@ export default function SubscriptionsTab() {
         setSubscriptions(subs);
 
         const suitePromises = subs.map(async (sub) => {
+          if (sub.isGlobal) {
+            return { 
+               id: sub.suiteId || 'global', 
+               name: 'Global Suite (Mis Herramientas)', 
+               authorName: userData.name || 'Tú',
+               subId: sub.id,
+               isGlobal: true
+            };
+          }
+          if (!sub.suiteId) return null;
           const suiteDoc = await getDoc(doc(db, 'suites', sub.suiteId));
-          return suiteDoc.exists() ? { id: suiteDoc.id, ...suiteDoc.data(), subId: sub.id } : null;
+          return suiteDoc.exists() ? { id: suiteDoc.id, ...suiteDoc.data(), subId: sub.id, isGlobal: false } : null;
         });
 
         const suitesData = (await Promise.all(suitePromises)).filter(Boolean);
@@ -74,6 +84,8 @@ export default function SubscriptionsTab() {
     } 
     // Si ESTÁ asignado y queremos desasignarlo (Unlink)
     else {
+      if (!confirm(`⚠️ ALERTA: Si desvinculas este equipo, NO podrás volver a asignarlo a esta Suite durante 7 días (Política Anti-Abuso).\n\n¿Estás seguro de que deseas desvincularlo ahora?`)) return;
+
       try {
         await toggleAssignment({ subId, deviceId, action: 'unassign' });
         const newAssigned = currentAssigned.filter(id => id !== deviceId);
@@ -89,37 +101,7 @@ export default function SubscriptionsTab() {
     }
   };
 
-  const handleDeleteDevice = async (deviceId, deviceName) => {
-    if (!confirm(`¿Eliminar el equipo "${deviceName}" del pool global? Esto revocará su acceso a todas las suites.`)) return;
-    try {
-      // 1. Remove from all subscriptions
-      const updatePromises = subscriptions.map(async (sub) => {
-        if (sub.assignedDevices && sub.assignedDevices.includes(deviceId)) {
-          const newAssigned = sub.assignedDevices.filter(id => id !== deviceId);
-          await updateDoc(doc(db, 'subscriptions', sub.id), { assignedDevices: newAssigned });
-          return { subId: sub.id, newAssigned };
-        }
-        return null;
-      });
-      
-      const results = await Promise.all(updatePromises);
-      
-      // 2. Delete device doc
-      await deleteDoc(doc(db, 'users', userData.id, 'devices', deviceId));
-      
-      // 3. Update UI state
-      setDevices(devices.filter(d => d.id !== deviceId));
-      setSubscriptions(subs => subs.map(s => {
-        const updated = results.find(r => r && r.subId === s.id);
-        return updated ? { ...s, assignedDevices: updated.newAssigned } : s;
-      }));
-      
-      showToast('Equipo eliminado exitosamente.', 'success');
-    } catch(e) {
-      console.error(e);
-      showToast('Error al eliminar el equipo.', 'error');
-    }
-  };
+  // El botón de borrar equipo se movió al dashboard de Licenses & Access
 
   const handleUnsubscribe = async (subId) => {
     if (!confirm(t('dashboard.subscriptions.confirmUnsubscribe'))) return;
@@ -227,29 +209,26 @@ export default function SubscriptionsTab() {
                                     disabled={disableCheck}
                                     onChange={() => handleToggleDevice(subObj, dev.id)}
                                   />
-                                  <span className="text-xs font-mono text-on-surface truncate max-w-[150px]">{dev.name || dev.id}</span>
+                                  <span className="text-xs font-mono text-on-surface truncate max-w-[150px]" title={dev.name || dev.id}>
+                                    {dev.name || dev.id}
+                                  </span>
                                 </label>
-                                <button 
-                                  onClick={() => handleDeleteDevice(dev.id, dev.name || dev.id)}
-                                  className="opacity-0 group-hover:opacity-100 text-error hover:bg-error/10 p-1 rounded transition-opacity"
-                                  title="Eliminar equipo del pool"
-                                >
-                                  <span className="material-symbols-outlined text-[14px]">delete</span>
-                                </button>
                               </div>
                             );
                           })}
                         </div>
                       </td>
                       <td className="py-3 px-4 text-right">
-                        <button 
-                          onClick={() => handleUnsubscribe(suite.subId)}
-                          className="px-3 py-1.5 bg-surface text-error hover:bg-error/10 border border-error/20 hover:border-error/50 rounded text-xs font-bold transition-all"
-                          title={t('dashboard.subscriptions.unsubscribe')}
-                        >
-                          <span className="material-symbols-outlined text-[16px] md:hidden">delete</span>
-                          <span className="hidden md:inline">{t('dashboard.subscriptions.unsubscribe')}</span>
-                        </button>
+                        {!suite.isGlobal && (
+                          <button 
+                            onClick={() => handleUnsubscribe(suite.subId)}
+                            className="px-3 py-1.5 bg-surface text-error hover:bg-error/10 border border-error/20 hover:border-error/50 rounded text-xs font-bold transition-all"
+                            title={t('dashboard.subscriptions.unsubscribe')}
+                          >
+                            <span className="material-symbols-outlined text-[16px] md:hidden">delete</span>
+                            <span className="hidden md:inline">{t('dashboard.subscriptions.unsubscribe')}</span>
+                          </button>
+                        )}
                       </td>
                     </tr>
                   );
