@@ -1,0 +1,3 @@
+## 2025-02-05 - Interactive Card Accessibility in React
+**Learning:** Nesting interactive elements (like a delete button) inside an interactive card container (like a `<div>` with an `onClick` handler) is an accessibility anti-pattern. Screen readers struggle with nested interactive elements, and it prevents proper keyboard navigation.
+**Action:** Replace interactive wrapper elements with non-interactive ones (e.g., `<div class="relative">`), and use an absolutely positioned native `<button>` (`absolute inset-0 w-full h-full z-0`) to capture the main card click. Ensure nested secondary actions (like delete buttons) sit correctly on top (`z-10 relative`) and have explicit `aria-label`s.
