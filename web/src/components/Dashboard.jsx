@@ -88,7 +88,7 @@ function DashboardInner({ mode }) {
                activeTab === 'favorites' ? t('dashboard.sidebar.collection') : 
                activeTab === 'profile' ? t('dashboard.sidebar.profile') : 
                activeTab === 'licenses' ? t('dashboard.sidebar.licenses') : 
-               activeTab === 'subscriptions' ? 'Mis Suscripciones' :
+               activeTab === 'subscriptions' ? t('dashboard.subscriptions.title') :
                t('dashboard.sidebar.notifications')}
             </span>
           </div>

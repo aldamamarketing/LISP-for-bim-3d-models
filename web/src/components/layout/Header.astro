@@ -33,7 +33,7 @@ const getPath = (path) => {
                     <option value="pt" selected={currentLocale === 'pt'} class="bg-[#0D0D0D]">PT</option>
                 </select>
             </div>
-            <a id="desktop-login-btn" href={getPath('/login')} class="text-on-surface-variant hover:text-white font-medium transition-colors text-sm">
+            <a id="desktop-login-btn" href={getPath('/login')} class="text-on-surface-variant hover:text-white font-medium transition-colors text-sm" data-i18n="header.login">
                 {t("header.login")}
             </a>
         </div>
@@ -56,55 +56,55 @@ const getPath = (path) => {
     </div>
     <div class="flex-1 overflow-y-auto p-6 flex flex-col gap-6">
         <nav class="flex flex-col gap-4">
-            <a href={getPath('/')} class="text-white font-medium text-lg border-l-2 border-primary-container pl-3">{t("header.home")}</a>
+            <a href={getPath('/')} class="text-white font-medium text-lg border-l-2 border-primary-container pl-3"><span data-i18n="header.home">{t("header.home")}</span></a>
             
             <div class="flex flex-col gap-2 mt-2">
-                <span class="text-primary-container text-xs font-bold uppercase tracking-wider pl-3">{t("header.tools") || "Tools"}</span>
+                <span class="text-primary-container text-xs font-bold uppercase tracking-wider pl-3" data-i18n="header.tools">{t("header.tools") || "Tools"}</span>
                 <a href={getPath('/tools/hatch-generator')} class="flex items-center gap-3 text-on-surface-variant hover:text-white pl-3 py-2 rounded-lg hover:bg-surface-container-high transition-colors">
-                    <span class="material-symbols-outlined text-[20px]">grid_view</span> {t("header.hatch")}
+                    <span class="material-symbols-outlined text-[20px]">grid_view</span> <span data-i18n="header.hatch">{t("header.hatch")}</span>
                 </a>
                 <a href={getPath('/tools/linetype-generator')} class="flex items-center gap-3 text-on-surface-variant hover:text-white pl-3 py-2 rounded-lg hover:bg-surface-container-high transition-colors">
-                    <span class="material-symbols-outlined text-[20px]">line_style</span> {t("header.lines")}
+                    <span class="material-symbols-outlined text-[20px]">line_style</span> <span data-i18n="header.lines">{t("header.lines")}</span>
                 </a>
                 <a href={getPath('/tools/icon-generator')} class="flex items-center gap-3 text-on-surface-variant hover:text-white pl-3 py-2 rounded-lg hover:bg-surface-container-high transition-colors">
-                    <span class="material-symbols-outlined text-[20px]">image</span> {t("header.icons")}
+                    <span class="material-symbols-outlined text-[20px]">image</span> <span data-i18n="header.icons">{t("header.icons")}</span>
                 </a>
                 <a href={getPath('/tools/calc-viga')} class="flex items-center gap-3 text-on-surface-variant hover:text-white pl-3 py-2 rounded-lg hover:bg-surface-container-high transition-colors">
-                    <span class="material-symbols-outlined text-[20px]">architecture</span> {t("header.profiles")}
+                    <span class="material-symbols-outlined text-[20px]">architecture</span> <span data-i18n="header.profiles">{t("header.profiles")}</span>
                 </a>
             </div>
 
             <!-- Contextual Dashboard Menu (Visible only when logged in) -->
             <div id="mobile-dashboard-nav" class="hidden flex-col gap-2 mt-2">
-                <span class="text-primary-container text-xs font-bold uppercase tracking-wider pl-3">Dashboard</span>
+                <span class="text-primary-container text-xs font-bold uppercase tracking-wider pl-3" data-i18n="dashboard.sidebar.sectionMain">{t("dashboard.sidebar.sectionMain")}</span>
                 <a href={getPath('/dashboard#lisp')} class="dashboard-link flex items-center gap-3 text-on-surface-variant hover:text-white pl-3 py-2 rounded-lg hover:bg-surface-container-high transition-colors">
-                    <span class="material-symbols-outlined text-[20px]">folder_copy</span> LISP Manager
+                    <span class="material-symbols-outlined text-[20px]">folder_copy</span> <span data-i18n="dashboard.sidebar.manager">{t("dashboard.sidebar.manager")}</span>
                 </a>
                 <a href={getPath('/dashboard#favorites')} class="dashboard-link flex items-center gap-3 text-on-surface-variant hover:text-white pl-3 py-2 rounded-lg hover:bg-surface-container-high transition-colors">
-                    <span class="material-symbols-outlined text-[20px]">star</span> My Collection
+                    <span class="material-symbols-outlined text-[20px]">star</span> <span data-i18n="dashboard.sidebar.collection">{t("dashboard.sidebar.collection")}</span>
                 </a>
                 <a href={getPath('/dashboard#profile')} class="dashboard-link flex items-center gap-3 text-on-surface-variant hover:text-white pl-3 py-2 rounded-lg hover:bg-surface-container-high transition-colors">
-                    <span class="material-symbols-outlined text-[20px]">person</span> My Profile
+                    <span class="material-symbols-outlined text-[20px]">person</span> <span data-i18n="dashboard.sidebar.profile">{t("dashboard.sidebar.profile")}</span>
                 </a>
                 <a href={getPath('/dashboard#subscriptions')} class="dashboard-link flex items-center gap-3 text-on-surface-variant hover:text-white pl-3 py-2 rounded-lg hover:bg-surface-container-high transition-colors">
-                    <span class="material-symbols-outlined text-[20px]">shopping_bag</span> Mis Suscripciones
+                    <span class="material-symbols-outlined text-[20px]">shopping_bag</span> <span data-i18n="dashboard.subscriptions.title">{t("dashboard.subscriptions.title")}</span>
                 </a>
                 <a href={getPath('/dashboard#licenses')} class="dashboard-link flex items-center gap-3 text-on-surface-variant hover:text-white pl-3 py-2 rounded-lg hover:bg-surface-container-high transition-colors">
-                    <span class="material-symbols-outlined text-[20px]">vpn_key</span> Licenses & Access
+                    <span class="material-symbols-outlined text-[20px]">vpn_key</span> <span data-i18n="dashboard.sidebar.licenses">{t("dashboard.sidebar.licenses")}</span>
                 </a>
                 <a href={getPath('/dashboard#notifications')} class="dashboard-link flex items-center gap-3 text-on-surface-variant hover:text-white pl-3 py-2 rounded-lg hover:bg-surface-container-high transition-colors">
-                    <span class="material-symbols-outlined text-[20px]">notifications</span> Notifications
+                    <span class="material-symbols-outlined text-[20px]">notifications</span> <span data-i18n="dashboard.sidebar.notifications">{t("dashboard.sidebar.notifications")}</span>
                 </a>
             </div>
 
-            <a href={getPath('/blog')} class="text-on-surface-variant hover:text-white font-medium text-base pl-3 mt-2">{t("header.blog") || "Blog"}</a>
+            <a href={getPath('/blog')} class="text-on-surface-variant hover:text-white font-medium text-base pl-3 mt-2" data-i18n="header.blog">{t("header.blog") || "Blog"}</a>
         </nav>
         
         <div class="mt-auto pt-6 border-t border-surface-variant flex flex-col gap-4">
-            <a id="mobile-login-btn" href={getPath('/login')} class="text-center font-medium text-white bg-surface-container-high py-3 rounded-lg hover:bg-surface-variant transition-colors">
+            <a id="mobile-login-btn" href={getPath('/login')} class="text-center font-medium text-white bg-surface-container-high py-3 rounded-lg hover:bg-surface-variant transition-colors" data-i18n="header.login">
                 {t("header.login")}
             </a>
-            <a id="mobile-help-btn" href={getPath('/help')} class="text-center font-bold text-white bg-primary-container py-3 rounded-lg hover:bg-[#e66000] shadow-glow-orange transition-all">
+            <a id="mobile-help-btn" href={getPath('/help')} class="text-center font-bold text-white bg-primary-container py-3 rounded-lg hover:bg-[#e66000] shadow-glow-orange transition-all" data-i18n="header.help">
                 {t("header.help")}
             </a>
             <div class="flex items-center justify-center gap-2 mt-4">
@@ -196,6 +196,7 @@ const getPath = (path) => {
 <script>
     import { auth } from '../../firebase';
     import { onAuthStateChanged, signOut } from 'firebase/auth';
+    import { translations } from '../../i18n/translations.js';
 
     document.addEventListener('DOMContentLoaded', () => {
         const dashboardNav = document.getElementById('mobile-dashboard-nav');
@@ -204,6 +205,9 @@ const getPath = (path) => {
         const helpBtn = document.getElementById('mobile-help-btn');
         
         onAuthStateChanged(auth, (user) => {
+            const storedLang = localStorage.getItem('lc-lang') || 'en';
+            const dict = translations[storedLang] || translations['en'];
+
             if (user) {
                 // Logged in
                 if (dashboardNav) {
@@ -211,7 +215,7 @@ const getPath = (path) => {
                     dashboardNav.classList.add('flex');
                 }
                 if (loginBtn) {
-                    loginBtn.textContent = 'Sign Out';
+                    loginBtn.textContent = dict['dashboard.sidebar.logout'] || 'Sign Out';
                     loginBtn.href = '#';
                     loginBtn.addEventListener('click', (e) => {
                         e.preventDefault();
@@ -224,7 +228,7 @@ const getPath = (path) => {
                     // Si está en la landing u otra página sin sidebar, 
                     // el botón "Login" cambia a "Dashboard" y lo lleva al portal.
                     // Desde el dashboard podrá hacer logout en el sidebar.
-                    desktopLoginBtn.textContent = 'Dashboard';
+                    desktopLoginBtn.textContent = dict['header.portal'] || 'Dashboard';
                     desktopLoginBtn.href = '/dashboard';
                     // Removemos cualquier listener previo reemplazando el nodo si es necesario,
                     // pero como no agregamos listeners a desktopLoginBtn, solo cambiar el href es seguro.
@@ -240,8 +244,12 @@ const getPath = (path) => {
                     dashboardNav.classList.remove('flex');
                 }
                 if (desktopLoginBtn) {
-                    desktopLoginBtn.textContent = 'Login';
+                    desktopLoginBtn.textContent = dict['header.login'] || 'Login';
                     desktopLoginBtn.href = '/login';
+                }
+                if (loginBtn) {
+                    loginBtn.textContent = dict['header.login'] || 'Login';
+                    loginBtn.href = '/login';
                 }
             }
         });

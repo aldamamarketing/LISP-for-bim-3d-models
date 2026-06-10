@@ -80,6 +80,11 @@ export const translations = {
     "dashboard.sidebar.sectionMain": "Main",
     "dashboard.sidebar.sectionAccount": "Account & Settings",
     "dashboard.sidebar.sectionHelp": "Help",
+    "dashboard.sidebar.sectionWorkspace": "Workspace",
+    "dashboard.sidebar.sectionResources": "Resources",
+    "dashboard.sidebar.files": "LISP Files & Commands",
+    "dashboard.sidebar.suites": "Suites & Groups",
+    "dashboard.sidebar.store": "Store",
 
     // Dashboard
     "dashboard.title": "Client Portal",
@@ -302,6 +307,11 @@ export const translations = {
     "dashboard.sidebar.sectionMain": "Principal",
     "dashboard.sidebar.sectionAccount": "Cuenta y Ajustes",
     "dashboard.sidebar.sectionHelp": "Ayuda",
+    "dashboard.sidebar.sectionWorkspace": "Espacio de Trabajo",
+    "dashboard.sidebar.sectionResources": "Recursos",
+    "dashboard.sidebar.files": "Archivos y Comandos LISP",
+    "dashboard.sidebar.suites": "Suites y Grupos",
+    "dashboard.sidebar.store": "Tienda",
 
     // Dashboard
     "dashboard.title": "Portal del Cliente",
@@ -524,6 +534,11 @@ export const translations = {
     "dashboard.sidebar.sectionMain": "Principal",
     "dashboard.sidebar.sectionAccount": "Conta & Configurações",
     "dashboard.sidebar.sectionHelp": "Ajuda",
+    "dashboard.sidebar.sectionWorkspace": "Espaço de Trabalho",
+    "dashboard.sidebar.sectionResources": "Recursos",
+    "dashboard.sidebar.files": "Arquivos & Comandos LISP",
+    "dashboard.sidebar.suites": "Suites & Grupos",
+    "dashboard.sidebar.store": "Loja",
 
     // Dashboard
     "dashboard.title": "Portal do Cliente",
