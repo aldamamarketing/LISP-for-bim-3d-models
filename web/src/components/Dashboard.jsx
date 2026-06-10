@@ -84,11 +84,11 @@ function DashboardInner({ mode }) {
             <span className="text-white">{t('dashboard.breadcrumb.panel')}</span>
             <span className="material-symbols-outlined text-[16px]">chevron_right</span>
             <span className="text-primary-container font-bold capitalize">
-              {activeTab === 'lisp' ? t('dashboard.sidebar.manager') : 
+              {(activeTab === 'files' || activeTab === 'suites') ? t('dashboard.sidebar.manager') :
                activeTab === 'favorites' ? t('dashboard.sidebar.collection') : 
                activeTab === 'profile' ? t('dashboard.sidebar.profile') : 
                activeTab === 'licenses' ? t('dashboard.sidebar.licenses') : 
-               activeTab === 'subscriptions' ? 'Mis Suscripciones' :
+               activeTab === 'subscriptions' ? t('dashboard.subscriptions.title') :
                t('dashboard.sidebar.notifications')}
             </span>
           </div>
