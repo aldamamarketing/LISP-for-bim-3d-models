@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { db } from '../../firebase';
-import { doc, setDoc, updateDoc, deleteDoc, collection, query, where, getDocs } from 'firebase/firestore';
+import { doc, setDoc, updateDoc, deleteDoc, collection, query, where, getDocs, getDoc } from 'firebase/firestore';
 import { ref, uploadBytes, deleteObject } from 'firebase/storage';
 import { showToast } from '../Toast';
 import { useTranslation } from '../../i18n/useTranslation';
 import { useDashboard } from './DashboardContext';
+import BlurInput from '../ui/BlurInput';
 
 function parseLispCommands(fileContent) {
   const regex = /\(defun\s+c:([A-Za-z0-9_-]+)/gi;
@@ -37,31 +38,11 @@ export default function LispFilesCard() {
   const [selectedIds, setSelectedIds] = useState([]);
   const [expandedFileIds, setExpandedFileIds] = useState([]);
 
-  // Assignments
-  const [groupAssignments, setGroupAssignments] = useState([]);
-  const [bulkAssignGroupId, setBulkAssignGroupId] = useState('');
-
   // Modals for icon selection
   const [showGalleryModal, setShowGalleryModal] = useState(false);
   const [showFavoritesModal, setShowFavoritesModal] = useState(false);
   const [activeCommandId, setActiveCommandId] = useState(null); 
-  const [dropdownOpenFor, setDropdownOpenFor] = useState(null); 
-
-  useEffect(() => {
-    const loadAssignments = async () => {
-      if (groups.length === 0) return;
-      try {
-        const groupIds = groups.map(g => g.id);
-        const q = query(collection(db, 'groupCommands'), where('groupId', 'in', groupIds.slice(0, 10)));
-        const snap = await getDocs(q);
-        const assignments = snap.docs.map(d => ({ id: d.id, ...d.data() }));
-        setGroupAssignments(assignments);
-      } catch (e) {
-        console.warn("Could not load assignments", e);
-      }
-    };
-    loadAssignments();
-  }, [groups]);
+  const [dropdownOpenFor, setDropdownOpenFor] = useState(null);
 
   const handleFileSelect = async (e) => {
     const files = Array.from(e.target.files).filter(f => f.name.toLowerCase().endsWith('.lsp'));
@@ -158,29 +139,54 @@ export default function LispFilesCard() {
     else setExpandedFileIds([...expandedFileIds, id]);
   };
 
+  const checkFileInPaidActiveSuite = async (fileId) => {
+    try {
+      const gfSnap = await getDocs(query(collection(db, 'groupFiles'), where('fileId', '==', fileId)));
+      if (gfSnap.empty) return false;
+      
+      for (const gfDoc of gfSnap.docs) {
+        const groupId = gfDoc.data().groupId;
+        const groupSnap = await getDocs(query(collection(db, 'groups'), where('__name__', '==', groupId)));
+        if (!groupSnap.empty) {
+          const suiteId = groupSnap.docs[0].data().suiteId;
+          const suiteSnap = await getDocs(query(collection(db, 'suites'), where('__name__', '==', suiteId)));
+          if (!suiteSnap.empty) {
+            const suiteData = suiteSnap.docs[0].data();
+            if (suiteData.visibility === 'store' && suiteData.price > 0 && suiteData.status !== 'deprecated' && suiteData.status !== 'archived') {
+              const subSnap = await getDocs(query(collection(db, 'subscriptions'), where('suiteId', '==', suiteId), where('status', '==', 'active')));
+              if (!subSnap.empty) return true;
+            }
+          }
+        }
+      }
+    } catch (e) {
+      console.error(e);
+    }
+    return false;
+  };
+
   const handleBulkDelete = async () => {
     if (selectedIds.length === 0) return;
+
+    for (const id of selectedIds) {
+      const isInPaidSuite = await checkFileInPaidActiveSuite(id);
+      if (isInPaidSuite) {
+        showToast('Alguns arquivos pertencem a suites pagas ativas. Deprecie a suite primeiro.', 'error');
+        return;
+      }
+    }
+
     if (!confirm(`Excluir ${selectedIds.length} arquivos selecionados? Isso também apagará os comandos relacionados.`)) return;
     
     try {
-      const { storage } = await import('../../firebase');
       for (const id of selectedIds) {
-        const fileData = tenantLisps.find(l => l.id === id);
-        if (fileData) {
-          await deleteObject(ref(storage, fileData.storagePath)).catch(e => console.warn(e));
-          await deleteDoc(doc(db, 'lispFiles', id));
-          
-          const cmdsToDelete = commands.filter(c => c.lispFileId === id);
-          for (const c of cmdsToDelete) {
-            await deleteDoc(doc(db, 'commands', c.id));
-          }
-          setCommands(prev => prev.filter(c => c.lispFileId !== id));
-        }
+        await deleteDoc(doc(db, 'lispFiles', id));
       }
       setTenantLisps(tenantLisps.filter(l => !selectedIds.includes(l.id)));
       setSelectedIds([]);
-      showToast('Arquivos excluídos com sucesso.', 'success');
+      showToast('Arquivos excluídos. A limpeza ocorrerá em background.', 'success');
     } catch (err) {
+      console.error(err);
       showToast('Erro ao excluir arquivos.', 'error');
     }
   };
@@ -255,42 +261,7 @@ export default function LispFilesCard() {
     }
   };
 
-  const handleAssignCommand = async (cmdId, groupId) => {
-    if (!groupId) return;
-    try {
-      const gcmdId = `GCMD-${groupId}-${cmdId}`;
-      const assignment = { groupId, commandId: cmdId, sortOrder: 0 };
-      await setDoc(doc(db, 'groupCommands', gcmdId), assignment);
-      setGroupAssignments([...groupAssignments.filter(a => a.commandId !== cmdId), { id: gcmdId, ...assignment }]);
-      showToast('Comando atribuído!', 'success');
-    } catch (err) {
-      showToast('Erro ao atribuir comando.', 'error');
-    }
-  };
 
-  const handleBulkAssign = async () => {
-    if (!bulkAssignGroupId || selectedIds.length === 0) return;
-    try {
-      let count = 0;
-      for (const fileId of selectedIds) {
-        const cmdsInFile = commands.filter(c => c.lispFileId === fileId);
-        for (const cmd of cmdsInFile) {
-          const gcmdId = `GCMD-${bulkAssignGroupId}-${cmd.id}`;
-          if (!groupAssignments.find(a => a.id === gcmdId)) {
-            const assignment = { groupId: bulkAssignGroupId, commandId: cmd.id, sortOrder: 0 };
-            await setDoc(doc(db, 'groupCommands', gcmdId), assignment);
-            setGroupAssignments(prev => [...prev.filter(a => a.commandId !== cmd.id), { id: gcmdId, ...assignment }]);
-            count++;
-          }
-        }
-      }
-      setBulkAssignGroupId('');
-      setSelectedIds([]);
-      showToast(`${count} comandos atribuídos com sucesso!`, 'success');
-    } catch (err) {
-      showToast('Erro na atribuição em lote.', 'error');
-    }
-  };
 
   return (
     <div className="tab-enter card pb-32">
@@ -336,26 +307,6 @@ export default function LispFilesCard() {
         <div className="bg-surface-container-high border border-outline-variant border-b-0 rounded-t-lg p-2 flex items-center justify-between sticky top-0 z-10">
           <span className="text-sm font-bold text-primary-container px-2">{selectedIds.length} selecionados</span>
           <div className="flex items-center gap-4">
-            <div className="flex items-center gap-2">
-              <span className="text-xs text-on-surface-variant">Atribuir tudo a:</span>
-              <select 
-                className="bg-surface border border-outline-variant rounded text-on-surface text-xs py-1 px-2 focus:border-primary-container"
-                value={bulkAssignGroupId}
-                onChange={e => setBulkAssignGroupId(e.target.value)}
-              >
-                <option value="">Selecione Grupo...</option>
-                {suites.map(s => (
-                  <optgroup key={s.id} label={s.name}>
-                    {groups.filter(g => g.suiteId === s.id).map(g => (
-                      <option key={g.id} value={g.id}>{g.name}</option>
-                    ))}
-                  </optgroup>
-                ))}
-              </select>
-              <button className="bg-primary-container text-white px-3 py-1 rounded text-xs font-bold" onClick={handleBulkAssign} disabled={!bulkAssignGroupId}>
-                Aplicar
-              </button>
-            </div>
             <button className="text-error hover:bg-error/10 px-3 py-1 rounded text-sm font-bold transition-colors" onClick={handleBulkDelete}>
               Excluir
             </button>
@@ -402,8 +353,6 @@ export default function LispFilesCard() {
 
                   {/* CHILD ROWS (COMMANDS) */}
                   {isExpanded && fileCommands.map(cmd => {
-                    const currentAssignment = groupAssignments.find(a => a.commandId === cmd.id);
-                    
                     return (
                       <tr key={cmd.id} className="border-b border-surface-container bg-surface-container-lowest hover:bg-surface-container transition-colors">
                         <td className="py-2 pl-4"></td>
@@ -446,32 +395,20 @@ export default function LispFilesCard() {
 
                             <div className="font-code-sm text-on-surface text-xs w-[120px] font-bold opacity-80 truncate" title={cmd.commandName}>{cmd.commandName}</div>
                             
-                            {/* FRIENDLY NAME INPUT */}
-                            <input 
-                              type="text" 
+                            {/* FRIENDLY NAME & DESCRIPTION INPUTS */}
+                            <BlurInput 
                               className="flex-1 bg-transparent border-b border-transparent hover:border-outline focus:border-primary-container rounded-none text-on-surface text-sm px-1 py-1 focus:outline-none transition-colors"
-                              value={cmd.friendlyName || ''} 
-                              onChange={e => handleCommandUpdate(cmd.id, 'friendlyName', e.target.value)}
+                              value={cmd.friendlyName} 
+                              onSave={val => handleCommandUpdate(cmd.id, 'friendlyName', val)}
                               placeholder="Nome amigável na Paleta"
                             />
                             
-                            {/* GROUP ASSIGNMENT SELECT */}
-                            <div className="w-[180px]">
-                              <select 
-                                className="w-full bg-surface border border-outline-variant rounded text-on-surface-variant text-xs py-1.5 px-2 focus:border-primary-container focus:text-on-surface transition-colors"
-                                value={currentAssignment ? currentAssignment.groupId : ''}
-                                onChange={e => handleAssignCommand(cmd.id, e.target.value)}
-                              >
-                                <option value="">Atribuir a Grupo...</option>
-                                {suites.map(s => (
-                                  <optgroup key={s.id} label={s.name}>
-                                    {groups.filter(g => g.suiteId === s.id).map(g => (
-                                      <option key={g.id} value={g.id}>{g.name}</option>
-                                    ))}
-                                  </optgroup>
-                                ))}
-                              </select>
-                            </div>
+                            <BlurInput 
+                              className="flex-1 bg-transparent border-b border-transparent hover:border-outline focus:border-primary-container rounded-none text-on-surface text-sm px-1 py-1 focus:outline-none transition-colors ml-4"
+                              value={cmd.description} 
+                              onSave={val => handleCommandUpdate(cmd.id, 'description', val)}
+                              placeholder="Descrição do comando"
+                            />
 
                           </div>
                         </td>

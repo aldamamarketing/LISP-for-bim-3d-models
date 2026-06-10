@@ -12,6 +12,7 @@ import LispFilesCard from './dashboard/LispFilesCard';
 import SuitesGroupsCard from './dashboard/SuitesGroupsCard';
 import SupportModal from './dashboard/SupportModal';
 import SubscriptionsTab from './dashboard/SubscriptionsTab';
+import IncomeDashboardTab from './dashboard/IncomeDashboardTab';
 
 function DashboardInner({ mode }) {
   const { t } = useTranslation();
@@ -29,8 +30,11 @@ function DashboardInner({ mode }) {
   React.useEffect(() => {
     const handleHashChange = () => {
       const hash = window.location.hash.replace('#', '');
-      if (['profile', 'licenses', 'files', 'suites', 'favorites', 'notifications', 'subscriptions'].includes(hash)) {
+      if (['profile', 'licenses', 'files', 'suites', 'favorites', 'notifications', 'subscriptions', 'income'].includes(hash)) {
         setActiveTab(hash);
+      } else if (!hash) {
+        setActiveTab('licenses');
+        window.history.replaceState(null, null, '#licenses');
       }
     };
     
@@ -38,6 +42,13 @@ function DashboardInner({ mode }) {
     window.addEventListener('hashchange', handleHashChange);
     return () => window.removeEventListener('hashchange', handleHashChange);
   }, [setActiveTab]);
+
+  // Handle custom event from Astro layout
+  React.useEffect(() => {
+    const handleOpenModal = () => setShowSupportModal(true);
+    window.addEventListener('open-support-modal', handleOpenModal);
+    return () => window.removeEventListener('open-support-modal', handleOpenModal);
+  }, [setShowSupportModal]);
 
   if (loading) return (
     <div className="min-h-screen bg-background flex flex-col items-center justify-center">
@@ -58,6 +69,7 @@ function DashboardInner({ mode }) {
       case 'suites': return <SuitesGroupsCard />;
       case 'favorites': return <FavoritesManager />;
       case 'subscriptions': return <SubscriptionsTab />;
+      case 'income': return <IncomeDashboardTab />;
       case 'notifications': 
         return (
           <div className="tab-enter card">
@@ -65,7 +77,7 @@ function DashboardInner({ mode }) {
             <p className="text-sm text-on-surface-variant">{t('dashboard.notifications.empty')}</p>
           </div>
         );
-      default: return <LispFilesCard />;
+      default: return <LicensesTab />;
     }
   };
 
@@ -84,11 +96,13 @@ function DashboardInner({ mode }) {
             <span className="text-white">{t('dashboard.breadcrumb.panel')}</span>
             <span className="material-symbols-outlined text-[16px]">chevron_right</span>
             <span className="text-primary-container font-bold capitalize">
-              {activeTab === 'lisp' ? t('dashboard.sidebar.manager') : 
+              {activeTab === 'files' ? t('dashboard.sidebar.files') : 
+               activeTab === 'suites' ? t('dashboard.sidebar.suites') : 
                activeTab === 'favorites' ? t('dashboard.sidebar.collection') : 
                activeTab === 'profile' ? t('dashboard.sidebar.profile') : 
                activeTab === 'licenses' ? t('dashboard.sidebar.licenses') : 
                activeTab === 'subscriptions' ? t('dashboard.subscriptions.title') :
+               activeTab === 'income' ? t('dashboard.sidebar.income') :
                t('dashboard.sidebar.notifications')}
             </span>
           </div>

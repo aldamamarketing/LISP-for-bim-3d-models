@@ -2,7 +2,9 @@ import React, { useState, useEffect } from 'react';
 import { db } from '../../firebase';
 import { doc, setDoc, deleteDoc, collection, query, where, getDocs, updateDoc } from 'firebase/firestore';
 import { showToast } from '../Toast';
+import { useTranslation } from '../../i18n/useTranslation';
 import { useDashboard } from './DashboardContext';
+import BlurInput from '../ui/BlurInput';
 import { Card, CardHeader } from '../ui/Card';
 
 export default function SuitesGroupsCard() {
@@ -103,13 +105,32 @@ export default function SuitesGroupsCard() {
     } catch (e) { showToast('Erro ao salvar suite.', 'error'); }
   };
 
-  const handleDeleteSuite = async (id) => {
-    if (!confirm('Excluir esta Suite e todos os seus Grupos?')) return;
+  const handleDeleteSuite = async (suite) => {
     try {
-      await deleteDoc(doc(db, 'suites', id));
-      setSuites(suites.filter(s => s.id !== id));
-      showToast('Suite excluída.', 'success');
-    } catch (e) { showToast('Erro ao excluir.', 'error'); }
+      const subSnap = await getDocs(query(collection(db, 'subscriptions'), where('suiteId', '==', suite.id), where('status', '==', 'active')));
+      const hasActiveSubscribers = !subSnap.empty;
+
+      if (suite.visibility === 'store' && suite.price > 0 && hasActiveSubscribers) {
+        if (!confirm('Esta suite tiene suscriptores activos. Se marcará como "Descontinuada" y dejará de venderse. Los suscriptores actuales mantendrán acceso hasta el fin de su ciclo de pago. ¿Continuar?')) return;
+        
+        await updateDoc(doc(db, 'suites', suite.id), { 
+          status: 'deprecated', 
+          deprecatedAt: new Date().toISOString() 
+        });
+        
+        setSuites(suites.map(s => s.id === suite.id ? { ...s, status: 'deprecated', deprecatedAt: new Date().toISOString() } : s));
+        showToast('Suite marcada como descontinuada.', 'info');
+      } else {
+        if (!confirm('¿Eliminar esta Suite y todos sus datos permanentemente?')) return;
+        
+        await deleteDoc(doc(db, 'suites', suite.id));
+        setSuites(suites.filter(s => s.id !== suite.id));
+        showToast('Suite excluída.', 'success');
+      }
+    } catch (e) {
+      console.error(e);
+      showToast('Erro ao excluir suite.', 'error');
+    }
   };
 
   const handleUpdateSuiteVisibility = async (suiteId, visibility) => {
@@ -404,7 +425,7 @@ export default function SuitesGroupsCard() {
                                   <button type="button" className="w-6 h-6 rounded text-on-surface-variant hover:text-white hover:bg-surface-container-highest flex items-center justify-center transition-colors focus-visible:ring-2 focus-visible:ring-primary-container outline-none" title="Adicionar Grupo" aria-label="Adicionar Grupo" onClick={() => handleAddGroup(suite.id)}>
                                     <span className="material-symbols-outlined text-[14px]" aria-hidden="true">create_new_folder</span>
                                   </button>
-                                  <button type="button" className="w-6 h-6 rounded text-on-surface-variant hover:text-error hover:bg-error/10 flex items-center justify-center transition-colors focus-visible:ring-2 focus-visible:ring-error outline-none" title="Excluir Suite" aria-label="Excluir Suite" onClick={() => handleDeleteSuite(suite.id)}>
+                                  <button type="button" className="w-6 h-6 rounded text-on-surface-variant hover:text-error hover:bg-error/10 flex items-center justify-center transition-colors focus-visible:ring-2 focus-visible:ring-error outline-none" title="Excluir Suite" aria-label="Excluir Suite" onClick={() => handleDeleteSuite(suite)}>
                                     <span className="material-symbols-outlined text-[14px]" aria-hidden="true">delete</span>
                                   </button>
                               </div>
@@ -429,14 +450,12 @@ export default function SuitesGroupsCard() {
                                 <div className="flex-1">
                                   <div className="flex justify-between items-center mb-1">
                                     {editingGroupId === group.id ? (
-                                      <input 
+                                      <BlurInput 
                                         autoFocus
-                                        type="text" 
                                         className="bg-surface border border-primary-container rounded text-on-surface font-bold text-xs px-2 py-0.5 focus:outline-none" 
                                         value={group.name} 
-                                        onChange={e => handleUpdateGroup(group.id, 'name', e.target.value)}
+                                        onSave={val => handleUpdateGroup(group.id, 'name', val)}
                                         onBlur={() => setEditingGroupId(null)}
-                                        onKeyDown={e => e.key === 'Enter' && setEditingGroupId(null)}
                                       />
                                     ) : (
                                       <button type="button" className="font-bold text-on-surface text-xs cursor-text hover:text-primary-container transition-colors text-left focus-visible:ring-2 focus-visible:ring-primary-container outline-none" aria-label={`Renomear grupo ${group.name}`} onClick={() => setEditingGroupId(group.id)}>

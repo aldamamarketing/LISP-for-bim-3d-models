@@ -105,3 +105,5 @@ Adhere to these principles:
 
 -   **Login Issues:** If the browser fails to open during the login step, use
     `npx -y firebase-tools@latest login --no-localhost` instead.
+
+-   **Deployment Timeouts on Windows:** If the `firebase deploy` command fails with `Timeout after 10000. Cannot determine backend specification`, it is because importing `firebase-admin` is very heavy on Windows, and the local CLI analysis times out. To fix this definitively and professionally, use **lazy-loading** for `firebase-admin` (e.g., wrap it in a function that is only called when needed) so the file loads instantly and the deployment succeeds. You can also temporarily bypass it with `$env:FUNCTIONS_DISCOVERY_TIMEOUT=60`.

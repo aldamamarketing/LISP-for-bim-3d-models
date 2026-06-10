@@ -1,5 +1,5 @@
 const { onRequest, onCall, HttpsError } = require("firebase-functions/v2/https");
-const { onDocumentCreated, onDocumentWritten } = require("firebase-functions/v2/firestore");
+const { onDocumentCreated, onDocumentWritten, onDocumentDeleted } = require("firebase-functions/v2/firestore");
 const logger = require("firebase-functions/logger");
 
 // Lazy imports de módulos nativos
@@ -11,21 +11,24 @@ function getOpenAI() {
   });
 }
 
-const admin = require("firebase-admin");
-if (admin.apps.length === 0) {
-  admin.initializeApp();
+function getAdmin() {
+  const admin = require("firebase-admin");
+  if (admin.apps.length === 0) {
+    admin.initializeApp();
+  }
+  return admin;
 }
 
 function getDeps() {
   return {
     fs: require("fs"),
     path: require("path"),
-    admin: admin
+    admin: getAdmin()
   };
 }
 
 function getDb() {
-  return admin.firestore();
+  return getAdmin().firestore();
 }
 
 exports.getRoutine = onRequest({ cors: true }, async (req, res) => {
@@ -606,6 +609,7 @@ exports.onUserCreated = onDocumentCreated("users/{userId}", async (event) => {
       type: "global",
       visibility: "private",
       isEditable: false,
+      status: "active",
       createdAt: admin.firestore.FieldValue.serverTimestamp()
     });
 
@@ -753,5 +757,203 @@ exports.onReviewWritten = onDocumentWritten("reviews/{reviewId}", async (event) 
     console.log(`Recalculated rating for suite ${suiteId}: ${averageRating} (${count} reviews)`);
   } catch (err) {
     console.error(`Error recalculating rating for suite ${suiteId}:`, err);
+  }
+});
+
+// ==========================================
+// DATA LIFECYCLE & CASCADE DELETES
+// ==========================================
+
+// Cascade delete when a Suite is hard-deleted
+exports.onSuiteDeleted = onDocumentDeleted({ document: "suites/{suiteId}", timeoutSeconds: 60 }, async (event) => {
+  const suiteId = event.params.suiteId;
+  const db = getDb();
+  const batch = db.batch();
+  let count = 0;
+
+  try {
+    // 1. Find and delete groups for this suite
+    const groupsSnap = await db.collection("groups").where("suiteId", "==", suiteId).get();
+    for (const groupDoc of groupsSnap.docs) {
+      batch.delete(groupDoc.ref);
+      count++;
+      
+      // 1a. Find and delete groupFiles for each group
+      const gfSnap = await db.collection("groupFiles").where("groupId", "==", groupDoc.id).get();
+      for (const gfDoc of gfSnap.docs) {
+        batch.delete(gfDoc.ref);
+        count++;
+      }
+    }
+
+    // 2. Find and delete subscriptions
+    const subSnap = await db.collection("subscriptions").where("suiteId", "==", suiteId).get();
+    for (const subDoc of subSnap.docs) {
+      batch.delete(subDoc.ref);
+      count++;
+    }
+
+    // 3. Find and delete reviews
+    const revSnap = await db.collection("reviews").where("suiteId", "==", suiteId).get();
+    for (const revDoc of revSnap.docs) {
+      batch.delete(revDoc.ref);
+      count++;
+    }
+
+    if (count > 0) {
+      await batch.commit();
+      console.log(`Cascade delete completed for suite ${suiteId}. Deleted ${count} child documents.`);
+    }
+  } catch (err) {
+    console.error(`Error in cascade delete for suite ${suiteId}:`, err);
+  }
+});
+
+// Lifecycle management when Suite status changes
+exports.onSuiteStatusChanged = onDocumentWritten({ document: "suites/{suiteId}", timeoutSeconds: 60 }, async (event) => {
+  if (!event.data.after.exists || !event.data.before.exists) return;
+  
+  const beforeData = event.data.before.data();
+  const afterData = event.data.after.data();
+  
+  if (beforeData.status === afterData.status) return;
+
+  const suiteId = event.params.suiteId;
+  const db = getDb();
+  const { admin } = getDeps();
+  const newStatus = afterData.status;
+
+  try {
+    if (newStatus === 'deprecated') {
+      if (afterData.price === 0) {
+        await db.collection("suites").doc(suiteId).update({
+          status: 'end-of-life',
+          endOfLifeAt: admin.firestore.FieldValue.serverTimestamp()
+        });
+        return;
+      }
+      
+      const subSnap = await db.collection("subscriptions").where("suiteId", "==", suiteId).get();
+      const batch = db.batch();
+      subSnap.docs.forEach(doc => {
+        batch.update(doc.ref, { autoRenew: false, status: 'deprecated' });
+      });
+      await batch.commit();
+      console.log(`Suite ${suiteId} deprecated. Subscriptions updated.`);
+    } 
+    else if (newStatus === 'end-of-life') {
+      const archiveDate = new Date();
+      archiveDate.setDate(archiveDate.getDate() + 30);
+      
+      await db.collection("suites").doc(suiteId).update({
+        archivedAt: admin.firestore.Timestamp.fromDate(archiveDate)
+      });
+      console.log(`Suite ${suiteId} entered EOL. Archival scheduled.`);
+    }
+    else if (newStatus === 'archived') {
+      const groupsSnap = await db.collection("groups").where("suiteId", "==", suiteId).get();
+      const groupIds = groupsSnap.docs.map(d => d.id);
+      
+      if (groupIds.length > 0) {
+        let fileIds = [];
+        for(let i = 0; i < groupIds.length; i += 10) {
+          const chunk = groupIds.slice(i, i + 10);
+          const gfSnap = await db.collection("groupFiles").where("groupId", "in", chunk).get();
+          gfSnap.docs.forEach(d => fileIds.push(d.data().fileId));
+        }
+        
+        fileIds = [...new Set(fileIds)];
+        
+        const batch = db.batch();
+        for (const fileId of fileIds) {
+          batch.update(db.collection("lispFiles").doc(fileId), {
+            status: 'soft-deleted',
+            softDeletedAt: admin.firestore.FieldValue.serverTimestamp(),
+            softDeleteReason: 'suite-archived'
+          });
+        }
+        
+        const subSnap = await db.collection("subscriptions").where("suiteId", "==", suiteId).get();
+        subSnap.docs.forEach(doc => {
+          batch.update(doc.ref, { status: 'expired' });
+        });
+        
+        await batch.commit();
+        console.log(`Suite ${suiteId} archived. Files soft-deleted, subs expired.`);
+      }
+    }
+    else if (newStatus === 'active' && beforeData.status !== 'active') {
+      await db.collection("suites").doc(suiteId).update({
+        deprecatedAt: admin.firestore.FieldValue.delete(),
+        endOfLifeAt: admin.firestore.FieldValue.delete(),
+        archivedAt: admin.firestore.FieldValue.delete()
+      });
+      console.log(`Suite ${suiteId} reactivated.`);
+    }
+  } catch (err) {
+    console.error(`Error processing lifecycle for suite ${suiteId}:`, err);
+  }
+});
+
+// Cascade delete when a Group is hard-deleted
+exports.onGroupDeleted = onDocumentDeleted({ document: "groups/{groupId}", timeoutSeconds: 60 }, async (event) => {
+  const groupId = event.params.groupId;
+  const db = getDb();
+  
+  try {
+    const gfSnap = await db.collection("groupFiles").where("groupId", "==", groupId).get();
+    const batch = db.batch();
+    gfSnap.docs.forEach(doc => batch.delete(doc.ref));
+    
+    if (!gfSnap.empty) {
+      await batch.commit();
+      console.log(`Cascade delete: removed ${gfSnap.size} groupFiles for group ${groupId}`);
+    }
+  } catch (err) {
+    console.error(`Error in cascade delete for group ${groupId}:`, err);
+  }
+});
+
+// Cascade delete when a LispFile is hard-deleted
+exports.onLispFileDeleted = onDocumentDeleted({ document: "lispFiles/{fileId}", timeoutSeconds: 60 }, async (event) => {
+  const fileId = event.params.fileId;
+  const fileData = event.data.data();
+  const db = getDb();
+  const { admin } = getDeps();
+  const batch = db.batch();
+  let count = 0;
+
+  try {
+    const cmdsSnap = await db.collection("commands").where("lispFileId", "==", fileId).get();
+    cmdsSnap.docs.forEach(doc => {
+      batch.delete(doc.ref);
+      count++;
+    });
+
+    const gfSnap = await db.collection("groupFiles").where("fileId", "==", fileId).get();
+    gfSnap.docs.forEach(doc => {
+      batch.delete(doc.ref);
+      count++;
+    });
+
+    if (count > 0) {
+      await batch.commit();
+    }
+
+    if (fileData && fileData.storagePath) {
+      try {
+        const bucket = admin.storage().bucket("lispcentral.firebasestorage.app");
+        await bucket.file(fileData.storagePath).delete();
+        console.log(`Storage file deleted: ${fileData.storagePath}`);
+      } catch (storageErr) {
+        if (storageErr.code !== 404) {
+          console.error(`Failed to delete storage file ${fileData.storagePath}:`, storageErr);
+        }
+      }
+    }
+    
+    console.log(`Cascade delete completed for lispFile ${fileId}. Deleted ${count} docs.`);
+  } catch (err) {
+    console.error(`Error in cascade delete for lispFile ${fileId}:`, err);
   }
 });

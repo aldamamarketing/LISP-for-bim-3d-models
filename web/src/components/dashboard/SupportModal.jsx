@@ -10,6 +10,7 @@ export default function SupportModal() {
   const { userData, showSupportModal, setShowSupportModal } = useDashboard();
   
   const [supportType, setSupportType] = useState('bug');
+  const [supportLocation, setSupportLocation] = useState('app');
   const [supportMsg, setSupportMsg] = useState('');
 
   if (!showSupportModal) return null;
@@ -22,6 +23,7 @@ export default function SupportModal() {
         tenantId: userData.id,
         email: userData.email,
         type: supportType,
+        location: supportLocation,
         message: supportMsg,
         createdAt: serverTimestamp(),
         status: 'open'
@@ -46,17 +48,32 @@ export default function SupportModal() {
         </button>
         <h3 className="text-xl font-bold mb-4">{t('dashboard.support.title')}</h3>
         <form onSubmit={handleSendSupport}>
-          <div className="mb-4">
-            <label className="block text-sm text-on-surface-variant mb-2">Assunto</label>
-            <select 
-              value={supportType} 
-              onChange={e => setSupportType(e.target.value)} 
-              className="w-full bg-[#0D0D0D] border border-surface-variant text-white rounded-lg p-3 focus:outline-none focus:border-primary-container"
-            >
-              <option value="bug">{t('dashboard.support.bug')}</option>
-              <option value="feature">{t('dashboard.support.feature')}</option>
-              <option value="help">{t('dashboard.support.help')}</option>
-            </select>
+          <div className="flex gap-4 mb-4">
+            <div className="flex-1">
+              <label className="block text-sm text-on-surface-variant mb-2">Asunto</label>
+              <select 
+                value={supportType} 
+                onChange={e => setSupportType(e.target.value)} 
+                className="w-full bg-[#0D0D0D] border border-surface-variant text-white rounded-lg p-3 focus:outline-none focus:border-primary-container"
+              >
+                <option value="bug">{t('dashboard.support.bug')}</option>
+                <option value="feature">{t('dashboard.support.feature')}</option>
+                <option value="help">{t('dashboard.support.help')}</option>
+              </select>
+            </div>
+            <div className="flex-1">
+              <label className="block text-sm text-on-surface-variant mb-2">{t('dashboard.support.location')}</label>
+              <select 
+                value={supportLocation} 
+                onChange={e => setSupportLocation(e.target.value)} 
+                className="w-full bg-[#0D0D0D] border border-surface-variant text-white rounded-lg p-3 focus:outline-none focus:border-primary-container"
+              >
+                <option value="app">{t('dashboard.support.loc_app')}</option>
+                <option value="loader">{t('dashboard.support.loc_loader')}</option>
+                <option value="lisp">{t('dashboard.support.loc_lisp')}</option>
+                <option value="palette">{t('dashboard.support.loc_palette')}</option>
+              </select>
+            </div>
           </div>
           <div className="mb-4">
             <label className="block text-sm text-on-surface-variant mb-2">Mensagem</label>

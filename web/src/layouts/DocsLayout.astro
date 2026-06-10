@@ -54,9 +54,54 @@ const t = (key) => {
     <aside id="global-sidebar" class="sidebar w-[260px] bg-[#0D0D0D] border-r border-[#262626] overflow-y-auto p-5 shrink-0 z-[85] absolute md:relative h-full hidden md:flex flex-col">
       <nav class="flex-1 overflow-y-auto space-y-6">
         
-        <!-- HERRAMIENTAS (siempre visible) -->
+        <!-- GENERAL -->
         <div>
-          <h4 class="text-primary-container uppercase text-xs font-bold tracking-wider mb-2 px-2" data-i18n="header.tools">{t("header.tools") || "Tools"}</h4>
+          <h4 class="text-primary-container uppercase text-xs font-bold tracking-wider mb-2 px-2" data-i18n="dashboard.sidebar.sectionGeneral">{t("dashboard.sidebar.sectionGeneral")}</h4>
+          <ul class="list-none p-0 m-0 space-y-1">
+            <li><a href="/dashboard#notifications" class="flex items-center gap-3 py-1.5 px-3 text-on-surface-variant hover:text-white hover:bg-[#1a1c1c] rounded-md transition-colors text-sm">
+              <span class="material-symbols-outlined text-[18px]">notifications</span> <span data-i18n="dashboard.sidebar.notifications">{t("dashboard.sidebar.notifications")}</span>
+            </a></li>
+            <li><a href="/dashboard#licenses" class="flex items-center gap-3 py-1.5 px-3 text-on-surface-variant hover:text-white hover:bg-[#1a1c1c] rounded-md transition-colors text-sm">
+              <span class="material-symbols-outlined text-[18px]">vpn_key</span> <span data-i18n="dashboard.sidebar.licenses">{t("dashboard.sidebar.licenses")}</span>
+            </a></li>
+          </ul>
+        </div>
+
+        <!-- STORE & PURCHASES -->
+        <div>
+          <hr class="border-[#262626] my-2" />
+          <h4 class="text-primary-container uppercase text-xs font-bold tracking-wider mb-2 px-2" data-i18n="dashboard.sidebar.sectionStore">{t("dashboard.sidebar.sectionStore")}</h4>
+          <ul class="list-none p-0 m-0 space-y-1">
+            <li><a href="/store" class="flex items-center gap-3 py-1.5 px-3 text-on-surface-variant hover:text-white hover:bg-[#1a1c1c] rounded-md transition-colors text-sm">
+              <span class="material-symbols-outlined text-[18px]">storefront</span> <span data-i18n="dashboard.sidebar.store">{t("dashboard.sidebar.store")}</span>
+            </a></li>
+            <li><a href="/dashboard#subscriptions" class="flex items-center gap-3 py-1.5 px-3 text-on-surface-variant hover:text-white hover:bg-[#1a1c1c] rounded-md transition-colors text-sm">
+              <span class="material-symbols-outlined text-[18px]">shopping_bag</span> <span data-i18n="dashboard.subscriptions.title">{t("dashboard.subscriptions.title")}</span>
+            </a></li>
+          </ul>
+        </div>
+
+        <!-- LISP STUDIO (solo logueado) -->
+        <div id="sidebar-dashboard-section" class="hidden">
+          <hr class="border-[#262626] my-2" />
+          <h4 class="text-primary-container uppercase text-xs font-bold tracking-wider mb-2 px-2" data-i18n="dashboard.sidebar.sectionStudio">{t("dashboard.sidebar.sectionStudio")}</h4>
+          <ul class="list-none p-0 m-0 space-y-1">
+            <li><a href="/dashboard#files" class="flex items-center gap-3 py-1.5 px-3 text-on-surface-variant hover:text-white hover:bg-[#1a1c1c] rounded-md transition-colors text-sm">
+              <span class="material-symbols-outlined text-[18px]">upload_file</span> <span data-i18n="dashboard.sidebar.files">{t("dashboard.sidebar.files")}</span>
+            </a></li>
+            <li><a href="/dashboard#suites" class="flex items-center gap-3 py-1.5 px-3 text-on-surface-variant hover:text-white hover:bg-[#1a1c1c] rounded-md transition-colors text-sm">
+              <span class="material-symbols-outlined text-[18px]">folder_copy</span> <span data-i18n="dashboard.sidebar.suites">{t("dashboard.sidebar.suites")}</span>
+            </a></li>
+            <li><a href="/dashboard#income" class="flex items-center gap-3 py-1.5 px-3 text-on-surface-variant hover:text-white hover:bg-[#1a1c1c] rounded-md transition-colors text-sm">
+              <span class="material-symbols-outlined text-[18px]">bar_chart</span> <span data-i18n="dashboard.sidebar.income">{t("dashboard.sidebar.income")}</span>
+            </a></li>
+          </ul>
+        </div>
+
+        <!-- HERRAMIENTAS -->
+        <div>
+          <hr class="border-[#262626] my-2" />
+          <h4 class="text-primary-container uppercase text-xs font-bold tracking-wider mb-2 px-2" data-i18n="dashboard.sidebar.sectionTools">{t("dashboard.sidebar.sectionTools")}</h4>
           <ul class="list-none p-0 m-0 space-y-1">
             <li><a href="/tools/hatch-generator" class="flex items-center gap-3 py-1.5 px-3 text-on-surface-variant hover:text-white hover:bg-[#1a1c1c] rounded-md transition-colors text-sm">
               <span class="material-symbols-outlined text-[18px]">grid_view</span> <span data-i18n="header.hatch">{t("header.hatch")}</span>
@@ -71,52 +116,28 @@ const t = (key) => {
               <span class="material-symbols-outlined text-[18px]">architecture</span> <span data-i18n="header.profiles">{t("header.profiles")}</span>
             </a></li>
           </ul>
-        </div>
-        
-        <!-- DASHBOARD (solo logueado, hidden por defecto) -->
-        <div id="sidebar-dashboard-section" class="hidden">
-          <hr class="border-[#262626] my-2" />
-          <h4 class="text-primary-container uppercase text-xs font-bold tracking-wider mb-2 px-2" data-i18n="dashboard.sidebar.sectionWorkspace">{t("dashboard.sidebar.sectionWorkspace")}</h4>
+          
+          <hr class="border-[#262626] border-dashed my-2 mx-2" />
           <ul class="list-none p-0 m-0 space-y-1">
-            <li><a href="/dashboard#files" class="flex items-center gap-3 py-1.5 px-3 text-on-surface-variant hover:text-white hover:bg-[#1a1c1c] rounded-md transition-colors text-sm">
-              <span class="material-symbols-outlined text-[18px]">upload_file</span> <span data-i18n="dashboard.sidebar.files">{t("dashboard.sidebar.files")}</span>
-            </a></li>
-            <li><a href="/dashboard#suites" class="flex items-center gap-3 py-1.5 px-3 text-on-surface-variant hover:text-white hover:bg-[#1a1c1c] rounded-md transition-colors text-sm">
-              <span class="material-symbols-outlined text-[18px]">folder_copy</span> <span data-i18n="dashboard.sidebar.suites">{t("dashboard.sidebar.suites")}</span>
-            </a></li>
             <li><a href="/dashboard#favorites" class="flex items-center gap-3 py-1.5 px-3 text-on-surface-variant hover:text-white hover:bg-[#1a1c1c] rounded-md transition-colors text-sm">
               <span class="material-symbols-outlined text-[18px]">star</span> <span data-i18n="dashboard.sidebar.collection">{t("dashboard.sidebar.collection")}</span>
             </a></li>
           </ul>
-
-          <hr class="border-[#262626] my-4" />
+        </div>
+        
+        <!-- CUENTA Y SOPORTE -->
+        <div>
+          <hr class="border-[#262626] my-2" />
           <h4 class="text-primary-container uppercase text-xs font-bold tracking-wider mb-2 px-2" data-i18n="dashboard.sidebar.sectionAccount">{t("dashboard.sidebar.sectionAccount")}</h4>
           <ul class="list-none p-0 m-0 space-y-1">
             <li><a href="/dashboard#profile" class="flex items-center gap-3 py-1.5 px-3 text-on-surface-variant hover:text-white hover:bg-[#1a1c1c] rounded-md transition-colors text-sm">
               <span class="material-symbols-outlined text-[18px]">person</span> <span data-i18n="dashboard.sidebar.profile">{t("dashboard.sidebar.profile")}</span>
             </a></li>
-            <li><a href="/dashboard#subscriptions" class="flex items-center gap-3 py-1.5 px-3 text-on-surface-variant hover:text-white hover:bg-[#1a1c1c] rounded-md transition-colors text-sm">
-              <span class="material-symbols-outlined text-[18px]">shopping_bag</span> <span data-i18n="dashboard.subscriptions.title">{t("dashboard.subscriptions.title")}</span>
-            </a></li>
-            <li><a href="/dashboard#licenses" class="flex items-center gap-3 py-1.5 px-3 text-on-surface-variant hover:text-white hover:bg-[#1a1c1c] rounded-md transition-colors text-sm">
-              <span class="material-symbols-outlined text-[18px]">vpn_key</span> <span data-i18n="dashboard.sidebar.licenses">{t("dashboard.sidebar.licenses")}</span>
-            </a></li>
-            <li><a href="/dashboard#notifications" class="flex items-center gap-3 py-1.5 px-3 text-on-surface-variant hover:text-white hover:bg-[#1a1c1c] rounded-md transition-colors text-sm">
-              <span class="material-symbols-outlined text-[18px]">notifications</span> <span data-i18n="dashboard.sidebar.notifications">{t("dashboard.sidebar.notifications")}</span>
-            </a></li>
-          </ul>
-        </div>
-        
-        <!-- RECURSOS (siempre visible) -->
-        <div>
-          <hr class="border-[#262626] my-2" />
-          <h4 class="text-primary-container uppercase text-xs font-bold tracking-wider mb-2 px-2" data-i18n="dashboard.sidebar.sectionResources">{t("dashboard.sidebar.sectionResources")}</h4>
-          <ul class="list-none p-0 m-0 space-y-1">
-            <li><a href="/store" class="flex items-center gap-3 py-1.5 px-3 text-on-surface-variant hover:text-white hover:bg-[#1a1c1c] rounded-md transition-colors text-sm">
-              <span class="material-symbols-outlined text-[18px]">storefront</span> <span data-i18n="dashboard.sidebar.store">{t("dashboard.sidebar.store")}</span>
+            <li><a href="#" id="sidebar-report-bug" class="flex items-center gap-3 py-1.5 px-3 text-on-surface-variant hover:text-white hover:bg-[#1a1c1c] rounded-md transition-colors text-sm">
+              <span class="material-symbols-outlined text-[18px]">bug_report</span> <span data-i18n="dashboard.sidebar.reportBug">{t("dashboard.sidebar.reportBug")}</span>
             </a></li>
             <li><a href="/blog" class="flex items-center gap-3 py-1.5 px-3 text-on-surface-variant hover:text-white hover:bg-[#1a1c1c] rounded-md transition-colors text-sm">
-              <span class="material-symbols-outlined text-[18px]">article</span> <span data-i18n="header.blog">{t("header.blog") || "Blog"}</span>
+              <span class="material-symbols-outlined text-[18px]">article</span> <span data-i18n="header.blog">{t("header.blog")}</span>
             </a></li>
             <li><a href="/help" class="flex items-center gap-3 py-1.5 px-3 text-on-surface-variant hover:text-white hover:bg-[#1a1c1c] rounded-md transition-colors text-sm">
               <span class="material-symbols-outlined text-[18px]">help</span> <span data-i18n="header.help">{t("header.help")}</span>
@@ -245,5 +266,16 @@ const t = (key) => {
       }
     }
   </style>
+
+  <script>
+    // Dispatch event to open support modal in React
+    const reportBugBtn = document.getElementById('sidebar-report-bug');
+    if (reportBugBtn) {
+      reportBugBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        window.dispatchEvent(new CustomEvent('open-support-modal'));
+      });
+    }
+  </script>
 </body>
 </html>

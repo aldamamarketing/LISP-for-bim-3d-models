@@ -96,10 +96,13 @@ Para manejar mltiples paletas (Comandos, Propiedades, IA) sin problemas de dupli
 ---
 
 ## Infraestructura y Despliegues en Producción
-* **Despliegues en Google Cloud CLI (`gcloud`):**
-  Debido al timeout estricto del firebase cli local, los deploys de las Cloud Run functions gen2 se realizan mediante gcloud cli:
+* **Timeout de Análisis Local (Firebase CLI en Windows):**
+  Si el comando `firebase deploy` falla con el error `Timeout after 10000. Cannot determine backend specification`, **NUNCA** recurras a desplegar individualmente con `gcloud`. Este error ocurre porque importar `firebase-admin` es muy pesado en Windows y el CLI aborta el análisis local tras 10 segundos.
+  **La Solución Definitiva:**
+  1. Utiliza siempre **lazy-loading** para la inicialización de `firebase-admin` (por ejemplo, encapsulándolo en una función `getAdmin()` en `index.js` que solo se invoque bajo demanda). Esto hace que el archivo cargue al instante y el comando de Firebase ya no fallará.
+  2. Adicionalmente, puedes aumentar el timeout temporalmente desde la terminal antes de desplegar:
   ```powershell
-  gcloud functions deploy getRoutine --gen2 --runtime=nodejs22 --region=us-central1 --source=./functions --entry-point=getRoutine --trigger-http --allow-unauthenticated --project=lispcentral
+  $env:FUNCTIONS_DISCOVERY_TIMEOUT=60; npx -y firebase-tools@latest deploy --only functions
   ```
 * **Enrutamiento del Backend:**
   El enrutamiento del backend (`functions/index.js`) ha sido modificado en su regex de saneamiento para admitir guiones medios (`-`), lo que permite que las peticiones a comandos de formato `ARQ-...` se validen y entreguen correctamente.
