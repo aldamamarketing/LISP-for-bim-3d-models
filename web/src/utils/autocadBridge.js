@@ -2,6 +2,8 @@
  * autocadBridge.js
  * Utilidades para comunicarse con el motor JS embebido de AutoCAD.
  * Funciona en paletas HTML nativas (Chromium/CEF).
+ * 
+ * TODO: Remove or disable all console logs in production environments.
  */
 
 // Diagnóstico inicial del entorno AutoCAD (se ejecuta al importar el módulo)

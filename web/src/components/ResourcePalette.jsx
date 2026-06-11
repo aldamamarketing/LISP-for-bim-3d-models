@@ -29,7 +29,8 @@ export default function ResourcePalette() {
   );
   const token = urlParams.get('token') || '';
   const hwid = urlParams.get('hwid') || '';
-  console.log('[ResourcePalette] URL Params capturados:', { token: token ? 'OK' : 'MISSING', hwid });
+  // TODO: Remove/disable all console logs before moving to final production environment
+  console.log('[ResourcePalette] URL Params capturados:', { token: token ? 'OK' : 'MISSING', hwid: hwid ? hwid.slice(0, 6) + '...' : 'MISSING' });
 
   // Cargar favoritos desde la API
   const fetchResources = useCallback(async () => {
@@ -44,7 +45,8 @@ export default function ResourcePalette() {
     setError(null);
     try {
       const url = `${API_BASE}/getUserResources?token=${encodeURIComponent(token)}&type=${activeTab}`;
-      console.log('[ResourcePalette] Fetching from:', url);
+      const maskedUrl = `${API_BASE}/getUserResources?token=${token ? encodeURIComponent(token.slice(0, 12) + '...') : ''}&type=${activeTab}`;
+      console.log('[ResourcePalette] Fetching from:', maskedUrl);
       const response = await fetch(url);
       console.log('[ResourcePalette] Fetch response status:', response.status);
       if (!response.ok) throw new Error(`Erro ${response.status}`);

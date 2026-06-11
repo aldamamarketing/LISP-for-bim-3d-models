@@ -59,14 +59,16 @@ export default function LispCommandPalette() {
   const urlParams = new URLSearchParams(typeof window !== 'undefined' ? window.location.search : '');
   const token = urlParams.get('token') || '';
   const hwid = urlParams.get('hwid') || '';
-  console.log('[LispCommandPalette] URL Params capturados:', { token: token ? 'OK' : 'MISSING', hwid });
+  // TODO: Remove/disable all console logs before moving to final production environment
+  console.log('[LispCommandPalette] URL Params capturados:', { token: token ? 'OK' : 'MISSING', hwid: hwid ? hwid.slice(0, 6) + '...' : 'MISSING' });
 
   const fetchCommands = useCallback(async () => {
     setLoading(true);
     setError(null);
     try {
       const url = `${API_BASE}?token=${encodeURIComponent(token)}&hwId=${encodeURIComponent(hwid)}&routine=INDEX`;
-      console.log('[LispCommandPalette] Fetching from:', url);
+      const maskedUrl = `${API_BASE}?token=${token ? encodeURIComponent(token.slice(0, 12) + '...') : ''}&hwId=${hwid ? encodeURIComponent(hwid.slice(0, 6) + '...') : ''}&routine=INDEX`;
+      console.log('[LispCommandPalette] Fetching from:', maskedUrl);
       const response = await fetch(url);
       console.log('[LispCommandPalette] Fetch response status:', response.status);
       if (!response.ok) throw new Error(`Erro ${response.status}`);
