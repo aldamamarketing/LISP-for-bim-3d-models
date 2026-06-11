@@ -27,3 +27,24 @@ Las paletas (`LispCommandPalette`, `ResourcePalette` y la futura `PropertiesPale
 - **Top Bar Global:** Un menú de navegación superior con iconos, permitiendo saltar entre las distintas paletas con un solo click enviando el comando LISP correspondiente (`(C:LC)`, `(C:RECURSOS)`, `(C:LC_PROP)`).
 - **Grid Layout:** En lugar de listas verticales, los comandos usan `display: grid` con tarjetas cuadradas, ajustándose dinámicamente al ancho para aprovechar el espacio (similar al Ribbon tradicional).
 - **Multi-Filtro Persistente:** Se reemplazó el `input` clásico de búsqueda por un sistema de *Tags/Pills* guardado en `localStorage`. Al escribir una palabra y pulsar Enter se crea un "filtro". Los resultados deben coincidir con todos los filtros activos, y estos se recuerdan entre sesiones.
+
+## 4. Comunicación con el Backend (Resolución de Comandos y Suites)
+
+Para cargar las herramientas dinámicamente, la paleta realiza peticiones HTTP al endpoint `getRoutine` en Cloud Functions:
+
+```
+https://<region>-<project>.cloudfunctions.net/getRoutine?token=<token>&hwId=<hwId>&routine=INDEX
+```
+
+### Parámetros de Consulta (Query Params)
+
+1. **`token`**: Identifica al usuario (creador) y permite recuperar sus comandos propios y personalizados.
+2. **`hwId` (Hardware ID)**: Identifica de forma única a la máquina física/estación de trabajo desde la cual se ejecuta AutoCAD.
+3. **`routine=INDEX`**: Indica que se solicita el índice completo de comandos disponibles.
+
+### Importancia del `hwId` en la Tienda (Store Suites)
+El parámetro `hwId` es indispensable para el sistema de suscripciones de la tienda:
+- Las suscripciones a suites de terceros (compradas/adquiridas en la tienda) se validan en el backend contra los dispositivos asociados (`assignedDevices` en Firestore).
+- Si la paleta no envía el `hwId` en la petición, el backend no puede comprobar si la máquina actual está autorizada para utilizar las suites del Store, omitiendo estos comandos en la respuesta y mostrando únicamente los comandos propios del usuario.
+- **Flujo Correcto:** La paleta web extrae el `hwId` desde los parámetros con los que AutoCAD levanta la ventana Chromium (`LC_Palette.html?token=...&hwId=...`) y lo propaga obligatoriamente en todas las consultas al backend.
+
