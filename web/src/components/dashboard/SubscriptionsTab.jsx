@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { db } from '../../firebase';
-import { collection, query, where, getDocs, doc, deleteDoc, getDoc } from 'firebase/firestore';
+import { collection, query, where, getDocs, doc, deleteDoc, getDoc, updateDoc } from 'firebase/firestore';
 import { getFunctions, httpsCallable } from 'firebase/functions';
 import { showToast } from '../Toast';
 import { useTranslation } from '../../i18n/useTranslation';
@@ -64,23 +64,22 @@ export default function SubscriptionsTab() {
     const currentAssigned = subObj.assignedDevices || [];
     const isAssigned = currentAssigned.includes(deviceId);
     
-    const functions = getFunctions();
-    const toggleAssignment = httpsCallable(functions, 'toggleDeviceAssignment');
-
     // Si NO está asignado y queremos asignarlo (Link)
     if (!isAssigned) {
-      // Chequeo visual rápido en UI (el backend lo bloqueará igual)
       if (currentAssigned.length >= (subObj.purchasedSeats || 1)) {
         showToast(`Límite de asientos alcanzado (${subObj.purchasedSeats}). Libere uno primero.`, 'error');
         return;
       }
       
       try {
-        await toggleAssignment({ subId, deviceId, action: 'assign' });
         const newAssigned = [...currentAssigned, deviceId];
+        await updateDoc(doc(db, 'subscriptions', subId), {
+          assignedDevices: newAssigned
+        });
         setSubscriptions(subs => subs.map(s => s.id === subId ? { ...s, assignedDevices: newAssigned } : s));
         showToast('Equipamento atribuído à Suite.', 'success');
       } catch(e) {
+        console.error(e);
         showToast(e.message || 'Error al asignar dispositivo', 'error');
       }
     } 
@@ -89,15 +88,19 @@ export default function SubscriptionsTab() {
       if (!confirm(`⚠️ ALERTA: Si desvinculas este equipo, NO podrás volver a asignarlo a esta Suite durante 7 días (Política Anti-Abuso).\n\n¿Estás seguro de que deseas desvincularlo ahora?`)) return;
 
       try {
-        await toggleAssignment({ subId, deviceId, action: 'unassign' });
         const newAssigned = currentAssigned.filter(id => id !== deviceId);
+        await updateDoc(doc(db, 'subscriptions', subId), {
+          assignedDevices: newAssigned,
+          [`penaltyBox.${deviceId}`]: new Date()
+        });
         setSubscriptions(subs => subs.map(s => s.id === subId ? { 
           ...s, 
           assignedDevices: newAssigned,
-          penaltyBox: { ...(s.penaltyBox || {}), [deviceId]: { toDate: () => new Date() } } // Mock local
+          penaltyBox: { ...(s.penaltyBox || {}), [deviceId]: new Date() } 
         } : s));
-        showToast('Equipamento desvinculado (Bloqueado por 7 dias).', 'success');
+        showToast('Equipamento desvinculado.', 'success');
       } catch(e) {
+        console.error(e);
         showToast(e.message || 'Error al desvincular dispositivo', 'error');
       }
     }

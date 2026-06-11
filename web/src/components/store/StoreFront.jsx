@@ -110,7 +110,7 @@ const SuiteRow = ({ suite, currentUser, initiallyExpanded }) => {
       
     } catch (err) {
       console.error(err);
-      alert('Erro ao assinar a suite.');
+      alert(t('store.error_subscribe', 'Erro ao assinar a suite.'));
     } finally {
       setIsSubscribing(false);
     }
@@ -131,7 +131,7 @@ const SuiteRow = ({ suite, currentUser, initiallyExpanded }) => {
       });
       
       setReviewModalOpen(false);
-      alert("¡Gracias por tu valoración!");
+      alert(t('store.review_success', '¡Gracias por tu valoración!'));
       
       // Non-critical: fire-and-forget counter
       updateDoc(doc(db, 'suites', suite.id), {
@@ -140,7 +140,7 @@ const SuiteRow = ({ suite, currentUser, initiallyExpanded }) => {
       
     } catch (err) {
       console.error(err);
-      alert("Error al enviar valoración.");
+      alert(t('store.review_error', 'Error al enviar valoración.'));
     } finally {
       setIsSubmittingReview(false);
     }
@@ -185,7 +185,7 @@ const SuiteRow = ({ suite, currentUser, initiallyExpanded }) => {
             onClick={hasSubscribed ? (e) => e.stopPropagation() : handleSubscribe}
             disabled={isSubscribing || hasSubscribed}
           >
-            {isSubscribing ? '...' : hasSubscribed ? 'Suscrito' : 'Gratis (Beta)'}
+            {isSubscribing ? '...' : hasSubscribed ? t('store.subscribed', 'Suscrito') : t('store.free_beta', 'Gratis (Beta)')}
           </button>
           
           <button className="text-on-surface-variant hover:text-on-surface w-6 flex justify-center transition-transform">
@@ -222,7 +222,7 @@ const SuiteRow = ({ suite, currentUser, initiallyExpanded }) => {
           {/* Review Modal inline */}
           {reviewModalOpen && (
             <div className="mb-5 p-4 bg-surface border border-primary-container/30 rounded-md max-w-xl animate-in fade-in zoom-in-95">
-              <h5 className="text-sm font-bold text-on-surface mb-3">Deja tu valoración para {suite.name}</h5>
+              <h5 className="text-sm font-bold text-on-surface mb-3">{t('store.leave_review', 'Deja tu valoración para')} {suite.name}</h5>
               <div className="flex gap-2 mb-3">
                 {[1,2,3,4,5].map(star => (
                   <button 
@@ -242,7 +242,7 @@ const SuiteRow = ({ suite, currentUser, initiallyExpanded }) => {
               <textarea 
                 className="w-full bg-surface-container-low border border-outline-variant rounded p-2 text-sm text-on-surface focus:border-primary-container focus:outline-none mb-3 resize-none"
                 rows="2"
-                placeholder="Cuenta tu experiencia (opcional)..."
+                placeholder={t('store.review_placeholder', 'Cuenta tu experiencia (opcional)...')}
                 value={reviewComment}
                 onChange={(e) => setReviewComment(e.target.value)}
               />
@@ -251,14 +251,14 @@ const SuiteRow = ({ suite, currentUser, initiallyExpanded }) => {
                   onClick={() => setReviewModalOpen(false)}
                   className="px-3 py-1.5 text-xs text-on-surface-variant hover:text-on-surface font-bold"
                 >
-                  Cancelar
+                  {t('store.cancel', 'Cancelar')}
                 </button>
                 <button 
                   onClick={handleReviewSubmit}
                   disabled={isSubmittingReview}
                   className="px-3 py-1.5 bg-primary-container text-white rounded text-xs font-bold hover:bg-[#e66000] disabled:opacity-50"
                 >
-                  {isSubmittingReview ? 'Enviando...' : 'Enviar Valoración'}
+                  {isSubmittingReview ? t('store.sending', 'Enviando...') : t('store.send_review', 'Enviar Valoración')}
                 </button>
               </div>
             </div>

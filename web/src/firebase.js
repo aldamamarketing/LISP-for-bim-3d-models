@@ -19,7 +19,15 @@ const app = initializeApp(firebaseConfig);
 export const auth = getAuth(app);
 export const db = getFirestore(app);
 export const storage = getStorage(app);
+import { getFunctions, connectFunctionsEmulator } from "firebase/functions";
+
 export const googleProvider = new GoogleAuthProvider();
+export const functions = getFunctions(app);
+
+// Enable Functions Emulator in local development
+if (typeof window !== "undefined" && window.location.hostname === "localhost") {
+  connectFunctionsEmulator(functions, "127.0.0.1", 5001);
+}
 
 // App Check Initialization
 // Bypass App Check for local development to avoid 403 Forbidden errors
