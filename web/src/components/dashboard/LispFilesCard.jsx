@@ -77,7 +77,7 @@ export default function LispFilesCard() {
       const newUploaded = [];
       const newCommands = [];
 
-      const tenantSlug = userData.id.split('-').pop() || 'user';
+      const tenantSlug = userData.slug || userData.email?.split('@')[0] || 'user';
 
       for (const draft of draftFiles) {
         const storagePath = `tenants/${userData.id}/lisps/${draft.originalName}`;
@@ -268,7 +268,7 @@ export default function LispFilesCard() {
       <h3 className="mt-0 mb-4 flex justify-between items-center">
         Arquivos & Comandos LISP
         <div>
-          <input type="file" multiple accept=".lsp" id="bulkUpload" className="hidden" onChange={handleFileSelect} />
+          <input type="file" multiple accept=".lsp, text/plain, application/octet-stream" id="bulkUpload" className="hidden" onChange={handleFileSelect} />
           <button className="btn text-sm py-1.5 px-3" onClick={() => document.getElementById('bulkUpload').click()}>
             <span className="material-symbols-outlined text-[16px] mr-1">upload_file</span> Subir LISPs
           </button>

@@ -1,45 +1,75 @@
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
+
+    // Public assets — read for everyone, create if authenticated
     match /publicAssets/{assetId} {
       allow read: if true;
-      allow create: if request.auth != null; // Usuarios pueden aportar
+      allow create: if request.auth != null;
       allow update, delete: if false;
     }
+
+    // User profiles — only the owner can access their own doc
     match /users/{userId} {
-      allow read, write: if request.auth != null;
+      allow read, write: if request.auth != null && request.auth.uid == userId;
     }
     match /users/{userId}/{document=**} {
-      allow read, write: if request.auth != null;
+      allow read, write: if request.auth != null && request.auth.uid == userId;
     }
-    match /users/{userId}/devices/{deviceId} {
-      allow read, write: if request.auth != null;
-    }
-    
-    // Phase B & C Collections
+
+    // LISP files — only the owner can manage
     match /lispFiles/{fileId} {
-      allow read, write: if request.auth != null;
+      allow read: if request.auth != null && request.auth.uid == resource.data.tenantId;
+      allow create: if request.auth != null;
+      allow update, delete: if request.auth != null && request.auth.uid == resource.data.tenantId;
     }
+
+    // Commands — public read (Store needs this), owner-only write
     match /commands/{commandId} {
-      allow read: if true; // Public store needs to read commands
-      allow write: if request.auth != null;
+      allow read: if true;
+      allow create: if request.auth != null;
+      allow update, delete: if request.auth != null && request.auth.uid == resource.data.tenantId;
     }
+
+    // Suites — public read (Store), owner-only full write, anyone can increment counters
     match /suites/{suiteId} {
       allow read: if true;
-      allow write: if request.auth != null;
+      allow create: if request.auth != null;
+      allow update: if request.auth != null && (
+        request.auth.uid == resource.data.tenantId
+        || request.resource.data.diff(resource.data).affectedKeys().hasOnly(['downloads', 'ratingCount'])
+      );
+      allow delete: if request.auth != null && request.auth.uid == resource.data.tenantId;
     }
+
+    // Groups — public read, owner-only write
     match /groups/{groupId} {
       allow read: if true;
-      allow write: if request.auth != null;
+      allow create: if request.auth != null;
+      allow update, delete: if request.auth != null && request.auth.uid == resource.data.tenantId;
     }
+
+    // Group-File assignments — public read, authenticated write
     match /groupFiles/{gfileId} {
       allow read: if true;
       allow write: if request.auth != null;
     }
 
+    // Subscriptions — only the subscriber can access their own
     match /subscriptions/{subId} {
-      allow read, write: if request.auth != null;
+      allow read: if request.auth != null && request.auth.uid == resource.data.tenantId;
+      allow create: if request.auth != null;
+      allow update, delete: if request.auth != null && request.auth.uid == resource.data.tenantId;
     }
+
+    // Reviews — public read, create if authenticated, only author can edit/delete
+    match /reviews/{reviewId} {
+      allow read: if true;
+      allow create: if request.auth != null;
+      allow update, delete: if request.auth != null && request.auth.uid == resource.data.tenantId;
+    }
+
+    // Feedback — create-only
     match /feedback/{feedbackId} {
       allow create: if request.auth != null;
       allow read, update, delete: if false;

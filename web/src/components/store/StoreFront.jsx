@@ -100,12 +100,14 @@ const SuiteRow = ({ suite, currentUser, initiallyExpanded }) => {
         pricePaid: 0
       });
       
-      // Increment downloads count for the suite
-      await updateDoc(doc(db, 'suites', suite.id), {
-        downloads: increment(1)
-      });
-      
+      // Success: update UI immediately
       setHasSubscribed(true);
+      
+      // Non-critical: fire-and-forget counter
+      updateDoc(doc(db, 'suites', suite.id), {
+        downloads: increment(1)
+      }).catch(err => console.warn('Counter update failed:', err));
+      
     } catch (err) {
       console.error(err);
       alert('Erro ao assinar a suite.');
@@ -128,15 +130,14 @@ const SuiteRow = ({ suite, currentUser, initiallyExpanded }) => {
         createdAt: serverTimestamp()
       });
       
-      // Increment rating count for the suite
-      await updateDoc(doc(db, 'suites', suite.id), {
-        ratingCount: increment(1),
-        // For accurate rating math we need a Cloud Function or transaction, 
-        // this is a simple fallback for the count.
-      });
-      
       setReviewModalOpen(false);
       alert("¡Gracias por tu valoración!");
+      
+      // Non-critical: fire-and-forget counter
+      updateDoc(doc(db, 'suites', suite.id), {
+        ratingCount: increment(1),
+      }).catch(err => console.warn('Rating counter failed:', err));
+      
     } catch (err) {
       console.error(err);
       alert("Error al enviar valoración.");

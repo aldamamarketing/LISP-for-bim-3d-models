@@ -34,7 +34,9 @@ export default function SubscriptionsTab() {
           }
           if (!sub.suiteId) return null;
           const suiteDoc = await getDoc(doc(db, 'suites', sub.suiteId));
-          return suiteDoc.exists() ? { id: suiteDoc.id, ...suiteDoc.data(), subId: sub.id, isGlobal: false } : null;
+          return suiteDoc.exists() 
+            ? { id: suiteDoc.id, ...suiteDoc.data(), subId: sub.id, isGlobal: false } 
+            : { id: sub.suiteId, name: 'Suite não encontrada', authorName: '—', subId: sub.id, isGlobal: false };
         });
 
         const suitesData = (await Promise.all(suitePromises)).filter(Boolean);

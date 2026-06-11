@@ -152,7 +152,7 @@ export default function LispManagerTab() {
       <h3 style={{ marginTop: 0, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         {t('dashboard.lisp.workspace')}
         <div>
-          <input type="file" multiple accept=".lsp" id="bulkUpload" style={{ display: 'none' }} onChange={handleFileSelect} />
+          <input type="file" multiple accept=".lsp, text/plain, application/octet-stream" id="bulkUpload" style={{ display: 'none' }} onChange={handleFileSelect} />
           <button className="btn" onClick={() => document.getElementById('bulkUpload').click()} style={{ fontSize: '0.85rem', padding: '6px 12px' }}>
             {t('dashboard.lisp.addLisps')}
           </button>
