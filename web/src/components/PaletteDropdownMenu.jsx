@@ -59,6 +59,9 @@ export default function PaletteDropdownMenu({ myId }) {
       {/* Botón Menu / Hamburguesa */}
       <button
         onClick={() => setIsOpen(!isOpen)}
+        aria-label="Opciones de Paleta"
+        aria-expanded={isOpen}
+        aria-haspopup="menu"
         style={{
           background: 'transparent',
           border: 'none',
@@ -80,7 +83,7 @@ export default function PaletteDropdownMenu({ myId }) {
 
       {/* Menú Desplegable */}
       {isOpen && (
-        <div style={{
+        <div role="menu" style={{
           position: 'absolute',
           top: '100%',
           left: 0,
@@ -100,6 +103,8 @@ export default function PaletteDropdownMenu({ myId }) {
             return (
               <button
                 key={p.id}
+                role="menuitemcheckbox"
+                aria-checked={isActive}
                 onClick={() => handleToggle(p)}
                 style={{
                   background: 'transparent',

@@ -1,0 +1,3 @@
+## 2024-06-11 - ARIA roles for custom dropdown menus
+**Learning:** Custom dropdown menus that simulate native behavior (like the palette switcher) require specific ARIA patterns to be accessible. A standard button toggle needs `aria-expanded` and `aria-haspopup="menu"`. The dropdown container needs `role="menu"`. More importantly, if the dropdown items represent toggleable states (like which palettes are currently active/visible), they should use `role="menuitemcheckbox"` and `aria-checked` instead of a standard `button` or `menuitem`, as it clearly conveys the "checked/active" state to screen readers.
+**Action:** Always verify if custom dropdown items act as toggles or simple links/actions. Use `menuitemcheckbox` for toggles.
