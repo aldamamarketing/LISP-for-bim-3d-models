@@ -81,6 +81,9 @@
 ;; Global tracking list for JIT-loaded routines
 (if (not *LC-LOADED-ROUTINES*) (setq *LC-LOADED-ROUTINES* nil))
 
+;; Global tracking list for Ghost Commands (Stubs) to allow live purging
+(if (not *LC-GHOST-ROUTINES*) (setq *LC-GHOST-ROUTINES* nil))
+
 ;; Core wrapper to run a command
 (defun LC:run-or-load (lisp_id / cmd-sym) 
   (setq cmd-sym (read (strcat "c:" lisp_id)))
@@ -162,11 +165,17 @@
             (progn 
               (foreach item cmds 
                 (if (not (member (cadr item) *LC-LOADED-ROUTINES*)) 
-                  (eval 
-                    (list 'defun 
-                          (read (strcat "c:" (car item)))
-                          '()
-                          (list 'LC:run-or-load (cadr item))
+                  (progn
+                    (eval 
+                      (list 'defun 
+                            (read (strcat "c:" (car item)))
+                            '()
+                            (list 'LC:run-or-load (cadr item))
+                      )
+                    )
+                    ;; Track the ghost command for future garbage collection
+                    (if (not (member (car item) *LC-GHOST-ROUTINES*))
+                      (setq *LC-GHOST-ROUTINES* (cons (car item) *LC-GHOST-ROUTINES*))
                     )
                   )
                 )
@@ -186,6 +195,30 @@
 )
 
 (LC:register-ghosts)
+
+;; Live Sync: Safely resets RAM permissions and regenerates ghosts
+(defun c:LC_SYNC ()
+  (princ "\n[LispCentral] Iniciando Live Sync (Garbage Collection)...")
+  
+  ;; 1. Destroy existing ghost commands from RAM
+  (if *LC-GHOST-ROUTINES*
+    (progn
+      (foreach cmd *LC-GHOST-ROUTINES*
+        (eval (list 'setq (read (strcat "c:" cmd)) nil))
+      )
+      (setq *LC-GHOST-ROUTINES* nil)
+      (princ "\n[LispCentral] Fantasmas anteriores destruidos.")
+    )
+  )
+
+  ;; 2. Clear JIT cache to force fresh permission validation on next use
+  (setq *LC-LOADED-ROUTINES* nil)
+  (princ "\n[LispCentral] Cache JIT limpiada.")
+
+  ;; 3. Fetch fresh INDEX and re-register allowed ghosts
+  (LC:register-ghosts)
+  (princ)
+)
 
 ;; Simple Base64 decoder
 (defun LC:b64-decode (b64str / idx ch val buf result pad charset) 

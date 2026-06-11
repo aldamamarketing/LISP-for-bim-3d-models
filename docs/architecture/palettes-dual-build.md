@@ -48,3 +48,14 @@ El parámetro `hwId` es indispensable para el sistema de suscripciones de la tie
 - Si la paleta no envía el `hwId` en la petición, el backend no puede comprobar si la máquina actual está autorizada para utilizar las suites del Store, omitiendo estos comandos en la respuesta y mostrando únicamente los comandos propios del usuario.
 - **Flujo Correcto:** La paleta web extrae el `hwId` desde los parámetros con los que AutoCAD levanta la ventana Chromium (`LC_Palette.html?token=...&hwId=...`) y lo propaga obligatoriamente en todas las consultas al backend.
 
+## 5. Live Sync y Garbage Collection en RAM
+
+Para garantizar que los permisos de las suites se reflejen en tiempo real en la sesión activa de AutoCAD (sin requerir reinicios), se implementó una función de "Garbage Collection" mediante el comando nativo `LC_SYNC`.
+
+1. **Rastreo (Ghost Tracking):** Cada vez que la API responde con un comando autorizado, el entorno LISP crea un comando "Ghost" (un stub) en memoria para que AutoCAD lo reconozca en la barra de comandos. El nombre de este comando se guarda en una lista global (`*LC-GHOST-ROUTINES*`).
+2. **Botón Sync en la UI:** Al pulsar el botón "Sync" en la paleta web, la UI no solo vuelve a solicitar los datos al backend, sino que inyecta en AutoCAD la orden `(C:LC_SYNC)`.
+3. **Destrucción y Purga:** El comando `LC_SYNC`:
+   - Elimina de la memoria de AutoCAD (asignando `nil`) todos los "Ghost Commands" previamente rastreados.
+   - Vacía la caché de archivos JIT (`*LC-LOADED-ROUTINES*`).
+   - Obliga a AutoCAD a contactar nuevamente a `getRoutine?routine=INDEX` y regenerar únicamente los comandos para los cuales el usuario tiene permiso en ese exacto instante.
+Esto asegura revocación de licencias inmediata y robusta.
