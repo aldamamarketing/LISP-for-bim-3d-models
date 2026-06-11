@@ -58,7 +58,7 @@ export default function LispCommandPalette() {
   // Get credentials from URL
   const urlParams = new URLSearchParams(typeof window !== 'undefined' ? window.location.search : '');
   const token = urlParams.get('token') || '';
-  const hwid = urlParams.get('hwid') || '';
+  const hwid = urlParams.get('hwId') || urlParams.get('hwid') || '';
   // TODO: Remove/disable all console logs before moving to final production environment
   console.log('[LispCommandPalette] URL Params capturados:', { token: token ? 'OK' : 'MISSING', hwid: hwid ? hwid.slice(0, 6) + '...' : 'MISSING' });
 
