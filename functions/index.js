@@ -206,19 +206,20 @@ exports.getRoutine = onRequest({ cors: true }, async (req, res) => {
          fileContextMap[d.id] = { group: data.group || "Custom Tools", isOverlimit: false };
       });
 
-      // 2. Obtener los IDs de lispFiles de la Store
+      // 2. Obtener los IDs de lispFiles de la Store (Desnormalizado: array suiteIds)
       const allSubscribedSuites = [...validSuiteIds, ...overlimitSuiteIds];
       const storeFileIds = [];
       if (allSubscribedSuites.length > 0) {
         for (let i = 0; i < allSubscribedSuites.length; i += 10) {
           const chunk = allSubscribedSuites.slice(i, i + 10);
-          const storeLispsSnap = await db.collection("lispFiles").where("suiteId", "in", chunk).get();
+          const storeLispsSnap = await db.collection("lispFiles").where("suiteIds", "array-contains-any", chunk).get();
           storeLispsSnap.forEach(docSnap => {
             const data = docSnap.data();
             if (data.tenantId !== userDocRef.id) {
                storeFileIds.push(docSnap.id);
-               const isOverlimit = overlimitSuiteIds.includes(data.suiteId);
-               fileContextMap[docSnap.id] = { group: `${data.suiteId} - ${data.group || 'Tools'}`, isOverlimit };
+               const matchedSuiteId = data.suiteIds.find(id => chunk.includes(id)) || 'Store';
+               const isOverlimit = overlimitSuiteIds.includes(matchedSuiteId);
+               fileContextMap[docSnap.id] = { group: `${matchedSuiteId} - ${data.group || 'Tools'}`, isOverlimit };
             }
           });
         }
@@ -343,7 +344,7 @@ exports.getRoutine = onRequest({ cors: true }, async (req, res) => {
           isAuthorizedForThisFile = true;
         } else {
           // Cross-Tenant: Validar si la Suite está autorizada para este HWID sin sobregiro
-          if (validSuiteIds.includes(lispData.suiteId)) {
+          if (lispData.suiteIds && lispData.suiteIds.some(id => validSuiteIds.includes(id))) {
              isAuthorizedForThisFile = true;
           }
         }
@@ -974,5 +975,285 @@ exports.onLispFileDeleted = onDocumentDeleted({ document: "lispFiles/{fileId}", 
     console.log(`Cascade delete completed for lispFile ${fileId}. Deleted ${count} docs.`);
   } catch (err) {
     console.error(`Error in cascade delete for lispFile ${fileId}:`, err);
+  }
+});
+
+// ============================================================================
+// V2 ARCHITECTURE: DENORMALIZATION TRIGGERS
+// ============================================================================
+
+// 1. Sync suiteIds array on LispFiles when a groupFile is written or deleted
+exports.syncSuiteIdsOnGroupFile = onDocumentWritten({ document: "groupFiles/{gfileId}", timeoutSeconds: 60 }, async (event) => {
+  const db = getDb();
+  const dataAfter = event.data.after.data();
+  const dataBefore = event.data.before.data();
+  const fileId = dataAfter ? dataAfter.fileId : (dataBefore ? dataBefore.fileId : null);
+
+  if (!fileId) return;
+
+  try {
+    // A. Find all groupFiles for this specific fileId
+    const groupFilesSnap = await db.collection("groupFiles").where("fileId", "==", fileId).get();
+    const groupIds = groupFilesSnap.docs.map(d => d.data().groupId);
+
+    // B. Resolve unique suiteIds from those groups
+    const uniqueSuiteIds = new Set();
+    if (groupIds.length > 0) {
+      // Chunking for safety if > 10, though rare for a single file
+      for (let i = 0; i < groupIds.length; i += 10) {
+        const chunk = groupIds.slice(i, i + 10);
+        const groupsSnap = await db.collection("groups").where("__name__", "in", chunk).get();
+        groupsSnap.docs.forEach(doc => {
+          if (doc.data().suiteId) uniqueSuiteIds.add(doc.data().suiteId);
+        });
+      }
+    }
+
+    // C. Update the lispFiles document
+    await db.collection("lispFiles").doc(fileId).update({
+      suiteIds: Array.from(uniqueSuiteIds)
+    });
+    console.log(`Synced suiteIds for file ${fileId}:`, Array.from(uniqueSuiteIds));
+  } catch (err) {
+    console.error(`Error syncing suiteIds for file ${fileId}:`, err);
+  }
+});
+
+// 2. Cascade delete groups when a suite is deleted
+exports.onSuiteDeleted = onDocumentDeleted({ document: "suites/{suiteId}", timeoutSeconds: 60 }, async (event) => {
+  const suiteId = event.params.suiteId;
+  const db = getDb();
+  try {
+    const groupsSnap = await db.collection("groups").where("suiteId", "==", suiteId).get();
+    const batch = db.batch();
+    let count = 0;
+    groupsSnap.docs.forEach(doc => {
+      batch.delete(doc.ref);
+      count++;
+    });
+    if (count > 0) {
+      await batch.commit();
+      console.log(`Cascade delete: removed ${count} groups for suite ${suiteId}`);
+    }
+  } catch (err) {
+    console.error(`Error in cascade delete for suite ${suiteId}:`, err);
+  }
+});
+
+// 3. Cascade delete groupFiles when a group is deleted
+// Note: This will trigger syncSuiteIdsOnGroupFile for each deleted groupFile, 
+// cleanly removing the suiteId from the lispFiles array if needed!
+exports.onGroupDeleted = onDocumentDeleted({ document: "groups/{groupId}", timeoutSeconds: 60 }, async (event) => {
+  const groupId = event.params.groupId;
+  const db = getDb();
+  try {
+    const gfSnap = await db.collection("groupFiles").where("groupId", "==", groupId).get();
+    const batch = db.batch();
+    let count = 0;
+    gfSnap.docs.forEach(doc => {
+        batch.update(doc.ref, { autoRenew: false, status: 'deprecated' });
+      });
+      await batch.commit();
+      console.log(`Suite ${suiteId} deprecated. Subscriptions updated.`);
+    } 
+    else if (newStatus === 'end-of-life') {
+      const archiveDate = new Date();
+      archiveDate.setDate(archiveDate.getDate() + 30);
+      
+      await db.collection("suites").doc(suiteId).update({
+        archivedAt: admin.firestore.Timestamp.fromDate(archiveDate)
+      });
+      console.log(`Suite ${suiteId} entered EOL. Archival scheduled.`);
+    }
+    else if (newStatus === 'archived') {
+      const groupsSnap = await db.collection("groups").where("suiteId", "==", suiteId).get();
+      const groupIds = groupsSnap.docs.map(d => d.id);
+      
+      if (groupIds.length > 0) {
+        let fileIds = [];
+        for(let i = 0; i < groupIds.length; i += 10) {
+          const chunk = groupIds.slice(i, i + 10);
+          const gfSnap = await db.collection("groupFiles").where("groupId", "in", chunk).get();
+          gfSnap.docs.forEach(d => fileIds.push(d.data().fileId));
+        }
+        
+        fileIds = [...new Set(fileIds)];
+        
+        const batch = db.batch();
+        for (const fileId of fileIds) {
+          batch.update(db.collection("lispFiles").doc(fileId), {
+            status: 'soft-deleted',
+            softDeletedAt: admin.firestore.FieldValue.serverTimestamp(),
+            softDeleteReason: 'suite-archived'
+          });
+        }
+        
+        const subSnap = await db.collection("subscriptions").where("suiteId", "==", suiteId).get();
+        subSnap.docs.forEach(doc => {
+          batch.update(doc.ref, { status: 'expired' });
+        });
+        
+        await batch.commit();
+        console.log(`Suite ${suiteId} archived. Files soft-deleted, subs expired.`);
+      }
+    }
+    else if (newStatus === 'active' && beforeData.status !== 'active') {
+      await db.collection("suites").doc(suiteId).update({
+        deprecatedAt: admin.firestore.FieldValue.delete(),
+        endOfLifeAt: admin.firestore.FieldValue.delete(),
+        archivedAt: admin.firestore.FieldValue.delete()
+      });
+      console.log(`Suite ${suiteId} reactivated.`);
+    }
+  } catch (err) {
+    console.error(`Error processing lifecycle for suite ${suiteId}:`, err);
+  }
+});
+
+// Cascade delete when a Group is hard-deleted
+exports.onGroupDeleted = onDocumentDeleted({ document: "groups/{groupId}", timeoutSeconds: 60 }, async (event) => {
+  const groupId = event.params.groupId;
+  const db = getDb();
+  
+  try {
+    const gfSnap = await db.collection("groupFiles").where("groupId", "==", groupId).get();
+    const batch = db.batch();
+    gfSnap.docs.forEach(doc => batch.delete(doc.ref));
+    
+    if (!gfSnap.empty) {
+      await batch.commit();
+      console.log(`Cascade delete: removed ${gfSnap.size} groupFiles for group ${groupId}`);
+    }
+  } catch (err) {
+    console.error(`Error in cascade delete for group ${groupId}:`, err);
+  }
+});
+
+// Cascade delete when a LispFile is hard-deleted
+exports.onLispFileDeleted = onDocumentDeleted({ document: "lispFiles/{fileId}", timeoutSeconds: 60 }, async (event) => {
+  const fileId = event.params.fileId;
+  const fileData = event.data.data();
+  const db = getDb();
+  const { admin } = getDeps();
+  const batch = db.batch();
+  let count = 0;
+
+  try {
+    const cmdsSnap = await db.collection("commands").where("lispFileId", "==", fileId).get();
+    cmdsSnap.docs.forEach(doc => {
+      batch.delete(doc.ref);
+      count++;
+    });
+
+    const gfSnap = await db.collection("groupFiles").where("fileId", "==", fileId).get();
+    gfSnap.docs.forEach(doc => {
+      batch.delete(doc.ref);
+      count++;
+    });
+
+    if (count > 0) {
+      await batch.commit();
+    }
+
+    if (fileData && fileData.storagePath) {
+      try {
+        const bucket = admin.storage().bucket("lispcentral.firebasestorage.app");
+        await bucket.file(fileData.storagePath).delete();
+        console.log(`Storage file deleted: ${fileData.storagePath}`);
+      } catch (storageErr) {
+        if (storageErr.code !== 404) {
+          console.error(`Failed to delete storage file ${fileData.storagePath}:`, storageErr);
+        }
+      }
+    }
+    
+    console.log(`Cascade delete completed for lispFile ${fileId}. Deleted ${count} docs.`);
+  } catch (err) {
+    console.error(`Error in cascade delete for lispFile ${fileId}:`, err);
+  }
+});
+
+// ============================================================================
+// V2 ARCHITECTURE: DENORMALIZATION TRIGGERS
+// ============================================================================
+
+// 1. Sync suiteIds array on LispFiles when a groupFile is written or deleted
+exports.syncSuiteIdsOnGroupFile = onDocumentWritten({ document: "groupFiles/{gfileId}", timeoutSeconds: 60 }, async (event) => {
+  const db = getDb();
+  const dataAfter = event.data.after.data();
+  const dataBefore = event.data.before.data();
+  const fileId = dataAfter ? dataAfter.fileId : (dataBefore ? dataBefore.fileId : null);
+
+  if (!fileId) return;
+
+  try {
+    // A. Find all groupFiles for this specific fileId
+    const groupFilesSnap = await db.collection("groupFiles").where("fileId", "==", fileId).get();
+    const groupIds = groupFilesSnap.docs.map(d => d.data().groupId);
+
+    // B. Resolve unique suiteIds from those groups
+    const uniqueSuiteIds = new Set();
+    if (groupIds.length > 0) {
+      // Chunking for safety if > 10, though rare for a single file
+      for (let i = 0; i < groupIds.length; i += 10) {
+        const chunk = groupIds.slice(i, i + 10);
+        const groupsSnap = await db.collection("groups").where("__name__", "in", chunk).get();
+        groupsSnap.docs.forEach(doc => {
+          if (doc.data().suiteId) uniqueSuiteIds.add(doc.data().suiteId);
+        });
+      }
+    }
+
+    // C. Update the lispFiles document
+    await db.collection("lispFiles").doc(fileId).update({
+      suiteIds: Array.from(uniqueSuiteIds)
+    });
+    console.log(`Synced suiteIds for file ${fileId}:`, Array.from(uniqueSuiteIds));
+  } catch (err) {
+    console.error(`Error syncing suiteIds for file ${fileId}:`, err);
+  }
+});
+
+// 2. Cascade delete groups when a suite is deleted
+exports.onSuiteDeleted = onDocumentDeleted({ document: "suites/{suiteId}", timeoutSeconds: 60 }, async (event) => {
+  const suiteId = event.params.suiteId;
+  const db = getDb();
+  try {
+    const groupsSnap = await db.collection("groups").where("suiteId", "==", suiteId).get();
+    const batch = db.batch();
+    let count = 0;
+    groupsSnap.docs.forEach(doc => {
+      batch.delete(doc.ref);
+      count++;
+    });
+    if (count > 0) {
+      await batch.commit();
+      console.log(`Cascade delete: removed ${count} groups for suite ${suiteId}`);
+    }
+  } catch (err) {
+    console.error(`Error in cascade delete for suite ${suiteId}:`, err);
+  }
+});
+
+// 3. Cascade delete groupFiles when a group is deleted
+// Note: This will trigger syncSuiteIdsOnGroupFile for each deleted groupFile, 
+// cleanly removing the suiteId from the lispFiles array if needed!
+exports.onGroupDeleted = onDocumentDeleted({ document: "groups/{groupId}", timeoutSeconds: 60 }, async (event) => {
+  const groupId = event.params.groupId;
+  const db = getDb();
+  try {
+    const gfSnap = await db.collection("groupFiles").where("groupId", "==", groupId).get();
+    const batch = db.batch();
+    let count = 0;
+    gfSnap.docs.forEach(doc => {
+      batch.delete(doc.ref);
+      count++;
+    });
+    if (count > 0) {
+      await batch.commit();
+      console.log(`Cascade delete: removed ${count} groupFiles for group ${groupId}`);
+    }
+  } catch (err) {
+    console.error(`Error in cascade delete for group ${groupId}:`, err);
   }
 });

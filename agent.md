@@ -119,6 +119,7 @@ El proyecto ha pivotado hacia un modelo Híbrido:
 2.  **IDs Semánticos:** Queda estrictamente prohibido usar UUIDs aleatorios (ej. `a1b2c3d4`) para identificar tenants, usuarios o rutinas en Firestore. Se usarán IDs descriptivos (ej. `tenant_tmdigital`, `lisp_viga_mvp`). **¿Por qué?** Facilita la depuración manual y mantiene la legibilidad semántica del diseño.
 3.  **Seguridad Online-Only:** Durante la Fase Beta, la plataforma funcionará online. Cada comando consulta al servidor. **No** se implementarán tokens JWT offline temporales. **¿Por qué?** Para garantizar la protección total de la Propiedad Intelectual hasta implementar un cifrado cliente-servidor nativo sólido.
 4.  **Cifrado SaaS Estándar:** Usamos encriptación en tránsito (HTTPS) y en reposo (Firebase/GCP). La ofuscación profunda queda de lado de la empresa (pueden subir `.fas` o `.vlx` a su bucket si desconfían del texto plano).
+5.  **Desnormalización NoSQL (Performance):** Las relaciones complejas (ej. Suites a Archivos LISP) NUNCA deben resolverse con queries encadenadas relacionales en Cloud Functions de alto tráfico. Deben desnormalizarse (ej. inyectar un array `suiteIds` en `lispFiles`) mantenidos por **Firestore Triggers** (`onDocumentWritten`). Esto garantiza consultas O(1) de baja latencia cuando AutoCAD arranca.
 
 ### Estado Actual del Dashboard Web (SaaS Console)
 El Dashboard web (React + Firebase + Astro) se ha reestructurado para operar como una consola SaaS profesional y "Mobile Friendly". Se aplicaron las siguientes decisiones arquitectónicas UI/UX y de código:

@@ -22,5 +22,8 @@ export default defineConfig({
         'palette': 'src/palettes-entry/palette.html'
       }
     }
+  },
+  esbuild: {
+    charset: 'ascii'
   }
 });

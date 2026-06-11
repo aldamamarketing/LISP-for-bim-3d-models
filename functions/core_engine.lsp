@@ -315,7 +315,7 @@
   )
 )
 
-(defun LC:Download-Asset (url dest / xmlhttp ado result) 
+(defun LC:Download-Asset (url dest / xmlhttp f result) 
   (setq result nil)
   (setq xmlhttp (vlax-create-object "MSXML2.XMLHTTP.6.0"))
   (if (not xmlhttp) (setq xmlhttp (vlax-create-object "MSXML2.XMLHTTP")))
@@ -325,15 +325,11 @@
       (vl-catch-all-apply 'vlax-invoke-method (list xmlhttp 'send))
       (if (= (vlax-get-property xmlhttp 'status) 200) 
         (progn 
-          (setq ado (vlax-create-object "ADODB.Stream"))
-          (if ado 
+          (setq f (open dest "w"))
+          (if f 
             (progn 
-              (vlax-put-property ado 'Type 1)
-              (vl-catch-all-apply 'vlax-invoke-method (list ado 'Open))
-              (vl-catch-all-apply 'vlax-invoke-method (list ado 'Write (vlax-get-property xmlhttp 'responseBody)))
-              (vl-catch-all-apply 'vlax-invoke-method (list ado 'SaveToFile dest 2))
-              (vl-catch-all-apply 'vlax-invoke-method (list ado 'Close))
-              (vlax-release-object ado)
+              (princ (vlax-get-property xmlhttp 'responseText) f)
+              (close f)
               (setq result t)
             )
           )
@@ -361,7 +357,7 @@
     (progn 
       (write-line "if (typeof Acad !== 'undefined') {" f-js)
       (write-line "    try { Acad.Application.removePalette('Command Palette'); } catch(e) {}" f-js)
-      (setq source-url (strcat "https://lispcentral.web.app/palette-builds/palette.html?v=" (rtos (getvar "MILLISECS") 2 0)))
+      (setq source-url (strcat "https://lispcentral.web.app/palette?v=" (rtos (getvar "MILLISECS") 2 0)))
       (setq temp-html (strcat (getenv "TEMP") "\\LC_Palette.html"))
       (princ "\n[LispCentral] Syncing latest UI from cloud...")
       (LC:Download-Asset source-url temp-html)
