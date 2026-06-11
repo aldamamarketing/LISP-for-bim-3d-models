@@ -1,0 +1,3 @@
+## 2024-05-18 - Replacing O(N^2) list building with O(N) in AutoLISP
+**Learning:** In AutoLISP scripts, using `(append lst (list item))` inside a loop creates an O(N^2) performance bottleneck because `append` has to traverse the entire list on every iteration. This is a common anti-pattern, especially when parsing large strings or datasets like JSON strings.
+**Action:** Always use `(cons item lst)` inside the loop and `(reverse lst)` at the end to build lists efficiently in O(N) time. I applied this fix to `LC:parse-json-names` in `functions/loader_template.lsp`.
