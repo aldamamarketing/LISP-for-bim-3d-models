@@ -1,0 +1,3 @@
+## 2024-06-12 - Form Label Accessibility in React Modal
+**Learning:** Found multiple form inputs (`input`, `textarea`, `radio`) without explicit `id` and `htmlFor` bindings to their corresponding `label` elements in `SuitesGroupsCard.jsx`. Relying on visual grouping via Tailwind classes is insufficient for screen readers. Using `<fieldset>` and `<legend>` for groups of radio buttons ensures they are semantically linked for assistive tech.
+**Action:** When creating forms, particularly inside complex modal dialogs, ensure every `<label>` has an explicit `htmlFor` pointing to the `id` of its input control, and use `<fieldset>` for groups of inputs like radio buttons.

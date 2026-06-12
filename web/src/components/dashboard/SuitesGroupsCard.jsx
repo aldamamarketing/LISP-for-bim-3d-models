@@ -515,21 +515,21 @@ export default function SuitesGroupsCard() {
             
             <div className="space-y-4">
               <div>
-                <label className="block text-sm font-bold text-on-surface-variant mb-1">Nome da Suite</label>
-                <input type="text" className="w-full bg-surface border border-outline-variant rounded p-2 text-on-surface" value={editSuiteData.name} onChange={e => setEditSuiteData({...editSuiteData, name: e.target.value})} />
+                <label htmlFor="suiteName" className="block text-sm font-bold text-on-surface-variant mb-1">Nome da Suite</label>
+                <input id="suiteName" type="text" className="w-full bg-surface border border-outline-variant rounded p-2 text-on-surface" value={editSuiteData.name} onChange={e => setEditSuiteData({...editSuiteData, name: e.target.value})} />
               </div>
               <div>
-                <label className="block text-sm font-bold text-on-surface-variant mb-1">Descrição</label>
-                <textarea className="w-full bg-surface border border-outline-variant rounded p-2 text-on-surface resize-none h-20" value={editSuiteData.description} onChange={e => setEditSuiteData({...editSuiteData, description: e.target.value})}></textarea>
+                <label htmlFor="suiteDesc" className="block text-sm font-bold text-on-surface-variant mb-1">Descrição</label>
+                <textarea id="suiteDesc" className="w-full bg-surface border border-outline-variant rounded p-2 text-on-surface resize-none h-20" value={editSuiteData.description} onChange={e => setEditSuiteData({...editSuiteData, description: e.target.value})}></textarea>
               </div>
-              <div>
-                <label className="block text-sm font-bold text-on-surface-variant mb-2">Visibilidade</label>
+              <fieldset>
+                <legend className="block text-sm font-bold text-on-surface-variant mb-2">Visibilidade</legend>
                 <div className="flex gap-4">
-                  <label className="flex items-center gap-2 text-sm cursor-pointer text-on-surface"><input type="radio" name="visibility" value="private" checked={editSuiteData.visibility === 'private'} onChange={() => setEditSuiteData({...editSuiteData, visibility: 'private'})} /> Privado</label>
-                  <label className="flex items-center gap-2 text-sm cursor-pointer text-on-surface"><input type="radio" name="visibility" value="link" checked={editSuiteData.visibility === 'link'} onChange={() => setEditSuiteData({...editSuiteData, visibility: 'link'})} /> Link (Oculto)</label>
-                  <label className="flex items-center gap-2 text-sm cursor-pointer text-on-surface"><input type="radio" name="visibility" value="store" checked={editSuiteData.visibility === 'store'} onChange={() => setEditSuiteData({...editSuiteData, visibility: 'store'})} /> Public Store</label>
+                  <label htmlFor="visPrivate" className="flex items-center gap-2 text-sm cursor-pointer text-on-surface"><input id="visPrivate" type="radio" name="visibility" value="private" checked={editSuiteData.visibility === 'private'} onChange={() => setEditSuiteData({...editSuiteData, visibility: 'private'})} /> Privado</label>
+                  <label htmlFor="visLink" className="flex items-center gap-2 text-sm cursor-pointer text-on-surface"><input id="visLink" type="radio" name="visibility" value="link" checked={editSuiteData.visibility === 'link'} onChange={() => setEditSuiteData({...editSuiteData, visibility: 'link'})} /> Link (Oculto)</label>
+                  <label htmlFor="visStore" className="flex items-center gap-2 text-sm cursor-pointer text-on-surface"><input id="visStore" type="radio" name="visibility" value="store" checked={editSuiteData.visibility === 'store'} onChange={() => setEditSuiteData({...editSuiteData, visibility: 'store'})} /> Public Store</label>
                 </div>
-              </div>
+              </fieldset>
 
               {editSuiteData.visibility === 'store' && (
                 <div className="p-4 bg-primary-container/10 border border-primary-container/30 rounded space-y-3">
@@ -589,8 +589,8 @@ export default function SuitesGroupsCard() {
                   </div>
                   
                   <div>
-                    <label className="block text-xs font-bold text-primary-container mb-1">Autor / Empresa</label>
-                    <input type="text" className="w-full bg-surface border border-outline-variant rounded p-2 text-on-surface text-sm" value={editSuiteData.authorName} onChange={e => setEditSuiteData({...editSuiteData, authorName: e.target.value})} />
+                    <label htmlFor="suiteAuthor" className="block text-xs font-bold text-primary-container mb-1">Autor / Empresa</label>
+                    <input id="suiteAuthor" type="text" className="w-full bg-surface border border-outline-variant rounded p-2 text-on-surface text-sm" value={editSuiteData.authorName} onChange={e => setEditSuiteData({...editSuiteData, authorName: e.target.value})} />
                   </div>
                 </div>
               )}
