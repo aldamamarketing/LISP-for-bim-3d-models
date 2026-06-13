@@ -127,13 +127,13 @@
     (if end 
       (progn 
         (setq name (substr jsonStr (1+ start) (- end start)))
-        (setq cmd-list (append cmd-list (list (list name name))))
+        (setq cmd-list (cons (list name name) cmd-list))
         (setq pos end)
       )
       (setq pos (strlen jsonStr))
     )
   )
-  cmd-list
+  (reverse cmd-list)
 )
 
 ;; Cloud Handshake: Fetches the command index upon launch
