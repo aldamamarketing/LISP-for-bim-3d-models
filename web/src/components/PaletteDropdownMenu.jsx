@@ -59,6 +59,9 @@ export default function PaletteDropdownMenu({ myId }) {
       {/* Botón Menu / Hamburguesa */}
       <button
         onClick={() => setIsOpen(!isOpen)}
+        aria-expanded={isOpen}
+        aria-haspopup="menu"
+        aria-label="Opciones de Paleta"
         style={{
           background: 'transparent',
           border: 'none',
@@ -80,26 +83,31 @@ export default function PaletteDropdownMenu({ myId }) {
 
       {/* Menú Desplegable */}
       {isOpen && (
-        <div style={{
-          position: 'absolute',
-          top: '100%',
-          left: 0,
-          marginTop: '4px',
-          backgroundColor: '#222',
-          border: '1px solid #333',
-          borderRadius: '4px',
-          boxShadow: '0 4px 12px rgba(0,0,0,0.5)',
-          minWidth: '200px',
-          zIndex: 1000,
-          display: 'flex',
-          flexDirection: 'column',
-          padding: '4px 0'
-        }}>
+        <div
+          role="menu"
+          style={{
+            position: 'absolute',
+            top: '100%',
+            left: 0,
+            marginTop: '4px',
+            backgroundColor: '#222',
+            border: '1px solid #333',
+            borderRadius: '4px',
+            boxShadow: '0 4px 12px rgba(0,0,0,0.5)',
+            minWidth: '200px',
+            zIndex: 1000,
+            display: 'flex',
+            flexDirection: 'column',
+            padding: '4px 0'
+          }}
+        >
           {palettes.map((p) => {
             const isActive = activePalettes.includes(p.id);
             return (
               <button
                 key={p.id}
+                role="menuitemcheckbox"
+                aria-checked={isActive}
                 onClick={() => handleToggle(p)}
                 style={{
                   background: 'transparent',

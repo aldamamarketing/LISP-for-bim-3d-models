@@ -1,0 +1,3 @@
+## 2024-06-13 - Accessible Dropdown Menu ARIA Patterns
+**Learning:** For custom dropdown menus implemented without native HTML `<select>` elements, screen readers often fail to announce state changes correctly if proper ARIA roles aren't used. Toggles or items representing an active/inactive state inside the menu should use `role="menuitemcheckbox"` with `aria-checked` rather than generic buttons. The trigger should carry `aria-expanded` and `aria-haspopup`, while the dropdown container must use `role="menu"`.
+**Action:** Always verify custom dropdowns or popover menus incorporate explicit ARIA roles (`menu`, `menuitem`, `menuitemcheckbox`) and explicitly link state toggles to `aria-checked` and `aria-expanded`.
