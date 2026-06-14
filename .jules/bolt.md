@@ -1,0 +1,3 @@
+## 2026-06-14 - Expensive String Allocations in O(N*M) React Filtering
+**Learning:** In React components running inside AutoCAD embedded browsers, doing `.toLowerCase()` inside a nested `.filter()` + `.some()` closure causes massive O(N*M) string re-allocations that severely degrade UI responsiveness, since these custom browser controls are much slower than modern desktop browsers at garbage collection.
+**Action:** Always pre-calculate lowercase search arrays outside of filter loops, and wrap derived list computations (filtering, grouping, sorting) in a `useMemo` hook to prevent recalculation on every render.
