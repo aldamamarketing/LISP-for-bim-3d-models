@@ -1,0 +1,3 @@
+## 2024-06-14 - Icon-only Remove Buttons Missing Accessible Labels and Focus States
+**Learning:** Found a recurring accessibility anti-pattern in the React components (e.g. `IconGenerator.jsx`, `LinetypeGenerator.jsx`) where icon-only remove buttons (using `×` text) lack `aria-label`s, rendering them meaningless to screen readers. Additionally, custom styled buttons (like `.btn-remove` in CSS) often omit a prominent `:focus-visible` state, failing keyboard accessibility standards.
+**Action:** When auditing or implementing UI components that use custom styling or icon-only elements (such as `×`), always ensure `aria-label` and visual `title` attributes are included, and verify that the corresponding CSS includes a `:focus-visible` ring/outline.

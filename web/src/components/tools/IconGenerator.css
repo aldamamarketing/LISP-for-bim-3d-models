@@ -225,6 +225,12 @@ textarea.form-control {
   border-radius: 4px;
 }
 
+.btn-remove:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 2px var(--tmd-orange);
+  border-radius: 4px;
+}
+
 .cart-empty {
   text-align: center;
   color: var(--text-muted);
