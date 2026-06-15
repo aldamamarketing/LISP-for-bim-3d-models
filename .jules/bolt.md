@@ -1,0 +1,3 @@
+## 2024-05-24 - Optimizing string allocations inside nested filtering loops
+**Learning:** In AutoCAD's embedded browser controls, React UI palettes (like `LispCommandPalette`) are sensitive to execution speed. Doing `.toLowerCase()` on dynamically changing strings inside inner `.filter()` or `.some()` loops (like parsing an array of tags inside an array of commands) can easily cause O(N*M) slowdowns and noticeable unresponsiveness.
+**Action:** Always pre-calculate derived string transformations (`toLowerCase`) into an array before the filter loop begins, and wrap the entire derived result in `React.useMemo` to skip recalculations when inputs (like `commands` and `activeFilters`) haven't changed.
