@@ -70,6 +70,9 @@ export default function PaletteDropdownMenu({ myId }) {
           justifyContent: 'center'
         }}
         title="Opciones de Paleta"
+        aria-label="Opciones de Paleta"
+        aria-expanded={isOpen}
+        aria-haspopup="menu"
       >
         <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round">
           <line x1="3" y1="12" x2="21" y2="12"></line>
@@ -80,7 +83,9 @@ export default function PaletteDropdownMenu({ myId }) {
 
       {/* Menú Desplegable */}
       {isOpen && (
-        <div style={{
+        <div
+          role="menu"
+          style={{
           position: 'absolute',
           top: '100%',
           left: 0,
@@ -100,6 +105,8 @@ export default function PaletteDropdownMenu({ myId }) {
             return (
               <button
                 key={p.id}
+                role="menuitemcheckbox"
+                aria-checked={isActive}
                 onClick={() => handleToggle(p)}
                 style={{
                   background: 'transparent',

@@ -1,0 +1,3 @@
+## 2024-06-15 - [Accessible ARIA Pattern for Toggleable State Dropdowns]
+**Learning:** Found a custom dropdown menu for toggling palette presence where items act as toggles. Standard buttons or menuitems are not fully semantic for toggles in a dropdown menu. Screen readers require specific ARIA patterns to understand the expanded state of the menu and the checked state of individual items.
+**Action:** When implementing custom dropdowns representing toggleable states, add `aria-expanded` and `aria-haspopup="menu"` to the trigger, `role="menu"` to the container, and use `role="menuitemcheckbox"` combined with `aria-checked` on the items. Also, always add an `aria-label` to icon-only buttons as `title` is insufficient.
