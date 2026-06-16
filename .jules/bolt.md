@@ -1,0 +1,3 @@
+## 2026-06-16 - Memoization in AutoCAD's Embedded Browser
+**Learning:** React components rendered within AutoCAD's embedded HTML5 web palette execute JavaScript slower than modern desktop browsers. String operations (like `.toLowerCase()`) inside `.filter()` loops cause O(N*M) performance degradation, and unmemoized derived states block the main thread, leading to UI unresponsiveness.
+**Action:** Always extract expensive string transformations outside of closures and wrap derived list computations (filtering, sorting, grouping) in `useMemo` hooks to prevent unnecessary recalculations on every render.
