@@ -229,6 +229,7 @@ export default function SubscriptionsTab() {
                             onClick={() => handleUnsubscribe(suite.subId)}
                             className="px-3 py-1.5 bg-surface text-error hover:bg-error/10 border border-error/20 hover:border-error/50 rounded text-xs font-bold transition-all"
                             title={t('dashboard.subscriptions.unsubscribe')}
+                            aria-label={t('dashboard.subscriptions.unsubscribe')}
                           >
                             <span className="material-symbols-outlined text-[16px] md:hidden">delete</span>
                             <span className="hidden md:inline">{t('dashboard.subscriptions.unsubscribe')}</span>

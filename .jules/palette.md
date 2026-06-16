@@ -1,0 +1,3 @@
+## 2024-05-18 - Missing ARIA labels on Dashboard Icon Buttons
+**Learning:** In complex dashboard components (like `LispFilesCard.jsx` and `SubscriptionsTab.jsx`), it is very common for interactive UI elements such as icon-only actions (delete, modify, close modal) to be missing `aria-label` attributes. Screen readers rely entirely on text content or `aria-label` to decipher these buttons, and attributes like `title` alone are insufficient for robust accessibility.
+**Action:** Always verify that interactive icon-only elements (e.g., `<button>` enclosing a `<span class="material-symbols-outlined">`) receive explicitly defined `aria-label`s mapping their action to improve screen-reader legibility.
