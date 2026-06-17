@@ -1,0 +1,3 @@
+## 2024-05-24 - Accessibility of Icon-Only Buttons
+**Learning:** In the LispCentral dashboard components (like `LispManagerTab` and `LispFilesCard`), there is a recurring pattern of using icon-only buttons (e.g., SVG upload, delete, edit, modal close) that lack `aria-label` attributes and keyboard focus states. While they have a visual `title` tooltip, this is insufficient for screen readers, and the lack of `:focus-visible` makes keyboard navigation difficult.
+**Action:** When adding or reviewing interactive elements in this app, specifically check icon-only buttons to ensure they have an `aria-label` that describes their action and clear `:focus-visible` styles (e.g., `focus-visible:ring-2 focus-visible:ring-primary-container outline-none`) for keyboard users.

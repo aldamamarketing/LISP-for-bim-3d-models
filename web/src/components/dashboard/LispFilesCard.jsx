@@ -288,7 +288,7 @@ export default function LispFilesCard() {
                     Comandos detectados: {draft.detectedCommands.map(c => c.commandName).join(', ') || 'Nenhum'}
                   </div>
                 </div>
-                <button className="text-error hover:text-white" onClick={() => removeDraft(i)}>
+                <button className="text-error hover:text-white focus-visible:ring-2 focus-visible:ring-error outline-none rounded" aria-label="Excluir rascunho" title="Excluir rascunho" onClick={() => removeDraft(i)}>
                   <span className="material-symbols-outlined text-[18px]">delete</span>
                 </button>
               </div>
@@ -435,7 +435,7 @@ export default function LispFilesCard() {
           <div className="bg-[#141414] border border-[#262626] rounded-xl w-full max-w-[600px] p-6 shadow-2xl">
             <h3 className="mt-0 mb-4 text-xl flex justify-between items-center">
               Galeria Pública de Íconos
-              <button className="text-on-surface-variant hover:text-white" onClick={() => setShowGalleryModal(false)}><span className="material-symbols-outlined text-[20px]">close</span></button>
+              <button className="text-on-surface-variant hover:text-white focus-visible:ring-2 focus-visible:ring-primary-container outline-none rounded" aria-label="Fechar" title="Fechar" onClick={() => setShowGalleryModal(false)}><span className="material-symbols-outlined text-[20px]">close</span></button>
             </h3>
             <div className="h-64 flex items-center justify-center border border-dashed border-[#262626] rounded text-on-surface-variant text-sm">
               [Galeria em desenvolvimento. Aqui aparecerão íconos públicos.]
@@ -449,7 +449,7 @@ export default function LispFilesCard() {
           <div className="bg-[#141414] border border-[#262626] rounded-xl w-full max-w-[600px] p-6 shadow-2xl">
             <h3 className="mt-0 mb-4 text-xl flex justify-between items-center">
               Meus Íconos Favoritos
-              <button className="text-on-surface-variant hover:text-white" onClick={() => setShowFavoritesModal(false)}><span className="material-symbols-outlined text-[20px]">close</span></button>
+              <button className="text-on-surface-variant hover:text-white focus-visible:ring-2 focus-visible:ring-primary-container outline-none rounded" aria-label="Fechar" title="Fechar" onClick={() => setShowFavoritesModal(false)}><span className="material-symbols-outlined text-[20px]">close</span></button>
             </h3>
             <div className="h-64 flex items-center justify-center border border-dashed border-[#262626] rounded text-on-surface-variant text-sm">
               [Aqui aparecerão os íconos salvos em "Minha Coleção".]
