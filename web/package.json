@@ -8,7 +8,7 @@
   "scripts": {
     "dev": "astro dev",
     "start": "astro dev",
-    "build": "vite build -c vite.palettes.config.mjs && astro build",
+    "build": "vite build -c vite.palettes.config.mjs && vite build -c vite.resource-palette.config.mjs && astro build",
     "preview": "astro preview",
     "astro": "astro"
   },

@@ -95,6 +95,9 @@ const t = (key) => {
             <li><a href="/dashboard#income" class="flex items-center gap-3 py-1.5 px-3 text-on-surface-variant hover:text-white hover:bg-[#1a1c1c] rounded-md transition-colors text-sm">
               <span class="material-symbols-outlined text-[18px]">bar_chart</span> <span data-i18n="dashboard.sidebar.income">{t("dashboard.sidebar.income")}</span>
             </a></li>
+            <li id="sidebar-admin-catalog" class="hidden"><a href="/dashboard#catalog-admin" class="flex items-center gap-3 py-1.5 px-3 text-on-surface-variant hover:text-white hover:bg-primary-container/20 rounded-md transition-colors text-sm text-primary-container font-bold">
+              <span class="material-symbols-outlined text-[18px]">key</span> <span>Gestão de Catálogos</span>
+            </a></li>
           </ul>
         </div>
 
@@ -207,6 +210,16 @@ const t = (key) => {
           userCard?.classList.add('flex', 'flex-col');
           if (avatar) avatar.textContent = (user.displayName || user.email || 'U').charAt(0).toUpperCase();
           if (nameEl) nameEl.textContent = user.displayName || user.email;
+
+          // Mostrar Gestão de Catálogos só para admin
+          const adminCat = document.getElementById('sidebar-admin-catalog');
+          if (adminCat) {
+            if (user.email === 'aldamadaniel1984@gmail.com') {
+              adminCat.classList.remove('hidden');
+            } else {
+              adminCat.classList.add('hidden');
+            }
+          }
         } else {
           dashSection?.classList.add('hidden');
           userCard?.classList.add('hidden');

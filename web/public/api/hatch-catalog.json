@@ -1,0 +1,1367 @@
+[
+  {
+    "id": "hatch_assets_hsbdr1e1",
+    "name": "HSBDR1E1",
+    "codeName": "HSBDR1E1",
+    "category": "Assets",
+    "icon": "https://storage.googleapis.com/lispcentral.firebasestorage.app/icons%2Fhatch%2Fhatch_assets_hsbdr1e1.webp"
+  },
+  {
+    "id": "hatch_assets_hsbdr2e0",
+    "name": "HSBDR2E0",
+    "codeName": "HSBDR2E0",
+    "category": "Assets",
+    "icon": "https://storage.googleapis.com/lispcentral.firebasestorage.app/icons%2Fhatch%2Fhatch_assets_hsbdr2e0.webp"
+  },
+  {
+    "id": "hatch_bricks_hbengles",
+    "name": "Brickwork english bond",
+    "codeName": "HBENGLES",
+    "category": "Bricks",
+    "icon": "https://storage.googleapis.com/lispcentral.firebasestorage.app/icons%2Fhatch%2Fhatch_bricks_hbengles.webp"
+  },
+  {
+    "id": "hatch_bricks_hbenglet",
+    "name": "Brickwork english bond",
+    "codeName": "HBENGLET",
+    "category": "Bricks",
+    "icon": "https://storage.googleapis.com/lispcentral.firebasestorage.app/icons%2Fhatch%2Fhatch_bricks_hbenglet.webp"
+  },
+  {
+    "id": "hatch_bricks_hbflemes",
+    "name": "Brickworkflemishbond",
+    "codeName": "HBFLEMES",
+    "category": "Bricks",
+    "icon": "https://storage.googleapis.com/lispcentral.firebasestorage.app/icons%2Fhatch%2Fhatch_bricks_hbflemes.webp"
+  },
+  {
+    "id": "hatch_bricks_hbflemet",
+    "name": "Brickworkflemishbond",
+    "codeName": "HBFLEMET",
+    "category": "Bricks",
+    "icon": "https://storage.googleapis.com/lispcentral.firebasestorage.app/icons%2Fhatch%2Fhatch_bricks_hbflemet.webp"
+  },
+  {
+    "id": "hatch_bricks_hblockes",
+    "name": "HBLOCKES",
+    "codeName": "HBLOCKES",
+    "category": "Bricks",
+    "icon": "https://storage.googleapis.com/lispcentral.firebasestorage.app/icons%2Fhatch%2Fhatch_bricks_hblockes.webp"
+  },
+  {
+    "id": "hatch_bricks_hblocket",
+    "name": "440x215 Blockwork",
+    "codeName": "HBLOCKET",
+    "category": "Bricks",
+    "icon": "https://storage.googleapis.com/lispcentral.firebasestorage.app/icons%2Fhatch%2Fhatch_bricks_hblocket.webp"
+  },
+  {
+    "id": "hatch_bricks_hbstrces",
+    "name": "HBSTRCES",
+    "codeName": "HBSTRCES",
+    "category": "Bricks",
+    "icon": "https://storage.googleapis.com/lispcentral.firebasestorage.app/icons%2Fhatch%2Fhatch_bricks_hbstrces.webp"
+  },
+  {
+    "id": "hatch_bricks_hbstrcet",
+    "name": "215 x 65 Brick",
+    "codeName": "HBSTRCET",
+    "category": "Bricks",
+    "icon": "https://storage.googleapis.com/lispcentral.firebasestorage.app/icons%2Fhatch%2Fhatch_bricks_hbstrcet.webp"
+  },
+  {
+    "id": "hatch_custom bricks_hpav2x1t",
+    "name": "PAVING 0.200x0.100 www.CADhatch.com",
+    "codeName": "HPAV2X1T",
+    "category": "Custom bricks",
+    "icon": "https://storage.googleapis.com/lispcentral.firebasestorage.app/icons%2Fhatch%2Fhatch_custom%20bricks_hpav2x1t.webp"
+  },
+  {
+    "id": "hatch_custom bricks_hpvbsk1s",
+    "name": "BAKSET PAVING",
+    "codeName": "HPVBSK1S",
+    "category": "Custom bricks",
+    "icon": "https://storage.googleapis.com/lispcentral.firebasestorage.app/icons%2Fhatch%2Fhatch_custom%20bricks_hpvbsk1s.webp"
+  },
+  {
+    "id": "hatch_custom bricks_hpvcv10t",
+    "name": "Paving Staggered www.CADhatch.com",
+    "codeName": "HPVCV10T",
+    "category": "Custom bricks",
+    "icon": "https://storage.googleapis.com/lispcentral.firebasestorage.app/icons%2Fhatch%2Fhatch_custom%20bricks_hpvcv10t.webp"
+  },
+  {
+    "id": "hatch_custom bricks_hpvherbt",
+    "name": "Paving Herringbone www.CADhatch.com",
+    "codeName": "HPVHERBT",
+    "category": "Custom bricks",
+    "icon": "https://storage.googleapis.com/lispcentral.firebasestorage.app/icons%2Fhatch%2Fhatch_custom%20bricks_hpvherbt.webp"
+  },
+  {
+    "id": "hatch_general_hsbdr1e1",
+    "name": "HSBDR1E1",
+    "codeName": "HSBDR1E1",
+    "category": "General",
+    "icon": "https://storage.googleapis.com/lispcentral.firebasestorage.app/icons%2Fhatch%2Fhatch_general_hsbdr1e1.webp"
+  },
+  {
+    "id": "hatch_general_hsbdr2e0",
+    "name": "HSBDR2E0",
+    "codeName": "HSBDR2E0",
+    "category": "General",
+    "icon": "https://storage.googleapis.com/lispcentral.firebasestorage.app/icons%2Fhatch%2Fhatch_general_hsbdr2e0.webp"
+  },
+  {
+    "id": "hatch_general_hsbdr3e0",
+    "name": "HSBDR3E0",
+    "codeName": "HSBDR3E0",
+    "category": "General",
+    "icon": "https://storage.googleapis.com/lispcentral.firebasestorage.app/icons%2Fhatch%2Fhatch_general_hsbdr3e0.webp"
+  },
+  {
+    "id": "hatch_general_hsbdr4e0",
+    "name": "HSBDR4E0",
+    "codeName": "HSBDR4E0",
+    "category": "General",
+    "icon": "https://storage.googleapis.com/lispcentral.firebasestorage.app/icons%2Fhatch%2Fhatch_general_hsbdr4e0.webp"
+  },
+  {
+    "id": "hatch_general_hshp11e0",
+    "name": "HSHP11E0",
+    "codeName": "HSHP11E0",
+    "category": "General",
+    "icon": "https://storage.googleapis.com/lispcentral.firebasestorage.app/icons%2Fhatch%2Fhatch_general_hshp11e0.webp"
+  },
+  {
+    "id": "hatch_general_hshp21e0",
+    "name": "HSHP21E0",
+    "codeName": "HSHP21E0",
+    "category": "General",
+    "icon": "https://storage.googleapis.com/lispcentral.firebasestorage.app/icons%2Fhatch%2Fhatch_general_hshp21e0.webp"
+  },
+  {
+    "id": "hatch_general_hshp31e0",
+    "name": "HSHP31E0",
+    "codeName": "HSHP31E0",
+    "category": "General",
+    "icon": "https://storage.googleapis.com/lispcentral.firebasestorage.app/icons%2Fhatch%2Fhatch_general_hshp31e0.webp"
+  },
+  {
+    "id": "hatch_general_hshp41e0",
+    "name": "HSHP41E0",
+    "codeName": "HSHP41E0",
+    "category": "General",
+    "icon": "https://storage.googleapis.com/lispcentral.firebasestorage.app/icons%2Fhatch%2Fhatch_general_hshp41e0.webp"
+  },
+  {
+    "id": "hatch_general_hston1e0",
+    "name": "HSTON1E0",
+    "codeName": "HSTON1E0",
+    "category": "General",
+    "icon": "https://storage.googleapis.com/lispcentral.firebasestorage.app/icons%2Fhatch%2Fhatch_general_hston1e0.webp"
+  },
+  {
+    "id": "hatch_general_hston2e0",
+    "name": "HSTON2E0",
+    "codeName": "HSTON2E0",
+    "category": "General",
+    "icon": "https://storage.googleapis.com/lispcentral.firebasestorage.app/icons%2Fhatch%2Fhatch_general_hston2e0.webp"
+  },
+  {
+    "id": "hatch_general_hston3e0",
+    "name": "Stone pattern -",
+    "codeName": "HSTON3E0",
+    "category": "General",
+    "icon": "https://storage.googleapis.com/lispcentral.firebasestorage.app/icons%2Fhatch%2Fhatch_general_hston3e0.webp"
+  },
+  {
+    "id": "hatch_general_hston4e0",
+    "name": ";",
+    "codeName": "HSTON4E0",
+    "category": "General",
+    "icon": "https://storage.googleapis.com/lispcentral.firebasestorage.app/icons%2Fhatch%2Fhatch_general_hston4e0.webp"
+  },
+  {
+    "id": "hatch_general_hston5e0",
+    "name": ";",
+    "codeName": "HSTON5E0",
+    "category": "General",
+    "icon": "https://storage.googleapis.com/lispcentral.firebasestorage.app/icons%2Fhatch%2Fhatch_general_hston5e0.webp"
+  },
+  {
+    "id": "hatch_general_hston6e0",
+    "name": ";",
+    "codeName": "HSTON6E0",
+    "category": "General",
+    "icon": "https://storage.googleapis.com/lispcentral.firebasestorage.app/icons%2Fhatch%2Fhatch_general_hston6e0.webp"
+  },
+  {
+    "id": "hatch_general_hston7e0",
+    "name": ";",
+    "codeName": "HSTON7E0",
+    "category": "General",
+    "icon": "https://storage.googleapis.com/lispcentral.firebasestorage.app/icons%2Fhatch%2Fhatch_general_hston7e0.webp"
+  },
+  {
+    "id": "hatch_general_hston8e0",
+    "name": ";",
+    "codeName": "HSTON8E0",
+    "category": "General",
+    "icon": "https://storage.googleapis.com/lispcentral.firebasestorage.app/icons%2Fhatch%2Fhatch_general_hston8e0.webp"
+  },
+  {
+    "id": "hatch_general_hston9e0",
+    "name": ";",
+    "codeName": "HSTON9E0",
+    "category": "General",
+    "icon": "https://storage.googleapis.com/lispcentral.firebasestorage.app/icons%2Fhatch%2Fhatch_general_hston9e0.webp"
+  },
+  {
+    "id": "hatch_general_hwdln1e1",
+    "name": ";",
+    "codeName": "HWDLN1E1",
+    "category": "General",
+    "icon": "https://storage.googleapis.com/lispcentral.firebasestorage.app/icons%2Fhatch%2Fhatch_general_hwdln1e1.webp"
+  },
+  {
+    "id": "hatch_general_hwdln2e1",
+    "name": ";",
+    "codeName": "HWDLN2E1",
+    "category": "General",
+    "icon": "https://storage.googleapis.com/lispcentral.firebasestorage.app/icons%2Fhatch%2Fhatch_general_hwdln2e1.webp"
+  },
+  {
+    "id": "hatch_general_hwdln3e1",
+    "name": ";",
+    "codeName": "HWDLN3E1",
+    "category": "General",
+    "icon": "https://storage.googleapis.com/lispcentral.firebasestorage.app/icons%2Fhatch%2Fhatch_general_hwdln3e1.webp"
+  },
+  {
+    "id": "hatch_general_hwend1n0",
+    "name": "HWEND1N0",
+    "codeName": "HWEND1N0",
+    "category": "General",
+    "icon": "https://storage.googleapis.com/lispcentral.firebasestorage.app/icons%2Fhatch%2Fhatch_general_hwend1n0.webp"
+  },
+  {
+    "id": "hatch_general_hwend2n0",
+    "name": "HWEND2N0",
+    "codeName": "HWEND2N0",
+    "category": "General",
+    "icon": "https://storage.googleapis.com/lispcentral.firebasestorage.app/icons%2Fhatch%2Fhatch_general_hwend2n0.webp"
+  },
+  {
+    "id": "hatch_general_hwend3n0",
+    "name": "HWEND3N0",
+    "codeName": "HWEND3N0",
+    "category": "General",
+    "icon": "https://storage.googleapis.com/lispcentral.firebasestorage.app/icons%2Fhatch%2Fhatch_general_hwend3n0.webp"
+  },
+  {
+    "id": "hatch_general_hwend4n0",
+    "name": ";",
+    "codeName": "HWEND4N0",
+    "category": "General",
+    "icon": "https://storage.googleapis.com/lispcentral.firebasestorage.app/icons%2Fhatch%2Fhatch_general_hwend4n0.webp"
+  },
+  {
+    "id": "hatch_general_hwend5n0",
+    "name": ";",
+    "codeName": "HWEND5N0",
+    "category": "General",
+    "icon": "https://storage.googleapis.com/lispcentral.firebasestorage.app/icons%2Fhatch%2Fhatch_general_hwend5n0.webp"
+  },
+  {
+    "id": "hatch_general_hwend6n0",
+    "name": ";",
+    "codeName": "HWEND6N0",
+    "category": "General",
+    "icon": "https://storage.googleapis.com/lispcentral.firebasestorage.app/icons%2Fhatch%2Fhatch_general_hwend6n0.webp"
+  },
+  {
+    "id": "hatch_general_hwend7n0",
+    "name": ";",
+    "codeName": "HWEND7N0",
+    "category": "General",
+    "icon": "https://storage.googleapis.com/lispcentral.firebasestorage.app/icons%2Fhatch%2Fhatch_general_hwend7n0.webp"
+  },
+  {
+    "id": "hatch_general_hwend8n0",
+    "name": ";",
+    "codeName": "HWEND8N0",
+    "category": "General",
+    "icon": "https://storage.googleapis.com/lispcentral.firebasestorage.app/icons%2Fhatch%2Fhatch_general_hwend8n0.webp"
+  },
+  {
+    "id": "hatch_general_hwod10e1",
+    "name": ";",
+    "codeName": "HWOD10E1",
+    "category": "General",
+    "icon": "https://storage.googleapis.com/lispcentral.firebasestorage.app/icons%2Fhatch%2Fhatch_general_hwod10e1.webp"
+  },
+  {
+    "id": "hatch_general_hwod20e1",
+    "name": ";",
+    "codeName": "HWOD20E1",
+    "category": "General",
+    "icon": "https://storage.googleapis.com/lispcentral.firebasestorage.app/icons%2Fhatch%2Fhatch_general_hwod20e1.webp"
+  },
+  {
+    "id": "hatch_general_hwod30e1",
+    "name": ";",
+    "codeName": "HWOD30E1",
+    "category": "General",
+    "icon": "https://storage.googleapis.com/lispcentral.firebasestorage.app/icons%2Fhatch%2Fhatch_general_hwod30e1.webp"
+  },
+  {
+    "id": "hatch_general_hwod40e1",
+    "name": ";",
+    "codeName": "HWOD40E1",
+    "category": "General",
+    "icon": "https://storage.googleapis.com/lispcentral.firebasestorage.app/icons%2Fhatch%2Fhatch_general_hwod40e1.webp"
+  },
+  {
+    "id": "hatch_general_hwood1e1",
+    "name": "HWOOD1E1",
+    "codeName": "HWOOD1E1",
+    "category": "General",
+    "icon": "https://storage.googleapis.com/lispcentral.firebasestorage.app/icons%2Fhatch%2Fhatch_general_hwood1e1.webp"
+  },
+  {
+    "id": "hatch_general_hwood2e1",
+    "name": "HWOOD2E1",
+    "codeName": "HWOOD2E1",
+    "category": "General",
+    "icon": "https://storage.googleapis.com/lispcentral.firebasestorage.app/icons%2Fhatch%2Fhatch_general_hwood2e1.webp"
+  },
+  {
+    "id": "hatch_general_hwood3e1",
+    "name": "HWOOD3E1",
+    "codeName": "HWOOD3E1",
+    "category": "General",
+    "icon": "https://storage.googleapis.com/lispcentral.firebasestorage.app/icons%2Fhatch%2Fhatch_general_hwood3e1.webp"
+  },
+  {
+    "id": "hatch_general_hwood4e1",
+    "name": "HWOOD4E1",
+    "codeName": "HWOOD4E1",
+    "category": "General",
+    "icon": "https://storage.googleapis.com/lispcentral.firebasestorage.app/icons%2Fhatch%2Fhatch_general_hwood4e1.webp"
+  },
+  {
+    "id": "hatch_general_hwood5e1",
+    "name": "HWOOD5E1",
+    "codeName": "HWOOD5E1",
+    "category": "General",
+    "icon": "https://storage.googleapis.com/lispcentral.firebasestorage.app/icons%2Fhatch%2Fhatch_general_hwood5e1.webp"
+  },
+  {
+    "id": "hatch_general_hwood6e1",
+    "name": "HWOOD6E1",
+    "codeName": "HWOOD6E1",
+    "category": "General",
+    "icon": "https://storage.googleapis.com/lispcentral.firebasestorage.app/icons%2Fhatch%2Fhatch_general_hwood6e1.webp"
+  },
+  {
+    "id": "hatch_general_hwood7e1",
+    "name": "HWOOD7E1",
+    "codeName": "HWOOD7E1",
+    "category": "General",
+    "icon": "https://storage.googleapis.com/lispcentral.firebasestorage.app/icons%2Fhatch%2Fhatch_general_hwood7e1.webp"
+  },
+  {
+    "id": "hatch_general_hwood8e1",
+    "name": "HWOOD8E1",
+    "codeName": "HWOOD8E1",
+    "category": "General",
+    "icon": "https://storage.googleapis.com/lispcentral.firebasestorage.app/icons%2Fhatch%2Fhatch_general_hwood8e1.webp"
+  },
+  {
+    "id": "hatch_general_hwood9e1",
+    "name": "HWOOD9E1",
+    "codeName": "HWOOD9E1",
+    "category": "General",
+    "icon": "https://storage.googleapis.com/lispcentral.firebasestorage.app/icons%2Fhatch%2Fhatch_general_hwood9e1.webp"
+  },
+  {
+    "id": "hatch_general_hwply3e1",
+    "name": "HWPLY3E1",
+    "codeName": "HWPLY3E1",
+    "category": "General",
+    "icon": "https://storage.googleapis.com/lispcentral.firebasestorage.app/icons%2Fhatch%2Fhatch_general_hwply3e1.webp"
+  },
+  {
+    "id": "hatch_gravel_hsbdr3e0",
+    "name": "HSBDR3E0",
+    "codeName": "HSBDR3E0",
+    "category": "Gravel",
+    "icon": "https://storage.googleapis.com/lispcentral.firebasestorage.app/icons%2Fhatch%2Fhatch_gravel_hsbdr3e0.webp"
+  },
+  {
+    "id": "hatch_gravel_hsbdr4e0",
+    "name": "HSBDR4E0",
+    "codeName": "HSBDR4E0",
+    "category": "Gravel",
+    "icon": "https://storage.googleapis.com/lispcentral.firebasestorage.app/icons%2Fhatch%2Fhatch_gravel_hsbdr4e0.webp"
+  },
+  {
+    "id": "hatch_gravel_hshp11e0",
+    "name": "HSHP11E0",
+    "codeName": "HSHP11E0",
+    "category": "Gravel",
+    "icon": "https://storage.googleapis.com/lispcentral.firebasestorage.app/icons%2Fhatch%2Fhatch_gravel_hshp11e0.webp"
+  },
+  {
+    "id": "hatch_gravel_hshp21e0",
+    "name": "HSHP21E0",
+    "codeName": "HSHP21E0",
+    "category": "Gravel",
+    "icon": "https://storage.googleapis.com/lispcentral.firebasestorage.app/icons%2Fhatch%2Fhatch_gravel_hshp21e0.webp"
+  },
+  {
+    "id": "hatch_gravel_hshp31e0",
+    "name": "HSHP31E0",
+    "codeName": "HSHP31E0",
+    "category": "Gravel",
+    "icon": "https://storage.googleapis.com/lispcentral.firebasestorage.app/icons%2Fhatch%2Fhatch_gravel_hshp31e0.webp"
+  },
+  {
+    "id": "hatch_gravel_hshp41e0",
+    "name": "HSHP41E0",
+    "codeName": "HSHP41E0",
+    "category": "Gravel",
+    "icon": "https://storage.googleapis.com/lispcentral.firebasestorage.app/icons%2Fhatch%2Fhatch_gravel_hshp41e0.webp"
+  },
+  {
+    "id": "hatch_roof_hrcd35os",
+    "name": "HRCD35OS",
+    "codeName": "HRCD35OS",
+    "category": "Roof",
+    "icon": "https://storage.googleapis.com/lispcentral.firebasestorage.app/icons%2Fhatch%2Fhatch_roof_hrcd35os.webp"
+  },
+  {
+    "id": "hatch_roof_hrdd35os",
+    "name": "HRDD35OS",
+    "codeName": "HRDD35OS",
+    "category": "Roof",
+    "icon": "https://storage.googleapis.com/lispcentral.firebasestorage.app/icons%2Fhatch%2Fhatch_roof_hrdd35os.webp"
+  },
+  {
+    "id": "hatch_roof_hrpa55o1",
+    "name": "HRPA55O1",
+    "codeName": "HRPA55O1",
+    "category": "Roof",
+    "icon": "https://storage.googleapis.com/lispcentral.firebasestorage.app/icons%2Fhatch%2Fhatch_roof_hrpa55o1.webp"
+  },
+  {
+    "id": "hatch_roof_hrpa55o2",
+    "name": "HRPA55O2",
+    "codeName": "HRPA55O2",
+    "category": "Roof",
+    "icon": "https://storage.googleapis.com/lispcentral.firebasestorage.app/icons%2Fhatch%2Fhatch_roof_hrpa55o2.webp"
+  },
+  {
+    "id": "hatch_roof_hrpn35os",
+    "name": "165W  100 35 DEG",
+    "codeName": "HRPN35OS",
+    "category": "Roof",
+    "icon": "https://storage.googleapis.com/lispcentral.firebasestorage.app/icons%2Fhatch%2Fhatch_roof_hrpn35os.webp"
+  },
+  {
+    "id": "hatch_roof_hrpn35ot",
+    "name": "165W  100 35 DEG",
+    "codeName": "HRPN35OT",
+    "category": "Roof",
+    "icon": "https://storage.googleapis.com/lispcentral.firebasestorage.app/icons%2Fhatch%2Fhatch_roof_hrpn35ot.webp"
+  },
+  {
+    "id": "hatch_roof_hrpn40os",
+    "name": "165W  100 40 DEG",
+    "codeName": "HRPN40OS",
+    "category": "Roof",
+    "icon": "https://storage.googleapis.com/lispcentral.firebasestorage.app/icons%2Fhatch%2Fhatch_roof_hrpn40os.webp"
+  },
+  {
+    "id": "hatch_roof_hrpn40ot",
+    "name": "165W  100 40 DEG",
+    "codeName": "HRPN40OT",
+    "category": "Roof",
+    "icon": "https://storage.googleapis.com/lispcentral.firebasestorage.app/icons%2Fhatch%2Fhatch_roof_hrpn40ot.webp"
+  },
+  {
+    "id": "hatch_roof_hrpn45os",
+    "name": "165W  100 45 DEG",
+    "codeName": "HRPN45OS",
+    "category": "Roof",
+    "icon": "https://storage.googleapis.com/lispcentral.firebasestorage.app/icons%2Fhatch%2Fhatch_roof_hrpn45os.webp"
+  },
+  {
+    "id": "hatch_roof_hrpn45ot",
+    "name": "165W  100 45 DEG",
+    "codeName": "HRPN45OT",
+    "category": "Roof",
+    "icon": "https://storage.googleapis.com/lispcentral.firebasestorage.app/icons%2Fhatch%2Fhatch_roof_hrpn45ot.webp"
+  },
+  {
+    "id": "hatch_roof_hrpn50os",
+    "name": "165W  100 50 DEG",
+    "codeName": "HRPN50OS",
+    "category": "Roof",
+    "icon": "https://storage.googleapis.com/lispcentral.firebasestorage.app/icons%2Fhatch%2Fhatch_roof_hrpn50os.webp"
+  },
+  {
+    "id": "hatch_roof_hrpn50ot",
+    "name": "165W  100 50 DEG",
+    "codeName": "HRPN50OT",
+    "category": "Roof",
+    "icon": "https://storage.googleapis.com/lispcentral.firebasestorage.app/icons%2Fhatch%2Fhatch_roof_hrpn50ot.webp"
+  },
+  {
+    "id": "hatch_roof_hrpn55os",
+    "name": "165W  100 55 DEG",
+    "codeName": "HRPN55OS",
+    "category": "Roof",
+    "icon": "https://storage.googleapis.com/lispcentral.firebasestorage.app/icons%2Fhatch%2Fhatch_roof_hrpn55os.webp"
+  },
+  {
+    "id": "hatch_roof_hrpn55ot",
+    "name": "165W  100 55 DEG",
+    "codeName": "HRPN55OT",
+    "category": "Roof",
+    "icon": "https://storage.googleapis.com/lispcentral.firebasestorage.app/icons%2Fhatch%2Fhatch_roof_hrpn55ot.webp"
+  },
+  {
+    "id": "hatch_roof_hrpn60os",
+    "name": "165W  100 60 DEG",
+    "codeName": "HRPN60OS",
+    "category": "Roof",
+    "icon": "https://storage.googleapis.com/lispcentral.firebasestorage.app/icons%2Fhatch%2Fhatch_roof_hrpn60os.webp"
+  },
+  {
+    "id": "hatch_roof_hrpn60ot",
+    "name": "165W  100 60 DEG",
+    "codeName": "HRPN60OT",
+    "category": "Roof",
+    "icon": "https://storage.googleapis.com/lispcentral.firebasestorage.app/icons%2Fhatch%2Fhatch_roof_hrpn60ot.webp"
+  },
+  {
+    "id": "hatch_roof_hrpn70os",
+    "name": "165W  100 70 DEG",
+    "codeName": "HRPN70OS",
+    "category": "Roof",
+    "icon": "https://storage.googleapis.com/lispcentral.firebasestorage.app/icons%2Fhatch%2Fhatch_roof_hrpn70os.webp"
+  },
+  {
+    "id": "hatch_roof_hrpn70ot",
+    "name": "165W  100 70 DEG",
+    "codeName": "HRPN70OT",
+    "category": "Roof",
+    "icon": "https://storage.googleapis.com/lispcentral.firebasestorage.app/icons%2Fhatch%2Fhatch_roof_hrpn70ot.webp"
+  },
+  {
+    "id": "hatch_roof_hrpn80os",
+    "name": "165W  100 80 DEG",
+    "codeName": "HRPN80OS",
+    "category": "Roof",
+    "icon": "https://storage.googleapis.com/lispcentral.firebasestorage.app/icons%2Fhatch%2Fhatch_roof_hrpn80os.webp"
+  },
+  {
+    "id": "hatch_roof_hrpn80ot",
+    "name": "165W  100 80 DEG",
+    "codeName": "HRPN80OT",
+    "category": "Roof",
+    "icon": "https://storage.googleapis.com/lispcentral.firebasestorage.app/icons%2Fhatch%2Fhatch_roof_hrpn80ot.webp"
+  },
+  {
+    "id": "hatch_roof_hrpn90ot",
+    "name": "165W  100 90 DEG",
+    "codeName": "HRPN90OT",
+    "category": "Roof",
+    "icon": "https://storage.googleapis.com/lispcentral.firebasestorage.app/icons%2Fhatch%2Fhatch_roof_hrpn90ot.webp"
+  },
+  {
+    "id": "hatch_stone_hsbdr1e1",
+    "name": "HSBDR1E1",
+    "codeName": "HSBDR1E1",
+    "category": "Stone",
+    "icon": "https://storage.googleapis.com/lispcentral.firebasestorage.app/icons%2Fhatch%2Fhatch_stone_hsbdr1e1.webp"
+  },
+  {
+    "id": "hatch_stone_hsbdr2e0",
+    "name": "HSBDR2E0",
+    "codeName": "HSBDR2E0",
+    "category": "Stone",
+    "icon": "https://storage.googleapis.com/lispcentral.firebasestorage.app/icons%2Fhatch%2Fhatch_stone_hsbdr2e0.webp"
+  },
+  {
+    "id": "hatch_stone_hston1e0",
+    "name": "HSTON1E0",
+    "codeName": "HSTON1E0",
+    "category": "Stone",
+    "icon": "https://storage.googleapis.com/lispcentral.firebasestorage.app/icons%2Fhatch%2Fhatch_stone_hston1e0.webp"
+  },
+  {
+    "id": "hatch_stone_hston2e0",
+    "name": "HSTON2E0",
+    "codeName": "HSTON2E0",
+    "category": "Stone",
+    "icon": "https://storage.googleapis.com/lispcentral.firebasestorage.app/icons%2Fhatch%2Fhatch_stone_hston2e0.webp"
+  },
+  {
+    "id": "hatch_stone_hston3e0",
+    "name": "Stone pattern -",
+    "codeName": "HSTON3E0",
+    "category": "Stone",
+    "icon": "https://storage.googleapis.com/lispcentral.firebasestorage.app/icons%2Fhatch%2Fhatch_stone_hston3e0.webp"
+  },
+  {
+    "id": "hatch_stone_hston4e0",
+    "name": ";",
+    "codeName": "HSTON4E0",
+    "category": "Stone",
+    "icon": "https://storage.googleapis.com/lispcentral.firebasestorage.app/icons%2Fhatch%2Fhatch_stone_hston4e0.webp"
+  },
+  {
+    "id": "hatch_stone_hston5e0",
+    "name": ";",
+    "codeName": "HSTON5E0",
+    "category": "Stone",
+    "icon": "https://storage.googleapis.com/lispcentral.firebasestorage.app/icons%2Fhatch%2Fhatch_stone_hston5e0.webp"
+  },
+  {
+    "id": "hatch_stone_hston6e0",
+    "name": ";",
+    "codeName": "HSTON6E0",
+    "category": "Stone",
+    "icon": "https://storage.googleapis.com/lispcentral.firebasestorage.app/icons%2Fhatch%2Fhatch_stone_hston6e0.webp"
+  },
+  {
+    "id": "hatch_stone_hston7e0",
+    "name": ";",
+    "codeName": "HSTON7E0",
+    "category": "Stone",
+    "icon": "https://storage.googleapis.com/lispcentral.firebasestorage.app/icons%2Fhatch%2Fhatch_stone_hston7e0.webp"
+  },
+  {
+    "id": "hatch_stone_hston8e0",
+    "name": ";",
+    "codeName": "HSTON8E0",
+    "category": "Stone",
+    "icon": "https://storage.googleapis.com/lispcentral.firebasestorage.app/icons%2Fhatch%2Fhatch_stone_hston8e0.webp"
+  },
+  {
+    "id": "hatch_stone_hston9e0",
+    "name": ";",
+    "codeName": "HSTON9E0",
+    "category": "Stone",
+    "icon": "https://storage.googleapis.com/lispcentral.firebasestorage.app/icons%2Fhatch%2Fhatch_stone_hston9e0.webp"
+  },
+  {
+    "id": "hatch_tiles_ht1001et",
+    "name": "100mm 1mm",
+    "codeName": "HT1001ET",
+    "category": "Tiles",
+    "icon": "https://storage.googleapis.com/lispcentral.firebasestorage.app/icons%2Fhatch%2Fhatch_tiles_ht1001et.webp"
+  },
+  {
+    "id": "hatch_tiles_ht1002et",
+    "name": "100mm 2mm",
+    "codeName": "HT1002ET",
+    "category": "Tiles",
+    "icon": "https://storage.googleapis.com/lispcentral.firebasestorage.app/icons%2Fhatch%2Fhatch_tiles_ht1002et.webp"
+  },
+  {
+    "id": "hatch_tiles_ht1003et",
+    "name": "100mm 3mm",
+    "codeName": "HT1003ET",
+    "category": "Tiles",
+    "icon": "https://storage.googleapis.com/lispcentral.firebasestorage.app/icons%2Fhatch%2Fhatch_tiles_ht1003et.webp"
+  },
+  {
+    "id": "hatch_tiles_ht1009et",
+    "name": "100mm 1.5mm",
+    "codeName": "HT1009ET",
+    "category": "Tiles",
+    "icon": "https://storage.googleapis.com/lispcentral.firebasestorage.app/icons%2Fhatch%2Fhatch_tiles_ht1009et.webp"
+  },
+  {
+    "id": "hatch_tiles_ht1081et",
+    "name": "250x200mm 1mm",
+    "codeName": "HT1081ET",
+    "category": "Tiles",
+    "icon": "https://storage.googleapis.com/lispcentral.firebasestorage.app/icons%2Fhatch%2Fhatch_tiles_ht1081et.webp"
+  },
+  {
+    "id": "hatch_tiles_ht1082et",
+    "name": "250x200mm 2mm",
+    "codeName": "HT1082ET",
+    "category": "Tiles",
+    "icon": "https://storage.googleapis.com/lispcentral.firebasestorage.app/icons%2Fhatch%2Fhatch_tiles_ht1082et.webp"
+  },
+  {
+    "id": "hatch_tiles_ht1083et",
+    "name": "250x200mm 3mm",
+    "codeName": "HT1083ET",
+    "category": "Tiles",
+    "icon": "https://storage.googleapis.com/lispcentral.firebasestorage.app/icons%2Fhatch%2Fhatch_tiles_ht1083et.webp"
+  },
+  {
+    "id": "hatch_tiles_ht1084et",
+    "name": "250x200mm 4mm",
+    "codeName": "HT1084ET",
+    "category": "Tiles",
+    "icon": "https://storage.googleapis.com/lispcentral.firebasestorage.app/icons%2Fhatch%2Fhatch_tiles_ht1084et.webp"
+  },
+  {
+    "id": "hatch_tiles_ht1085et",
+    "name": "250x200mm 5mm",
+    "codeName": "HT1085ET",
+    "category": "Tiles",
+    "icon": "https://storage.googleapis.com/lispcentral.firebasestorage.app/icons%2Fhatch%2Fhatch_tiles_ht1085et.webp"
+  },
+  {
+    "id": "hatch_tiles_ht1251et",
+    "name": "125mm 1.0mm",
+    "codeName": "HT1251ET",
+    "category": "Tiles",
+    "icon": "https://storage.googleapis.com/lispcentral.firebasestorage.app/icons%2Fhatch%2Fhatch_tiles_ht1251et.webp"
+  },
+  {
+    "id": "hatch_tiles_ht1252et",
+    "name": "125mm 2.0mm",
+    "codeName": "HT1252ET",
+    "category": "Tiles",
+    "icon": "https://storage.googleapis.com/lispcentral.firebasestorage.app/icons%2Fhatch%2Fhatch_tiles_ht1252et.webp"
+  },
+  {
+    "id": "hatch_tiles_ht1253et",
+    "name": "125mm 3.0mm",
+    "codeName": "HT1253ET",
+    "category": "Tiles",
+    "icon": "https://storage.googleapis.com/lispcentral.firebasestorage.app/icons%2Fhatch%2Fhatch_tiles_ht1253et.webp"
+  },
+  {
+    "id": "hatch_tiles_ht1254et",
+    "name": "125mm 4.0mm",
+    "codeName": "HT1254ET",
+    "category": "Tiles",
+    "icon": "https://storage.googleapis.com/lispcentral.firebasestorage.app/icons%2Fhatch%2Fhatch_tiles_ht1254et.webp"
+  },
+  {
+    "id": "hatch_tiles_ht1259et",
+    "name": "125mm 1.5mm",
+    "codeName": "HT1259ET",
+    "category": "Tiles",
+    "icon": "https://storage.googleapis.com/lispcentral.firebasestorage.app/icons%2Fhatch%2Fhatch_tiles_ht1259et.webp"
+  },
+  {
+    "id": "hatch_tiles_ht1501et",
+    "name": "150mm 1.0mm",
+    "codeName": "HT1501ET",
+    "category": "Tiles",
+    "icon": "https://storage.googleapis.com/lispcentral.firebasestorage.app/icons%2Fhatch%2Fhatch_tiles_ht1501et.webp"
+  },
+  {
+    "id": "hatch_tiles_ht1502et",
+    "name": "150mm 2.0mm",
+    "codeName": "HT1502ET",
+    "category": "Tiles",
+    "icon": "https://storage.googleapis.com/lispcentral.firebasestorage.app/icons%2Fhatch%2Fhatch_tiles_ht1502et.webp"
+  },
+  {
+    "id": "hatch_tiles_ht1503et",
+    "name": "150mm 3.0mm",
+    "codeName": "HT1503ET",
+    "category": "Tiles",
+    "icon": "https://storage.googleapis.com/lispcentral.firebasestorage.app/icons%2Fhatch%2Fhatch_tiles_ht1503et.webp"
+  },
+  {
+    "id": "hatch_tiles_ht1504et",
+    "name": "150mm 4.0mm",
+    "codeName": "HT1504ET",
+    "category": "Tiles",
+    "icon": "https://storage.googleapis.com/lispcentral.firebasestorage.app/icons%2Fhatch%2Fhatch_tiles_ht1504et.webp"
+  },
+  {
+    "id": "hatch_tiles_ht1509et",
+    "name": "150mm 1.5mm",
+    "codeName": "HT1509ET",
+    "category": "Tiles",
+    "icon": "https://storage.googleapis.com/lispcentral.firebasestorage.app/icons%2Fhatch%2Fhatch_tiles_ht1509et.webp"
+  },
+  {
+    "id": "hatch_tiles_ht2000et",
+    "name": "200mm 0.0mm",
+    "codeName": "HT2000ET",
+    "category": "Tiles",
+    "icon": "https://storage.googleapis.com/lispcentral.firebasestorage.app/icons%2Fhatch%2Fhatch_tiles_ht2000et.webp"
+  },
+  {
+    "id": "hatch_tiles_ht2001et",
+    "name": "200mm 1.0mm",
+    "codeName": "HT2001ET",
+    "category": "Tiles",
+    "icon": "https://storage.googleapis.com/lispcentral.firebasestorage.app/icons%2Fhatch%2Fhatch_tiles_ht2001et.webp"
+  },
+  {
+    "id": "hatch_tiles_ht2002et",
+    "name": "200mm 2.0mm",
+    "codeName": "HT2002ET",
+    "category": "Tiles",
+    "icon": "https://storage.googleapis.com/lispcentral.firebasestorage.app/icons%2Fhatch%2Fhatch_tiles_ht2002et.webp"
+  },
+  {
+    "id": "hatch_tiles_ht2003et",
+    "name": "200mm 3.0mm",
+    "codeName": "HT2003ET",
+    "category": "Tiles",
+    "icon": "https://storage.googleapis.com/lispcentral.firebasestorage.app/icons%2Fhatch%2Fhatch_tiles_ht2003et.webp"
+  },
+  {
+    "id": "hatch_tiles_ht2004et",
+    "name": "200mm 4.0mm",
+    "codeName": "HT2004ET",
+    "category": "Tiles",
+    "icon": "https://storage.googleapis.com/lispcentral.firebasestorage.app/icons%2Fhatch%2Fhatch_tiles_ht2004et.webp"
+  },
+  {
+    "id": "hatch_tiles_ht3001et",
+    "name": ";",
+    "codeName": "HT3001ET",
+    "category": "Tiles",
+    "icon": "https://storage.googleapis.com/lispcentral.firebasestorage.app/icons%2Fhatch%2Fhatch_tiles_ht3001et.webp"
+  },
+  {
+    "id": "hatch_tiles_ht3002et",
+    "name": ";",
+    "codeName": "HT3002ET",
+    "category": "Tiles",
+    "icon": "https://storage.googleapis.com/lispcentral.firebasestorage.app/icons%2Fhatch%2Fhatch_tiles_ht3002et.webp"
+  },
+  {
+    "id": "hatch_tiles_ht3003et",
+    "name": ";",
+    "codeName": "HT3003ET",
+    "category": "Tiles",
+    "icon": "https://storage.googleapis.com/lispcentral.firebasestorage.app/icons%2Fhatch%2Fhatch_tiles_ht3003et.webp"
+  },
+  {
+    "id": "hatch_tiles_ht3004et",
+    "name": ";",
+    "codeName": "HT3004ET",
+    "category": "Tiles",
+    "icon": "https://storage.googleapis.com/lispcentral.firebasestorage.app/icons%2Fhatch%2Fhatch_tiles_ht3004et.webp"
+  },
+  {
+    "id": "hatch_tiles_ht3005et",
+    "name": ";",
+    "codeName": "HT3005ET",
+    "category": "Tiles",
+    "icon": "https://storage.googleapis.com/lispcentral.firebasestorage.app/icons%2Fhatch%2Fhatch_tiles_ht3005et.webp"
+  },
+  {
+    "id": "hatch_tiles_ht3006et",
+    "name": ";",
+    "codeName": "HT3006ET",
+    "category": "Tiles",
+    "icon": "https://storage.googleapis.com/lispcentral.firebasestorage.app/icons%2Fhatch%2Fhatch_tiles_ht3006et.webp"
+  },
+  {
+    "id": "hatch_tiles_ht4001et",
+    "name": ";",
+    "codeName": "HT4001ET",
+    "category": "Tiles",
+    "icon": "https://storage.googleapis.com/lispcentral.firebasestorage.app/icons%2Fhatch%2Fhatch_tiles_ht4001et.webp"
+  },
+  {
+    "id": "hatch_tiles_ht4002et",
+    "name": ";",
+    "codeName": "HT4002ET",
+    "category": "Tiles",
+    "icon": "https://storage.googleapis.com/lispcentral.firebasestorage.app/icons%2Fhatch%2Fhatch_tiles_ht4002et.webp"
+  },
+  {
+    "id": "hatch_tiles_ht4003et",
+    "name": ";",
+    "codeName": "HT4003ET",
+    "category": "Tiles",
+    "icon": "https://storage.googleapis.com/lispcentral.firebasestorage.app/icons%2Fhatch%2Fhatch_tiles_ht4003et.webp"
+  },
+  {
+    "id": "hatch_tiles_ht4004et",
+    "name": ";",
+    "codeName": "HT4004ET",
+    "category": "Tiles",
+    "icon": "https://storage.googleapis.com/lispcentral.firebasestorage.app/icons%2Fhatch%2Fhatch_tiles_ht4004et.webp"
+  },
+  {
+    "id": "hatch_tiles_ht4005et",
+    "name": ";",
+    "codeName": "HT4005ET",
+    "category": "Tiles",
+    "icon": "https://storage.googleapis.com/lispcentral.firebasestorage.app/icons%2Fhatch%2Fhatch_tiles_ht4005et.webp"
+  },
+  {
+    "id": "hatch_tiles_ht4006et",
+    "name": ";",
+    "codeName": "HT4006ET",
+    "category": "Tiles",
+    "icon": "https://storage.googleapis.com/lispcentral.firebasestorage.app/icons%2Fhatch%2Fhatch_tiles_ht4006et.webp"
+  },
+  {
+    "id": "hatch_tiles_ht4007et",
+    "name": ";",
+    "codeName": "HT4007ET",
+    "category": "Tiles",
+    "icon": "https://storage.googleapis.com/lispcentral.firebasestorage.app/icons%2Fhatch%2Fhatch_tiles_ht4007et.webp"
+  },
+  {
+    "id": "hatch_tiles_ht4008et",
+    "name": ";",
+    "codeName": "HT4008ET",
+    "category": "Tiles",
+    "icon": "https://storage.googleapis.com/lispcentral.firebasestorage.app/icons%2Fhatch%2Fhatch_tiles_ht4008et.webp"
+  },
+  {
+    "id": "hatch_tiles_ht4009et",
+    "name": ";",
+    "codeName": "HT4009ET",
+    "category": "Tiles",
+    "icon": "https://storage.googleapis.com/lispcentral.firebasestorage.app/icons%2Fhatch%2Fhatch_tiles_ht4009et.webp"
+  },
+  {
+    "id": "hatch_tiles_ht4x80et",
+    "name": "100x200mm 0mm",
+    "codeName": "HT4x80ET",
+    "category": "Tiles",
+    "icon": "https://storage.googleapis.com/lispcentral.firebasestorage.app/icons%2Fhatch%2Fhatch_tiles_ht4x80et.webp"
+  },
+  {
+    "id": "hatch_tiles_ht4x81et",
+    "name": "100x200mm 1mm",
+    "codeName": "HT4x81ET",
+    "category": "Tiles",
+    "icon": "https://storage.googleapis.com/lispcentral.firebasestorage.app/icons%2Fhatch%2Fhatch_tiles_ht4x81et.webp"
+  },
+  {
+    "id": "hatch_tiles_ht4x82et",
+    "name": "100x200mm 2mm",
+    "codeName": "HT4x82ET",
+    "category": "Tiles",
+    "icon": "https://storage.googleapis.com/lispcentral.firebasestorage.app/icons%2Fhatch%2Fhatch_tiles_ht4x82et.webp"
+  },
+  {
+    "id": "hatch_tiles_ht4x83et",
+    "name": "100x200mm 3mm",
+    "codeName": "HT4x83ET",
+    "category": "Tiles",
+    "icon": "https://storage.googleapis.com/lispcentral.firebasestorage.app/icons%2Fhatch%2Fhatch_tiles_ht4x83et.webp"
+  },
+  {
+    "id": "hatch_tiles_ht4x84et",
+    "name": "100x200mm 4mm",
+    "codeName": "HT4x84ET",
+    "category": "Tiles",
+    "icon": "https://storage.googleapis.com/lispcentral.firebasestorage.app/icons%2Fhatch%2Fhatch_tiles_ht4x84et.webp"
+  },
+  {
+    "id": "hatch_tiles_ht6001et",
+    "name": ";",
+    "codeName": "HT6001ET",
+    "category": "Tiles",
+    "icon": "https://storage.googleapis.com/lispcentral.firebasestorage.app/icons%2Fhatch%2Fhatch_tiles_ht6001et.webp"
+  },
+  {
+    "id": "hatch_tiles_ht6002et",
+    "name": ";",
+    "codeName": "HT6002ET",
+    "category": "Tiles",
+    "icon": "https://storage.googleapis.com/lispcentral.firebasestorage.app/icons%2Fhatch%2Fhatch_tiles_ht6002et.webp"
+  },
+  {
+    "id": "hatch_tiles_ht6003et",
+    "name": ";",
+    "codeName": "HT6003ET",
+    "category": "Tiles",
+    "icon": "https://storage.googleapis.com/lispcentral.firebasestorage.app/icons%2Fhatch%2Fhatch_tiles_ht6003et.webp"
+  },
+  {
+    "id": "hatch_tiles_ht6004et",
+    "name": ";",
+    "codeName": "HT6004ET",
+    "category": "Tiles",
+    "icon": "https://storage.googleapis.com/lispcentral.firebasestorage.app/icons%2Fhatch%2Fhatch_tiles_ht6004et.webp"
+  },
+  {
+    "id": "hatch_tiles_ht6005et",
+    "name": ";",
+    "codeName": "HT6005ET",
+    "category": "Tiles",
+    "icon": "https://storage.googleapis.com/lispcentral.firebasestorage.app/icons%2Fhatch%2Fhatch_tiles_ht6005et.webp"
+  },
+  {
+    "id": "hatch_tiles_ht6006et",
+    "name": ";",
+    "codeName": "HT6006ET",
+    "category": "Tiles",
+    "icon": "https://storage.googleapis.com/lispcentral.firebasestorage.app/icons%2Fhatch%2Fhatch_tiles_ht6006et.webp"
+  },
+  {
+    "id": "hatch_tiles_ht600x3001et",
+    "name": "600x300mm 1mm",
+    "codeName": "HT600x3001ET",
+    "category": "Tiles",
+    "icon": "https://storage.googleapis.com/lispcentral.firebasestorage.app/icons%2Fhatch%2Fhatch_tiles_ht600x3001et.webp"
+  },
+  {
+    "id": "hatch_tiles_ht600x3002et",
+    "name": "600x300mm 2mm",
+    "codeName": "HT600x3002ET",
+    "category": "Tiles",
+    "icon": "https://storage.googleapis.com/lispcentral.firebasestorage.app/icons%2Fhatch%2Fhatch_tiles_ht600x3002et.webp"
+  },
+  {
+    "id": "hatch_tiles_ht600x3003et",
+    "name": "600x300mm 3mm",
+    "codeName": "HT600x3003ET",
+    "category": "Tiles",
+    "icon": "https://storage.googleapis.com/lispcentral.firebasestorage.app/icons%2Fhatch%2Fhatch_tiles_ht600x3003et.webp"
+  },
+  {
+    "id": "hatch_tiles_ht600x3004et",
+    "name": "600x300mm 4mm",
+    "codeName": "HT600x3004ET",
+    "category": "Tiles",
+    "icon": "https://storage.googleapis.com/lispcentral.firebasestorage.app/icons%2Fhatch%2Fhatch_tiles_ht600x3004et.webp"
+  },
+  {
+    "id": "hatch_tiles_ht600x3005et",
+    "name": "600x300mm 5mm",
+    "codeName": "HT600x3005ET",
+    "category": "Tiles",
+    "icon": "https://storage.googleapis.com/lispcentral.firebasestorage.app/icons%2Fhatch%2Fhatch_tiles_ht600x3005et.webp"
+  },
+  {
+    "id": "hatch_tiles_ht600x3006et",
+    "name": "600x300mm 6mm",
+    "codeName": "HT600x3006ET",
+    "category": "Tiles",
+    "icon": "https://storage.googleapis.com/lispcentral.firebasestorage.app/icons%2Fhatch%2Fhatch_tiles_ht600x3006et.webp"
+  },
+  {
+    "id": "hatch_tiles_ht8121et",
+    "name": "300x200mm 1mm",
+    "codeName": "HT8121ET",
+    "category": "Tiles",
+    "icon": "https://storage.googleapis.com/lispcentral.firebasestorage.app/icons%2Fhatch%2Fhatch_tiles_ht8121et.webp"
+  },
+  {
+    "id": "hatch_tiles_ht8122et",
+    "name": "300x200mm 2mm",
+    "codeName": "HT8122ET",
+    "category": "Tiles",
+    "icon": "https://storage.googleapis.com/lispcentral.firebasestorage.app/icons%2Fhatch%2Fhatch_tiles_ht8122et.webp"
+  },
+  {
+    "id": "hatch_tiles_ht8123et",
+    "name": "300x200mm 3mm",
+    "codeName": "HT8123ET",
+    "category": "Tiles",
+    "icon": "https://storage.googleapis.com/lispcentral.firebasestorage.app/icons%2Fhatch%2Fhatch_tiles_ht8123et.webp"
+  },
+  {
+    "id": "hatch_tiles_ht8124et",
+    "name": "300x200mm 4mm",
+    "codeName": "HT8124ET",
+    "category": "Tiles",
+    "icon": "https://storage.googleapis.com/lispcentral.firebasestorage.app/icons%2Fhatch%2Fhatch_tiles_ht8124et.webp"
+  },
+  {
+    "id": "hatch_tiles_ht8125et",
+    "name": "300x200mm 5mm",
+    "codeName": "HT8125ET",
+    "category": "Tiles",
+    "icon": "https://storage.googleapis.com/lispcentral.firebasestorage.app/icons%2Fhatch%2Fhatch_tiles_ht8125et.webp"
+  },
+  {
+    "id": "hatch_trees_htreec1s",
+    "name": "CONFIER www.cadhatch.com",
+    "codeName": "HTREEC1S",
+    "category": "Trees",
+    "icon": "https://storage.googleapis.com/lispcentral.firebasestorage.app/icons%2Fhatch%2Fhatch_trees_htreec1s.webp"
+  },
+  {
+    "id": "hatch_trees_htreecps",
+    "name": "CONIFERS WWW.CADHATCH.COM",
+    "codeName": "HTREECPS",
+    "category": "Trees",
+    "icon": "https://storage.googleapis.com/lispcentral.firebasestorage.app/icons%2Fhatch%2Fhatch_trees_htreecps.webp"
+  },
+  {
+    "id": "hatch_trees_htreecrs",
+    "name": "CONFIFER WWW.CADHATCH.COM",
+    "codeName": "HTREECRS",
+    "category": "Trees",
+    "icon": "https://storage.googleapis.com/lispcentral.firebasestorage.app/icons%2Fhatch%2Fhatch_trees_htreecrs.webp"
+  },
+  {
+    "id": "hatch_trees_htreed1s",
+    "name": "TREES www.cadhatch.com",
+    "codeName": "HTREED1S",
+    "category": "Trees",
+    "icon": "https://storage.googleapis.com/lispcentral.firebasestorage.app/icons%2Fhatch%2Fhatch_trees_htreed1s.webp"
+  },
+  {
+    "id": "hatch_trees_htreedcs",
+    "name": "DECIDUOUS CONFIFER WWW.CADHATCH.COM",
+    "codeName": "HTREEDCS",
+    "category": "Trees",
+    "icon": "https://storage.googleapis.com/lispcentral.firebasestorage.app/icons%2Fhatch%2Fhatch_trees_htreedcs.webp"
+  },
+  {
+    "id": "hatch_trees_htreep1s",
+    "name": "TREE2 www.cadhatch.com",
+    "codeName": "HTREEP1S",
+    "category": "Trees",
+    "icon": "https://storage.googleapis.com/lispcentral.firebasestorage.app/icons%2Fhatch%2Fhatch_trees_htreep1s.webp"
+  },
+  {
+    "id": "hatch_vegetation_hvege100",
+    "name": "CadHatch.com",
+    "codeName": "HVEGE100",
+    "category": "Vegetation",
+    "icon": "https://storage.googleapis.com/lispcentral.firebasestorage.app/icons%2Fhatch%2Fhatch_vegetation_hvege100.webp"
+  },
+  {
+    "id": "hatch_vegetation_hvspr1e0",
+    "name": "HVSPR1E0",
+    "codeName": "HVSPR1E0",
+    "category": "Vegetation",
+    "icon": "https://storage.googleapis.com/lispcentral.firebasestorage.app/icons%2Fhatch%2Fhatch_vegetation_hvspr1e0.webp"
+  },
+  {
+    "id": "hatch_vegetation_hvspr1e1",
+    "name": "HVSPR1E1",
+    "codeName": "HVSPR1E1",
+    "category": "Vegetation",
+    "icon": "https://storage.googleapis.com/lispcentral.firebasestorage.app/icons%2Fhatch%2Fhatch_vegetation_hvspr1e1.webp"
+  },
+  {
+    "id": "hatch_vegetation_hvspr1e2",
+    "name": "HVSPR1E2",
+    "codeName": "HVSPR1E2",
+    "category": "Vegetation",
+    "icon": "https://storage.googleapis.com/lispcentral.firebasestorage.app/icons%2Fhatch%2Fhatch_vegetation_hvspr1e2.webp"
+  },
+  {
+    "id": "hatch_vegetation_hvspr1e3",
+    "name": "HVSPR1E3",
+    "codeName": "HVSPR1E3",
+    "category": "Vegetation",
+    "icon": "https://storage.googleapis.com/lispcentral.firebasestorage.app/icons%2Fhatch%2Fhatch_vegetation_hvspr1e3.webp"
+  },
+  {
+    "id": "hatch_vegetation_hvspr1e4",
+    "name": "HVSPR1E4",
+    "codeName": "HVSPR1E4",
+    "category": "Vegetation",
+    "icon": "https://storage.googleapis.com/lispcentral.firebasestorage.app/icons%2Fhatch%2Fhatch_vegetation_hvspr1e4.webp"
+  },
+  {
+    "id": "hatch_vegetation_hvspr1e5",
+    "name": "HVSPR1E5",
+    "codeName": "HVSPR1E5",
+    "category": "Vegetation",
+    "icon": "https://storage.googleapis.com/lispcentral.firebasestorage.app/icons%2Fhatch%2Fhatch_vegetation_hvspr1e5.webp"
+  },
+  {
+    "id": "hatch_vegetation_hvspr1e6",
+    "name": "HVSPR1E6",
+    "codeName": "HVSPR1E6",
+    "category": "Vegetation",
+    "icon": "https://storage.googleapis.com/lispcentral.firebasestorage.app/icons%2Fhatch%2Fhatch_vegetation_hvspr1e6.webp"
+  },
+  {
+    "id": "hatch_vegetation_hvspr1e7",
+    "name": "HVSPR1E7",
+    "codeName": "HVSPR1E7",
+    "category": "Vegetation",
+    "icon": "https://storage.googleapis.com/lispcentral.firebasestorage.app/icons%2Fhatch%2Fhatch_vegetation_hvspr1e7.webp"
+  },
+  {
+    "id": "hatch_wood_hwdln1e1",
+    "name": ";",
+    "codeName": "HWDLN1E1",
+    "category": "Wood",
+    "icon": "https://storage.googleapis.com/lispcentral.firebasestorage.app/icons%2Fhatch%2Fhatch_wood_hwdln1e1.webp"
+  },
+  {
+    "id": "hatch_wood_hwdln2e1",
+    "name": ";",
+    "codeName": "HWDLN2E1",
+    "category": "Wood",
+    "icon": "https://storage.googleapis.com/lispcentral.firebasestorage.app/icons%2Fhatch%2Fhatch_wood_hwdln2e1.webp"
+  },
+  {
+    "id": "hatch_wood_hwdln3e1",
+    "name": ";",
+    "codeName": "HWDLN3E1",
+    "category": "Wood",
+    "icon": "https://storage.googleapis.com/lispcentral.firebasestorage.app/icons%2Fhatch%2Fhatch_wood_hwdln3e1.webp"
+  },
+  {
+    "id": "hatch_wood_hwend1n0",
+    "name": "HWEND1N0",
+    "codeName": "HWEND1N0",
+    "category": "Wood",
+    "icon": "https://storage.googleapis.com/lispcentral.firebasestorage.app/icons%2Fhatch%2Fhatch_wood_hwend1n0.webp"
+  },
+  {
+    "id": "hatch_wood_hwend2n0",
+    "name": "HWEND2N0",
+    "codeName": "HWEND2N0",
+    "category": "Wood",
+    "icon": "https://storage.googleapis.com/lispcentral.firebasestorage.app/icons%2Fhatch%2Fhatch_wood_hwend2n0.webp"
+  },
+  {
+    "id": "hatch_wood_hwend3n0",
+    "name": "HWEND3N0",
+    "codeName": "HWEND3N0",
+    "category": "Wood",
+    "icon": "https://storage.googleapis.com/lispcentral.firebasestorage.app/icons%2Fhatch%2Fhatch_wood_hwend3n0.webp"
+  },
+  {
+    "id": "hatch_wood_hwend4n0",
+    "name": ";",
+    "codeName": "HWEND4N0",
+    "category": "Wood",
+    "icon": "https://storage.googleapis.com/lispcentral.firebasestorage.app/icons%2Fhatch%2Fhatch_wood_hwend4n0.webp"
+  },
+  {
+    "id": "hatch_wood_hwend5n0",
+    "name": ";",
+    "codeName": "HWEND5N0",
+    "category": "Wood",
+    "icon": "https://storage.googleapis.com/lispcentral.firebasestorage.app/icons%2Fhatch%2Fhatch_wood_hwend5n0.webp"
+  },
+  {
+    "id": "hatch_wood_hwend6n0",
+    "name": ";",
+    "codeName": "HWEND6N0",
+    "category": "Wood",
+    "icon": "https://storage.googleapis.com/lispcentral.firebasestorage.app/icons%2Fhatch%2Fhatch_wood_hwend6n0.webp"
+  },
+  {
+    "id": "hatch_wood_hwend7n0",
+    "name": ";",
+    "codeName": "HWEND7N0",
+    "category": "Wood",
+    "icon": "https://storage.googleapis.com/lispcentral.firebasestorage.app/icons%2Fhatch%2Fhatch_wood_hwend7n0.webp"
+  },
+  {
+    "id": "hatch_wood_hwend8n0",
+    "name": ";",
+    "codeName": "HWEND8N0",
+    "category": "Wood",
+    "icon": "https://storage.googleapis.com/lispcentral.firebasestorage.app/icons%2Fhatch%2Fhatch_wood_hwend8n0.webp"
+  },
+  {
+    "id": "hatch_wood_hwod10e1",
+    "name": ";",
+    "codeName": "HWOD10E1",
+    "category": "Wood",
+    "icon": "https://storage.googleapis.com/lispcentral.firebasestorage.app/icons%2Fhatch%2Fhatch_wood_hwod10e1.webp"
+  },
+  {
+    "id": "hatch_wood_hwod20e1",
+    "name": ";",
+    "codeName": "HWOD20E1",
+    "category": "Wood",
+    "icon": "https://storage.googleapis.com/lispcentral.firebasestorage.app/icons%2Fhatch%2Fhatch_wood_hwod20e1.webp"
+  },
+  {
+    "id": "hatch_wood_hwod30e1",
+    "name": ";",
+    "codeName": "HWOD30E1",
+    "category": "Wood",
+    "icon": "https://storage.googleapis.com/lispcentral.firebasestorage.app/icons%2Fhatch%2Fhatch_wood_hwod30e1.webp"
+  },
+  {
+    "id": "hatch_wood_hwod40e1",
+    "name": ";",
+    "codeName": "HWOD40E1",
+    "category": "Wood",
+    "icon": "https://storage.googleapis.com/lispcentral.firebasestorage.app/icons%2Fhatch%2Fhatch_wood_hwod40e1.webp"
+  },
+  {
+    "id": "hatch_wood_hwood1e1",
+    "name": "HWOOD1E1",
+    "codeName": "HWOOD1E1",
+    "category": "Wood",
+    "icon": "https://storage.googleapis.com/lispcentral.firebasestorage.app/icons%2Fhatch%2Fhatch_wood_hwood1e1.webp"
+  },
+  {
+    "id": "hatch_wood_hwood2e1",
+    "name": "HWOOD2E1",
+    "codeName": "HWOOD2E1",
+    "category": "Wood",
+    "icon": "https://storage.googleapis.com/lispcentral.firebasestorage.app/icons%2Fhatch%2Fhatch_wood_hwood2e1.webp"
+  },
+  {
+    "id": "hatch_wood_hwood3e1",
+    "name": "HWOOD3E1",
+    "codeName": "HWOOD3E1",
+    "category": "Wood",
+    "icon": "https://storage.googleapis.com/lispcentral.firebasestorage.app/icons%2Fhatch%2Fhatch_wood_hwood3e1.webp"
+  },
+  {
+    "id": "hatch_wood_hwood4e1",
+    "name": "HWOOD4E1",
+    "codeName": "HWOOD4E1",
+    "category": "Wood",
+    "icon": "https://storage.googleapis.com/lispcentral.firebasestorage.app/icons%2Fhatch%2Fhatch_wood_hwood4e1.webp"
+  },
+  {
+    "id": "hatch_wood_hwood5e1",
+    "name": "HWOOD5E1",
+    "codeName": "HWOOD5E1",
+    "category": "Wood",
+    "icon": "https://storage.googleapis.com/lispcentral.firebasestorage.app/icons%2Fhatch%2Fhatch_wood_hwood5e1.webp"
+  },
+  {
+    "id": "hatch_wood_hwood6e1",
+    "name": "HWOOD6E1",
+    "codeName": "HWOOD6E1",
+    "category": "Wood",
+    "icon": "https://storage.googleapis.com/lispcentral.firebasestorage.app/icons%2Fhatch%2Fhatch_wood_hwood6e1.webp"
+  },
+  {
+    "id": "hatch_wood_hwood7e1",
+    "name": "HWOOD7E1",
+    "codeName": "HWOOD7E1",
+    "category": "Wood",
+    "icon": "https://storage.googleapis.com/lispcentral.firebasestorage.app/icons%2Fhatch%2Fhatch_wood_hwood7e1.webp"
+  },
+  {
+    "id": "hatch_wood_hwood8e1",
+    "name": "HWOOD8E1",
+    "codeName": "HWOOD8E1",
+    "category": "Wood",
+    "icon": "https://storage.googleapis.com/lispcentral.firebasestorage.app/icons%2Fhatch%2Fhatch_wood_hwood8e1.webp"
+  },
+  {
+    "id": "hatch_wood_hwood9e1",
+    "name": "HWOOD9E1",
+    "codeName": "HWOOD9E1",
+    "category": "Wood",
+    "icon": "https://storage.googleapis.com/lispcentral.firebasestorage.app/icons%2Fhatch%2Fhatch_wood_hwood9e1.webp"
+  },
+  {
+    "id": "hatch_wood_hwply3e1",
+    "name": "HWPLY3E1",
+    "codeName": "HWPLY3E1",
+    "category": "Wood",
+    "icon": "https://storage.googleapis.com/lispcentral.firebasestorage.app/icons%2Fhatch%2Fhatch_wood_hwply3e1.webp"
+  }
+]

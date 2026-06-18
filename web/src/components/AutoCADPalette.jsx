@@ -1,100 +1,147 @@
-import React, { useState, useEffect } from 'react';
-import { getUserFavorites } from '../utils/library';
-import HatchPreview from './tools/HatchPreview';
-import LinetypePreview from './tools/LinetypePreview';
+import React from 'react';
 
-const SvgPreview = ({ svgString }) => (
-  <div 
-    style={{ width: '100%', height: '80px', backgroundColor: 'rgba(0,0,0,0.2)', borderRadius: '6px', display: 'flex', justifyContent: 'center', alignItems: 'center' }}
-    dangerouslySetInnerHTML={{ __html: svgString }} 
-  />
-);
-
+/**
+ * AutoCADPalette — Inspector BIM (Próxima versión)
+ * 
+ * Esta paleta substituirá los diálogos DCL de AutoLISP por una interfaz moderna,
+ * y permitirá convertir objetos CAD nativos en elementos BIM inteligentes
+ * con propiedades, materiales y quantitativos gestionables directamente desde la paleta.
+ * 
+ * Estado: EM DESENVOLVIMENTO
+ */
 export default function AutoCADPalette() {
-  const [activeTab, setActiveTab] = useState('hatch');
-  const [favorites, setFavorites] = useState([]);
-  const [loading, setLoading] = useState(true);
-
-  const fetchFavorites = async () => {
-    setLoading(true);
-    try {
-      const data = await getUserFavorites(activeTab);
-      setFavorites(data);
-    } catch (error) {
-      console.error("Error fetching favorites:", error);
-    }
-    setLoading(false);
-  };
-
-  useEffect(() => {
-    fetchFavorites();
-  }, [activeTab]);
-
-  const handleApply = (item) => {
-    // Comunicar con AutoCAD a traves de window.external
-    if (window.external && typeof window.external.ExecuteAutoCADCommand === 'function') {
-      // Codificamos en Base64 para evitar problemas con las comillas y saltos de linea en AutoLISP
-      const codeB64 = btoa(item.code);
-      const name = item.name ? item.name.replace(/[^a-zA-Z0-9_-]/g, '') : 'LC_ASSET';
-      
-      const lispCommand = `(LC_ApplyAsset "${item.type}" "${name}" "${codeB64}")\n`;
-      window.external.ExecuteAutoCADCommand(lispCommand);
-    } else {
-      console.warn("[LC] Funcao disponivel apenas na Paleta do AutoCAD.");
-    }
-  };
-
   return (
-    <div style={{ backgroundColor: '#181818', color: '#fff', minHeight: '100vh', padding: '10px' }}>
-      <div style={{ display: 'flex', gap: '5px', marginBottom: '15px', borderBottom: '1px solid #333', paddingBottom: '10px' }}>
-        <button 
-          onClick={() => setActiveTab('hatch')}
-          style={{ flex: 1, padding: '8px', backgroundColor: activeTab === 'hatch' ? 'var(--tmd-orange)' : '#222', color: '#fff', border: 'none', borderRadius: '4px', cursor: 'pointer', fontSize: '0.8rem' }}
-        >
-          Hatch
-        </button>
-        <button 
-          onClick={() => setActiveTab('lin')}
-          style={{ flex: 1, padding: '8px', backgroundColor: activeTab === 'lin' ? 'var(--tmd-orange)' : '#222', color: '#fff', border: 'none', borderRadius: '4px', cursor: 'pointer', fontSize: '0.8rem' }}
-        >
-          Lineas
-        </button>
-        <button 
-          onClick={() => setActiveTab('icon')}
-          style={{ flex: 1, padding: '8px', backgroundColor: activeTab === 'icon' ? 'var(--tmd-orange)' : '#222', color: '#fff', border: 'none', borderRadius: '4px', cursor: 'pointer', fontSize: '0.8rem' }}
-        >
-          Icons
-        </button>
+    <div style={{
+      backgroundColor: '#181818',
+      color: '#fff',
+      minHeight: '100vh',
+      fontFamily: "'Inter', sans-serif",
+      display: 'flex',
+      flexDirection: 'column',
+      alignItems: 'center',
+      justifyContent: 'center',
+      padding: '30px 20px',
+      textAlign: 'center',
+    }}>
+
+      {/* Ícone animado */}
+      <div style={{
+        width: '72px',
+        height: '72px',
+        marginBottom: '24px',
+        position: 'relative',
+      }}>
+        <svg viewBox="0 0 72 72" fill="none" xmlns="http://www.w3.org/2000/svg">
+          {/* Cubo BIM */}
+          <path d="M36 8L62 22V50L36 64L10 50V22L36 8Z"
+            stroke="rgba(242,109,33,0.3)" strokeWidth="1.5" fill="none" />
+          <path d="M36 8L62 22V50L36 64L10 50V22L36 8Z"
+            stroke="var(--tmd-orange, #f26d21)" strokeWidth="1.5" fill="none"
+            strokeDasharray="120" strokeDashoffset="120"
+            style={{ animation: 'draw 2s ease forwards' }} />
+          {/* Líneas internas */}
+          <line x1="36" y1="8" x2="36" y2="36" stroke="rgba(242,109,33,0.4)" strokeWidth="1" />
+          <line x1="10" y1="22" x2="36" y2="36" stroke="rgba(242,109,33,0.4)" strokeWidth="1" />
+          <line x1="62" y1="22" x2="36" y2="36" stroke="rgba(242,109,33,0.4)" strokeWidth="1" />
+          {/* Punto central */}
+          <circle cx="36" cy="36" r="3" fill="var(--tmd-orange, #f26d21)" opacity="0.8" />
+        </svg>
       </div>
 
-      {loading ? (
-        <p style={{ textAlign: 'center', color: '#777', fontSize: '0.9rem' }}>Cargando paleta...</p>
-      ) : favorites.length === 0 ? (
-        <div style={{ textAlign: 'center', padding: '20px' }}>
-          <p style={{ color: 'var(--text-muted)', fontSize: '0.85rem' }}>No hay favoritos en esta categoria.</p>
-        </div>
-      ) : (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
-          {favorites.map(item => (
-            <div key={item.id} style={{ backgroundColor: '#222', padding: '10px', borderRadius: '6px', border: '1px solid #333' }}>
-              <strong style={{ color: 'var(--tmd-orange)', fontSize: '0.9rem', marginBottom: '5px', display: 'block' }}>{item.name}</strong>
-              
-              <div style={{ marginBottom: '10px' }}>
-                {activeTab === 'hatch' && <HatchPreview patCode={item.code} scale={0.5} />}
-                {activeTab === 'lin' && <LinetypePreview linCode={item.code} scale={0.5} />}
-                {activeTab === 'icon' && <SvgPreview svgString={item.svgCode || item.code} />}
-              </div>
-              
-              <button 
-                onClick={() => handleApply(item)}
-                style={{ width: '100%', padding: '8px', backgroundColor: 'var(--tmd-orange)', color: '#fff', border: 'none', borderRadius: '4px', cursor: 'pointer', fontWeight: 'bold', fontSize: '0.85rem' }}
-              >
-                Insertar en AutoCAD
-              </button>
-            </div>
-          ))}
-        </div>
-      )}
+      {/* Título */}
+      <h2 style={{
+        fontSize: '1.1rem',
+        fontWeight: 'bold',
+        color: '#fff',
+        margin: '0 0 8px 0',
+        letterSpacing: '0.5px',
+      }}>
+        Inspector BIM
+      </h2>
+
+      {/* Badge */}
+      <div style={{
+        display: 'inline-flex',
+        alignItems: 'center',
+        gap: '6px',
+        backgroundColor: 'rgba(242,109,33,0.1)',
+        border: '1px solid rgba(242,109,33,0.35)',
+        borderRadius: '20px',
+        padding: '4px 12px',
+        marginBottom: '20px',
+      }}>
+        <span style={{
+          width: '6px',
+          height: '6px',
+          borderRadius: '50%',
+          backgroundColor: 'var(--tmd-orange, #f26d21)',
+          animation: 'pulse 1.5s ease-in-out infinite',
+          flexShrink: 0,
+        }} />
+        <span style={{
+          fontSize: '0.65rem',
+          fontWeight: 'bold',
+          color: 'var(--tmd-orange, #f26d21)',
+          textTransform: 'uppercase',
+          letterSpacing: '1px',
+        }}>
+          Em Desenvolvimento
+        </span>
+      </div>
+
+      {/* Descripción */}
+      <p style={{
+        fontSize: '0.8rem',
+        color: '#888',
+        lineHeight: '1.6',
+        maxWidth: '260px',
+        margin: '0 0 24px 0',
+      }}>
+        Converta objetos CAD nativos em elementos BIM inteligentes. Gerencie
+        propriedades, materiais e quantitativos direto na paleta — sem sair do AutoCAD.
+      </p>
+
+      {/* Lista de features próximas */}
+      <div style={{
+        width: '100%',
+        maxWidth: '280px',
+        display: 'flex',
+        flexDirection: 'column',
+        gap: '8px',
+      }}>
+        {[
+          { icon: '🏗️', label: 'Converter CAD → BIM' },
+          { icon: '📐', label: 'Propriedades paramétricas' },
+          { icon: '🧱', label: 'Gestão de materiais' },
+          { icon: '📊', label: 'Quantitativos automáticos' },
+          { icon: '🔗', label: 'Substituição de DCL por UI moderna' },
+        ].map(({ icon, label }) => (
+          <div key={label} style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: '10px',
+            backgroundColor: '#222',
+            border: '1px solid #2a2a2a',
+            borderRadius: '6px',
+            padding: '8px 12px',
+            textAlign: 'left',
+          }}>
+            <span style={{ fontSize: '0.85rem' }}>{icon}</span>
+            <span style={{ fontSize: '0.75rem', color: '#aaa' }}>{label}</span>
+          </div>
+        ))}
+      </div>
+
+      <style>{`
+        :root { --tmd-orange: #f26d21; }
+        @keyframes pulse {
+          0%, 100% { opacity: 1; }
+          50% { opacity: 0.3; }
+        }
+        @keyframes draw {
+          to { stroke-dashoffset: 0; }
+        }
+      `}</style>
     </div>
   );
 }

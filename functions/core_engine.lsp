@@ -253,42 +253,110 @@
   result
 )
 
-;; Temporarily write the resource to %TEMP%
-(defun LC_ApplyHatch (patName codeB64 / tmpDir tmpFile f decoded) 
-  (setq tmpDir (getenv "TEMP"))
-  (setq tmpFile (strcat tmpDir "\\LC_" patName ".pat"))
-  (setq decoded (LC:b64-decode codeB64))
-  (setq f (open tmpFile "w"))
-  (if f 
-    (progn 
-      (write-line (strcat "*" patName ", LispCentral Cloud Resource") f)
-      (write-line decoded f)
-      (close f)
-      (setvar "HPNAME" patName)
-      (setenv "ACAD" (strcat (getenv "ACAD") ";" tmpDir))
-      (princ (strcat "\n[LispCentral] Hatch '" patName "' is now available. Use the HATCH command to apply."))
+;; Cache de sesión para assets descargados (evita re-descarga en la misma sesión)
+(if (not *LC-ASSET-CACHE*) (setq *LC-ASSET-CACHE* nil))
+
+;; Ghost Command: LC_APPLY_ASSET
+;; Disparado por el ResourcePalette via executeCommandAsync.
+;; Los datos (*LC-ASSET-TYPE*, *LC-ASSET-NAME*, *LC-ASSET-CODE*) son
+;; inyectados previamente via evaluateLisp de forma silenciosa.
+;;
+;; Flujo JIT de 3 niveles:
+;;  Nivel 2 — cache de sesión RAM (*LC-ASSET-CACHE*)
+;;  Nivel 3 — código inyectado por JS (*LC-ASSET-CODE*)
+(defun c:LC_APPLY_ASSET (/ assetType assetName codeB64 cachedCode tmpDir tmpFile f decoded)
+  (setq assetType *LC-ASSET-TYPE*)
+  (setq assetName *LC-ASSET-NAME*)
+  (setq codeB64   *LC-ASSET-CODE*)
+
+  ;; Limpiar variables globales inmediatamente
+  (setq *LC-ASSET-TYPE* nil *LC-ASSET-NAME* nil *LC-ASSET-CODE* nil)
+
+  (if (not (and assetType assetName))
+    (progn
+      (princ "\n[LC] Selecione um padrão na paleta primeiro.")
+      (princ)
     )
-    (princ "\n[ERROR] Failed to create temporary hatch file in %TEMP%. Check your permissions.")
+    (progn
+      ;; Nivel 2: buscar en cache de sesión
+      (setq cachedCode (cdr (assoc assetName *LC-ASSET-CACHE*)))
+
+      ;; Nivel 3: usar el código inyectado por JS si no está en cache
+      (if (not cachedCode)
+        (progn
+          (if codeB64
+            (progn
+              (setq decoded (LC:b64-decode codeB64))
+              ;; Guardar en cache de sesión RAM (sin disco)
+              (setq *LC-ASSET-CACHE* (cons (cons assetName decoded) *LC-ASSET-CACHE*))
+              (setq cachedCode decoded)
+            )
+            (princ (strcat "\n[LC] Código do padrão '" assetName "' não encontrado."))
+          )
+        )
+      )
+
+      (if cachedCode
+        (progn
+          (setq tmpDir (strcat (getenv "TEMP") "\\LC_Assets"))
+          (vl-mkdir tmpDir)
+
+          (if (= assetType "hatch")
+            (progn
+              ;; Escrever .pat temporário e registrar no search path
+              (setq tmpFile (strcat tmpDir "\\" assetName ".pat"))
+              (setq f (open tmpFile "w"))
+              (if f
+                (progn
+                  (write-line (strcat "*" assetName ", LispCentral") f)
+                  (write-line cachedCode f)
+                  (close f)
+                  ;; Adicionar diretório temporário ao search path (se ainda não estiver)
+                  (if (not (vl-string-search tmpDir (getenv "ACAD")))
+                    (setenv "ACAD" (strcat (getenv "ACAD") ";" tmpDir))
+                  )
+                  (setvar "HPNAME" assetName)
+                  (princ (strcat "\n[LC] Hachura '" assetName "' disponível. Use o comando HATCH para aplicar."))
+                )
+                (princ "\n[LC][ERRO] Falha ao criar arquivo temporário. Verifique permissões do %TEMP%.")
+              )
+            )
+            ;; else: linetype
+            (progn
+              (setq tmpFile (strcat tmpDir "\\" assetName ".lin"))
+              (setq f (open tmpFile "w"))
+              (if f
+                (progn
+                  (write-line (strcat "*" assetName ", LispCentral") f)
+                  (write-line cachedCode f)
+                  (close f)
+                  (vl-cmdf "._-LINETYPE" "_Load" assetName tmpFile "")
+                  (princ (strcat "\n[LC] Tipo de linha '" assetName "' carregado com sucesso."))
+                )
+                (princ "\n[LC][ERRO] Falha ao criar arquivo temporário de linetype.")
+              )
+            )
+          )
+        )
+      )
+      (princ)
+    )
   )
-  (princ)
 )
 
-(defun LC_ApplyLinetype (linName codeB64 / tmpDir tmpFile f decoded) 
-  (setq tmpDir (getenv "TEMP"))
-  (setq tmpFile (strcat tmpDir "\\LC_" linName ".lin"))
-  (setq decoded (LC:b64-decode codeB64))
-  (setq f (open tmpFile "w"))
-  (if f 
-    (progn 
-      (write-line (strcat "*" linName ", LispCentral Cloud Resource") f)
-      (write-line decoded f)
-      (close f)
-      (vl-cmdf "._-LINETYPE" "_Load" linName tmpFile "")
-      (princ (strcat "\n[LispCentral] Linetype '" linName "' loaded successfully."))
-    )
-    (princ "\n[ERROR] Failed to create temporary linetype file in %TEMP%. Check your permissions.")
-  )
-  (princ)
+;; Aliases legacy (mantidos para compatibilidade com código antigo)
+(defun LC_ApplyHatch (patName codeB64)
+  (setq *LC-ASSET-TYPE* "hatch")
+  (setq *LC-ASSET-NAME* patName)
+  (setq *LC-ASSET-CODE* codeB64)
+  (c:LC_APPLY_ASSET)
+)
+
+(defun LC_ApplyLinetype (linName codeB64)
+  (setq *LC-ASSET-TYPE* "lin")
+  (setq *LC-ASSET-NAME* linName)
+  (setq *LC-ASSET-CODE* codeB64)
+  (c:LC_APPLY_ASSET)
 )
 
 ;; Reactor Callback

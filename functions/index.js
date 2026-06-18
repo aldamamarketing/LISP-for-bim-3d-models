@@ -31,7 +31,7 @@ function getDb() {
   return getAdmin().firestore();
 }
 
-exports.getRoutine = onRequest({ cors: true }, async (req, res) => {
+exports.getRoutine = onRequest({ cors: true, minInstances: 1 }, async (req, res) => {
   const { fs, path } = getDeps();
   // Soporte de compatibilidad y arquitectura SaaS: token/lispId (Nuevo) o apiKey/routine (Legacy)
   const rawToken = req.query.token || req.query.apiKey;

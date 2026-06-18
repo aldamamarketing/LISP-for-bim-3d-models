@@ -164,23 +164,54 @@ Para acelerar la creación de comandos en la plataforma B2B, se migró el stack 
 ---
 
 ## 📚 Ecosistema de Biblioteca Global y Paleta AutoCAD
-*El sistema ha evolucionado de "Generación Bajo Demanda" a un "Catálogo Global".*
+*El sistema ha evolucionado de "Generación Bajo Demanda" a un "Catálogo Curado Estático + JIT Load".*
 
-### 1. Curaduría por IA (English First)
-- Las Cloud Functions (Generadores de Hatch, Linetype e Iconos) utilizan la IA no solo para generar la matemática, sino como **Curador de Contenido**.
-- La IA está instruida obligatoriamente para devolver un **nombre, descripción y categoría EN INGLÉS**, garantizando la uniformidad y estandarización del catálogo global.
-- Los recursos se guardan directamente en la colección `publicAssets` de Firestore. Solo se almacena el código plano (`patCode`, `linCode`, `svgCode`), evitando el uso ineficiente de Storage (archivos físicos).
+### 1. Arquitectura de Datos del Catálogo (v2)
+- **Catálogo ligero (JSON estático en Hosting):** `web/public/api/hatch-catalog.json` y `lin-catalog.json`.
+  - Contiene solo: `id`, `name`, `desc`, `category`, `icon` (SVG string).
+  - **NUNCA** incluye el campo `code` (.pat/.lin) — protección de IP.
+  - Se genera con `node functions/scripts/buildHatchCatalog.mjs` y se sube via `firebase deploy --only hosting`.
+- **Código individual (Firestore JIT):** `publicAssets/{id}` con campo `code`.
+  - Se descarga bajo demanda **solo al insertar** en AutoCAD (1 read Firestore por uso).
+- **Cache de sesión (RAM LISP):** `*LC-ASSET-CACHE*` — lista asociativa en RAM. Evita re-descarga del mismo patrón en la misma sesión de AutoCAD.
+- **Cache cliente (localStorage TTL 1h):** El catálogo ligero se guarda localmente para aperturas posteriores de la paleta sin costo de red.
 
-### 2. Panel de Biblioteca (LibraryPanel)
-- Integrado de forma permanente en los generadores (Hatch, Lin, Icon).
-- El usuario puede alternar entre "Resultados IA" (si acaba de generar algo) y "Biblioteca Pública" (contenido curado por la comunidad/IA).
-- Permite filtrado semántico y categorización, además de ofrecer el botón "⭐ Añadir a Favoritos".
-- Muestra los detalles y descripciones de los recursos directamente en el cuadro de selección.
+### 2. JIT Loading de Assets (3 Niveles)
+Al hacer clic en "Insertar" en la ResourcePalette:
+1. **Nivel 1 — Dibujo:** ¿El patrón ya existe en el dibujo? Aplicar directo.
+2. **Nivel 2 — Sesión LISP:** ¿`(assoc nombre *LC-ASSET-CACHE*)` existe? Escribir temp y aplicar.
+3. **Nivel 3 — Cloud:** Fetch de `publicAssets/{id}` campo `code` → decodificar Base64 → registrar en `*LC-ASSET-CACHE*` → escribir temp y aplicar.
 
-### 3. Dashboard de Favoritos y Paleta Integrada
-- **/favorites**: Consola web que agrupa los recursos guardados por el usuario. Permite eliminar ("Apagar") o descargar dinámicamente los recursos.
-- **/palette**: Endpoint minimalista diseñado *exclusivamente* para ser cargado dentro de la paleta lateral de AutoCAD mediante un WebView (C# Loader).
-- **Inyección Directa (Bridge)**: Al hacer clic en "Insertar en AutoCAD" desde `/palette`, se codifica la matemática en Base64 y se dispara `window.external.ExecuteAutoCADCommand()`, llamando a la función LISP `LC_ApplyAsset`. Esto inserta o aplica el bloque/trama sin salir jamás de la interfaz nativa del programa.
+### 3. Administración del Catálogo (Admin Only)
+- **Solo** `aldamadaniel1984@gmail.com` puede agregar/eliminar entradas al catálogo.
+- Panel disponible en `/dashboard#catalog-admin` → tab `CatalogAdminTab.jsx`.
+- Al guardar, ejecutar el script de regeneración del JSON estático y hacer deploy.
+- IDs semánticos: `hatch_architecture_brick_stretcher` (formato: `{type}_{category}_{name}`).
+
+### 4. Pauta de Multi-Idioma para Escritores de LISP
+La plataforma provee la **estructura** para multi-idioma. El programador elige implementarla o no.
+
+**Convención estándar de LispCentral (opcional para el escritor):**
+```lisp
+(princ "\n[LC] Hatch aplicado com sucesso!")   ;;[lang:pt]
+(princ "\n[LC] Hatch aplicado con éxito!")     ;;[lang:es]
+(princ "\n[LC] Hatch applied successfully!")   ;;[lang:en]
+```
+- El backend (`getRoutine`) leerá el parámetro `?lang=pt|es|en` y el script de preprocessing filtrará solo los `(princ)` del idioma solicitado antes de servir el código.
+- Si el archivo no tiene bloques `;;[lang:]`, se sirve sin modificación (compatibilidad total con LISPs existentes).
+
+### 5. Ghost Command: LC_APPLY_ASSET (Bridge Seguro)
+El `ResourcePalette` usa el patrón bridge de dos canales para evitar el bug de repetición de comandos:
+```js
+// Canal 1 (evaluateLisp): inyección silenciosa de datos en RAM LISP
+executeInAutoCAD(`(setq *LC-ASSET-TYPE* "hatch")`);
+executeInAutoCAD(`(setq *LC-ASSET-NAME* "BRICK_45")`);
+executeInAutoCAD(`(setq *LC-ASSET-CODE* "base64...")`);
+// Canal 2 (executeCommandAsync): disparo del Ghost Command limpio
+executeInAutoCAD('LC_APPLY_ASSET');
+```
+- El Ghost Command `c:LC_APPLY_ASSET` lee las variables, escribe el `.pat`/`.lin` en `%TEMP%\LC_Assets\`, agrega la ruta al ACAD search path, y limpia las variables globales.
+- Los archivos temporales persisten durante la sesión para re-uso (cache Nivel 2).
 
 ---
 
@@ -228,3 +259,14 @@ Incluso con la paleta funcionando localmente, descubrimos bugs severos al comuni
   
 - **NUNCA añadas espacios ni `\n` al final en JavaScript:**
   AutoCAD inyecta automáticamente el Enter necesario. Si en JS hacemos `cmdStr + ' '`, AutoCAD recibirá dos instrucciones de terminación, causando doble ejecución o repetición de comandos. `autocadBridge.js` ya está configurado con una Regex para podar cualquier espacio residual (`.replace(/[\\n\\r\\s]+$/, '')`).
+
+---
+
+## 🚀 Future Planned Features
+
+### Parametric Hatch Builder (ARTX Style)
+- **Objective**: A new tab in the palette to generate custom vector hatch patterns (.pat) dynamically without images or colors, purely mathematical.
+- **UI Design**: Inspired by Architextures (Glassmorphism, clean panels, modern floating UI with inputs and sliders).
+- **Inputs**: Width, Height, Gap/Joint size, Angle, Pattern Type (Stack, Stretcher, Herringbone, Wood, etc).
+- **Preview**: Real-time SVG vector rendering of the hatch in the palette before insertion (60fps, no server lag).
+- **Execution**: Clicking 'Insert' calculates the `.pat` mathematics entirely in JavaScript on the client side, base64 encodes it, and uses the `LC_APPLY_ASSET` Ghost Command / JIT flow to apply it directly in AutoCAD with zero server processing cost.
