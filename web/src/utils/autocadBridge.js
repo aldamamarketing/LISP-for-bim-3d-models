@@ -29,16 +29,7 @@ _diagAcad();
 export const executeInAutoCAD = (cmdStr) => {
   console.log('[autocadBridge] executeInAutoCAD:', cmdStr);
 
-  // Puente Iframe: Si estamos dentro del Wrapper Local HTML, usamos postMessage
-  if (window.parent !== window) {
-    try {
-      console.log('[LC] Enviando comando vía postMessage al Wrapper Local...');
-      window.parent.postMessage({ type: 'ACAD_COMMAND', command: cmdStr }, '*');
-      return true; // Asumimos éxito al delegar
-    } catch (e) {
-      console.warn('[LC] Error al enviar postMessage:', e);
-    }
-  }
+
 
   // Verificar disponibilidad del objeto Acad
   const acadAvailable = typeof Acad !== 'undefined';
