@@ -1,0 +1,3 @@
+## 2026-06-18 - Adding ARIA Labels to Icon-Only Buttons
+**Learning:** In the `LispManagerTab` component, icon-only buttons for actions like 'Upload SVG', 'Editar', and 'Excluir' relied solely on `title` attributes. While tooltips provide visual context, they are often insufficient for screen reader users because the underlying content is just an icon class (e.g., `<span className="material-symbols-outlined">`).
+**Action:** When creating or reviewing icon-only buttons, always ensure an `aria-label` attribute is explicitly provided to guarantee accessibility for assistive technologies, regardless of the presence of a `title` attribute.
