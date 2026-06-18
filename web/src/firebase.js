@@ -29,11 +29,12 @@ if (typeof window !== "undefined" && window.location.hostname === "localhost") {
   connectFunctionsEmulator(functions, "127.0.0.1", 5001);
 }
 
-// App Check Initialization
-// Bypass App Check for local development to avoid 403 Forbidden errors
-if (typeof window !== "undefined" && window.location.hostname !== "localhost") {
+// Bypass App Check for local development and AutoCAD CefSharp to avoid 400/403 errors
+const isInsideAutoCAD = typeof window !== "undefined" && window.location.search.includes('token=');
+
+if (typeof window !== "undefined" && window.location.hostname !== "localhost" && !isInsideAutoCAD) {
   initializeAppCheck(app, {
-    provider: new ReCaptchaEnterpriseProvider('6Lcw9wkqAAAAAIL9Z_M_p_7rW-bJmG4D2M-N43Qh'), // Reemplace por su clave real de ReCAPTCHA Enterprise
+    provider: new ReCaptchaEnterpriseProvider('6Lcw9wkqAAAAAIL9Z_M_p_7rW-bJmG4D2M-N43Qh'),
     isTokenAutoRefreshEnabled: true
   });
 }

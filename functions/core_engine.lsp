@@ -316,7 +316,8 @@
                     (setenv "ACAD" (strcat (getenv "ACAD") ";" tmpDir))
                   )
                   (setvar "HPNAME" assetName)
-                  (princ (strcat "\n[LC] Hachura '" assetName "' disponível. Use o comando HATCH para aplicar."))
+                  (princ (strcat "\n[LC] Hachura '" assetName "' disponivel. Selecione a area interna..."))
+                  (vla-sendcommand (vla-get-ActiveDocument (vlax-get-acad-object)) "._BHATCH ")
                 )
                 (princ "\n[LC][ERRO] Falha ao criar arquivo temporário. Verifique permissões do %TEMP%.")
               )
@@ -390,31 +391,7 @@
   (princ "\n[LispCentral Hub] Global Session Reactor initialized.")
 )
 
-(defun LC:Create-Palette-Wrapper (fileName url / htmlPath f-html) 
-  (setq htmlPath (strcat (getenv "TEMP") "\\\\" fileName))
-  (setq f-html (open htmlPath "w"))
-  (if f-html 
-    (progn 
-      (write-line "<!DOCTYPE html><html><head><style>body,html{margin:0;padding:0;height:100%;overflow:hidden;background-color:#222;}iframe{width:100%;height:100%;border:none;}</style></head><body>" f-html)
-      (write-line (strcat "<iframe src=\"" url "\" allow=\"clipboard-read; clipboard-write\"></iframe>") f-html)
-      (write-line "<script>" f-html)
-      (write-line "window.addEventListener('message', function(event) {" f-html)
-      (write-line "  if (event.data && event.data.type === 'ACAD_COMMAND') {" f-html)
-      (write-line "    var cmd = event.data.command.replace(/[\\n\\r\\s]+$/, '');" f-html)
-      (write-line "    if (typeof exec !== 'undefined') {" f-html)
-      (write-line "      exec(JSON.stringify({functionName: 'Ac_EditorInterop.executeCommand', functionParams: { commands: cmd }}));" f-html)
-      (write-line "    } else if (typeof execAsync !== 'undefined') {" f-html)
-      (write-line "      execAsync(JSON.stringify({functionName: 'Ac_EditorInterop.executeCommand', functionParams: { commands: cmd }}));" f-html)
-      (write-line "    }" f-html)
-      (write-line "  }" f-html)
-      (write-line "});" f-html)
-      (write-line "</script></body></html>" f-html)
-      (close f-html)
-      (vl-string-translate "\\" "/" htmlPath)
-    )
-    nil
-  )
-)
+
 
 (defun LC:Download-Asset (url dest / xmlhttp f result) 
   (setq result nil)
@@ -484,7 +461,7 @@
   (princ)
 )
 
-(defun c:LC_RESOURCES (/ doc loader-js f-js local-html) 
+(defun c:LC_RESOURCES (/ doc loader-js f-js local-html source-url temp-html) 
   (vl-load-com)
   (setq doc (vla-get-ActiveDocument (vlax-get-acad-object)))
   (vla-StartUndoMark doc)
@@ -498,7 +475,11 @@
     (progn 
       (write-line "if (typeof Acad !== 'undefined') {" f-js)
       (write-line "    try { Acad.Application.removePalette('LispCentral Resources'); } catch(e) {}" f-js)
-      (setq local-html (LC:Create-Palette-Wrapper "LC_Resource_Wrapper.html" *LC-RESOURCE-URL*))
+      (setq source-url (strcat "https://lispcentral.web.app/resource-palette?v=" (rtos (getvar "MILLISECS") 2 0)))
+      (setq temp-html (strcat (getenv "TEMP") "\\LC_Resource.html"))
+      (princ "\n[LispCentral] Syncing Resource UI from cloud...")
+      (LC:Download-Asset source-url temp-html)
+      (setq local-html (strcat "file:///" (vl-string-translate "\\" "/" temp-html) "?token=" *LC-SEAT-TOKEN* "&hwId=" (LC:url-encode *LC-HWID*) "&v=" (rtos (getvar "MILLISECS") 2 0)))
       (write-line (strcat "    Acad.Application.addPalette(\"LispCentral Resources\", \"" local-html "\");") f-js)
       (write-line "    Acad.Editor.writeMessage(\"\\n[SUCCESS] Resource Palette is ready.\\n\");" f-js)
       (write-line "} else {" f-js)
@@ -513,7 +494,7 @@
   (princ)
 )
 
-(defun c:LC_PROPERTIES (/ doc loader-js f-js local-html) 
+(defun c:LC_PROPERTIES (/ doc loader-js f-js local-html temp-html) 
   (vl-load-com)
   (if (not (boundp '*LC-PROPERTIES-URL*)) 
     (setq *LC-PROPERTIES-URL* (strcat "https://lispcentral.web.app/properties-palette?token=" *LC-SEAT-TOKEN* "&hwid=" (LC:url-encode *LC-HWID*)))
@@ -525,7 +506,18 @@
     (progn 
       (write-line "if (typeof Acad !== 'undefined') {" f-js)
       (write-line "    try { Acad.Application.removePalette('LispCentral Properties'); } catch(e) {}" f-js)
-      (setq local-html (LC:Create-Palette-Wrapper "LC_Prop_Wrapper.html" *LC-PROPERTIES-URL*))
+      
+      ;; Crear HTML Dummy temporal para propiedades ya que todavia no hay build de vite en la nube
+      (setq temp-html (strcat (getenv "TEMP") "\\LC_Prop_Dummy.html"))
+      (setq f-html (open temp-html "w"))
+      (if f-html
+        (progn
+          (write-line "<!DOCTYPE html><html><head><style>body{background:#222;color:#fff;font-family:sans-serif;display:flex;align-items:center;justify-content:center;height:100vh;margin:0;}</style></head><body><h3>Próximamente...</h3></body></html>" f-html)
+          (close f-html)
+        )
+      )
+      
+      (setq local-html (strcat "file:///" (vl-string-translate "\\" "/" temp-html)))
       (write-line (strcat "    Acad.Application.addPalette(\"LispCentral Properties\", \"" local-html "\");") f-js)
       (write-line "    Acad.Editor.writeMessage(\"\\n[SUCCESS] Properties Palette is ready.\\n\");" f-js)
       (write-line "} else {" f-js)

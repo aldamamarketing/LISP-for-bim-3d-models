@@ -168,8 +168,8 @@ function ResourceItem({ item, isPinned, activeTab, onContextMenu, onInsert }) {
         justifyContent: 'flex-end',
         overflow: 'hidden',
         padding: 0,
-        backgroundColor: '#f5f5f5', // Fondo claro si falla la imagen
-        border: '1px solid #ddd',
+        backgroundColor: '#1e1e1e', // Fondo oscuro para que resalten las líneas WebP blancas
+        border: '1px solid #333',
         borderRadius: '6px',
         cursor: 'pointer',
       }}
