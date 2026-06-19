@@ -1,0 +1,4 @@
+
+## 2024-05-18 - [Optimize Filter Performance in Web Palette]
+**Learning:** In AutoCAD's embedded HTML5 browser environment, JavaScript execution can be significantly slower than in modern desktop browsers. Heavy array filtering operations, such as calling `.toLowerCase()` on filter keywords inside an `.includes()` check within a `.filter()` loop, results in O(N*M) string operations which noticeably degrades UI responsiveness when dealing with hundreds of commands. Moreover, unmemoized derived state lists cause these recalculations on every re-render.
+**Action:** Always extract expensive string transformations (like `.toLowerCase()`) on filter constraints out of the main iteration loop. Furthermore, wrap the derived filtered and grouped UI lists within a `useMemo` hook so they only recalculate when the underlying data (`commands` or `activeFilters`) actually change.
