@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, useRef } from 'react';
+import React, { useState, useEffect, useCallback, useRef, useMemo } from 'react';
 import PaletteDropdownMenu from './PaletteDropdownMenu';
 import MultiFilter from './MultiFilter';
 import { executeInAutoCAD } from '../utils/autocadBridge';
@@ -360,21 +360,28 @@ export default function ResourcePalette() {
   };
 
   // ── Filtrado y agrupamiento (igual que LispCommandPalette) ──
-  const filtered = catalog.filter(item => {
-    if (activeFilters.length === 0) return true;
-    const text = `${item.name} ${item.desc || ''} ${item.category}`.toLowerCase();
-    return activeFilters.some(tag => text.includes(tag.toLowerCase()));
-  });
+  const { filtered, pinned, grouped, sortedCategories } = useMemo(() => {
+    // ⚡ Bolt: Lift activeFilters lowercasing outside the O(N) filter loop
+    const lowerFilters = activeFilters.map(f => f.toLowerCase());
 
-  const pinned  = filtered.filter(i => pinnedIds.includes(i.id));
-  const grouped = {};
-  filtered.forEach(item => {
-    if (pinnedIds.includes(item.id)) return; // ya en sección pinned
-    const cat = item.category || 'General';
-    if (!grouped[cat]) grouped[cat] = [];
-    grouped[cat].push(item);
-  });
-  const sortedCategories = Object.keys(grouped).sort();
+    const filt = catalog.filter(item => {
+      if (lowerFilters.length === 0) return true;
+      const text = `${item.name} ${item.desc || ''} ${item.category}`.toLowerCase();
+      return lowerFilters.some(tag => text.includes(tag));
+    });
+
+    const pin = filt.filter(i => pinnedIds.includes(i.id));
+    const grp = {};
+    filt.forEach(item => {
+      if (pinnedIds.includes(item.id)) return; // ya en sección pinned
+      const cat = item.category || 'General';
+      if (!grp[cat]) grp[cat] = [];
+      grp[cat].push(item);
+    });
+    const sortedCats = Object.keys(grp).sort();
+
+    return { filtered: filt, pinned: pin, grouped: grp, sortedCategories: sortedCats };
+  }, [catalog, activeFilters, pinnedIds]);
 
   const tabBtn = (id, label) => ({
     flex: 1,

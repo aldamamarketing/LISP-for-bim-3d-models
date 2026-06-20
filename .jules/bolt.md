@@ -1,0 +1,3 @@
+## 2024-10-27 - Performance optimization for AutoCAD embedded browser
+**Learning:** React components rendered in the HTML5 web palette (such as LispCommandPalette) run directly within AutoCAD's embedded browser control, which may execute JavaScript slower than modern desktop browsers. O(N*M) string allocations within array filtering and lack of memoization can cause significant UI unresponsiveness.
+**Action:** Extract expensive string transformations (such as `.toLowerCase()`) outside of `.filter()` or `.some()` closures to prevent O(N*M) performance degradation. Additionally, wrap derived lists in a `useMemo` hook to ensure calculations only run when dependencies change.
