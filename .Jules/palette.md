@@ -1,0 +1,3 @@
+## 2024-05-18 - [Accessibility & UX Form Improvements]
+**Learning:** Found that custom modal implementations often lack fundamental ARIA attributes (`role="dialog"`, `aria-modal="true"`) and semantic form associations (missing `htmlFor` and `id` linking `<label>` to inputs), which breaks screen reader support. Also noticed missing loading states on async submission buttons, providing poor user feedback.
+**Action:** When implementing or updating custom modals and forms, always group the addition of interactive loading states (`isSubmitting` with disabled button state) with core accessibility properties: `aria-modal`, `role="dialog"`, `aria-labelledby`, `aria-label` for icon-only buttons, and strict `htmlFor` / `id` mapping for inputs.
