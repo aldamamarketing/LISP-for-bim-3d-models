@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { db } from '../../firebase';
 import { doc, setDoc, deleteDoc, collection, query, where, getDocs, updateDoc } from 'firebase/firestore';
 import { showToast } from '../Toast';
@@ -272,9 +272,12 @@ export default function SuitesGroupsCard() {
     } catch (err) { showToast('Erro ao remover arquivo.', 'error'); }
   };
 
-  const filteredFiles = tenantLisps.filter(f => 
-    f.originalName.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  const filteredFiles = useMemo(() => {
+    const lowerQuery = searchQuery.toLowerCase();
+    return tenantLisps.filter(f =>
+      f.originalName.toLowerCase().includes(lowerQuery)
+    );
+  }, [tenantLisps, searchQuery]);
 
   const toggleSelectAllFiles = (e) => {
     if (e.target.checked) setSelectedFileIds(filteredFiles.map(f => f.id));

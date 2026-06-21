@@ -1,0 +1,3 @@
+## 2024-06-21 - Extract dynamic string functions out of filters
+**Learning:** In React components like those for LispCentral, computing `.toLowerCase()` or other string transformations directly inside `.filter()` calls leads to an O(N*M) performance penalty, as it is dynamically re-calculated. In the context of AutoCAD's embedded browser constraint, this can cause significant performance and UI responsiveness degradation.
+**Action:** Always wrap lists that need sorting or filtering in a `useMemo` hook, and extract all query/state-based string computations outside of the `.filter()` closures so they are strictly evaluated once per input change.
