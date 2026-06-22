@@ -1,0 +1,3 @@
+## 2024-06-22 - [Performance] Avoid O(N*M) string allocations in array filtering
+**Learning:** In React components rendered in AutoCAD's embedded browser control (HTML5 web palette), minimizing string allocations is highly critical to maintain UI responsiveness. Repeated expensive operations like `.toLowerCase()` inside a `.filter()` or `.some()` closure evaluated against an array cause an O(N*M) performance degradation.
+**Action:** Always extract expensive string transformations outside of closures and loop boundaries. Additionally, wrap derived lists and filtered groups in a `useMemo` hook to ensure calculations only run when their dependencies (`commands`, `activeFilters`) actually change.
