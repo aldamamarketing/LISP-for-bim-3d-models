@@ -286,7 +286,7 @@
         (progn
           (if codeB64
             (progn
-              (setq decoded (LC:b64-decode codeB64))
+              (setq decoded codeB64)
               ;; Guardar en cache de sesión RAM (sin disco)
               (setq *LC-ASSET-CACHE* (cons (cons assetName decoded) *LC-ASSET-CACHE*))
               (setq cachedCode decoded)
@@ -308,7 +308,9 @@
               (setq f (open tmpFile "w"))
               (if f
                 (progn
-                  (write-line (strcat "*" assetName ", LispCentral") f)
+                  (if (not (= (substr cachedCode 1 1) "*"))
+                    (write-line (strcat "*" assetName ", LispCentral") f)
+                  )
                   (write-line cachedCode f)
                   (close f)
                   ;; Adicionar diretório temporário ao search path (se ainda não estiver)
@@ -328,7 +330,9 @@
               (setq f (open tmpFile "w"))
               (if f
                 (progn
-                  (write-line (strcat "*" assetName ", LispCentral") f)
+                  (if (not (= (substr cachedCode 1 1) "*"))
+                    (write-line (strcat "*" assetName ", LispCentral") f)
+                  )
                   (write-line cachedCode f)
                   (close f)
                   (vl-cmdf "._-LINETYPE" "_Load" assetName tmpFile "")

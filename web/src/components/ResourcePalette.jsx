@@ -245,7 +245,7 @@ export default function ResourcePalette() {
       if (cached && !expired && !forceRefresh) {
         setCatalog(JSON.parse(cached));
       } else {
-        const res  = await fetch(`../api/${activeTab}-catalog.json`);
+        const res  = await fetch(`https://us-central1-lispcentral.cloudfunctions.net/getUserResources?token=${encodeURIComponent(token)}&type=${encodeURIComponent(activeTab)}`);
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
         const data = await res.json();
         localStorage.setItem(cacheKey, JSON.stringify(data));
@@ -257,7 +257,7 @@ export default function ResourcePalette() {
       setError('Falha ao carregar catálogo.');
     }
     setLoading(false);
-  }, [activeTab]);
+  }, [activeTab, token]);
 
   useEffect(() => {
     fetchCatalog();
@@ -283,14 +283,30 @@ export default function ResourcePalette() {
       }
 
       const safeName = item.name.replace(/[^a-zA-Z0-9_]/g, '_').toUpperCase();
-      const codeB64  = btoa(unescape(encodeURIComponent(patCode)));
 
       // ── Bridge seguro: inyectar datos silenciosamente via evaluateLisp ──
       // Luego disparar el Ghost Command limpio via executeCommandAsync
       // NUNCA enviar expresiones LISP completas via executeCommandAsync (bug de repetición)
       executeInAutoCAD(`(setq *LC-ASSET-TYPE* "${activeTab}")`);
       executeInAutoCAD(`(setq *LC-ASSET-NAME* "${safeName}")`);
-      executeInAutoCAD(`(setq *LC-ASSET-CODE* "${codeB64}")`);
+      
+      // FIX: Chunk string to avoid Access Violation y Syntax Errors.
+      // 1. Tamaño seguro (100) para evitar buffer overflow en línea de comandos.
+      // 2. Trocear el texto PRIMERO y escapar DESPUÉS, para no romper secuencias de escape.
+      executeInAutoCAD(`(setq *LC-ASSET-CODE* "")`);
+      const chunkSize = 100;
+      for (let i = 0; i < patCode.length; i += chunkSize) {
+        const rawChunk = patCode.substring(i, i + chunkSize);
+        const escapedChunk = rawChunk
+          .replace(/\\/g, '\\\\')
+          .replace(/"/g, '\\"')
+          .replace(/\n/g, '\\n')
+          .replace(/\r/g, '\\r')
+          .replace(/\t/g, '\\t');
+        
+        executeInAutoCAD(`(progn (setq *LC-ASSET-CODE* (strcat *LC-ASSET-CODE* "${escapedChunk}")) (princ))`);
+      }
+      
       executeInAutoCAD('LC_APPLY_ASSET');
 
     } catch (err) {

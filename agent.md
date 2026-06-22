@@ -200,18 +200,28 @@ La plataforma provee la **estructura** para multi-idioma. El programador elige i
 - El backend (`getRoutine`) leerá el parámetro `?lang=pt|es|en` y el script de preprocessing filtrará solo los `(princ)` del idioma solicitado antes de servir el código.
 - Si el archivo no tiene bloques `;;[lang:]`, se sirve sin modificación (compatibilidad total con LISPs existentes).
 
-### 5. Ghost Command: LC_APPLY_ASSET (Bridge Seguro)
-El `ResourcePalette` usa el patrón bridge de dos canales para evitar el bug de repetición de comandos:
+### 5. Ghost Command: LC_APPLY_ASSET y Bridge Seguro (Inyección sin Base64)
+El `ResourcePalette` usa el patrón bridge de dos canales para inyectar recursos (patrones `.pat` o `.lin`) en AutoCAD de forma silenciosa y evitar el bug de repetición de comandos.
+
+Inicialmente se usó codificación Base64, pero resultó en bugs matemáticos en LISP y corrupciones de texto. La solución definitiva (Implementada en v5) consiste en:
+1. Escapar de forma nativa los caracteres problemáticos en JS (`\n` -> `\\n`, `"` -> `\\"`).
+2. Cortar el texto **antes** de escapar en "chunks" de 100 caracteres. Esto previene que se parta un carácter de escape por la mitad (lo que colgaría AutoCAD con errores de sintaxis tipo `((("_>`).
+3. Inyectar silenciosamente envolviendo con `(progn ... (princ))` para suprimir el molesto eco en la consola de AutoCAD.
+
 ```js
-// Canal 1 (evaluateLisp): inyección silenciosa de datos en RAM LISP
+// Canal 1 (evaluateLisp): inyección silenciosa y segura en RAM LISP
 executeInAutoCAD(`(setq *LC-ASSET-TYPE* "hatch")`);
 executeInAutoCAD(`(setq *LC-ASSET-NAME* "BRICK_45")`);
-executeInAutoCAD(`(setq *LC-ASSET-CODE* "base64...")`);
+executeInAutoCAD(`(setq *LC-ASSET-CODE* "")`);
+// Chunking iterativo para evadir el límite de 256 chars del buffer de comandos:
+executeInAutoCAD(`(progn (setq *LC-ASSET-CODE* (strcat *LC-ASSET-CODE* "chunk1_escapado")) (princ))`);
+// ...
+
 // Canal 2 (executeCommandAsync): disparo del Ghost Command limpio
 executeInAutoCAD('LC_APPLY_ASSET');
 ```
-- El Ghost Command `c:LC_APPLY_ASSET` lee las variables, escribe el `.pat`/`.lin` en `%TEMP%\LC_Assets\`, agrega la ruta al ACAD search path, y limpia las variables globales.
-- Los archivos temporales persisten durante la sesión para re-uso (cache Nivel 2).
+- El Ghost Command `c:LC_APPLY_ASSET` lee las variables, verifica si el patrón ya incluye un encabezado `*` (para no duplicarlo, lo que causaría `Bad pattern definition file`), escribe el `.pat`/`.lin` temporal en `%TEMP%\LC_Assets\`, agrega la ruta al ACAD search path, y limpia las variables globales.
+- Al escribir el temporal (con modo `"w"`), siempre se sobreescribe, garantizando cero acumulación de basura y que AutoCAD lea siempre la versión más actualizada de Firebase.
 
 ---
 

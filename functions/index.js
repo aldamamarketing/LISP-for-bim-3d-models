@@ -588,19 +588,9 @@ exports.getUserResources = onRequest({ cors: true }, async (req, res) => {
     const userDoc = userSnap.docs[0];
     const userId = userDoc.id;
 
-    // Obtener IDs de favoritos del usuario
-    const favSnap = await db.collection(`users/${userId}/favorites`).get();
-    const favIds = favSnap.docs.map(d => d.id);
-
-    if (favIds.length === 0) {
-      return res.status(200).json([]);
-    }
-
-    // Obtener los assets públicos que coincidan con los favoritos y el tipo
+    // Obtener los assets públicos que coincidan con el tipo
     const assetsSnap = await db.collection("publicAssets").where("type", "==", type).get();
-    const results = assetsSnap.docs
-      .filter(d => favIds.includes(d.id))
-      .map(d => ({ id: d.id, ...d.data() }));
+    const results = assetsSnap.docs.map(d => ({ id: d.id, ...d.data() }));
 
     res.setHeader("Cache-Control", "public, max-age=30"); // Cache corto para sync rápido
     return res.status(200).json(results);

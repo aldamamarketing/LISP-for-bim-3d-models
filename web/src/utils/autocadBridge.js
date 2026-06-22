@@ -106,15 +106,6 @@ export const executeInAutoCAD = (cmdStr) => {
 
   // ⚠️ NO navegamos con window.location.href — eso destruye el DOM de React
   console.error('[LC] No se encontró ningún método válido para ejecutar comandos en AutoCAD.');
-  console.log('[LC] Comando pendiente copiado al portapapeles como último recurso.');
-
-  // Último recurso: copiar al portapapeles
-  try {
-    navigator.clipboard.writeText(cmdStr.trim());
-  } catch (e) {
-    console.warn('[LC] Tampoco se pudo copiar al portapapeles:', e);
-  }
-
   return false;
 };
 
