@@ -744,45 +744,116 @@ exports.onSubscriptionCreated = onDocumentCreated("subscriptions/{subId}", async
   }
 });
 
-// Recalcular el rating de la suite cuando hay una nueva o modificada reseña
+// Recalcular el rating de la suite o del comando cuando hay una nueva o modificada reseña
 exports.onReviewWritten = onDocumentWritten("reviews/{reviewId}", async (event) => {
   const db = getDb();
   
-  // Si se borró, el doc posterior no existe. Tomamos el previo para saber qué suiteId es.
+  // Si se borró, el doc posterior no existe. Tomamos el previo.
   const docData = event.data.after.exists ? event.data.after.data() : event.data.before.data();
-  if (!docData || !docData.suiteId) return;
+  if (!docData) return;
 
   const suiteId = docData.suiteId;
+  const commandId = docData.commandId;
 
-  try {
-    const reviewsSnap = await db.collection("reviews").where("suiteId", "==", suiteId).get();
-    
-    let totalRating = 0;
-    let count = 0;
-    
-    reviewsSnap.forEach(doc => {
-      const rData = doc.data();
-      if (typeof rData.rating === "number") {
-        totalRating += rData.rating;
-        count++;
-      }
-    });
+  // Lógica para recalcular el promedio de la Suite
+  if (suiteId && !commandId) {
+    try {
+      // Nota: Si una reseña es de un comando, NO recalculamos el promedio de la suite con esa reseña,
+      // para mantener las reseñas de comandos separadas de la reseña general de la suite.
+      const reviewsSnap = await db.collection("reviews")
+        .where("suiteId", "==", suiteId)
+        // Solo contamos reseñas de la suite que no sean específicas de un comando
+        // Como Firestore no soporta un simple isNull nativo combinado con '==', 
+        // filtramos en memoria las que tengan commandId.
+        .get();
+      
+      let totalRating = 0;
+      let count = 0;
+      
+      reviewsSnap.forEach(doc => {
+        const rData = doc.data();
+        if (typeof rData.rating === "number" && !rData.commandId) {
+          totalRating += rData.rating;
+          count++;
+        }
+      });
 
-    const averageRating = count > 0 ? (totalRating / count) : 0;
+      const averageRating = count > 0 ? (totalRating / count) : 0;
 
-    await db.collection("suites").doc(suiteId).update({
-      rating: averageRating,
-      ratingCount: count
-    });
-    console.log(`Recalculated rating for suite ${suiteId}: ${averageRating} (${count} reviews)`);
-  } catch (err) {
-    console.error(`Error recalculating rating for suite ${suiteId}:`, err);
+      await db.collection("suites").doc(suiteId).update({
+        rating: averageRating,
+        ratingCount: count
+      });
+      console.log(`Recalculated rating for suite ${suiteId}: ${averageRating} (${count} reviews)`);
+    } catch (err) {
+      console.error(`Error recalculating rating for suite ${suiteId}:`, err);
+    }
+  }
+
+  // Lógica para recalcular el promedio del Comando Individual
+  if (commandId) {
+    try {
+      const reviewsSnap = await db.collection("reviews")
+        .where("commandId", "==", commandId)
+        .get();
+      
+      let totalRating = 0;
+      let count = 0;
+      
+      reviewsSnap.forEach(doc => {
+        const rData = doc.data();
+        if (typeof rData.rating === "number") {
+          totalRating += rData.rating;
+          count++;
+        }
+      });
+
+      const averageRating = count > 0 ? (totalRating / count) : 0;
+
+      await db.collection("commands").doc(commandId).update({
+        rating: averageRating,
+        ratingCount: count
+      });
+      console.log(`Recalculated rating for command ${commandId}: ${averageRating} (${count} reviews)`);
+    } catch (err) {
+      console.error(`Error recalculating rating for command ${commandId}:`, err);
+    }
   }
 });
 
 // ==========================================
 // DATA LIFECYCLE & CASCADE DELETES
 // ==========================================
+
+// Cascade delete when a Device is hard-deleted from a user's pool
+exports.onDeviceDeleted = onDocumentDeleted({ document: "users/{userId}/devices/{deviceId}", timeoutSeconds: 60 }, async (event) => {
+  const userId = event.params.userId;
+  const deviceId = event.params.deviceId;
+  const db = getDb();
+  const { admin } = getDeps();
+  
+  try {
+    // Find all subscriptions for this user where assignedDevices contains deviceId
+    const subsSnap = await db.collection("subscriptions")
+      .where("tenantId", "==", userId)
+      .where("assignedDevices", "array-contains", deviceId)
+      .get();
+      
+    if (subsSnap.empty) return;
+    
+    const batch = db.batch();
+    subsSnap.forEach(docSnap => {
+      batch.update(docSnap.ref, {
+        assignedDevices: admin.firestore.FieldValue.arrayRemove(deviceId)
+      });
+    });
+    
+    await batch.commit();
+    console.log(`Removed deleted device ${deviceId} from ${subsSnap.size} subscriptions for user ${userId}`);
+  } catch (err) {
+    console.error(`Error removing deleted device ${deviceId} from subscriptions:`, err);
+  }
+});
 
 // Cascade delete when a Suite is hard-deleted
 exports.onSuiteDeleted = onDocumentDeleted({ document: "suites/{suiteId}", timeoutSeconds: 60 }, async (event) => {

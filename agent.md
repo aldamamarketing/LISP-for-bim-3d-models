@@ -270,3 +270,45 @@ Incluso con la paleta funcionando localmente, descubrimos bugs severos al comuni
 - **Inputs**: Width, Height, Gap/Joint size, Angle, Pattern Type (Stack, Stretcher, Herringbone, Wood, etc).
 - **Preview**: Real-time SVG vector rendering of the hatch in the palette before insertion (60fps, no server lag).
 - **Execution**: Clicking 'Insert' calculates the `.pat` mathematics entirely in JavaScript on the client side, base64 encodes it, and uses the `LC_APPLY_ASSET` Ghost Command / JIT flow to apply it directly in AutoCAD with zero server processing cost.
+
+## 🚀 Logros Recientes (Núcleo Funcional B2B)
+El núcleo de la plataforma SaaS (LispCentral B2B) ha sido estabilizado y testeado exitosamente en producción:
+- **Desnormalización NoSQL:** Se eliminaron consultas anidadas costosas introduciendo `suiteIds` inyectados asíncronamente vía Triggers (Firestore) en `lispFiles`, logrando respuestas instantáneas en la API `INDEX`.
+- **Live Sync & JIT Garbage Collection:** Al hacer click en "Sync" desde la paleta, AutoCAD envía internamente el comando nativo `LC_SYNC`. Esto elimina de la memoria LISP (`undefine`) los comandos a los que el usuario ya no tiene acceso, vacía la caché JIT y fuerza la regeneración estricta de permisos en cuestión de milisegundos sin necesidad de reiniciar la sesión de trabajo.
+
+## 🔮 Roadmap (Fase 2 - Optimizaciones B2B y Performance)
+La Fase 2 se enfocará en optimizar payloads y modernizar la gestión de activos nativos de AutoCAD:
+
+1. **Desnormalización Profunda de Comandos:** Mover la estructura de comandos (Name, Desc, Icon) adentro de `lispFiles`. Esto simplificará drásticamente la API `INDEX`, eliminando pasos innecesarios.
+2. **Optimización Extrema de SVGs:** Reemplazar el inyectado de SVGs literales en el JSON por un sistema de `iconId` (diccionarios), reduciendo dramáticamente el peso de red y el consumo de memoria en AutoCAD.
+3. **Contexto Visual de Grupos en el Payload:** Inyectar los nombres amigables de los grupos directamente en la carga que va a AutoCAD. Esto permitirá a la paleta agrupar visualmente la interfaz de forma robusta sin adivinanzas.
+4. **Soft Deletes en Firestore:** Pasar de borrados destructivos a "borrados lógicos" añadiendo *flags* para proteger la propiedad intelectual de las empresas frente a accidentes.
+5. **Estrategia Integral de Hatches (NUEVO):** 
+   - Transicionar del modelo actual (Generar hatches con IA en caliente y descargarlos) hacia una **Colección Organizada Permanente de Hatches** pre-cargados.
+   - El objetivo es que la Paleta Web funcione como un catálogo robusto donde el usuario pueda hacer click en un Hatch y usarlo "directamente" en el dibujo, con gestión unificada de descargas. Esto requiere replantear la inyección de `LC_ApplyAsset` para que soporte librerías amplias, control de escalas y visualizaciones precisas sin generar basura en `%TEMP%`.
+
+---
+
+## 🚨 Resolución de Bugs Críticos: Lag de Conexión Inicial (21 segundos)
+
+**El Problema:**
+Usuarios reportaron un retraso congelante de entre 20 a 40 segundos al iniciar la aplicación (al cargar `LC_Loader.lsp` o realizar la primera petición HTTP). 
+Inicialmente se sospechaba de AutoCAD, de los servidores Cloud Functions, o de verificaciones estrictas de revocación de certificados SSL. Sin embargo, el diagnóstico comprobó que el lag de exactamente **21 segundos** se debe a la característica de **IPv6 Blackholing** de Windows.
+
+**Causa Raíz:**
+Cuando el loader usa `MSXML2.XMLHTTP.6.0` o `MSXML2.ServerXMLHTTP.6.0`, Windows resuelve el dominio `cloudfunctions.net` y encuentra registros IPv4 e IPv6. Windows prioriza IPv6 y envía un paquete TCP SYN. Si el router del usuario tiene el IPv6 mal configurado (hace "blackhole" descartando el paquete sin rechazarlo activamente), Windows espera por 3 segundos, reintenta (espera 6s), y vuelve a reintentar (espera 12s). Total: **21 segundos exactos** antes de abortar y saltar exitosamente al IPv4 en ~14ms. Windows cachea el fallo, haciendo que subsiguientes peticiones sean instantáneas hasta que el caché expire.
+
+**La Solución Propuesta (Fase 3):**
+Se comprobó que usar el motor **`WinHttp.WinHttpRequest.5.1`** junto con la inyección explícita de `SetTimeouts` resuelve el problema obligando a Windows a abortar el intento fallido mucho antes de los 21 segundos.
+El código óptimo a implementar en el Loader y en `core_engine.lsp` a futuro es:
+```lisp
+(setq winhttp (vlax-create-object "WinHttp.WinHttpRequest.5.1"))
+;; Timeouts en MS: Resolve=10000, Connect=2000, Send=30000, Receive=30000
+;; Esto fuerza a abortar el IPv6 roto en solo 2 segundos y saltar a IPv4.
+(vlax-invoke-method winhttp 'SetTimeouts 10000 2000 30000 30000)
+(vlax-invoke-method winhttp 'Open "GET" url :vlax-false)
+;; Opcional: Ignorar errores SSL de validación para entornos restrictivos
+(vlax-put-property winhttp 'Option 4 13056)
+(vlax-invoke-method winhttp 'Send)
+```
+*Recomendación:* Migrar todos los HTTP Getters nativos en LISP al objeto `WinHttpRequest.5.1` con timeouts acelerados para proteger la experiencia del usuario SaaS (B2B) en redes corporativas defectuosas.

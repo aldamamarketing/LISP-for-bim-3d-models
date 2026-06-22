@@ -67,6 +67,14 @@ export default function LicensesTab() {
     } catch(e) { showToast('Erro ao desvincular.', 'error'); }
   };
 
+  const handleDeleteDevice = async (deviceObj) => {
+    if (!confirm(`¿Estás seguro de que deseas ELIMINAR permanentemente ${deviceObj.name || deviceObj.id}? Esto lo removerá de todas las suscripciones.`)) return;
+    try {
+      await deleteDoc(doc(db, 'users', userData.id, 'devices', deviceObj.id));
+      showToast('Equipamento eliminado com sucesso.', 'success');
+    } catch(e) { showToast('Erro ao eliminar equipamento.', 'error'); }
+  };
+
   const handleLink = async (deviceObj) => {
     try {
       const activeCount = devicesList.filter(d => d.globalLinked).length;
@@ -182,12 +190,21 @@ export default function LicensesTab() {
                       Unlink
                     </button>
                   ) : (
-                    <button 
-                      className="bg-primary-container text-white hover:bg-[#e66000] font-bold text-xs px-3 py-1 rounded transition-colors" 
-                      onClick={() => handleLink(dev)}
-                    >
-                      Link
-                    </button>
+                    <div className="flex items-center gap-2">
+                      <button 
+                        className="bg-primary-container text-white hover:bg-[#e66000] font-bold text-xs px-3 py-1 rounded transition-colors" 
+                        onClick={() => handleLink(dev)}
+                      >
+                        Link
+                      </button>
+                      <button 
+                        className="bg-transparent text-on-surface-variant hover:text-error transition-colors flex items-center justify-center w-6 h-6 rounded hover:bg-error/10" 
+                        onClick={() => handleDeleteDevice(dev)}
+                        title="Eliminar Equipo Permanentemente"
+                      >
+                        <span className="material-symbols-outlined text-[16px]">delete</span>
+                      </button>
+                    </div>
                   )}
                 </div>
                 <div className="text-xs text-on-surface-variant mb-2">Última conexión: {dev.lastActive ? new Date(dev.lastActive.toDate()).toLocaleString() : 'N/A'}</div>
