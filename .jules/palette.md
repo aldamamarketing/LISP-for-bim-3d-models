@@ -1,0 +1,3 @@
+## 2024-10-27 - Nested Buttons Break Screen Readers and Interaction
+**Learning:** Placing interactive `<button>` elements (such as a 'Delete' button) inside a wrapper that is also a `<button>` creates illegal HTML and breaks expected screen reader and keyboard behavior. Screen readers cannot properly navigate or announce nested actionable elements.
+**Action:** When making an entire card interactive, always use a non-interactive wrapper `<div>`. Place the main actionable area inside a standard `<button>`, and place any secondary actions (like delete buttons) as sibling `<button>` elements to the main action button. Use `relative z-10` or similar techniques if necessary to ensure the sibling buttons are clickable without triggering the main action underneath.
