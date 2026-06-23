@@ -1,0 +1,9 @@
+<svg version="1.2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="200" height="200">
+	<style type="text/css">.shape {stroke-width: 4; vector-effect: non-scaling-stroke; fill:none; stroke: #000; stroke-linecap: round; stroke-linejoin: miter;}</style>
+	<line x1="0" y1="50" x2="200" y2="50" class="shape" />
+	<line x1="0" y1="100" x2="200" y2="100" class="shape" />
+	<line x1="0" y1="150" x2="200" y2="150" class="shape" />
+	<line x1="50" y1="0" x2="50" y2="200" class="shape" />
+	<line x1="100" y1="0" x2="100" y2="200" class="shape" />
+	<line x1="150" y1="0" x2="150" y2="200" class="shape" />
+</svg>

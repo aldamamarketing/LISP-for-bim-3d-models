@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg id="save_bookmark" data-name="save bookmark" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 160">
+  <defs>
+    <style>
+      .cls-1 {
+        fill: none;
+        stroke: #000;
+        stroke-linecap: round;
+        stroke-linejoin: round;
+        stroke-width: 11px;
+      }
+    </style>
+  </defs>
+  <polygon class="cls-1" points="29.86 145.4 29.86 14.6 130.88 14.6 130.88 145.4 80.37 91.02 29.86 145.4"/>
+</svg>

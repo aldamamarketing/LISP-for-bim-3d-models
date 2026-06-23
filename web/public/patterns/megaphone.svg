@@ -1,0 +1,32 @@
+<svg id="Megaphone" xmlns="http://www.w3.org/2000/svg" width="160" height="160" viewBox="0 0 160 160">
+  <defs>
+    <style>
+      .cls-1, .cls-2, .cls-3 {
+        fill: none;
+        stroke: #010101;
+        stroke-width: 10px;
+        fill-rule: evenodd;
+      }
+
+      .cls-2, .cls-3 {
+        stroke-linecap: round;
+      }
+
+      .cls-3 {
+        stroke-linejoin: round;
+      }
+    </style>
+  </defs>
+  <path class="cls-1" d="M111.327,29.188c15.6,0,28.248,19.648,28.248,43.885s-12.647,43.885-28.248,43.885S83.079,97.31,83.079,73.073,95.726,29.188,111.327,29.188Z"/>
+  <path id="Ellipse_3_copy" data-name="Ellipse 3 copy" class="cls-1" d="M62.188,90.456a7.331,7.331,0,0,1-.923-0.058c-5.753-.729-10.275-8.214-10.275-17.339,0-8.845,4.249-16.149,9.749-17.253a7.351,7.351,0,0,1,1.449-.144"/>
+  <path id="Ellipse_3_copy_2" data-name="Ellipse 3 copy 2" class="cls-2" d="M57.763,54.728H31.922a7.9,7.9,0,0,0-1.557.155c-5.909,1.186-10.474,9.033-10.474,18.536,0,9.8,4.859,17.845,11.039,18.629a7.872,7.872,0,0,0,.992.063H61.188"/>
+  <g id="Handle">
+    <path class="cls-3" d="M34.035,93.672l10,42h17"/>
+    <path id="Shape_20_copy_3" data-name="Shape 20 copy 3" class="cls-3" d="M57.035,88.672l10,42"/>
+    <path class="cls-3" d="M66.884,100.65a3.871,3.871,0,1,1-3.871,3.871A3.871,3.871,0,0,1,66.884,100.65Z"/>
+    <path id="Shape_20_copy_4" data-name="Shape 20 copy 4" class="cls-3" d="M66.65,131.8l-4.234,3.479"/>
+  </g>
+  <path id="Ellipse_4_copy" data-name="Ellipse 4 copy" class="cls-3" d="M95.272,61.735A12.174,12.174,0,1,1,83.1,73.908,12.173,12.173,0,0,1,95.272,61.735Z"/>
+  <path id="Shape_20_copy" data-name="Shape 20 copy" class="cls-2" d="M103.076,115.559L61.561,91.591"/>
+  <path id="Shape_20_copy_2" data-name="Shape 20 copy 2" class="cls-2" d="M103.111,31.053L62.179,54.685"/>
+</svg>

@@ -5,6 +5,7 @@ import { onAuthStateChanged } from 'firebase/auth';
 import HatchPreview from './HatchPreview';
 import LinetypePreview from './LinetypePreview';
 import ToastContainer, { showToast } from '../Toast';
+import EditMetadataModal from './EditMetadataModal';
 
 const SvgPreview = ({ svgString }) => (
   <div 
@@ -19,6 +20,11 @@ export default function LibraryPanel({ currentType, searchQuery = '', selectedIt
   const [activeCategory, setActiveCategory] = useState('Todas');
   const [saving, setSaving] = useState(null);
   const [user, setUser] = useState(null);
+  
+  const [contextMenu, setContextMenu] = useState(null);
+  const [editingHatch, setEditingHatch] = useState(null);
+
+  const isAdmin = user && user.email === 'aldamadaniel1984@gmail.com';
 
   useEffect(() => {
     const unsub = onAuthStateChanged(auth, u => setUser(u));
@@ -93,6 +99,25 @@ export default function LibraryPanel({ currentType, searchQuery = '', selectedIt
     );
   };
 
+  const handleContextMenu = (e, item) => {
+    if (!isAdmin) return;
+    e.preventDefault();
+    setContextMenu({
+      x: e.pageX,
+      y: e.pageY,
+      item
+    });
+  };
+
+  const handleEditMetadata = () => {
+    setEditingHatch(contextMenu.item);
+    setContextMenu(null);
+  };
+
+  const handleMetadataSaved = (updatedHatch) => {
+    setAssets(assets.map(a => a.id === updatedHatch.id ? updatedHatch : a));
+  };
+
   const categories = ['Todas', ...new Set(assets.map(a => a.category || 'General'))];
 
   const filtered = assets.filter(a => {
@@ -161,6 +186,7 @@ export default function LibraryPanel({ currentType, searchQuery = '', selectedIt
               <div 
                 key={item.id} 
                 onClick={() => onToggleSelect && onToggleSelect(item)}
+                onContextMenu={(e) => handleContextMenu(e, item)}
                 style={{ 
                   backgroundColor: isSelected ? 'rgba(242, 109, 33, 0.2)' : 'transparent', 
                   padding: '5px', 
@@ -187,7 +213,17 @@ export default function LibraryPanel({ currentType, searchQuery = '', selectedIt
               >
                 <div style={{ width: '64px', height: '64px', backgroundColor: '#3b4654', display: 'flex', justifyContent: 'center', alignItems: 'center', overflow: 'hidden' }}>
                   {currentType === 'icon' && <IconGenerator iconName={item.name} size={64} color="var(--tmd-orange)" />}
-                  {currentType === 'hatch' && <HatchPreview patCode={item.code} scale={1} width={64} height={64} />}
+                  {currentType === 'hatch' && (
+                    <div 
+                      title={item.name}
+                      style={{ 
+                        width: '48px', height: '48px', 
+                        backgroundImage: `url(${item.iconUrl || '/patterns/stack.svg'})`, 
+                        backgroundSize: '50% 50%', backgroundRepeat: 'repeat', 
+                        filter: 'invert(1) hue-rotate(180deg)', opacity: 0.9 
+                      }} 
+                    />
+                  )}
                   {currentType === 'lin' && <LinetypePreview linCode={item.code} scale={1} width={64} height={64} />}
                 </div>
                 <span style={{ 
@@ -207,6 +243,58 @@ export default function LibraryPanel({ currentType, searchQuery = '', selectedIt
           })
         )}
       </div>
+
+      {contextMenu && (
+        <>
+          <div 
+            style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, zIndex: 999 }} 
+            onClick={() => setContextMenu(null)} 
+            onContextMenu={(e) => { e.preventDefault(); setContextMenu(null); }}
+          />
+          <div style={{
+            position: 'absolute',
+            top: contextMenu.y,
+            left: contextMenu.x,
+            backgroundColor: '#1e293b',
+            border: '1px solid #475569',
+            borderRadius: '6px',
+            boxShadow: '0 4px 6px rgba(0,0,0,0.3)',
+            zIndex: 1000,
+            overflow: 'hidden',
+            display: 'flex',
+            flexDirection: 'column',
+            width: '160px'
+          }}>
+            <button 
+              onClick={handleEditMetadata}
+              style={{ padding: '10px 15px', backgroundColor: 'transparent', border: 'none', color: 'white', textAlign: 'left', cursor: 'pointer', fontSize: '0.85rem' }}
+              onMouseOver={(e) => e.target.style.backgroundColor = '#334155'}
+              onMouseOut={(e) => e.target.style.backgroundColor = 'transparent'}
+            >
+              ✏️ Editar Metadatos
+            </button>
+            <button 
+              onClick={() => {
+                showToast("Para editar geometría, selecciona un arquetipo en el constructor y sobreescribe este patrón.", "info", 5000);
+                setContextMenu(null);
+              }}
+              style={{ padding: '10px 15px', backgroundColor: 'transparent', border: 'none', color: 'white', textAlign: 'left', cursor: 'pointer', fontSize: '0.85rem', borderTop: '1px solid #334155' }}
+              onMouseOver={(e) => e.target.style.backgroundColor = '#334155'}
+              onMouseOut={(e) => e.target.style.backgroundColor = 'transparent'}
+            >
+              📐 Editar Geometría
+            </button>
+          </div>
+        </>
+      )}
+
+      {editingHatch && (
+        <EditMetadataModal 
+          hatch={editingHatch} 
+          onClose={() => setEditingHatch(null)} 
+          onSaved={handleMetadataSaved} 
+        />
+      )}
     </div>
   );
 }

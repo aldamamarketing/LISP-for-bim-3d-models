@@ -1,0 +1,22 @@
+<svg id="Lock" xmlns="http://www.w3.org/2000/svg" width="160" height="160" viewBox="0 0 160 160">
+  <defs>
+    <style>
+      .cls-1, .cls-2 {
+        fill: none;
+        stroke: #000;
+        stroke-width: 8.889px;
+        fill-rule: evenodd;
+      }
+
+      .cls-2 {
+        stroke-linecap: round;
+        stroke-linejoin: round;
+      }
+    </style>
+  </defs>
+  <path class="cls-1" d="M52,46a28,28,0,0,1,56,0"/>
+  <path class="cls-1" d="M52,80V46"/>
+  <path id="Shape_25_copy" data-name="Shape 25 copy" class="cls-1" d="M108,80V46"/>
+  <path id="Rounded_Rectangle_2" data-name="Rounded Rectangle 2" class="cls-1" d="M46.222,79.694h67.556a10.666,10.666,0,0,1,10.666,10.667V131.25a10.666,10.666,0,0,1-10.666,10.667H46.222A10.667,10.667,0,0,1,35.556,131.25V90.361A10.667,10.667,0,0,1,46.222,79.694Z"/>
+  <path class="cls-2" d="M80,103.16v16.792"/>
+</svg>

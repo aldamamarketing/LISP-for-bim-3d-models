@@ -1,0 +1,24 @@
+<svg id="Settings_B" data-name="Settings B" xmlns="http://www.w3.org/2000/svg" width="160" height="160" viewBox="0 0 160 160">
+  <defs>
+    <style>
+      .kIshe, .mBuIw {
+        fill: none;
+        stroke: #000;
+        stroke-width: 16px;
+      }
+
+      .mBuIw {
+        fill-rule: evenodd;
+      }
+    </style>
+  </defs>
+  <circle class="kIshe" cx="80.64" cy="79.609" r="55.922"/>
+  <path id="Shape_31_copy_11" data-name="Shape 31 copy 11" class="mBuIw" d="M68.74,24.671L75.182,10H84.6l6.441,14.671"/>
+  <path id="Shape_31_copy_12" data-name="Shape 31 copy 12" class="mBuIw" d="M111.377,32.691l14.929-5.819,6.657,6.657-5.819,14.929"/>
+  <path id="Shape_31_copy_14" data-name="Shape 31 copy 14" class="mBuIw" d="M134.6,68.417l14.671,6.442v9.414L134.6,90.714"/>
+  <path id="Shape_31_copy_13" data-name="Shape 31 copy 13" class="mBuIw" d="M126.585,111.054l5.82,14.929-6.657,6.657-14.929-5.819"/>
+  <path id="Shape_31_copy_16" data-name="Shape 31 copy 16" class="mBuIw" d="M90.086,134.53L83.645,149.2H74.23l-6.441-14.67"/>
+  <path id="Shape_31_copy_15" data-name="Shape 31 copy 15" class="mBuIw" d="M47.449,126.51L32.52,132.329l-6.657-6.657,5.819-14.928"/>
+  <path id="Shape_31_copy_18" data-name="Shape 31 copy 18" class="mBuIw" d="M25.215,89.86L10.544,83.419V74l14.671-6.442"/>
+  <path id="Shape_31_copy_17" data-name="Shape 31 copy 17" class="mBuIw" d="M33.234,47.223L27.415,32.294l6.657-6.657L49,31.456"/>
+</svg>

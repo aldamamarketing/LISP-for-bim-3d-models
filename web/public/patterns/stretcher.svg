@@ -1,0 +1,16 @@
+<svg version="1.2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="200" height="200">
+	<style type="text/css">.shape {stroke-width: 4; vector-effect: non-scaling-stroke; fill:none; stroke: #000; stroke-linecap: round; stroke-linejoin: miter;}</style>
+	<rect x="0" y="0" width="100" height="50" class="shape" />
+	<rect x="100" y="0" width="100" height="50" class="shape" />
+	
+	<rect x="-50" y="50" width="100" height="50" class="shape" />
+	<rect x="50" y="50" width="100" height="50" class="shape" />
+	<rect x="150" y="50" width="100" height="50" class="shape" />
+	
+	<rect x="0" y="100" width="100" height="50" class="shape" />
+	<rect x="100" y="100" width="100" height="50" class="shape" />
+	
+	<rect x="-50" y="150" width="100" height="50" class="shape" />
+	<rect x="50" y="150" width="100" height="50" class="shape" />
+	<rect x="150" y="150" width="100" height="50" class="shape" />
+</svg>

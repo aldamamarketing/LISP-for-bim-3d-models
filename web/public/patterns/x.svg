@@ -1,0 +1,11 @@
+<svg id="X" xmlns="http://www.w3.org/2000/svg" width="160" height="160" viewBox="0 0 160 160">
+  <defs>
+    <style>
+      .asudbeu {
+        fill-rule: evenodd;
+      }
+    </style>
+  </defs>
+  <path class="asudbeu" d="M27.2,122.238L122.238,27.2,132.8,37.762,37.762,132.8Z"/>
+  <path id="Rectangle_1_copy" data-name="Rectangle 1 copy" class="asudbeu" d="M37.762,27.2L132.8,122.238,122.238,132.8,27.2,37.762Z"/>
+</svg>

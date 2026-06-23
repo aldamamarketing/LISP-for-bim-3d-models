@@ -1,0 +1,15 @@
+<svg version="1.2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 160" width="160" height="160">
+	<title>all-icons</title>
+	<style>
+		.s0 { fill: none;stroke: #000006;stroke-linecap: round;stroke-linejoin: round;stroke-width: 10 } 
+	</style>
+	<g id="Metalness B">
+		<path id="Shape 37 copy 4" class="s0" d="m24.2 63.8h25.5"/>
+		<path id="Shape 37 copy 6" class="s0" d="m67.5 97.1h25.6"/>
+		<path id="Shape 37 copy 3" class="s0" d="m24.2 63.7l-17.9 33.5"/>
+		<path id="Shape 37 copy 5" class="s0" d="m67.6 97.1l-17.8-33.3"/>
+		<path id="Shape 37 copy 7" class="s0" d="m110.8 63.8h25.6"/>
+		<path id="Shape 37 copy 7" class="s0" d="m110.9 63.7l-17.9 33.5"/>
+		<path id="Shape 37 copy 7" class="s0" d="m154.2 97.1l-17.8-33.3"/>
+	</g>
+</svg>

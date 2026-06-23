@@ -1,0 +1,18 @@
+<svg id="Edges" xmlns="http://www.w3.org/2000/svg" width="160" height="160" viewBox="0 0 160 160">
+  <defs>
+    <style>
+      .cls-1 {
+        fill: none;
+        stroke: #000;
+        stroke-width: 10px;
+        fill-rule: evenodd;
+      }
+    </style>
+  </defs>
+  <path id="Rectangle_1_copy" data-name="Rectangle 1 copy" class="cls-1" d="M16.32,16.314H143.685V143.679H16.32V16.314Z"/>
+  <path id="Rectangle_1_copy_2" data-name="Rectangle 1 copy 2" class="cls-1" d="M45.614,45.608h68.777v68.777H45.614V45.608Z"/>
+  <path class="cls-1" d="M16.541,16.756L44.8,45.01"/>
+  <path id="Shape_1_copy" data-name="Shape 1 copy" class="cls-1" d="M16.541,143.679L44.8,115.425"/>
+  <path id="Shape_1_copy_2" data-name="Shape 1 copy 2" class="cls-1" d="M143.685,16.756L115.431,45.01"/>
+  <path id="Shape_1_copy_2-2" data-name="Shape 1 copy 2" class="cls-1" d="M143.685,143.679l-28.254-28.254"/>
+</svg>

@@ -1,0 +1,17 @@
+<svg id="Rotate" xmlns="http://www.w3.org/2000/svg" width="160" height="160" viewBox="0 0 160 160">
+  <defs>
+    <style>
+      .cls-1 {
+        fill: none;
+        stroke: #000;
+        stroke-linecap: round;
+        stroke-linejoin: round;
+        stroke-width: 8.889px;
+        fill-rule: evenodd;
+      }
+    </style>
+  </defs>
+  <path class="cls-1" d="M135.394,62.739a62.665,62.665,0,1,0-.538,37.147"/>
+  <path id="Shape_1_copy" data-name="Shape 1 copy" class="cls-1" d="M148.785,22.881L137.623,64.218"/>
+  <path class="cls-1" d="M95.967,53.142l41.656,11.076"/>
+</svg>

@@ -1,0 +1,9 @@
+<svg version="1.2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 160" width="160" height="160">
+	<title>all-icons</title>
+	<style>
+		.s0 { fill: none;stroke: #000006;stroke-linecap: round;stroke-linejoin: round;stroke-width: 10 } 
+	</style>
+	<g id="Sphere">
+		<path id="Ellipse 13" class="s0" d="m80 5.6c41.1 0 74.4 33.3 74.4 74.4 0 41.1-33.3 74.4-74.4 74.4-41.1 0-74.4-33.3-74.4-74.4 0-41.1 33.3-74.4 74.4-74.4z"/>
+	</g>
+</svg>

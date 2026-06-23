@@ -21,6 +21,11 @@ export default defineConfig({
     },
     resolve: {
       preserveSymlinks: true
+    },
+    server: {
+      watch: {
+        usePolling: true
+      }
     }
   }
 });

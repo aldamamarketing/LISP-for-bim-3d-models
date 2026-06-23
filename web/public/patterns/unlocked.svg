@@ -1,0 +1,23 @@
+<svg id="Lock" xmlns="http://www.w3.org/2000/svg" width="160" height="160" viewBox="0 0 160 160">
+  <defs>
+    <style>
+      .cls-1, .cls-2, .cls-3 {
+        fill: none;
+        stroke: #000;
+        stroke-width: 8.889px;
+        fill-rule: evenodd;
+      }
+
+      .cls-1, .cls-3 {
+        stroke-linecap: round;
+      }
+
+      .cls-3 {
+        stroke-linejoin: round;
+      }
+    </style>
+  </defs>
+  <path id="Unlocked" class="cls-1" d="M84.444,57.778L84.5,33.411c0-15.992,5.346-28.956,11.941-28.956s11.941,12.964,11.941,28.956l0.059,43.033"/>
+  <path id="Rounded_Rectangle_2" data-name="Rounded Rectangle 2" class="cls-2" d="M46.222,79.694h67.556a10.666,10.666,0,0,1,10.666,10.667V131.25a10.666,10.666,0,0,1-10.666,10.667H46.222A10.667,10.667,0,0,1,35.556,131.25V90.361A10.667,10.667,0,0,1,46.222,79.694Z"/>
+  <path class="cls-3" d="M80,103.16v16.792"/>
+</svg>

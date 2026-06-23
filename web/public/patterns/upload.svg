@@ -1,0 +1,18 @@
+<svg id="Upload" xmlns="http://www.w3.org/2000/svg" width="160" height="160" viewBox="0 0 160 160">
+  <defs>
+    <style>
+      .cls-1 {
+        fill: none;
+        stroke: #000006;
+        stroke-linecap: round;
+        stroke-linejoin: round;
+        stroke-width: 10px;
+        fill-rule: evenodd;
+      }
+    </style>
+  </defs>
+  <path class="cls-1" d="M22,113v31H137V113"/>
+  <path class="cls-1" d="M80,113V14"/>
+  <path id="Shape_3_copy" data-name="Shape 3 copy" class="cls-1" d="M122.062,55.656L79.948,13.542"/>
+  <path id="Shape_3_copy_2" data-name="Shape 3 copy 2" class="cls-1" d="M37.938,55.656L80.052,13.542"/>
+</svg>

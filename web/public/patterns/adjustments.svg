@@ -1,0 +1,15 @@
+<svg version="1.2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 160" width="160" height="160">
+	<title>all-icons</title>
+	<style>
+		.s0 { fill: none;stroke: #000006;stroke-linecap: round;stroke-width: 9.5 } 
+		.s1 { fill: #ffffff;stroke: #000006;stroke-linecap: round;stroke-width: 9.5 } 
+	</style>
+	<g id="Adjustments">
+		<path id="Shape 2" class="s0" d="m22 35h116"/>
+		<path id="Shape 2 copy" class="s0" d="m22 80h116"/>
+		<path id="Shape 2 copy 2" class="s0" d="m22 125h116"/>
+		<path id="Rounded Rectangle 3" class="s1" d="m114 25c5.5 0 10 4.5 10 10 0 5.5-4.5 10-10 10-5.5 0-10-4.5-10-10 0-5.5 4.5-10 10-10z"/>
+		<path id="Rounded Rectangle 3 copy" class="s1" d="m46 70c5.5 0 10 4.5 10 10 0 5.5-4.5 10-10 10-5.5 0-10-4.5-10-10 0-5.5 4.5-10 10-10z"/>
+		<path id="Rounded Rectangle 3 copy 2" class="s1" d="m80 115c5.5 0 10 4.5 10 10 0 5.5-4.5 10-10 10-5.5 0-10-4.5-10-10 0-5.5 4.5-10 10-10z"/>
+	</g>
+</svg>

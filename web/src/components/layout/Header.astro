@@ -225,13 +225,18 @@ const getPath = (path) => {
                     });
                 }
                 if (desktopLoginBtn) {
-                    // Si está en la landing u otra página sin sidebar, 
-                    // el botón "Login" cambia a "Dashboard" y lo lleva al portal.
-                    // Desde el dashboard podrá hacer logout en el sidebar.
                     desktopLoginBtn.textContent = dict['header.portal'] || 'Dashboard';
                     desktopLoginBtn.href = '/dashboard';
-                    // Removemos cualquier listener previo reemplazando el nodo si es necesario,
-                    // pero como no agregamos listeners a desktopLoginBtn, solo cambiar el href es seguro.
+                }
+                const mobileAdminCat = document.getElementById('mobile-admin-catalog');
+                if (mobileAdminCat) {
+                    if (user.email === 'aldamadaniel1984@gmail.com') {
+                        mobileAdminCat.classList.remove('hidden');
+                        mobileAdminCat.classList.add('flex');
+                    } else {
+                        mobileAdminCat.classList.add('hidden');
+                        mobileAdminCat.classList.remove('flex');
+                    }
                 }
                 // Optionally hide help btn to save space
                 if (helpBtn) {
@@ -250,6 +255,11 @@ const getPath = (path) => {
                 if (loginBtn) {
                     loginBtn.textContent = dict['header.login'] || 'Login';
                     loginBtn.href = '/login';
+                }
+                const mobileAdminCat = document.getElementById('mobile-admin-catalog');
+                if (mobileAdminCat) {
+                    mobileAdminCat.classList.add('hidden');
+                    mobileAdminCat.classList.remove('flex');
                 }
             }
         });

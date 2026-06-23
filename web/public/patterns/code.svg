@@ -1,0 +1,18 @@
+<svg id="Code" xmlns="http://www.w3.org/2000/svg" width="160" height="160" viewBox="0 0 160 160">
+  <defs>
+    <style>
+      .cls-1 {
+        fill: none;
+        stroke: #010101;
+        stroke-linecap: round;
+        stroke-linejoin: round;
+        stroke-width: 10px;
+        fill-rule: evenodd;
+      }
+    </style>
+  </defs>
+  <path class="cls-1" d="M50,53L22,81l27,27"/>
+  <path id="Shape_21_copy" data-name="Shape 21 copy" class="cls-1" d="M108.031,108.031l28-28-27-27"/>
+  <path class="cls-1" d="M55,116"/>
+  <path class="cls-1" d="M63.589,118.411L92.9,43.311"/>
+</svg>

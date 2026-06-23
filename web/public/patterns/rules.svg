@@ -1,0 +1,33 @@
+<svg id="Rules_copy" data-name="Rules copy" xmlns="http://www.w3.org/2000/svg" width="160" height="160" viewBox="0 0 160 160">
+  <defs>
+    <style>
+      .cls-1, .cls-2 {
+        fill: none;
+        stroke: #010101;
+        stroke-linecap: round;
+        stroke-width: 10px;
+        fill-rule: evenodd;
+      }
+
+      .cls-2 {
+        opacity: 0.5;
+      }
+    </style>
+  </defs>
+  <path id="Shape_31_copy_2" data-name="Shape 31 copy 2" class="cls-1" d="M17.734,18.967H67.482"/>
+  <path id="Shape_31_copy_3" data-name="Shape 31 copy 3" class="cls-1" d="M92.734,18.967h49.748"/>
+  <path id="Shape_31_copy_4" data-name="Shape 31 copy 4" class="cls-1" d="M17.734,80.542H67.482"/>
+  <path id="Shape_31_copy_4-2" data-name="Shape 31 copy 4" class="cls-1" d="M92.734,80.542h49.748"/>
+  <g>
+    <path id="Shape_31_copy_7" data-name="Shape 31 copy 7" class="cls-2" d="M55.734,111.329h49.748"/>
+    <path id="Shape_31_copy_7-2" data-name="Shape 31 copy 7" class="cls-1" d="M129.145,111.341h13.928"/>
+    <path id="Shape_31_copy_8" data-name="Shape 31 copy 8" class="cls-1" d="M17.145,111.341H31.073"/>
+  </g>
+  <g id="Group_3_copy" data-name="Group 3 copy">
+    <path id="Shape_31_copy_7-3" data-name="Shape 31 copy 7" class="cls-2" d="M55.734,49.754h49.748"/>
+    <path id="Shape_31_copy_7-4" data-name="Shape 31 copy 7" class="cls-1" d="M129.145,49.766h13.928"/>
+    <path id="Shape_31_copy_8-2" data-name="Shape 31 copy 8" class="cls-1" d="M17.145,49.766H31.073"/>
+  </g>
+  <path id="Shape_31_copy_6" data-name="Shape 31 copy 6" class="cls-1" d="M17.734,142.117H67.482"/>
+  <path id="Shape_31_copy_6-2" data-name="Shape 31 copy 6" class="cls-1" d="M92.734,142.117h49.748"/>
+</svg>

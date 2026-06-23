@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="114" height="200" viewBox="0 0 114 200">
+  <defs>
+    <style type="text/css">path,circle {stroke-width: 1; vector-effect: non-scaling-stroke; fill:none; stroke: #000; stroke-linecap: round; stroke-linejoin: round;}</style>
+  </defs>
+  <circle cx="57" cy="100" r="48.531"/>
+  <path d="M0,151.678a48.436,48.436,0,1,1,0,96.871,48.485,48.485,0,0,1-48.535-48.435A48.485,48.485,0,0,1,0,151.678Z"/>
+  <circle cx="114" cy="200.125" r="48.531"/>
+  <path d="M114-48.322A48.486,48.486,0,0,1,162.536.114,48.486,48.486,0,0,1,114,48.55,48.486,48.486,0,0,1,65.465.114,48.486,48.486,0,0,1,114-48.322Z"/>
+  <circle cy="0.125" r="48.531"/>
+</svg>
