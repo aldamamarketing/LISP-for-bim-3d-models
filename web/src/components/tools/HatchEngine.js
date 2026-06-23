@@ -5,6 +5,11 @@ export const CATEGORIES = [
   'Brick Bond', 'Paving', 'Geometric', 'Roofing', 'Parquetry', 'Madera', 'Topography', 'Fabric', 'General'
 ];
 
+// GLOBAL RULES FOR ARCHETYPES:
+// 1. Parametric Engine (generatePat): Has explicit JS math functions.
+// 2. Static SVGs: Do NOT have generatePat. Handled by SvgPreviewEngine.
+// 3. For Static SVGs, default width & height represent real physical dimensions of the SVG box.
+// 4. Default rows and columns should be 1 unless explicitly needed.
 export const ARCHETYPES = [
   {
     id: 'line',
@@ -1452,6 +1457,1598 @@ export const ARCHETYPES = [
       }
       return { w: W, h: W, paths };
     }
+  },
+  {
+    id: '13_stretcher',
+    name: '13 Stretcher',
+    category: 'Brick Bond',
+    controlsType: 'lines',
+    iconUrl: '/patterns/13_stretcher.svg',
+    controls: ['width', 'height'],
+    defaults: { width: 200, height: 100, joint: 0, rows: 1, columns: 1 },
+    // AVISO A EDITORES: width y height deben representar las dimensiones reales físicas
+    // del patrón SVG asociado en el mundo real (ej. tamaño del azulejo o panel en mm).
+    // Por regla general, rows y columns inician en 1 (vista de 1x1 azulejos/patrones),
+    // a menos que un patrón requiera un mosaico predeterminado más grande para entenderse.
+    // Al carecer de generatePat, este patrón usa SvgPreviewEngine (static fallback).
+  },
+  {
+    id: '14_stretcher',
+    name: '14 Stretcher',
+    category: 'Brick Bond',
+    controlsType: 'lines',
+    iconUrl: '/patterns/14_stretcher.svg',
+    controls: ['width', 'height'],
+    defaults: { width: 200, height: 100, joint: 0, rows: 1, columns: 1 },
+    // AVISO A EDITORES: width y height deben representar las dimensiones reales físicas
+    // del patrón SVG asociado en el mundo real (ej. tamaño del azulejo o panel en mm).
+    // Por regla general, rows y columns inician en 1 (vista de 1x1 azulejos/patrones),
+    // a menos que un patrón requiera un mosaico predeterminado más grande para entenderse.
+    // Al carecer de generatePat, este patrón usa SvgPreviewEngine (static fallback).
+  },
+  {
+    id: '303',
+    name: '303',
+    category: 'General',
+    controlsType: 'lines',
+    iconUrl: '/patterns/303.svg',
+    controls: ['width', 'height'],
+    defaults: { width: 200, height: 100, joint: 0, rows: 1, columns: 1 },
+    // AVISO A EDITORES: width y height deben representar las dimensiones reales físicas
+    // del patrón SVG asociado en el mundo real (ej. tamaño del azulejo o panel en mm).
+    // Por regla general, rows y columns inician en 1 (vista de 1x1 azulejos/patrones),
+    // a menos que un patrón requiera un mosaico predeterminado más grande para entenderse.
+    // Al carecer de generatePat, este patrón usa SvgPreviewEngine (static fallback).
+  },
+  {
+    id: '304',
+    name: '304',
+    category: 'General',
+    controlsType: 'lines',
+    iconUrl: '/patterns/304.svg',
+    controls: ['width', 'height'],
+    defaults: { width: 200, height: 100, joint: 0, rows: 1, columns: 1 },
+    // AVISO A EDITORES: width y height deben representar las dimensiones reales físicas
+    // del patrón SVG asociado en el mundo real (ej. tamaño del azulejo o panel en mm).
+    // Por regla general, rows y columns inician en 1 (vista de 1x1 azulejos/patrones),
+    // a menos que un patrón requiera un mosaico predeterminado más grande para entenderse.
+    // Al carecer de generatePat, este patrón usa SvgPreviewEngine (static fallback).
+  },
+  {
+    id: '344',
+    name: '344',
+    category: 'General',
+    controlsType: 'lines',
+    iconUrl: '/patterns/344.svg',
+    controls: ['width', 'height'],
+    defaults: { width: 200, height: 100, joint: 0, rows: 1, columns: 1 },
+    // AVISO A EDITORES: width y height deben representar las dimensiones reales físicas
+    // del patrón SVG asociado en el mundo real (ej. tamaño del azulejo o panel en mm).
+    // Por regla general, rows y columns inician en 1 (vista de 1x1 azulejos/patrones),
+    // a menos que un patrón requiera un mosaico predeterminado más grande para entenderse.
+    // Al carecer de generatePat, este patrón usa SvgPreviewEngine (static fallback).
+  },
+  {
+    id: '356',
+    name: '356',
+    category: 'General',
+    controlsType: 'lines',
+    iconUrl: '/patterns/356.svg',
+    controls: ['width', 'height'],
+    defaults: { width: 200, height: 100, joint: 0, rows: 1, columns: 1 },
+    // AVISO A EDITORES: width y height deben representar las dimensiones reales físicas
+    // del patrón SVG asociado en el mundo real (ej. tamaño del azulejo o panel en mm).
+    // Por regla general, rows y columns inician en 1 (vista de 1x1 azulejos/patrones),
+    // a menos que un patrón requiera un mosaico predeterminado más grande para entenderse.
+    // Al carecer de generatePat, este patrón usa SvgPreviewEngine (static fallback).
+  },
+  {
+    id: '367',
+    name: '367',
+    category: 'General',
+    controlsType: 'lines',
+    iconUrl: '/patterns/367.svg',
+    controls: ['width', 'height'],
+    defaults: { width: 200, height: 100, joint: 0, rows: 1, columns: 1 },
+    // AVISO A EDITORES: width y height deben representar las dimensiones reales físicas
+    // del patrón SVG asociado en el mundo real (ej. tamaño del azulejo o panel en mm).
+    // Por regla general, rows y columns inician en 1 (vista de 1x1 azulejos/patrones),
+    // a menos que un patrón requiera un mosaico predeterminado más grande para entenderse.
+    // Al carecer de generatePat, este patrón usa SvgPreviewEngine (static fallback).
+  },
+  {
+    id: '385',
+    name: '385',
+    category: 'General',
+    controlsType: 'lines',
+    iconUrl: '/patterns/385.svg',
+    controls: ['width', 'height'],
+    defaults: { width: 200, height: 100, joint: 0, rows: 1, columns: 1 },
+    // AVISO A EDITORES: width y height deben representar las dimensiones reales físicas
+    // del patrón SVG asociado en el mundo real (ej. tamaño del azulejo o panel en mm).
+    // Por regla general, rows y columns inician en 1 (vista de 1x1 azulejos/patrones),
+    // a menos que un patrón requiera un mosaico predeterminado más grande para entenderse.
+    // Al carecer de generatePat, este patrón usa SvgPreviewEngine (static fallback).
+  },
+  {
+    id: 'aberdeen_bond',
+    name: 'Aberdeen Bond',
+    category: 'Brick Bond',
+    controlsType: 'lines',
+    iconUrl: '/patterns/aberdeen_bond.svg',
+    controls: ['width', 'height'],
+    defaults: { width: 200, height: 100, joint: 0, rows: 1, columns: 1 },
+    // AVISO A EDITORES: width y height deben representar las dimensiones reales físicas
+    // del patrón SVG asociado en el mundo real (ej. tamaño del azulejo o panel en mm).
+    // Por regla general, rows y columns inician en 1 (vista de 1x1 azulejos/patrones),
+    // a menos que un patrón requiera un mosaico predeterminado más grande para entenderse.
+    // Al carecer de generatePat, este patrón usa SvgPreviewEngine (static fallback).
+  },
+  {
+    id: 'alternatingFishscale',
+    name: 'AlternatingFishscale',
+    category: 'Roofing',
+    controlsType: 'lines',
+    iconUrl: '/patterns/alternatingFishscale.svg',
+    controls: ['width', 'height'],
+    defaults: { width: 200, height: 100, joint: 0, rows: 1, columns: 1 },
+    // AVISO A EDITORES: width y height deben representar las dimensiones reales físicas
+    // del patrón SVG asociado en el mundo real (ej. tamaño del azulejo o panel en mm).
+    // Por regla general, rows y columns inician en 1 (vista de 1x1 azulejos/patrones),
+    // a menos que un patrón requiera un mosaico predeterminado más grande para entenderse.
+    // Al carecer de generatePat, este patrón usa SvgPreviewEngine (static fallback).
+  },
+  {
+    id: 'angled_chevron',
+    name: 'Angled Chevron',
+    category: 'General',
+    controlsType: 'lines',
+    iconUrl: '/patterns/angled_chevron.svg',
+    controls: ['width', 'height'],
+    defaults: { width: 200, height: 100, joint: 0, rows: 1, columns: 1 },
+    // AVISO A EDITORES: width y height deben representar las dimensiones reales físicas
+    // del patrón SVG asociado en el mundo real (ej. tamaño del azulejo o panel en mm).
+    // Por regla general, rows y columns inician en 1 (vista de 1x1 azulejos/patrones),
+    // a menos que un patrón requiera un mosaico predeterminado más grande para entenderse.
+    // Al carecer de generatePat, este patrón usa SvgPreviewEngine (static fallback).
+  },
+  {
+    id: 'angled_trapezoids',
+    name: 'Angled Trapezoids',
+    category: 'General',
+    controlsType: 'lines',
+    iconUrl: '/patterns/angled_trapezoids.svg',
+    controls: ['width', 'height'],
+    defaults: { width: 200, height: 100, joint: 0, rows: 1, columns: 1 },
+    // AVISO A EDITORES: width y height deben representar las dimensiones reales físicas
+    // del patrón SVG asociado en el mundo real (ej. tamaño del azulejo o panel en mm).
+    // Por regla general, rows y columns inician en 1 (vista de 1x1 azulejos/patrones),
+    // a menos que un patrón requiera un mosaico predeterminado más grande para entenderse.
+    // Al carecer de generatePat, este patrón usa SvgPreviewEngine (static fallback).
+  },
+  {
+    id: 'arabesque_floral',
+    name: 'Arabesque Floral',
+    category: 'General',
+    controlsType: 'lines',
+    iconUrl: '/patterns/arabesque_floral.svg',
+    controls: ['width', 'height'],
+    defaults: { width: 200, height: 100, joint: 0, rows: 1, columns: 1 },
+    // AVISO A EDITORES: width y height deben representar las dimensiones reales físicas
+    // del patrón SVG asociado en el mundo real (ej. tamaño del azulejo o panel en mm).
+    // Por regla general, rows y columns inician en 1 (vista de 1x1 azulejos/patrones),
+    // a menos que un patrón requiera un mosaico predeterminado más grande para entenderse.
+    // Al carecer de generatePat, este patrón usa SvgPreviewEngine (static fallback).
+  },
+  {
+    id: 'arabesque_lantern',
+    name: 'Arabesque Lantern',
+    category: 'General',
+    controlsType: 'lines',
+    iconUrl: '/patterns/arabesque_lantern.svg',
+    controls: ['width', 'height'],
+    defaults: { width: 200, height: 100, joint: 0, rows: 1, columns: 1 },
+    // AVISO A EDITORES: width y height deben representar las dimensiones reales físicas
+    // del patrón SVG asociado en el mundo real (ej. tamaño del azulejo o panel en mm).
+    // Por regla general, rows y columns inician en 1 (vista de 1x1 azulejos/patrones),
+    // a menos que un patrón requiera un mosaico predeterminado más grande para entenderse.
+    // Al carecer de generatePat, este patrón usa SvgPreviewEngine (static fallback).
+  },
+  {
+    id: 'ashlar',
+    name: 'Ashlar',
+    category: 'Brick Bond',
+    controlsType: 'lines',
+    iconUrl: '/patterns/ashlar.svg',
+    controls: ['width', 'height'],
+    defaults: { width: 200, height: 100, joint: 0, rows: 1, columns: 1 },
+    // AVISO A EDITORES: width y height deben representar las dimensiones reales físicas
+    // del patrón SVG asociado en el mundo real (ej. tamaño del azulejo o panel en mm).
+    // Por regla general, rows y columns inician en 1 (vista de 1x1 azulejos/patrones),
+    // a menos que un patrón requiera un mosaico predeterminado más grande para entenderse.
+    // Al carecer de generatePat, este patrón usa SvgPreviewEngine (static fallback).
+  },
+  {
+    id: 'bowtie_pavers',
+    name: 'Bowtie Pavers',
+    category: 'Paving',
+    controlsType: 'lines',
+    iconUrl: '/patterns/bowtie_pavers.svg',
+    controls: ['width', 'height'],
+    defaults: { width: 200, height: 100, joint: 0, rows: 1, columns: 1 },
+    // AVISO A EDITORES: width y height deben representar las dimensiones reales físicas
+    // del patrón SVG asociado en el mundo real (ej. tamaño del azulejo o panel en mm).
+    // Por regla general, rows y columns inician en 1 (vista de 1x1 azulejos/patrones),
+    // a menos que un patrón requiera un mosaico predeterminado más grande para entenderse.
+    // Al carecer de generatePat, este patrón usa SvgPreviewEngine (static fallback).
+  },
+  {
+    id: 'broken_herringbone',
+    name: 'Broken Herringbone',
+    category: 'General',
+    controlsType: 'lines',
+    iconUrl: '/patterns/broken_herringbone.svg',
+    controls: ['width', 'height'],
+    defaults: { width: 200, height: 100, joint: 0, rows: 1, columns: 1 },
+    // AVISO A EDITORES: width y height deben representar las dimensiones reales físicas
+    // del patrón SVG asociado en el mundo real (ej. tamaño del azulejo o panel en mm).
+    // Por regla general, rows y columns inician en 1 (vista de 1x1 azulejos/patrones),
+    // a menos que un patrón requiera un mosaico predeterminado más grande para entenderse.
+    // Al carecer de generatePat, este patrón usa SvgPreviewEngine (static fallback).
+  },
+  {
+    id: 'broken_range_ashlar',
+    name: 'Broken Range Ashlar',
+    category: 'Brick Bond',
+    controlsType: 'lines',
+    iconUrl: '/patterns/broken_range_ashlar.svg',
+    controls: ['width', 'height'],
+    defaults: { width: 200, height: 100, joint: 0, rows: 1, columns: 1 },
+    // AVISO A EDITORES: width y height deben representar las dimensiones reales físicas
+    // del patrón SVG asociado en el mundo real (ej. tamaño del azulejo o panel en mm).
+    // Por regla general, rows y columns inician en 1 (vista de 1x1 azulejos/patrones),
+    // a menos que un patrón requiera un mosaico predeterminado más grande para entenderse.
+    // Al carecer de generatePat, este patrón usa SvgPreviewEngine (static fallback).
+  },
+  {
+    id: 'bsAguisse',
+    name: 'BsAguisse',
+    category: 'General',
+    controlsType: 'lines',
+    iconUrl: '/patterns/bsAguisse.svg',
+    controls: ['width', 'height'],
+    defaults: { width: 200, height: 100, joint: 0, rows: 1, columns: 1 },
+    // AVISO A EDITORES: width y height deben representar las dimensiones reales físicas
+    // del patrón SVG asociado en el mundo real (ej. tamaño del azulejo o panel en mm).
+    // Por regla general, rows y columns inician en 1 (vista de 1x1 azulejos/patrones),
+    // a menos que un patrón requiera un mosaico predeterminado más grande para entenderse.
+    // Al carecer de generatePat, este patrón usa SvgPreviewEngine (static fallback).
+  },
+  {
+    id: 'bsChevron',
+    name: 'BsChevron',
+    category: 'General',
+    controlsType: 'lines',
+    iconUrl: '/patterns/bsChevron.svg',
+    controls: ['width', 'height'],
+    defaults: { width: 200, height: 100, joint: 0, rows: 1, columns: 1 },
+    // AVISO A EDITORES: width y height deben representar las dimensiones reales físicas
+    // del patrón SVG asociado en el mundo real (ej. tamaño del azulejo o panel en mm).
+    // Por regla general, rows y columns inician en 1 (vista de 1x1 azulejos/patrones),
+    // a menos que un patrón requiera un mosaico predeterminado más grande para entenderse.
+    // Al carecer de generatePat, este patrón usa SvgPreviewEngine (static fallback).
+  },
+  {
+    id: 'bsMarelle',
+    name: 'BsMarelle',
+    category: 'General',
+    controlsType: 'lines',
+    iconUrl: '/patterns/bsMarelle.svg',
+    controls: ['width', 'height'],
+    defaults: { width: 200, height: 100, joint: 0, rows: 1, columns: 1 },
+    // AVISO A EDITORES: width y height deben representar las dimensiones reales físicas
+    // del patrón SVG asociado en el mundo real (ej. tamaño del azulejo o panel en mm).
+    // Por regla general, rows y columns inician en 1 (vista de 1x1 azulejos/patrones),
+    // a menos que un patrón requiera un mosaico predeterminado más grande para entenderse.
+    // Al carecer de generatePat, este patrón usa SvgPreviewEngine (static fallback).
+  },
+  {
+    id: 'bsMoulin',
+    name: 'BsMoulin',
+    category: 'General',
+    controlsType: 'lines',
+    iconUrl: '/patterns/bsMoulin.svg',
+    controls: ['width', 'height'],
+    defaults: { width: 200, height: 100, joint: 0, rows: 1, columns: 1 },
+    // AVISO A EDITORES: width y height deben representar las dimensiones reales físicas
+    // del patrón SVG asociado en el mundo real (ej. tamaño del azulejo o panel en mm).
+    // Por regla general, rows y columns inician en 1 (vista de 1x1 azulejos/patrones),
+    // a menos que un patrón requiera un mosaico predeterminado más grande para entenderse.
+    // Al carecer de generatePat, este patrón usa SvgPreviewEngine (static fallback).
+  },
+  {
+    id: 'chevron_diamond',
+    name: 'Chevron Diamond',
+    category: 'Geometric',
+    controlsType: 'lines',
+    iconUrl: '/patterns/chevron_diamond.svg',
+    controls: ['width', 'height'],
+    defaults: { width: 200, height: 100, joint: 0, rows: 1, columns: 1 },
+    // AVISO A EDITORES: width y height deben representar las dimensiones reales físicas
+    // del patrón SVG asociado en el mundo real (ej. tamaño del azulejo o panel en mm).
+    // Por regla general, rows y columns inician en 1 (vista de 1x1 azulejos/patrones),
+    // a menos que un patrón requiera un mosaico predeterminado más grande para entenderse.
+    // Al carecer de generatePat, este patrón usa SvgPreviewEngine (static fallback).
+  },
+  {
+    id: 'circular',
+    name: 'Circular',
+    category: 'General',
+    controlsType: 'lines',
+    iconUrl: '/patterns/circular.svg',
+    controls: ['width', 'height'],
+    defaults: { width: 200, height: 100, joint: 0, rows: 1, columns: 1 },
+    // AVISO A EDITORES: width y height deben representar las dimensiones reales físicas
+    // del patrón SVG asociado en el mundo real (ej. tamaño del azulejo o panel en mm).
+    // Por regla general, rows y columns inician en 1 (vista de 1x1 azulejos/patrones),
+    // a menos que un patrón requiera un mosaico predeterminado más grande para entenderse.
+    // Al carecer de generatePat, este patrón usa SvgPreviewEngine (static fallback).
+  },
+  {
+    id: 'cloud_weave',
+    name: 'Cloud Weave',
+    category: 'Fabric',
+    controlsType: 'lines',
+    iconUrl: '/patterns/cloud_weave.svg',
+    controls: ['width', 'height'],
+    defaults: { width: 200, height: 100, joint: 0, rows: 1, columns: 1 },
+    // AVISO A EDITORES: width y height deben representar las dimensiones reales físicas
+    // del patrón SVG asociado en el mundo real (ej. tamaño del azulejo o panel en mm).
+    // Por regla general, rows y columns inician en 1 (vista de 1x1 azulejos/patrones),
+    // a menos que un patrón requiera un mosaico predeterminado más grande para entenderse.
+    // Al carecer de generatePat, este patrón usa SvgPreviewEngine (static fallback).
+  },
+  {
+    id: 'concrete2',
+    name: 'Concrete2',
+    category: 'General',
+    controlsType: 'lines',
+    iconUrl: '/patterns/concrete2.svg',
+    controls: ['width', 'height'],
+    defaults: { width: 200, height: 100, joint: 0, rows: 1, columns: 1 },
+    // AVISO A EDITORES: width y height deben representar las dimensiones reales físicas
+    // del patrón SVG asociado en el mundo real (ej. tamaño del azulejo o panel en mm).
+    // Por regla general, rows y columns inician en 1 (vista de 1x1 azulejos/patrones),
+    // a menos que un patrón requiera un mosaico predeterminado más grande para entenderse.
+    // Al carecer de generatePat, este patrón usa SvgPreviewEngine (static fallback).
+  },
+  {
+    id: 'consistent_width_terrazzo',
+    name: 'Consistent Width Terrazzo',
+    category: 'General',
+    controlsType: 'lines',
+    iconUrl: '/patterns/consistent_width_terrazzo.svg',
+    controls: ['width', 'height'],
+    defaults: { width: 200, height: 100, joint: 0, rows: 1, columns: 1 },
+    // AVISO A EDITORES: width y height deben representar las dimensiones reales físicas
+    // del patrón SVG asociado en el mundo real (ej. tamaño del azulejo o panel en mm).
+    // Por regla general, rows y columns inician en 1 (vista de 1x1 azulejos/patrones),
+    // a menos que un patrón requiera un mosaico predeterminado más grande para entenderse.
+    // Al carecer de generatePat, este patrón usa SvgPreviewEngine (static fallback).
+  },
+  {
+    id: 'corfu',
+    name: 'Corfu',
+    category: 'General',
+    controlsType: 'lines',
+    iconUrl: '/patterns/corfu.svg',
+    controls: ['width', 'height'],
+    defaults: { width: 200, height: 100, joint: 0, rows: 1, columns: 1 },
+    // AVISO A EDITORES: width y height deben representar las dimensiones reales físicas
+    // del patrón SVG asociado en el mundo real (ej. tamaño del azulejo o panel en mm).
+    // Por regla general, rows y columns inician en 1 (vista de 1x1 azulejos/patrones),
+    // a menos que un patrón requiera un mosaico predeterminado más grande para entenderse.
+    // Al carecer de generatePat, este patrón usa SvgPreviewEngine (static fallback).
+  },
+  {
+    id: 'coursedAshlar',
+    name: 'CoursedAshlar',
+    category: 'Brick Bond',
+    controlsType: 'lines',
+    iconUrl: '/patterns/coursedAshlar.svg',
+    controls: ['width', 'height'],
+    defaults: { width: 200, height: 100, joint: 0, rows: 1, columns: 1 },
+    // AVISO A EDITORES: width y height deben representar las dimensiones reales físicas
+    // del patrón SVG asociado en el mundo real (ej. tamaño del azulejo o panel en mm).
+    // Por regla general, rows y columns inician en 1 (vista de 1x1 azulejos/patrones),
+    // a menos que un patrón requiera un mosaico predeterminado más grande para entenderse.
+    // Al carecer de generatePat, este patrón usa SvgPreviewEngine (static fallback).
+  },
+  {
+    id: 'crazy_paving',
+    name: 'Crazy Paving',
+    category: 'Paving',
+    controlsType: 'lines',
+    iconUrl: '/patterns/crazy_paving.svg',
+    controls: ['width', 'height'],
+    defaults: { width: 200, height: 100, joint: 0, rows: 1, columns: 1 },
+    // AVISO A EDITORES: width y height deben representar las dimensiones reales físicas
+    // del patrón SVG asociado en el mundo real (ej. tamaño del azulejo o panel en mm).
+    // Por regla general, rows y columns inician en 1 (vista de 1x1 azulejos/patrones),
+    // a menos que un patrón requiera un mosaico predeterminado más grande para entenderse.
+    // Al carecer de generatePat, este patrón usa SvgPreviewEngine (static fallback).
+  },
+  {
+    id: 'cross_versailles',
+    name: 'Cross Versailles',
+    category: 'General',
+    controlsType: 'lines',
+    iconUrl: '/patterns/cross_versailles.svg',
+    controls: ['width', 'height'],
+    defaults: { width: 200, height: 100, joint: 0, rows: 1, columns: 1 },
+    // AVISO A EDITORES: width y height deben representar las dimensiones reales físicas
+    // del patrón SVG asociado en el mundo real (ej. tamaño del azulejo o panel en mm).
+    // Por regla general, rows y columns inician en 1 (vista de 1x1 azulejos/patrones),
+    // a menos que un patrón requiera un mosaico predeterminado más grande para entenderse.
+    // Al carecer de generatePat, este patrón usa SvgPreviewEngine (static fallback).
+  },
+  {
+    id: 'cyclone_versailles',
+    name: 'Cyclone Versailles',
+    category: 'General',
+    controlsType: 'lines',
+    iconUrl: '/patterns/cyclone_versailles.svg',
+    controls: ['width', 'height'],
+    defaults: { width: 200, height: 100, joint: 0, rows: 1, columns: 1 },
+    // AVISO A EDITORES: width y height deben representar las dimensiones reales físicas
+    // del patrón SVG asociado en el mundo real (ej. tamaño del azulejo o panel en mm).
+    // Por regla general, rows y columns inician en 1 (vista de 1x1 azulejos/patrones),
+    // a menos que un patrón requiera un mosaico predeterminado más grande para entenderse.
+    // Al carecer de generatePat, este patrón usa SvgPreviewEngine (static fallback).
+  },
+  {
+    id: 'diamond_continuous_versailles',
+    name: 'Diamond Continuous Versailles',
+    category: 'Geometric',
+    controlsType: 'lines',
+    iconUrl: '/patterns/diamond_continuous_versailles.svg',
+    controls: ['width', 'height'],
+    defaults: { width: 200, height: 100, joint: 0, rows: 1, columns: 1 },
+    // AVISO A EDITORES: width y height deben representar las dimensiones reales físicas
+    // del patrón SVG asociado en el mundo real (ej. tamaño del azulejo o panel en mm).
+    // Por regla general, rows y columns inician en 1 (vista de 1x1 azulejos/patrones),
+    // a menos que un patrón requiera un mosaico predeterminado más grande para entenderse.
+    // Al carecer de generatePat, este patrón usa SvgPreviewEngine (static fallback).
+  },
+  {
+    id: 'diamond_in_diamond',
+    name: 'Diamond In Diamond',
+    category: 'Geometric',
+    controlsType: 'lines',
+    iconUrl: '/patterns/diamond_in_diamond.svg',
+    controls: ['width', 'height'],
+    defaults: { width: 200, height: 100, joint: 0, rows: 1, columns: 1 },
+    // AVISO A EDITORES: width y height deben representar las dimensiones reales físicas
+    // del patrón SVG asociado en el mundo real (ej. tamaño del azulejo o panel en mm).
+    // Por regla general, rows y columns inician en 1 (vista de 1x1 azulejos/patrones),
+    // a menos que un patrón requiera un mosaico predeterminado más grande para entenderse.
+    // Al carecer de generatePat, este patrón usa SvgPreviewEngine (static fallback).
+  },
+  {
+    id: 'diamond_square',
+    name: 'Diamond Square',
+    category: 'Geometric',
+    controlsType: 'lines',
+    iconUrl: '/patterns/diamond_square.svg',
+    controls: ['width', 'height'],
+    defaults: { width: 200, height: 100, joint: 0, rows: 1, columns: 1 },
+    // AVISO A EDITORES: width y height deben representar las dimensiones reales físicas
+    // del patrón SVG asociado en el mundo real (ej. tamaño del azulejo o panel en mm).
+    // Por regla general, rows y columns inician en 1 (vista de 1x1 azulejos/patrones),
+    // a menos que un patrón requiera un mosaico predeterminado más grande para entenderse.
+    // Al carecer de generatePat, este patrón usa SvgPreviewEngine (static fallback).
+  },
+  {
+    id: 'diamond_weave',
+    name: 'Diamond Weave',
+    category: 'Fabric',
+    controlsType: 'lines',
+    iconUrl: '/patterns/diamond_weave.svg',
+    controls: ['width', 'height'],
+    defaults: { width: 200, height: 100, joint: 0, rows: 1, columns: 1 },
+    // AVISO A EDITORES: width y height deben representar las dimensiones reales físicas
+    // del patrón SVG asociado en el mundo real (ej. tamaño del azulejo o panel en mm).
+    // Por regla general, rows y columns inician en 1 (vista de 1x1 azulejos/patrones),
+    // a menos que un patrón requiera un mosaico predeterminado más grande para entenderse.
+    // Al carecer de generatePat, este patrón usa SvgPreviewEngine (static fallback).
+  },
+  {
+    id: 'doubleHerringbone',
+    name: 'DoubleHerringbone',
+    category: 'General',
+    controlsType: 'lines',
+    iconUrl: '/patterns/doubleHerringbone.svg',
+    controls: ['width', 'height'],
+    defaults: { width: 200, height: 100, joint: 0, rows: 1, columns: 1 },
+    // AVISO A EDITORES: width y height deben representar las dimensiones reales físicas
+    // del patrón SVG asociado en el mundo real (ej. tamaño del azulejo o panel en mm).
+    // Por regla general, rows y columns inician en 1 (vista de 1x1 azulejos/patrones),
+    // a menos que un patrón requiera un mosaico predeterminado más grande para entenderse.
+    // Al carecer de generatePat, este patrón usa SvgPreviewEngine (static fallback).
+  },
+  {
+    id: 'double_basketweave',
+    name: 'Double Basketweave',
+    category: 'Fabric',
+    controlsType: 'lines',
+    iconUrl: '/patterns/double_basketweave.svg',
+    controls: ['width', 'height'],
+    defaults: { width: 200, height: 100, joint: 0, rows: 1, columns: 1 },
+    // AVISO A EDITORES: width y height deben representar las dimensiones reales físicas
+    // del patrón SVG asociado en el mundo real (ej. tamaño del azulejo o panel en mm).
+    // Por regla general, rows y columns inician en 1 (vista de 1x1 azulejos/patrones),
+    // a menos que un patrón requiera un mosaico predeterminado más grande para entenderse.
+    // Al carecer de generatePat, este patrón usa SvgPreviewEngine (static fallback).
+  },
+  {
+    id: 'double_chevron_diamond',
+    name: 'Double Chevron Diamond',
+    category: 'Geometric',
+    controlsType: 'lines',
+    iconUrl: '/patterns/double_chevron_diamond.svg',
+    controls: ['width', 'height'],
+    defaults: { width: 200, height: 100, joint: 0, rows: 1, columns: 1 },
+    // AVISO A EDITORES: width y height deben representar las dimensiones reales físicas
+    // del patrón SVG asociado en el mundo real (ej. tamaño del azulejo o panel en mm).
+    // Por regla general, rows y columns inician en 1 (vista de 1x1 azulejos/patrones),
+    // a menos que un patrón requiera un mosaico predeterminado más grande para entenderse.
+    // Al carecer de generatePat, este patrón usa SvgPreviewEngine (static fallback).
+  },
+  {
+    id: 'double_stretcher_with_header',
+    name: 'Double Stretcher With Header',
+    category: 'Brick Bond',
+    controlsType: 'lines',
+    iconUrl: '/patterns/double_stretcher_with_header.svg',
+    controls: ['width', 'height'],
+    defaults: { width: 200, height: 100, joint: 0, rows: 1, columns: 1 },
+    // AVISO A EDITORES: width y height deben representar las dimensiones reales físicas
+    // del patrón SVG asociado en el mundo real (ej. tamaño del azulejo o panel en mm).
+    // Por regla general, rows y columns inician en 1 (vista de 1x1 azulejos/patrones),
+    // a menos que un patrón requiera un mosaico predeterminado más grande para entenderse.
+    // Al carecer de generatePat, este patrón usa SvgPreviewEngine (static fallback).
+  },
+  {
+    id: 'double_zig_zag',
+    name: 'Double Zig Zag',
+    category: 'General',
+    controlsType: 'lines',
+    iconUrl: '/patterns/double_zig_zag.svg',
+    controls: ['width', 'height'],
+    defaults: { width: 200, height: 100, joint: 0, rows: 1, columns: 1 },
+    // AVISO A EDITORES: width y height deben representar las dimensiones reales físicas
+    // del patrón SVG asociado en el mundo real (ej. tamaño del azulejo o panel en mm).
+    // Por regla general, rows y columns inician en 1 (vista de 1x1 azulejos/patrones),
+    // a menos que un patrón requiera un mosaico predeterminado más grande para entenderse.
+    // Al carecer de generatePat, este patrón usa SvgPreviewEngine (static fallback).
+  },
+  {
+    id: 'drystone',
+    name: 'Drystone',
+    category: 'General',
+    controlsType: 'lines',
+    iconUrl: '/patterns/drystone.svg',
+    controls: ['width', 'height'],
+    defaults: { width: 200, height: 100, joint: 0, rows: 1, columns: 1 },
+    // AVISO A EDITORES: width y height deben representar las dimensiones reales físicas
+    // del patrón SVG asociado en el mundo real (ej. tamaño del azulejo o panel en mm).
+    // Por regla general, rows y columns inician en 1 (vista de 1x1 azulejos/patrones),
+    // a menos que un patrón requiera un mosaico predeterminado más grande para entenderse.
+    // Al carecer de generatePat, este patrón usa SvgPreviewEngine (static fallback).
+  },
+  {
+    id: 'edges',
+    name: 'Edges',
+    category: 'General',
+    controlsType: 'lines',
+    iconUrl: '/patterns/edges.svg',
+    controls: ['width', 'height'],
+    defaults: { width: 200, height: 100, joint: 0, rows: 1, columns: 1 },
+    // AVISO A EDITORES: width y height deben representar las dimensiones reales físicas
+    // del patrón SVG asociado en el mundo real (ej. tamaño del azulejo o panel en mm).
+    // Por regla general, rows y columns inician en 1 (vista de 1x1 azulejos/patrones),
+    // a menos que un patrón requiera un mosaico predeterminado más grande para entenderse.
+    // Al carecer de generatePat, este patrón usa SvgPreviewEngine (static fallback).
+  },
+  {
+    id: 'europeanFan',
+    name: 'EuropeanFan',
+    category: 'General',
+    controlsType: 'lines',
+    iconUrl: '/patterns/europeanFan.svg',
+    controls: ['width', 'height'],
+    defaults: { width: 200, height: 100, joint: 0, rows: 1, columns: 1 },
+    // AVISO A EDITORES: width y height deben representar las dimensiones reales físicas
+    // del patrón SVG asociado en el mundo real (ej. tamaño del azulejo o panel en mm).
+    // Por regla general, rows y columns inician en 1 (vista de 1x1 azulejos/patrones),
+    // a menos que un patrón requiera un mosaico predeterminado más grande para entenderse.
+    // Al carecer de generatePat, este patrón usa SvgPreviewEngine (static fallback).
+  },
+  {
+    id: 'fishscale',
+    name: 'Fishscale',
+    category: 'Roofing',
+    controlsType: 'lines',
+    iconUrl: '/patterns/fishscale.svg',
+    controls: ['width', 'height'],
+    defaults: { width: 200, height: 100, joint: 0, rows: 1, columns: 1 },
+    // AVISO A EDITORES: width y height deben representar las dimensiones reales físicas
+    // del patrón SVG asociado en el mundo real (ej. tamaño del azulejo o panel en mm).
+    // Por regla general, rows y columns inician en 1 (vista de 1x1 azulejos/patrones),
+    // a menos que un patrón requiera un mosaico predeterminado más grande para entenderse.
+    // Al carecer de generatePat, este patrón usa SvgPreviewEngine (static fallback).
+  },
+  {
+    id: 'four_leaf',
+    name: 'Four Leaf',
+    category: 'General',
+    controlsType: 'lines',
+    iconUrl: '/patterns/four_leaf.svg',
+    controls: ['width', 'height'],
+    defaults: { width: 200, height: 100, joint: 0, rows: 1, columns: 1 },
+    // AVISO A EDITORES: width y height deben representar las dimensiones reales físicas
+    // del patrón SVG asociado en el mundo real (ej. tamaño del azulejo o panel en mm).
+    // Por regla general, rows y columns inician en 1 (vista de 1x1 azulejos/patrones),
+    // a menos que un patrón requiera un mosaico predeterminado más grande para entenderse.
+    // Al carecer de generatePat, este patrón usa SvgPreviewEngine (static fallback).
+  },
+  {
+    id: 'four_piece_modular_paver',
+    name: 'Four Piece Modular Paver',
+    category: 'Paving',
+    controlsType: 'lines',
+    iconUrl: '/patterns/four_piece_modular_paver.svg',
+    controls: ['width', 'height'],
+    defaults: { width: 200, height: 100, joint: 0, rows: 1, columns: 1 },
+    // AVISO A EDITORES: width y height deben representar las dimensiones reales físicas
+    // del patrón SVG asociado en el mundo real (ej. tamaño del azulejo o panel en mm).
+    // Por regla general, rows y columns inician en 1 (vista de 1x1 azulejos/patrones),
+    // a menos que un patrón requiera un mosaico predeterminado más grande para entenderse.
+    // Al carecer de generatePat, este patrón usa SvgPreviewEngine (static fallback).
+  },
+  {
+    id: 'framed_versailles',
+    name: 'Framed Versailles',
+    category: 'General',
+    controlsType: 'lines',
+    iconUrl: '/patterns/framed_versailles.svg',
+    controls: ['width', 'height'],
+    defaults: { width: 200, height: 100, joint: 0, rows: 1, columns: 1 },
+    // AVISO A EDITORES: width y height deben representar las dimensiones reales físicas
+    // del patrón SVG asociado en el mundo real (ej. tamaño del azulejo o panel en mm).
+    // Por regla general, rows y columns inician en 1 (vista de 1x1 azulejos/patrones),
+    // a menos que un patrón requiera un mosaico predeterminado más grande para entenderse.
+    // Al carecer de generatePat, este patrón usa SvgPreviewEngine (static fallback).
+  },
+  {
+    id: 'french',
+    name: 'French',
+    category: 'General',
+    controlsType: 'lines',
+    iconUrl: '/patterns/french.svg',
+    controls: ['width', 'height'],
+    defaults: { width: 200, height: 100, joint: 0, rows: 1, columns: 1 },
+    // AVISO A EDITORES: width y height deben representar las dimensiones reales físicas
+    // del patrón SVG asociado en el mundo real (ej. tamaño del azulejo o panel en mm).
+    // Por regla general, rows y columns inician en 1 (vista de 1x1 azulejos/patrones),
+    // a menos que un patrón requiera un mosaico predeterminado más grande para entenderse.
+    // Al carecer de generatePat, este patrón usa SvgPreviewEngine (static fallback).
+  },
+  {
+    id: 'haddonHall',
+    name: 'HaddonHall',
+    category: 'General',
+    controlsType: 'lines',
+    iconUrl: '/patterns/haddonHall.svg',
+    controls: ['width', 'height'],
+    defaults: { width: 200, height: 100, joint: 0, rows: 1, columns: 1 },
+    // AVISO A EDITORES: width y height deben representar las dimensiones reales físicas
+    // del patrón SVG asociado en el mundo real (ej. tamaño del azulejo o panel en mm).
+    // Por regla general, rows y columns inician en 1 (vista de 1x1 azulejos/patrones),
+    // a menos que un patrón requiera un mosaico predeterminado más grande para entenderse.
+    // Al carecer de generatePat, este patrón usa SvgPreviewEngine (static fallback).
+  },
+  {
+    id: 'half_hexagon',
+    name: 'Half Hexagon',
+    category: 'Geometric',
+    controlsType: 'lines',
+    iconUrl: '/patterns/half_hexagon.svg',
+    controls: ['width', 'height'],
+    defaults: { width: 200, height: 100, joint: 0, rows: 1, columns: 1 },
+    // AVISO A EDITORES: width y height deben representar las dimensiones reales físicas
+    // del patrón SVG asociado en el mundo real (ej. tamaño del azulejo o panel en mm).
+    // Por regla general, rows y columns inician en 1 (vista de 1x1 azulejos/patrones),
+    // a menos que un patrón requiera un mosaico predeterminado más grande para entenderse.
+    // Al carecer de generatePat, este patrón usa SvgPreviewEngine (static fallback).
+  },
+  {
+    id: 'hexagonAndTriangle',
+    name: 'HexagonAndTriangle',
+    category: 'Geometric',
+    controlsType: 'lines',
+    iconUrl: '/patterns/hexagonAndTriangle.svg',
+    controls: ['width', 'height'],
+    defaults: { width: 200, height: 100, joint: 0, rows: 1, columns: 1 },
+    // AVISO A EDITORES: width y height deben representar las dimensiones reales físicas
+    // del patrón SVG asociado en el mundo real (ej. tamaño del azulejo o panel en mm).
+    // Por regla general, rows y columns inician en 1 (vista de 1x1 azulejos/patrones),
+    // a menos que un patrón requiera un mosaico predeterminado más grande para entenderse.
+    // Al carecer de generatePat, este patrón usa SvgPreviewEngine (static fallback).
+  },
+  {
+    id: 'hexagonWeave',
+    name: 'HexagonWeave',
+    category: 'Fabric',
+    controlsType: 'lines',
+    iconUrl: '/patterns/hexagonWeave.svg',
+    controls: ['width', 'height'],
+    defaults: { width: 200, height: 100, joint: 0, rows: 1, columns: 1 },
+    // AVISO A EDITORES: width y height deben representar las dimensiones reales físicas
+    // del patrón SVG asociado en el mundo real (ej. tamaño del azulejo o panel en mm).
+    // Por regla general, rows y columns inician en 1 (vista de 1x1 azulejos/patrones),
+    // a menos que un patrón requiera un mosaico predeterminado más grande para entenderse.
+    // Al carecer de generatePat, este patrón usa SvgPreviewEngine (static fallback).
+  },
+  {
+    id: 'hexagon_diamond',
+    name: 'Hexagon Diamond',
+    category: 'Geometric',
+    controlsType: 'lines',
+    iconUrl: '/patterns/hexagon_diamond.svg',
+    controls: ['width', 'height'],
+    defaults: { width: 200, height: 100, joint: 0, rows: 1, columns: 1 },
+    // AVISO A EDITORES: width y height deben representar las dimensiones reales físicas
+    // del patrón SVG asociado en el mundo real (ej. tamaño del azulejo o panel en mm).
+    // Por regla general, rows y columns inician en 1 (vista de 1x1 azulejos/patrones),
+    // a menos que un patrón requiera un mosaico predeterminado más grande para entenderse.
+    // Al carecer de generatePat, este patrón usa SvgPreviewEngine (static fallback).
+  },
+  {
+    id: 'houndstooth',
+    name: 'Houndstooth',
+    category: 'Fabric',
+    controlsType: 'lines',
+    iconUrl: '/patterns/houndstooth.svg',
+    controls: ['width', 'height'],
+    defaults: { width: 200, height: 100, joint: 0, rows: 1, columns: 1 },
+    // AVISO A EDITORES: width y height deben representar las dimensiones reales físicas
+    // del patrón SVG asociado en el mundo real (ej. tamaño del azulejo o panel en mm).
+    // Por regla general, rows y columns inician en 1 (vista de 1x1 azulejos/patrones),
+    // a menos que un patrón requiera un mosaico predeterminado más grande para entenderse.
+    // Al carecer de generatePat, este patrón usa SvgPreviewEngine (static fallback).
+  },
+  {
+    id: 'hourglass',
+    name: 'Hourglass',
+    category: 'General',
+    controlsType: 'lines',
+    iconUrl: '/patterns/hourglass.svg',
+    controls: ['width', 'height'],
+    defaults: { width: 200, height: 100, joint: 0, rows: 1, columns: 1 },
+    // AVISO A EDITORES: width y height deben representar las dimensiones reales físicas
+    // del patrón SVG asociado en el mundo real (ej. tamaño del azulejo o panel en mm).
+    // Por regla general, rows y columns inician en 1 (vista de 1x1 azulejos/patrones),
+    // a menos que un patrón requiera un mosaico predeterminado más grande para entenderse.
+    // Al carecer de generatePat, este patrón usa SvgPreviewEngine (static fallback).
+  },
+  {
+    id: 'interlocking_rectangle_pavers',
+    name: 'Interlocking Rectangle Pavers',
+    category: 'Paving',
+    controlsType: 'lines',
+    iconUrl: '/patterns/interlocking_rectangle_pavers.svg',
+    controls: ['width', 'height'],
+    defaults: { width: 200, height: 100, joint: 0, rows: 1, columns: 1 },
+    // AVISO A EDITORES: width y height deben representar las dimensiones reales físicas
+    // del patrón SVG asociado en el mundo real (ej. tamaño del azulejo o panel en mm).
+    // Por regla general, rows y columns inician en 1 (vista de 1x1 azulejos/patrones),
+    // a menos que un patrón requiera un mosaico predeterminado más grande para entenderse.
+    // Al carecer de generatePat, este patrón usa SvgPreviewEngine (static fallback).
+  },
+  {
+    id: 'interlocking_rectangle_with_square',
+    name: 'Interlocking Rectangle With Square',
+    category: 'General',
+    controlsType: 'lines',
+    iconUrl: '/patterns/interlocking_rectangle_with_square.svg',
+    controls: ['width', 'height'],
+    defaults: { width: 200, height: 100, joint: 0, rows: 1, columns: 1 },
+    // AVISO A EDITORES: width y height deben representar las dimensiones reales físicas
+    // del patrón SVG asociado en el mundo real (ej. tamaño del azulejo o panel en mm).
+    // Por regla general, rows y columns inician en 1 (vista de 1x1 azulejos/patrones),
+    // a menos que un patrón requiera un mosaico predeterminado más grande para entenderse.
+    // Al carecer de generatePat, este patrón usa SvgPreviewEngine (static fallback).
+  },
+  {
+    id: 'interlocking_wave',
+    name: 'Interlocking Wave',
+    category: 'General',
+    controlsType: 'lines',
+    iconUrl: '/patterns/interlocking_wave.svg',
+    controls: ['width', 'height'],
+    defaults: { width: 200, height: 100, joint: 0, rows: 1, columns: 1 },
+    // AVISO A EDITORES: width y height deben representar las dimensiones reales físicas
+    // del patrón SVG asociado en el mundo real (ej. tamaño del azulejo o panel en mm).
+    // Por regla general, rows y columns inician en 1 (vista de 1x1 azulejos/patrones),
+    // a menos que un patrón requiera un mosaico predeterminado más grande para entenderse.
+    // Al carecer de generatePat, este patrón usa SvgPreviewEngine (static fallback).
+  },
+  {
+    id: 'intersectingCircle',
+    name: 'IntersectingCircle',
+    category: 'General',
+    controlsType: 'lines',
+    iconUrl: '/patterns/intersectingCircle.svg',
+    controls: ['width', 'height'],
+    defaults: { width: 200, height: 100, joint: 0, rows: 1, columns: 1 },
+    // AVISO A EDITORES: width y height deben representar las dimensiones reales físicas
+    // del patrón SVG asociado en el mundo real (ej. tamaño del azulejo o panel en mm).
+    // Por regla general, rows y columns inician en 1 (vista de 1x1 azulejos/patrones),
+    // a menos que un patrón requiera un mosaico predeterminado más grande para entenderse.
+    // Al carecer de generatePat, este patrón usa SvgPreviewEngine (static fallback).
+  },
+  {
+    id: 'isosceles',
+    name: 'Isosceles',
+    category: 'General',
+    controlsType: 'lines',
+    iconUrl: '/patterns/isosceles.svg',
+    controls: ['width', 'height'],
+    defaults: { width: 200, height: 100, joint: 0, rows: 1, columns: 1 },
+    // AVISO A EDITORES: width y height deben representar las dimensiones reales físicas
+    // del patrón SVG asociado en el mundo real (ej. tamaño del azulejo o panel en mm).
+    // Por regla general, rows y columns inician en 1 (vista de 1x1 azulejos/patrones),
+    // a menos que un patrón requiera un mosaico predeterminado más grande para entenderse.
+    // Al carecer de generatePat, este patrón usa SvgPreviewEngine (static fallback).
+  },
+  {
+    id: 'kite',
+    name: 'Kite',
+    category: 'General',
+    controlsType: 'lines',
+    iconUrl: '/patterns/kite.svg',
+    controls: ['width', 'height'],
+    defaults: { width: 200, height: 100, joint: 0, rows: 1, columns: 1 },
+    // AVISO A EDITORES: width y height deben representar las dimensiones reales físicas
+    // del patrón SVG asociado en el mundo real (ej. tamaño del azulejo o panel en mm).
+    // Por regla general, rows y columns inician en 1 (vista de 1x1 azulejos/patrones),
+    // a menos que un patrón requiera un mosaico predeterminado más grande para entenderse.
+    // Al carecer de generatePat, este patrón usa SvgPreviewEngine (static fallback).
+  },
+  {
+    id: 'leaf',
+    name: 'Leaf',
+    category: 'General',
+    controlsType: 'lines',
+    iconUrl: '/patterns/leaf.svg',
+    controls: ['width', 'height'],
+    defaults: { width: 200, height: 100, joint: 0, rows: 1, columns: 1 },
+    // AVISO A EDITORES: width y height deben representar las dimensiones reales físicas
+    // del patrón SVG asociado en el mundo real (ej. tamaño del azulejo o panel en mm).
+    // Por regla general, rows y columns inician en 1 (vista de 1x1 azulejos/patrones),
+    // a menos que un patrón requiera un mosaico predeterminado más grande para entenderse.
+    // Al carecer de generatePat, este patrón usa SvgPreviewEngine (static fallback).
+  },
+  {
+    id: 'mansionWeave',
+    name: 'MansionWeave',
+    category: 'Fabric',
+    controlsType: 'lines',
+    iconUrl: '/patterns/mansionWeave.svg',
+    controls: ['width', 'height'],
+    defaults: { width: 200, height: 100, joint: 0, rows: 1, columns: 1 },
+    // AVISO A EDITORES: width y height deben representar las dimensiones reales físicas
+    // del patrón SVG asociado en el mundo real (ej. tamaño del azulejo o panel en mm).
+    // Por regla general, rows y columns inician en 1 (vista de 1x1 azulejos/patrones),
+    // a menos que un patrón requiera un mosaico predeterminado más grande para entenderse.
+    // Al carecer de generatePat, este patrón usa SvgPreviewEngine (static fallback).
+  },
+  {
+    id: 'mirrored_geometric_patte',
+    name: 'Mirrored Geometric Patte',
+    category: 'Geometric',
+    controlsType: 'lines',
+    iconUrl: '/patterns/mirrored_geometric_patte.svg',
+    controls: ['width', 'height'],
+    defaults: { width: 200, height: 100, joint: 0, rows: 1, columns: 1 },
+    // AVISO A EDITORES: width y height deben representar las dimensiones reales físicas
+    // del patrón SVG asociado en el mundo real (ej. tamaño del azulejo o panel en mm).
+    // Por regla general, rows y columns inician en 1 (vista de 1x1 azulejos/patrones),
+    // a menos que un patrón requiera un mosaico predeterminado más grande para entenderse.
+    // Al carecer de generatePat, este patrón usa SvgPreviewEngine (static fallback).
+  },
+  {
+    id: 'mixedStones',
+    name: 'MixedStones',
+    category: 'General',
+    controlsType: 'lines',
+    iconUrl: '/patterns/mixedStones.svg',
+    controls: ['width', 'height'],
+    defaults: { width: 200, height: 100, joint: 0, rows: 1, columns: 1 },
+    // AVISO A EDITORES: width y height deben representar las dimensiones reales físicas
+    // del patrón SVG asociado en el mundo real (ej. tamaño del azulejo o panel en mm).
+    // Por regla general, rows y columns inician en 1 (vista de 1x1 azulejos/patrones),
+    // a menos que un patrón requiera un mosaico predeterminado más grande para entenderse.
+    // Al carecer de generatePat, este patrón usa SvgPreviewEngine (static fallback).
+  },
+  {
+    id: 'octagonSquare',
+    name: 'OctagonSquare',
+    category: 'Geometric',
+    controlsType: 'lines',
+    iconUrl: '/patterns/octagonSquare.svg',
+    controls: ['width', 'height'],
+    defaults: { width: 200, height: 100, joint: 0, rows: 1, columns: 1 },
+    // AVISO A EDITORES: width y height deben representar las dimensiones reales físicas
+    // del patrón SVG asociado en el mundo real (ej. tamaño del azulejo o panel en mm).
+    // Por regla general, rows y columns inician en 1 (vista de 1x1 azulejos/patrones),
+    // a menos que un patrón requiera un mosaico predeterminado más grande para entenderse.
+    // Al carecer de generatePat, este patrón usa SvgPreviewEngine (static fallback).
+  },
+  {
+    id: 'octagonStar',
+    name: 'OctagonStar',
+    category: 'Geometric',
+    controlsType: 'lines',
+    iconUrl: '/patterns/octagonStar.svg',
+    controls: ['width', 'height'],
+    defaults: { width: 200, height: 100, joint: 0, rows: 1, columns: 1 },
+    // AVISO A EDITORES: width y height deben representar las dimensiones reales físicas
+    // del patrón SVG asociado en el mundo real (ej. tamaño del azulejo o panel en mm).
+    // Por regla general, rows y columns inician en 1 (vista de 1x1 azulejos/patrones),
+    // a menos que un patrón requiera un mosaico predeterminado más grande para entenderse.
+    // Al carecer de generatePat, este patrón usa SvgPreviewEngine (static fallback).
+  },
+  {
+    id: 'octagon_picket',
+    name: 'Octagon Picket',
+    category: 'Geometric',
+    controlsType: 'lines',
+    iconUrl: '/patterns/octagon_picket.svg',
+    controls: ['width', 'height'],
+    defaults: { width: 200, height: 100, joint: 0, rows: 1, columns: 1 },
+    // AVISO A EDITORES: width y height deben representar las dimensiones reales físicas
+    // del patrón SVG asociado en el mundo real (ej. tamaño del azulejo o panel en mm).
+    // Por regla general, rows y columns inician en 1 (vista de 1x1 azulejos/patrones),
+    // a menos que un patrón requiera un mosaico predeterminado más grande para entenderse.
+    // Al carecer de generatePat, este patrón usa SvgPreviewEngine (static fallback).
+  },
+  {
+    id: 'octagram_mosaic',
+    name: 'Octagram Mosaic',
+    category: 'General',
+    controlsType: 'lines',
+    iconUrl: '/patterns/octagram_mosaic.svg',
+    controls: ['width', 'height'],
+    defaults: { width: 200, height: 100, joint: 0, rows: 1, columns: 1 },
+    // AVISO A EDITORES: width y height deben representar las dimensiones reales físicas
+    // del patrón SVG asociado en el mundo real (ej. tamaño del azulejo o panel en mm).
+    // Por regla general, rows y columns inician en 1 (vista de 1x1 azulejos/patrones),
+    // a menos que un patrón requiera un mosaico predeterminado más grande para entenderse.
+    // Al carecer de generatePat, este patrón usa SvgPreviewEngine (static fallback).
+  },
+  {
+    id: 'ogeeFishscale',
+    name: 'OgeeFishscale',
+    category: 'Roofing',
+    controlsType: 'lines',
+    iconUrl: '/patterns/ogeeFishscale.svg',
+    controls: ['width', 'height'],
+    defaults: { width: 200, height: 100, joint: 0, rows: 1, columns: 1 },
+    // AVISO A EDITORES: width y height deben representar las dimensiones reales físicas
+    // del patrón SVG asociado en el mundo real (ej. tamaño del azulejo o panel en mm).
+    // Por regla general, rows y columns inician en 1 (vista de 1x1 azulejos/patrones),
+    // a menos que un patrón requiera un mosaico predeterminado más grande para entenderse.
+    // Al carecer de generatePat, este patrón usa SvgPreviewEngine (static fallback).
+  },
+  {
+    id: 'parallelogram',
+    name: 'Parallelogram',
+    category: 'General',
+    controlsType: 'lines',
+    iconUrl: '/patterns/parallelogram.svg',
+    controls: ['width', 'height'],
+    defaults: { width: 200, height: 100, joint: 0, rows: 1, columns: 1 },
+    // AVISO A EDITORES: width y height deben representar las dimensiones reales físicas
+    // del patrón SVG asociado en el mundo real (ej. tamaño del azulejo o panel en mm).
+    // Por regla general, rows y columns inician en 1 (vista de 1x1 azulejos/patrones),
+    // a menos que un patrón requiera un mosaico predeterminado más grande para entenderse.
+    // Al carecer de generatePat, este patrón usa SvgPreviewEngine (static fallback).
+  },
+  {
+    id: 'paseo',
+    name: 'Paseo',
+    category: 'General',
+    controlsType: 'lines',
+    iconUrl: '/patterns/paseo.svg',
+    controls: ['width', 'height'],
+    defaults: { width: 200, height: 100, joint: 0, rows: 1, columns: 1 },
+    // AVISO A EDITORES: width y height deben representar las dimensiones reales físicas
+    // del patrón SVG asociado en el mundo real (ej. tamaño del azulejo o panel en mm).
+    // Por regla general, rows y columns inician en 1 (vista de 1x1 azulejos/patrones),
+    // a menos que un patrón requiera un mosaico predeterminado más grande para entenderse.
+    // Al carecer de generatePat, este patrón usa SvgPreviewEngine (static fallback).
+  },
+  {
+    id: 'petal_mosaic',
+    name: 'Petal Mosaic',
+    category: 'General',
+    controlsType: 'lines',
+    iconUrl: '/patterns/petal_mosaic.svg',
+    controls: ['width', 'height'],
+    defaults: { width: 200, height: 100, joint: 0, rows: 1, columns: 1 },
+    // AVISO A EDITORES: width y height deben representar las dimensiones reales físicas
+    // del patrón SVG asociado en el mundo real (ej. tamaño del azulejo o panel en mm).
+    // Por regla general, rows y columns inician en 1 (vista de 1x1 azulejos/patrones),
+    // a menos que un patrón requiera un mosaico predeterminado más grande para entenderse.
+    // Al carecer de generatePat, este patrón usa SvgPreviewEngine (static fallback).
+  },
+  {
+    id: 'picket_and_square',
+    name: 'Picket And Square',
+    category: 'General',
+    controlsType: 'lines',
+    iconUrl: '/patterns/picket_and_square.svg',
+    controls: ['width', 'height'],
+    defaults: { width: 200, height: 100, joint: 0, rows: 1, columns: 1 },
+    // AVISO A EDITORES: width y height deben representar las dimensiones reales físicas
+    // del patrón SVG asociado en el mundo real (ej. tamaño del azulejo o panel en mm).
+    // Por regla general, rows y columns inician en 1 (vista de 1x1 azulejos/patrones),
+    // a menos que un patrón requiera un mosaico predeterminado más grande para entenderse.
+    // Al carecer de generatePat, este patrón usa SvgPreviewEngine (static fallback).
+  },
+  {
+    id: 'polygonal_interlocking',
+    name: 'Polygonal Interlocking',
+    category: 'General',
+    controlsType: 'lines',
+    iconUrl: '/patterns/polygonal_interlocking.svg',
+    controls: ['width', 'height'],
+    defaults: { width: 200, height: 100, joint: 0, rows: 1, columns: 1 },
+    // AVISO A EDITORES: width y height deben representar las dimensiones reales físicas
+    // del patrón SVG asociado en el mundo real (ej. tamaño del azulejo o panel en mm).
+    // Por regla general, rows y columns inician en 1 (vista de 1x1 azulejos/patrones),
+    // a menos que un patrón requiera un mosaico predeterminado más grande para entenderse.
+    // Al carecer de generatePat, este patrón usa SvgPreviewEngine (static fallback).
+  },
+  {
+    id: 'propeller_pavers',
+    name: 'Propeller Pavers',
+    category: 'Paving',
+    controlsType: 'lines',
+    iconUrl: '/patterns/propeller_pavers.svg',
+    controls: ['width', 'height'],
+    defaults: { width: 200, height: 100, joint: 0, rows: 1, columns: 1 },
+    // AVISO A EDITORES: width y height deben representar las dimensiones reales físicas
+    // del patrón SVG asociado en el mundo real (ej. tamaño del azulejo o panel en mm).
+    // Por regla general, rows y columns inician en 1 (vista de 1x1 azulejos/patrones),
+    // a menos que un patrón requiera un mosaico predeterminado más grande para entenderse.
+    // Al carecer de generatePat, este patrón usa SvgPreviewEngine (static fallback).
+  },
+  {
+    id: 'pyramid_versailles',
+    name: 'Pyramid Versailles',
+    category: 'General',
+    controlsType: 'lines',
+    iconUrl: '/patterns/pyramid_versailles.svg',
+    controls: ['width', 'height'],
+    defaults: { width: 200, height: 100, joint: 0, rows: 1, columns: 1 },
+    // AVISO A EDITORES: width y height deben representar las dimensiones reales físicas
+    // del patrón SVG asociado en el mundo real (ej. tamaño del azulejo o panel en mm).
+    // Por regla general, rows y columns inician en 1 (vista de 1x1 azulejos/patrones),
+    // a menos que un patrón requiera un mosaico predeterminado más grande para entenderse.
+    // Al carecer de generatePat, este patrón usa SvgPreviewEngine (static fallback).
+  },
+  {
+    id: 'random_bond',
+    name: 'Random Bond',
+    category: 'Brick Bond',
+    controlsType: 'lines',
+    iconUrl: '/patterns/random_bond.svg',
+    controls: ['width', 'height'],
+    defaults: { width: 200, height: 100, joint: 0, rows: 1, columns: 1 },
+    // AVISO A EDITORES: width y height deben representar las dimensiones reales físicas
+    // del patrón SVG asociado en el mundo real (ej. tamaño del azulejo o panel en mm).
+    // Por regla general, rows y columns inician en 1 (vista de 1x1 azulejos/patrones),
+    // a menos que un patrón requiera un mosaico predeterminado más grande para entenderse.
+    // Al carecer de generatePat, este patrón usa SvgPreviewEngine (static fallback).
+  },
+  {
+    id: 'rectangular_ashlar',
+    name: 'Rectangular Ashlar',
+    category: 'Brick Bond',
+    controlsType: 'lines',
+    iconUrl: '/patterns/rectangular_ashlar.svg',
+    controls: ['width', 'height'],
+    defaults: { width: 200, height: 100, joint: 0, rows: 1, columns: 1 },
+    // AVISO A EDITORES: width y height deben representar las dimensiones reales físicas
+    // del patrón SVG asociado en el mundo real (ej. tamaño del azulejo o panel en mm).
+    // Por regla general, rows y columns inician en 1 (vista de 1x1 azulejos/patrones),
+    // a menos que un patrón requiera un mosaico predeterminado más grande para entenderse.
+    // Al carecer de generatePat, este patrón usa SvgPreviewEngine (static fallback).
+  },
+  {
+    id: 'roundedRubble',
+    name: 'RoundedRubble',
+    category: 'General',
+    controlsType: 'lines',
+    iconUrl: '/patterns/roundedRubble.svg',
+    controls: ['width', 'height'],
+    defaults: { width: 200, height: 100, joint: 0, rows: 1, columns: 1 },
+    // AVISO A EDITORES: width y height deben representar las dimensiones reales físicas
+    // del patrón SVG asociado en el mundo real (ej. tamaño del azulejo o panel en mm).
+    // Por regla general, rows y columns inician en 1 (vista de 1x1 azulejos/patrones),
+    // a menos que un patrón requiera un mosaico predeterminado más grande para entenderse.
+    // Al carecer de generatePat, este patrón usa SvgPreviewEngine (static fallback).
+  },
+  {
+    id: 'rounded_rectangle_terrazzo',
+    name: 'Rounded Rectangle Terrazzo',
+    category: 'General',
+    controlsType: 'lines',
+    iconUrl: '/patterns/rounded_rectangle_terrazzo.svg',
+    controls: ['width', 'height'],
+    defaults: { width: 200, height: 100, joint: 0, rows: 1, columns: 1 },
+    // AVISO A EDITORES: width y height deben representar las dimensiones reales físicas
+    // del patrón SVG asociado en el mundo real (ej. tamaño del azulejo o panel en mm).
+    // Por regla general, rows y columns inician en 1 (vista de 1x1 azulejos/patrones),
+    // a menos que un patrón requiera un mosaico predeterminado más grande para entenderse.
+    // Al carecer de generatePat, este patrón usa SvgPreviewEngine (static fallback).
+  },
+  {
+    id: 'rubble',
+    name: 'Rubble',
+    category: 'General',
+    controlsType: 'lines',
+    iconUrl: '/patterns/rubble.svg',
+    controls: ['width', 'height'],
+    defaults: { width: 200, height: 100, joint: 0, rows: 1, columns: 1 },
+    // AVISO A EDITORES: width y height deben representar las dimensiones reales físicas
+    // del patrón SVG asociado en el mundo real (ej. tamaño del azulejo o panel en mm).
+    // Por regla general, rows y columns inician en 1 (vista de 1x1 azulejos/patrones),
+    // a menos que un patrón requiera un mosaico predeterminado más grande para entenderse.
+    // Al carecer de generatePat, este patrón usa SvgPreviewEngine (static fallback).
+  },
+  {
+    id: 'scarpa',
+    name: 'Scarpa',
+    category: 'General',
+    controlsType: 'lines',
+    iconUrl: '/patterns/scarpa.svg',
+    controls: ['width', 'height'],
+    defaults: { width: 200, height: 100, joint: 0, rows: 1, columns: 1 },
+    // AVISO A EDITORES: width y height deben representar las dimensiones reales físicas
+    // del patrón SVG asociado en el mundo real (ej. tamaño del azulejo o panel en mm).
+    // Por regla general, rows y columns inician en 1 (vista de 1x1 azulejos/patrones),
+    // a menos que un patrón requiera un mosaico predeterminado más grande para entenderse.
+    // Al carecer de generatePat, este patrón usa SvgPreviewEngine (static fallback).
+  },
+  {
+    id: 'single_basketweave',
+    name: 'Single Basketweave',
+    category: 'Fabric',
+    controlsType: 'lines',
+    iconUrl: '/patterns/single_basketweave.svg',
+    controls: ['width', 'height'],
+    defaults: { width: 200, height: 100, joint: 0, rows: 1, columns: 1 },
+    // AVISO A EDITORES: width y height deben representar las dimensiones reales físicas
+    // del patrón SVG asociado en el mundo real (ej. tamaño del azulejo o panel en mm).
+    // Por regla general, rows y columns inician en 1 (vista de 1x1 azulejos/patrones),
+    // a menos que un patrón requiera un mosaico predeterminado más grande para entenderse.
+    // Al carecer de generatePat, este patrón usa SvgPreviewEngine (static fallback).
+  },
+  {
+    id: 'snowflake',
+    name: 'Snowflake',
+    category: 'General',
+    controlsType: 'lines',
+    iconUrl: '/patterns/snowflake.svg',
+    controls: ['width', 'height'],
+    defaults: { width: 200, height: 100, joint: 0, rows: 1, columns: 1 },
+    // AVISO A EDITORES: width y height deben representar las dimensiones reales físicas
+    // del patrón SVG asociado en el mundo real (ej. tamaño del azulejo o panel en mm).
+    // Por regla general, rows y columns inician en 1 (vista de 1x1 azulejos/patrones),
+    // a menos que un patrón requiera un mosaico predeterminado más grande para entenderse.
+    // Al carecer de generatePat, este patrón usa SvgPreviewEngine (static fallback).
+  },
+  {
+    id: 'staggered',
+    name: 'Staggered',
+    category: 'General',
+    controlsType: 'lines',
+    iconUrl: '/patterns/staggered.svg',
+    controls: ['width', 'height'],
+    defaults: { width: 200, height: 100, joint: 0, rows: 1, columns: 1 },
+    // AVISO A EDITORES: width y height deben representar las dimensiones reales físicas
+    // del patrón SVG asociado en el mundo real (ej. tamaño del azulejo o panel en mm).
+    // Por regla general, rows y columns inician en 1 (vista de 1x1 azulejos/patrones),
+    // a menos que un patrón requiera un mosaico predeterminado más grande para entenderse.
+    // Al carecer de generatePat, este patrón usa SvgPreviewEngine (static fallback).
+  },
+  {
+    id: 'staggeredIsosceles',
+    name: 'StaggeredIsosceles',
+    category: 'General',
+    controlsType: 'lines',
+    iconUrl: '/patterns/staggeredIsosceles.svg',
+    controls: ['width', 'height'],
+    defaults: { width: 200, height: 100, joint: 0, rows: 1, columns: 1 },
+    // AVISO A EDITORES: width y height deben representar las dimensiones reales físicas
+    // del patrón SVG asociado en el mundo real (ej. tamaño del azulejo o panel en mm).
+    // Por regla general, rows y columns inician en 1 (vista de 1x1 azulejos/patrones),
+    // a menos que un patrón requiera un mosaico predeterminado más grande para entenderse.
+    // Al carecer de generatePat, este patrón usa SvgPreviewEngine (static fallback).
+  },
+  {
+    id: 'starAndCross',
+    name: 'StarAndCross',
+    category: 'General',
+    controlsType: 'lines',
+    iconUrl: '/patterns/starAndCross.svg',
+    controls: ['width', 'height'],
+    defaults: { width: 200, height: 100, joint: 0, rows: 1, columns: 1 },
+    // AVISO A EDITORES: width y height deben representar las dimensiones reales físicas
+    // del patrón SVG asociado en el mundo real (ej. tamaño del azulejo o panel en mm).
+    // Por regla general, rows y columns inician en 1 (vista de 1x1 azulejos/patrones),
+    // a menos que un patrón requiera un mosaico predeterminado más grande para entenderse.
+    // Al carecer de generatePat, este patrón usa SvgPreviewEngine (static fallback).
+  },
+  {
+    id: 'starAndHexagon',
+    name: 'StarAndHexagon',
+    category: 'Geometric',
+    controlsType: 'lines',
+    iconUrl: '/patterns/starAndHexagon.svg',
+    controls: ['width', 'height'],
+    defaults: { width: 200, height: 100, joint: 0, rows: 1, columns: 1 },
+    // AVISO A EDITORES: width y height deben representar las dimensiones reales físicas
+    // del patrón SVG asociado en el mundo real (ej. tamaño del azulejo o panel en mm).
+    // Por regla general, rows y columns inician en 1 (vista de 1x1 azulejos/patrones),
+    // a menos que un patrón requiera un mosaico predeterminado más grande para entenderse.
+    // Al carecer de generatePat, este patrón usa SvgPreviewEngine (static fallback).
+  },
+  {
+    id: 'star_mosaic',
+    name: 'Star Mosaic',
+    category: 'General',
+    controlsType: 'lines',
+    iconUrl: '/patterns/star_mosaic.svg',
+    controls: ['width', 'height'],
+    defaults: { width: 200, height: 100, joint: 0, rows: 1, columns: 1 },
+    // AVISO A EDITORES: width y height deben representar las dimensiones reales físicas
+    // del patrón SVG asociado en el mundo real (ej. tamaño del azulejo o panel en mm).
+    // Por regla general, rows y columns inician en 1 (vista de 1x1 azulejos/patrones),
+    // a menos que un patrón requiera un mosaico predeterminado más grande para entenderse.
+    // Al carecer de generatePat, este patrón usa SvgPreviewEngine (static fallback).
+  },
+  {
+    id: 'swissCross',
+    name: 'SwissCross',
+    category: 'General',
+    controlsType: 'lines',
+    iconUrl: '/patterns/swissCross.svg',
+    controls: ['width', 'height'],
+    defaults: { width: 200, height: 100, joint: 0, rows: 1, columns: 1 },
+    // AVISO A EDITORES: width y height deben representar las dimensiones reales físicas
+    // del patrón SVG asociado en el mundo real (ej. tamaño del azulejo o panel en mm).
+    // Por regla general, rows y columns inician en 1 (vista de 1x1 azulejos/patrones),
+    // a menos que un patrón requiera un mosaico predeterminado más grande para entenderse.
+    // Al carecer de generatePat, este patrón usa SvgPreviewEngine (static fallback).
+  },
+  {
+    id: 'swissCrossSquare',
+    name: 'SwissCrossSquare',
+    category: 'General',
+    controlsType: 'lines',
+    iconUrl: '/patterns/swissCrossSquare.svg',
+    controls: ['width', 'height'],
+    defaults: { width: 200, height: 100, joint: 0, rows: 1, columns: 1 },
+    // AVISO A EDITORES: width y height deben representar las dimensiones reales físicas
+    // del patrón SVG asociado en el mundo real (ej. tamaño del azulejo o panel en mm).
+    // Por regla general, rows y columns inician en 1 (vista de 1x1 azulejos/patrones),
+    // a menos que un patrón requiera un mosaico predeterminado más grande para entenderse.
+    // Al carecer de generatePat, este patrón usa SvgPreviewEngine (static fallback).
+  },
+  {
+    id: 't',
+    name: 'T',
+    category: 'General',
+    controlsType: 'lines',
+    iconUrl: '/patterns/t.svg',
+    controls: ['width', 'height'],
+    defaults: { width: 200, height: 100, joint: 0, rows: 1, columns: 1 },
+    // AVISO A EDITORES: width y height deben representar las dimensiones reales físicas
+    // del patrón SVG asociado en el mundo real (ej. tamaño del azulejo o panel en mm).
+    // Por regla general, rows y columns inician en 1 (vista de 1x1 azulejos/patrones),
+    // a menos que un patrón requiera un mosaico predeterminado más grande para entenderse.
+    // Al carecer de generatePat, este patrón usa SvgPreviewEngine (static fallback).
+  },
+  {
+    id: 'three_piece_modular_paver',
+    name: 'Three Piece Modular Paver',
+    category: 'Paving',
+    controlsType: 'lines',
+    iconUrl: '/patterns/three_piece_modular_paver.svg',
+    controls: ['width', 'height'],
+    defaults: { width: 200, height: 100, joint: 0, rows: 1, columns: 1 },
+    // AVISO A EDITORES: width y height deben representar las dimensiones reales físicas
+    // del patrón SVG asociado en el mundo real (ej. tamaño del azulejo o panel en mm).
+    // Por regla general, rows y columns inician en 1 (vista de 1x1 azulejos/patrones),
+    // a menos que un patrón requiera un mosaico predeterminado más grande para entenderse.
+    // Al carecer de generatePat, este patrón usa SvgPreviewEngine (static fallback).
+  },
+  {
+    id: 'trapeze',
+    name: 'Trapeze',
+    category: 'General',
+    controlsType: 'lines',
+    iconUrl: '/patterns/trapeze.svg',
+    controls: ['width', 'height'],
+    defaults: { width: 200, height: 100, joint: 0, rows: 1, columns: 1 },
+    // AVISO A EDITORES: width y height deben representar las dimensiones reales físicas
+    // del patrón SVG asociado en el mundo real (ej. tamaño del azulejo o panel en mm).
+    // Por regla general, rows y columns inician en 1 (vista de 1x1 azulejos/patrones),
+    // a menos que un patrón requiera un mosaico predeterminado más grande para entenderse.
+    // Al carecer de generatePat, este patrón usa SvgPreviewEngine (static fallback).
+  },
+  {
+    id: 'trapeze_hex',
+    name: 'Trapeze Hex',
+    category: 'General',
+    controlsType: 'lines',
+    iconUrl: '/patterns/trapeze_hex.svg',
+    controls: ['width', 'height'],
+    defaults: { width: 200, height: 100, joint: 0, rows: 1, columns: 1 },
+    // AVISO A EDITORES: width y height deben representar las dimensiones reales físicas
+    // del patrón SVG asociado en el mundo real (ej. tamaño del azulejo o panel en mm).
+    // Por regla general, rows y columns inician en 1 (vista de 1x1 azulejos/patrones),
+    // a menos que un patrón requiera un mosaico predeterminado más grande para entenderse.
+    // Al carecer de generatePat, este patrón usa SvgPreviewEngine (static fallback).
+  },
+  {
+    id: 'trapezoid_triangle',
+    name: 'Trapezoid Triangle',
+    category: 'Geometric',
+    controlsType: 'lines',
+    iconUrl: '/patterns/trapezoid_triangle.svg',
+    controls: ['width', 'height'],
+    defaults: { width: 200, height: 100, joint: 0, rows: 1, columns: 1 },
+    // AVISO A EDITORES: width y height deben representar las dimensiones reales físicas
+    // del patrón SVG asociado en el mundo real (ej. tamaño del azulejo o panel en mm).
+    // Por regla general, rows y columns inician en 1 (vista de 1x1 azulejos/patrones),
+    // a menos que un patrón requiera un mosaico predeterminado más grande para entenderse.
+    // Al carecer de generatePat, este patrón usa SvgPreviewEngine (static fallback).
+  },
+  {
+    id: 'triangleChevron',
+    name: 'TriangleChevron',
+    category: 'Geometric',
+    controlsType: 'lines',
+    iconUrl: '/patterns/triangleChevron.svg',
+    controls: ['width', 'height'],
+    defaults: { width: 200, height: 100, joint: 0, rows: 1, columns: 1 },
+    // AVISO A EDITORES: width y height deben representar las dimensiones reales físicas
+    // del patrón SVG asociado en el mundo real (ej. tamaño del azulejo o panel en mm).
+    // Por regla general, rows y columns inician en 1 (vista de 1x1 azulejos/patrones),
+    // a menos que un patrón requiera un mosaico predeterminado más grande para entenderse.
+    // Al carecer de generatePat, este patrón usa SvgPreviewEngine (static fallback).
+  },
+  {
+    id: 'triangleDiamond',
+    name: 'TriangleDiamond',
+    category: 'Geometric',
+    controlsType: 'lines',
+    iconUrl: '/patterns/triangleDiamond.svg',
+    controls: ['width', 'height'],
+    defaults: { width: 200, height: 100, joint: 0, rows: 1, columns: 1 },
+    // AVISO A EDITORES: width y height deben representar las dimensiones reales físicas
+    // del patrón SVG asociado en el mundo real (ej. tamaño del azulejo o panel en mm).
+    // Por regla general, rows y columns inician en 1 (vista de 1x1 azulejos/patrones),
+    // a menos que un patrón requiera un mosaico predeterminado más grande para entenderse.
+    // Al carecer de generatePat, este patrón usa SvgPreviewEngine (static fallback).
+  },
+  {
+    id: 'triangle_square_mosaic',
+    name: 'Triangle Square Mosaic',
+    category: 'Geometric',
+    controlsType: 'lines',
+    iconUrl: '/patterns/triangle_square_mosaic.svg',
+    controls: ['width', 'height'],
+    defaults: { width: 200, height: 100, joint: 0, rows: 1, columns: 1 },
+    // AVISO A EDITORES: width y height deben representar las dimensiones reales físicas
+    // del patrón SVG asociado en el mundo real (ej. tamaño del azulejo o panel en mm).
+    // Por regla general, rows y columns inician en 1 (vista de 1x1 azulejos/patrones),
+    // a menos que un patrón requiera un mosaico predeterminado más grande para entenderse.
+    // Al carecer de generatePat, este patrón usa SvgPreviewEngine (static fallback).
+  },
+  {
+    id: 'tripleHerringbone',
+    name: 'TripleHerringbone',
+    category: 'General',
+    controlsType: 'lines',
+    iconUrl: '/patterns/tripleHerringbone.svg',
+    controls: ['width', 'height'],
+    defaults: { width: 200, height: 100, joint: 0, rows: 1, columns: 1 },
+    // AVISO A EDITORES: width y height deben representar las dimensiones reales físicas
+    // del patrón SVG asociado en el mundo real (ej. tamaño del azulejo o panel en mm).
+    // Por regla general, rows y columns inician en 1 (vista de 1x1 azulejos/patrones),
+    // a menos que un patrón requiera un mosaico predeterminado más grande para entenderse.
+    // Al carecer de generatePat, este patrón usa SvgPreviewEngine (static fallback).
+  },
+  {
+    id: 'tri_hex_pavers',
+    name: 'Tri Hex Pavers',
+    category: 'Paving',
+    controlsType: 'lines',
+    iconUrl: '/patterns/tri_hex_pavers.svg',
+    controls: ['width', 'height'],
+    defaults: { width: 200, height: 100, joint: 0, rows: 1, columns: 1 },
+    // AVISO A EDITORES: width y height deben representar las dimensiones reales físicas
+    // del patrón SVG asociado en el mundo real (ej. tamaño del azulejo o panel en mm).
+    // Por regla general, rows y columns inician en 1 (vista de 1x1 azulejos/patrones),
+    // a menos que un patrón requiera un mosaico predeterminado más grande para entenderse.
+    // Al carecer de generatePat, este patrón usa SvgPreviewEngine (static fallback).
+  },
+  {
+    id: 'true_chevron',
+    name: 'True Chevron',
+    category: 'General',
+    controlsType: 'lines',
+    iconUrl: '/patterns/true_chevron.svg',
+    controls: ['width', 'height'],
+    defaults: { width: 200, height: 100, joint: 0, rows: 1, columns: 1 },
+    // AVISO A EDITORES: width y height deben representar las dimensiones reales físicas
+    // del patrón SVG asociado en el mundo real (ej. tamaño del azulejo o panel en mm).
+    // Por regla general, rows y columns inician en 1 (vista de 1x1 azulejos/patrones),
+    // a menos que un patrón requiera un mosaico predeterminado más grande para entenderse.
+    // Al carecer de generatePat, este patrón usa SvgPreviewEngine (static fallback).
+  },
+  {
+    id: 'uncoursed_ashlar',
+    name: 'Uncoursed Ashlar',
+    category: 'Brick Bond',
+    controlsType: 'lines',
+    iconUrl: '/patterns/uncoursed_ashlar.svg',
+    controls: ['width', 'height'],
+    defaults: { width: 200, height: 100, joint: 0, rows: 1, columns: 1 },
+    // AVISO A EDITORES: width y height deben representar las dimensiones reales físicas
+    // del patrón SVG asociado en el mundo real (ej. tamaño del azulejo o panel en mm).
+    // Por regla general, rows y columns inician en 1 (vista de 1x1 azulejos/patrones),
+    // a menos que un patrón requiera un mosaico predeterminado más grande para entenderse.
+    // Al carecer de generatePat, este patrón usa SvgPreviewEngine (static fallback).
+  },
+  {
+    id: 'unified_herringbone',
+    name: 'Unified Herringbone',
+    category: 'General',
+    controlsType: 'lines',
+    iconUrl: '/patterns/unified_herringbone.svg',
+    controls: ['width', 'height'],
+    defaults: { width: 200, height: 100, joint: 0, rows: 1, columns: 1 },
+    // AVISO A EDITORES: width y height deben representar las dimensiones reales físicas
+    // del patrón SVG asociado en el mundo real (ej. tamaño del azulejo o panel en mm).
+    // Por regla general, rows y columns inician en 1 (vista de 1x1 azulejos/patrones),
+    // a menos que un patrón requiera un mosaico predeterminado más grande para entenderse.
+    // Al carecer de generatePat, este patrón usa SvgPreviewEngine (static fallback).
+  },
+  {
+    id: 'variableHexagon',
+    name: 'VariableHexagon',
+    category: 'Geometric',
+    controlsType: 'lines',
+    iconUrl: '/patterns/variableHexagon.svg',
+    controls: ['width', 'height'],
+    defaults: { width: 200, height: 100, joint: 0, rows: 1, columns: 1 },
+    // AVISO A EDITORES: width y height deben representar las dimensiones reales físicas
+    // del patrón SVG asociado en el mundo real (ej. tamaño del azulejo o panel en mm).
+    // Por regla general, rows y columns inician en 1 (vista de 1x1 azulejos/patrones),
+    // a menos que un patrón requiera un mosaico predeterminado más grande para entenderse.
+    // Al carecer de generatePat, este patrón usa SvgPreviewEngine (static fallback).
+  },
+  {
+    id: 'varied_ashlar',
+    name: 'Varied Ashlar',
+    category: 'Brick Bond',
+    controlsType: 'lines',
+    iconUrl: '/patterns/varied_ashlar.svg',
+    controls: ['width', 'height'],
+    defaults: { width: 200, height: 100, joint: 0, rows: 1, columns: 1 },
+    // AVISO A EDITORES: width y height deben representar las dimensiones reales físicas
+    // del patrón SVG asociado en el mundo real (ej. tamaño del azulejo o panel en mm).
+    // Por regla general, rows y columns inician en 1 (vista de 1x1 azulejos/patrones),
+    // a menos que un patrón requiera un mosaico predeterminado más grande para entenderse.
+    // Al carecer de generatePat, este patrón usa SvgPreviewEngine (static fallback).
+  },
+  {
+    id: 'varied_size_terrazzo',
+    name: 'Varied Size Terrazzo',
+    category: 'General',
+    controlsType: 'lines',
+    iconUrl: '/patterns/varied_size_terrazzo.svg',
+    controls: ['width', 'height'],
+    defaults: { width: 200, height: 100, joint: 0, rows: 1, columns: 1 },
+    // AVISO A EDITORES: width y height deben representar las dimensiones reales físicas
+    // del patrón SVG asociado en el mundo real (ej. tamaño del azulejo o panel en mm).
+    // Por regla general, rows y columns inician en 1 (vista de 1x1 azulejos/patrones),
+    // a menos que un patrón requiera un mosaico predeterminado más grande para entenderse.
+    // Al carecer de generatePat, este patrón usa SvgPreviewEngine (static fallback).
+  },
+  {
+    id: 'varied_terrazzo',
+    name: 'Varied Terrazzo',
+    category: 'General',
+    controlsType: 'lines',
+    iconUrl: '/patterns/varied_terrazzo.svg',
+    controls: ['width', 'height'],
+    defaults: { width: 200, height: 100, joint: 0, rows: 1, columns: 1 },
+    // AVISO A EDITORES: width y height deben representar las dimensiones reales físicas
+    // del patrón SVG asociado en el mundo real (ej. tamaño del azulejo o panel en mm).
+    // Por regla general, rows y columns inician en 1 (vista de 1x1 azulejos/patrones),
+    // a menos que un patrón requiera un mosaico predeterminado más grande para entenderse.
+    // Al carecer de generatePat, este patrón usa SvgPreviewEngine (static fallback).
+  },
+  {
+    id: 'venetian',
+    name: 'Venetian',
+    category: 'General',
+    controlsType: 'lines',
+    iconUrl: '/patterns/venetian.svg',
+    controls: ['width', 'height'],
+    defaults: { width: 200, height: 100, joint: 0, rows: 1, columns: 1 },
+    // AVISO A EDITORES: width y height deben representar las dimensiones reales físicas
+    // del patrón SVG asociado en el mundo real (ej. tamaño del azulejo o panel en mm).
+    // Por regla general, rows y columns inician en 1 (vista de 1x1 azulejos/patrones),
+    // a menos que un patrón requiera un mosaico predeterminado más grande para entenderse.
+    // Al carecer de generatePat, este patrón usa SvgPreviewEngine (static fallback).
+  },
+  {
+    id: 'versailles',
+    name: 'Versailles',
+    category: 'General',
+    controlsType: 'lines',
+    iconUrl: '/patterns/versailles.svg',
+    controls: ['width', 'height'],
+    defaults: { width: 200, height: 100, joint: 0, rows: 1, columns: 1 },
+    // AVISO A EDITORES: width y height deben representar las dimensiones reales físicas
+    // del patrón SVG asociado en el mundo real (ej. tamaño del azulejo o panel en mm).
+    // Por regla general, rows y columns inician en 1 (vista de 1x1 azulejos/patrones),
+    // a menos que un patrón requiera un mosaico predeterminado más grande para entenderse.
+    // Al carecer de generatePat, este patrón usa SvgPreviewEngine (static fallback).
+  },
+  {
+    id: 'v_pavers',
+    name: 'V Pavers',
+    category: 'Paving',
+    controlsType: 'lines',
+    iconUrl: '/patterns/v_pavers.svg',
+    controls: ['width', 'height'],
+    defaults: { width: 200, height: 100, joint: 0, rows: 1, columns: 1 },
+    // AVISO A EDITORES: width y height deben representar las dimensiones reales físicas
+    // del patrón SVG asociado en el mundo real (ej. tamaño del azulejo o panel en mm).
+    // Por regla general, rows y columns inician en 1 (vista de 1x1 azulejos/patrones),
+    // a menos que un patrón requiera un mosaico predeterminado más grande para entenderse.
+    // Al carecer de generatePat, este patrón usa SvgPreviewEngine (static fallback).
+  },
+  {
+    id: 'zig-zag_pavers',
+    name: 'Zig-Zag Pavers',
+    category: 'Paving',
+    controlsType: 'lines',
+    iconUrl: '/patterns/zig-zag_pavers.svg',
+    controls: ['width', 'height'],
+    defaults: { width: 200, height: 100, joint: 0, rows: 3, columns: 3 },
+    // NO generatePat / generateSvgRenderer -> TRIGGERS FALLBACK
   }
 ];
 

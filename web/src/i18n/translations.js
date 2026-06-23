@@ -48,6 +48,8 @@ export const translations = {
     "hatch.publish": "🌍 Publish",
     "hatch.spaceS": "Space (S)",
     "hatch.ribbonThicknessT": "Ribbon Thickness (T)",
+    "hatch.comingSoonTitle": "Coming Soon",
+    "hatch.comingSoonDesc": "The mathematical engine for this pattern is under development. You can preview the texture, but parameter controls are temporarily disabled.",
 
     // Profile Generator
     "profiles.title": "Profile Generator",
@@ -320,6 +322,8 @@ export const translations = {
     "hatch.publish": "🌍 Publicar",
     "hatch.spaceS": "Espacio (S)",
     "hatch.ribbonThicknessT": "Grosor Cinta (T)",
+    "hatch.comingSoonTitle": "Próximamente",
+    "hatch.comingSoonDesc": "El motor matemático para este patrón está en desarrollo. Puedes previsualizar la textura, pero los controles paramétricos están temporalmente deshabilitados.",
 
     // Profile Generator
     "profiles.title": "Generador de Perfiles",
@@ -592,6 +596,8 @@ export const translations = {
     "hatch.publish": "🌍 Publicar",
     "hatch.spaceS": "Espaço (S)",
     "hatch.ribbonThicknessT": "Espessura da Fita (T)",
+    "hatch.comingSoonTitle": "Em breve",
+    "hatch.comingSoonDesc": "O motor matemático para este padrão está em desenvolvimento. Você pode pré-visualizar a textura, mas os controles paramétricos estão temporariamente desabilitados.",
 
     // Profile Generator
     "profiles.title": "Gerador de Perfis",

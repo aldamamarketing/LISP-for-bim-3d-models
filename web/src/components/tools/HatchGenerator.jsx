@@ -244,9 +244,38 @@ export default function HatchGenerator({ lang = 'en' }) {
                 <button onClick={() => setGeneratorView('archetypes')} style={{ background: 'none', border: 'none', color: 'var(--tmd-orange)', cursor: 'pointer', fontSize: '0.8rem', fontWeight: 'bold' }}>⬅ Volver</button>
               </div>
 
-              <div style={{ padding: '20px', display: 'flex', flexDirection: 'column', gap: '20px' }}>
+              <div style={{ padding: '20px', display: 'flex', flexDirection: 'column', gap: '20px', position: 'relative' }}>
                 
+                {!currentArchetype.generatePat && (
+                  <div style={{
+                    position: 'absolute',
+                    top: '10px', left: '10px', right: '10px', bottom: '90px',
+                    backgroundColor: 'rgba(26, 26, 26, 0.75)',
+                    backdropFilter: 'blur(3px)',
+                    zIndex: 10,
+                    display: 'flex',
+                    flexDirection: 'column',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    padding: '20px',
+                    textAlign: 'center',
+                    borderRadius: '8px',
+                    border: '1px solid rgba(255,255,255,0.05)'
+                  }}>
+                    <div style={{ marginBottom: '15px' }}>
+                      <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="var(--tmd-orange)" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <polyline points="12 6 12 12 16 14"></polyline>
+                      </svg>
+                    </div>
+                    <h4 style={{ color: 'white', margin: '0 0 10px 0', fontSize: '1.2rem' }}>{t('hatch.comingSoonTitle')}</h4>
+                    <p style={{ color: '#aaa', fontSize: '0.85rem', lineHeight: '1.4', margin: 0 }}>
+                      {t('hatch.comingSoonDesc')}
+                    </p>
+                  </div>
+                )}
 
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '20px', opacity: currentArchetype.generatePat ? 1 : 0.3, pointerEvents: currentArchetype.generatePat ? 'auto' : 'none' }}>
 
                 {/* Grid Setup */}
                 <div className="form-group" style={{ borderTop: '1px solid #444', paddingTop: '15px' }}>
@@ -322,6 +351,7 @@ export default function HatchGenerator({ lang = 'en' }) {
                     </div>
                   </div>
                 )}
+                </div>
 
                 <div style={{ display: 'flex', gap: '10px', marginTop: '25px' }}>
                   <button 
