@@ -1247,3 +1247,19 @@ exports.onGroupDeleted = onDocumentDeleted({ document: "groups/{groupId}", timeo
     console.error(`Error in cascade delete for group ${groupId}:`, err);
   }
 });
+
+// Endpoint para generar el patrón Hatch algorítmico en la nube
+exports.buildHatchPattern = onCall(async (request) => {
+  const { archetypeId, params } = request.data;
+  if (!archetypeId || !params) {
+    throw new HttpsError('invalid-argument', 'Missing archetypeId or params');
+  }
+  const { generatePatternString } = require('./patterns/index.js');
+  try {
+    const patCode = generatePatternString(archetypeId, params);
+    return { patCode };
+  } catch (err) {
+    console.error('Error in buildHatchPattern:', err);
+    throw new HttpsError('internal', err.message);
+  }
+});

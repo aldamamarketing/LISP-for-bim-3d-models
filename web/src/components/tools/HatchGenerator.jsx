@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import './IconGenerator.css'; 
 import { saveToGlobalLibrary, addToFavorites } from '../../utils/library';
-import { auth } from '../../firebase';
+import { auth, functions } from '../../firebase';
 import { onAuthStateChanged } from 'firebase/auth';
+import { httpsCallable } from 'firebase/functions';
+import { executeInAutoCAD } from '../../utils/autocadBridge';
 import LibraryPanel from './LibraryPanel';
 import ToastContainer, { showToast } from '../Toast';
 import { translations } from '../../i18n/translations.js';
@@ -10,7 +12,14 @@ import { ARCHETYPES, generatePatternName, ARCHETYPE_DESCRIPTIONS, CATEGORIES } f
 import SvgPreviewEngine from './SvgPreviewEngine';
 
 
-export default function HatchGenerator({ lang = 'en' }) {
+const isInsideAutoCAD = typeof window !== 'undefined' && (
+  typeof window.external?.ExecuteAutoCADCommand === 'function' ||
+  typeof window.exec === 'function' ||
+  typeof window.execAsync === 'function' ||
+  window.location.search.includes('token=')
+);
+
+export default function HatchGenerator({ lang = 'en', isEmbedded = false }) {
   const t = (key) => { const dict = translations[lang] || translations['en']; return dict[key] || key; };
   
   const [activeTab, setActiveTab] = useState('generator'); // 'library' | 'generator'
@@ -86,7 +95,9 @@ export default function HatchGenerator({ lang = 'en' }) {
     setSaving(true);
     try {
       const p1 = currentArchetype.controlsType === 'lines' ? spacing : width;
-      const patCode = currentArchetype.generatePat(p1, height, joint);
+      const buildHatchPattern = httpsCallable(functions, 'buildHatchPattern');
+      const { data } = await buildHatchPattern({ archetypeId: currentArchetype.id, params: [p1, height, joint] });
+      const patCode = data.patCode;
       const generatedName = generatePatternName(currentArchetype, p1, height, joint);
       const hatchId = "hatch_" + generatedName.replace(/[^a-zA-Z0-9]/g, "_").toLowerCase();
 
@@ -100,7 +111,7 @@ export default function HatchGenerator({ lang = 'en' }) {
         iconUrl: currentArchetype.iconUrl
       };
 
-      await addToFavorites(assetData); // Guarda el código y datos completos en la colección privada
+      await addToFavorites(assetData);
       showToast('Padrão salvo na sua coleção! ⭐', 'success');
     } catch (error) {
       showToast(error.message, 'error');
@@ -112,7 +123,9 @@ export default function HatchGenerator({ lang = 'en' }) {
     setSaving(true);
     try {
       const p1 = currentArchetype.controlsType === 'lines' ? spacing : width;
-      const patCode = currentArchetype.generatePat(p1, height, joint);
+      const buildHatchPattern = httpsCallable(functions, 'buildHatchPattern');
+      const { data } = await buildHatchPattern({ archetypeId: currentArchetype.id, params: [p1, height, joint] });
+      const patCode = data.patCode;
       const generatedName = generatePatternName(currentArchetype, p1, height, joint);
       const hatchId = "hatch_" + generatedName.replace(/[^a-zA-Z0-9]/g, "_").toLowerCase();
 
@@ -127,8 +140,43 @@ export default function HatchGenerator({ lang = 'en' }) {
       };
 
       await saveToGlobalLibrary(assetData);
-      await addToFavorites(assetData); // También a favoritos del admin para acceso rápido
+      await addToFavorites(assetData);
       showToast('Padrão publicado na Livraria Global! 🌍', 'success');
+    } catch (error) {
+      showToast(error.message, 'error');
+    }
+    setSaving(false);
+  };
+
+  const handleApplyToAutoCAD = async () => {
+    setSaving(true);
+    try {
+      const p1 = currentArchetype.controlsType === 'lines' ? spacing : width;
+      const buildHatchPattern = httpsCallable(functions, 'buildHatchPattern');
+      const { data } = await buildHatchPattern({ archetypeId: currentArchetype.id, params: [p1, height, joint] });
+      const patCode = data.patCode;
+      const generatedName = generatePatternName(currentArchetype, p1, height, joint);
+      const safeName = generatedName.replace(/[^a-zA-Z0-9_]/g, '_').toUpperCase();
+
+      executeInAutoCAD(`(setq *LC-ASSET-TYPE* "hatch")`);
+      executeInAutoCAD(`(setq *LC-ASSET-NAME* "${safeName}")`);
+      executeInAutoCAD(`(setq *LC-ASSET-CODE* "")`);
+      
+      const chunkSize = 100;
+      for (let i = 0; i < patCode.length; i += chunkSize) {
+        const rawChunk = patCode.substring(i, i + chunkSize);
+        const escapedChunk = rawChunk
+          .replace(/\\/g, '\\\\')
+          .replace(/"/g, '\\"')
+          .replace(/\n/g, '\\n')
+          .replace(/\r/g, '\\r')
+          .replace(/\t/g, '\\t');
+        
+        executeInAutoCAD(`(progn (setq *LC-ASSET-CODE* (strcat *LC-ASSET-CODE* "${escapedChunk}")) (princ))`);
+      }
+      
+      executeInAutoCAD('LC_APPLY_ASSET');
+      showToast('Aplicando Padrão no AutoCAD... 🚀', 'success');
     } catch (error) {
       showToast(error.message, 'error');
     }
@@ -153,41 +201,43 @@ export default function HatchGenerator({ lang = 'en' }) {
     <div style={{ display: 'flex', flexDirection: 'column', height: '100%', position: 'relative' }}>
       
       {/* Pestañas de Navegación */}
-      <div style={{ display: 'flex', borderBottom: '1px solid #333', marginBottom: '15px' }}>
-        <button 
-          onClick={() => setActiveTab('library')}
-          style={{ 
-            padding: '10px 20px', 
-            backgroundColor: activeTab === 'library' ? '#222' : 'transparent', 
-            color: activeTab === 'library' ? '#fff' : 'var(--text-muted)', 
-            border: '1px solid #333',
-            borderBottom: activeTab === 'library' ? '1px solid #222' : '1px solid #333',
-            borderRadius: '8px 8px 0 0',
-            cursor: 'pointer', 
-            fontWeight: 'bold',
-            marginBottom: '-1px'
-          }}
-        >
-          {t('hatch.factory')}
-        </button>
-        <button 
-          onClick={() => { setActiveTab('generator'); setGeneratorView('archetypes'); }}
-          style={{ 
-            padding: '10px 20px', 
-            backgroundColor: activeTab === 'generator' ? '#222' : 'transparent', 
-            color: activeTab === 'generator' ? 'var(--tmd-orange)' : 'var(--text-muted)', 
-            border: '1px solid #333',
-            borderBottom: activeTab === 'generator' ? '1px solid #222' : '1px solid #333',
-            borderRadius: '8px 8px 0 0',
-            cursor: 'pointer', 
-            fontWeight: 'bold',
-            marginBottom: '-1px',
-            marginLeft: '5px'
-          }}
-        >
-          {t('hatch.parametricBuilder')}
-        </button>
-      </div>
+      {!isEmbedded && (
+        <div style={{ display: 'flex', borderBottom: '1px solid #333', marginBottom: '15px' }}>
+          <button 
+            onClick={() => setActiveTab('library')}
+            style={{ 
+              padding: '10px 20px', 
+              backgroundColor: activeTab === 'library' ? '#222' : 'transparent', 
+              color: activeTab === 'library' ? '#fff' : 'var(--text-muted)', 
+              border: '1px solid #333',
+              borderBottom: activeTab === 'library' ? '1px solid #222' : '1px solid #333',
+              borderRadius: '8px 8px 0 0',
+              cursor: 'pointer', 
+              fontWeight: 'bold',
+              marginBottom: '-1px'
+            }}
+          >
+            {t('hatch.factory')}
+          </button>
+          <button 
+            onClick={() => { setActiveTab('generator'); setGeneratorView('archetypes'); }}
+            style={{ 
+              padding: '10px 20px', 
+              backgroundColor: activeTab === 'generator' ? '#222' : 'transparent', 
+              color: activeTab === 'generator' ? 'var(--tmd-orange)' : 'var(--text-muted)', 
+              border: '1px solid #333',
+              borderBottom: activeTab === 'generator' ? '1px solid #222' : '1px solid #333',
+              borderRadius: '8px 8px 0 0',
+              cursor: 'pointer', 
+              fontWeight: 'bold',
+              marginBottom: '-1px',
+              marginLeft: '5px'
+            }}
+          >
+            {t('hatch.parametricBuilder')}
+          </button>
+        </div>
+      )}
 
       {/* Contenido Principal */}
       <div style={{ flex: 1, overflow: 'hidden', display: 'flex', gap: '20px' }}>
@@ -235,10 +285,10 @@ export default function HatchGenerator({ lang = 'en' }) {
         )}
 
         {activeTab === 'generator' && generatorView === 'builder' && (
-          <div style={{ display: 'flex', width: '100%', gap: '20px' }}>
+          <div style={{ display: 'flex', width: '100%', gap: '20px', flexDirection: isEmbedded ? 'column-reverse' : 'row', overflowY: isEmbedded ? 'auto' : 'hidden', paddingBottom: isEmbedded ? '20px' : '0' }}>
             
             {/* Columna Izquierda: Parámetros */}
-            <div className="panel col-settings" style={{ width: '320px', flexShrink: 0, overflowY: 'auto' }}>
+            <div className="panel col-settings" style={{ width: isEmbedded ? '100%' : '320px', flexShrink: 0, overflowY: isEmbedded ? 'visible' : 'auto' }}>
               <div style={{ padding: '15px', borderBottom: '1px solid #333', backgroundColor: '#1a1a1a', borderTopLeftRadius: '8px', borderTopRightRadius: '8px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                 <h3 style={{ margin: 0, color: '#fff', fontSize: '1.1rem' }}>{t('hatch.settings')}</h3>
                 <button onClick={() => setGeneratorView('archetypes')} style={{ background: 'none', border: 'none', color: 'var(--tmd-orange)', cursor: 'pointer', fontSize: '0.8rem', fontWeight: 'bold' }}>⬅ Volver</button>
@@ -246,7 +296,7 @@ export default function HatchGenerator({ lang = 'en' }) {
 
               <div style={{ padding: '20px', display: 'flex', flexDirection: 'column', gap: '20px', position: 'relative' }}>
                 
-                {!currentArchetype.generatePat && (
+                {!currentArchetype.id && (
                   <div style={{
                     position: 'absolute',
                     top: '10px', left: '10px', right: '10px', bottom: '90px',
@@ -275,7 +325,7 @@ export default function HatchGenerator({ lang = 'en' }) {
                   </div>
                 )}
 
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '20px', opacity: currentArchetype.generatePat ? 1 : 0.3, pointerEvents: currentArchetype.generatePat ? 'auto' : 'none' }}>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '20px', opacity: currentArchetype.id ? 1 : 0.3, pointerEvents: currentArchetype.id ? 'auto' : 'none' }}>
 
                 {/* Grid Setup */}
                 <div className="form-group" style={{ borderTop: '1px solid #444', paddingTop: '15px' }}>
@@ -353,25 +403,35 @@ export default function HatchGenerator({ lang = 'en' }) {
                 )}
                 </div>
 
-                <div style={{ display: 'flex', gap: '10px', marginTop: '25px' }}>
+                <div style={{ display: 'flex', gap: '10px', marginTop: '25px', flexDirection: 'column' }}>
+                  {isInsideAutoCAD && (
+                    <button 
+                      className="btn-primary" 
+                      style={{ padding: '15px', fontSize: '1rem', backgroundColor: 'var(--tmd-orange)', color: '#fff' }}
+                      onClick={handleApplyToAutoCAD}
+                      disabled={saving}
+                    >
+                      {saving ? 'Generando...' : 'Aplicar a AutoCAD 🎯'}
+                    </button>
+                  )}
                   <button 
                     className="btn-primary" 
-                    style={{ flex: 1, padding: '15px', fontSize: '1rem' }}
+                    style={{ padding: '15px', fontSize: '1rem', backgroundColor: isInsideAutoCAD ? '#333' : 'var(--tmd-orange)' }}
                     onClick={handleSaveToFavorites}
                     disabled={saving}
                   >
-                    {saving ? '...' : t('hatch.myCollection')}
+                    {saving ? 'Generando...' : t('hatch.myCollection')}
                   </button>
 
                   {isAdmin && (
                     <button 
                       className="btn-primary" 
-                      style={{ flex: 1, padding: '15px', fontSize: '1rem', backgroundColor: '#e65c00' }}
+                      style={{ padding: '15px', fontSize: '1rem', backgroundColor: '#e65c00' }}
                       onClick={handleSaveToPublicLibrary}
                       disabled={saving}
                       title="Solo visible para Administradores"
                     >
-                      {saving ? '...' : t('hatch.publish')}
+                      {saving ? 'Generando...' : t('hatch.publish')}
                     </button>
                   )}
                 </div>
@@ -379,7 +439,7 @@ export default function HatchGenerator({ lang = 'en' }) {
             </div>
 
             {/* Columna Derecha: Preview Canvas */}
-            <div style={{ flex: 1, backgroundColor: '#222', borderRadius: '8px', padding: '15px', display: 'flex', flexDirection: 'column' }}>
+            <div style={{ flex: isEmbedded ? 'none' : 1, minHeight: isEmbedded ? '300px' : 'auto', backgroundColor: '#222', borderRadius: '8px', padding: '15px', display: 'flex', flexDirection: 'column' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '15px' }}>
                 <h3 style={{ margin: 0, color: '#fff', fontSize: '1.1rem' }}>{t('hatch.livePreview')}</h3>
                 <span style={{ color: 'var(--tmd-orange)', fontWeight: 'bold' }}>

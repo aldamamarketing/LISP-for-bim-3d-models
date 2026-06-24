@@ -1,9 +1,11 @@
-import React, { useState, useEffect, useCallback, useRef } from 'react';
+import React, { useState, useEffect, useCallback, useRef, Suspense, lazy } from 'react';
 import PaletteDropdownMenu from './PaletteDropdownMenu';
 import MultiFilter from './MultiFilter';
 import { executeInAutoCAD } from '../utils/autocadBridge';
 import { db } from '../firebase';
 import { doc, getDoc } from 'firebase/firestore';
+
+const HatchGenerator = lazy(() => import('./tools/HatchGenerator'));
 
 /**
  * ResourcePalette
@@ -46,7 +48,7 @@ const CATALOG_TTL_MS = 60 * 60 * 1000; // 1 hora
 const sessionPatCache = {};
 
 function SvgIcon({ svgString, category }) {
-  const isUrl = typeof svgString === 'string' && svgString.startsWith('http');
+  const isUrl = typeof svgString === 'string' && (svgString.startsWith('http') || svgString.startsWith('/'));
   const icon = svgString || CATEGORY_ICONS[category] || CATEGORY_ICONS['General'];
 
   if (isUrl) {
@@ -174,7 +176,7 @@ function ResourceItem({ item, isPinned, activeTab, onContextMenu, onInsert }) {
         cursor: 'pointer',
       }}
     >
-      <SvgIcon svgString={item.icon} category={item.category} />
+      <SvgIcon svgString={item.iconUrl || item.icon} category={item.category} />
 
       <button
         onClick={(e) => { e.stopPropagation(); onContextMenu(e, item, true); }}
@@ -226,6 +228,7 @@ export default function ResourcePalette() {
   const [pinnedIds, setPinnedIds]       = useState([]);
   const [contextMenu, setContextMenu]   = useState(null); // { item, position, pinTrigger }
   const [applying, setApplying]         = useState(null); // id del item en proceso
+  const [showGenerator, setShowGenerator] = useState(false);
 
   // Credenciales del Loader (igual que LispCommandPalette)
   const urlParams = new URLSearchParams(typeof window !== 'undefined' ? window.location.search : '');
@@ -406,10 +409,32 @@ export default function ResourcePalette() {
   });
 
   return (
-    <div style={{ backgroundColor: '#181818', color: '#fff', height: '100vh', overflow: 'hidden', fontFamily: "'Inter', sans-serif", display: 'flex', flexDirection: 'column' }}>
+    <div style={{ backgroundColor: '#181818', color: '#fff', height: '100vh', overflow: 'hidden', fontFamily: "'Inter', sans-serif", display: 'flex', flexDirection: 'column', position: 'relative' }}>
+      
+      {/* CAPA: Gerador Paramétrico */}
+      {showGenerator && (
+        <div style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, backgroundColor: '#181818', zIndex: 9999, display: 'flex', flexDirection: 'column' }}>
+          <div style={{ padding: '8px 10px', backgroundColor: '#111', borderBottom: '1px solid #333', display: 'flex', alignItems: 'center' }}>
+            <button 
+              onClick={() => setShowGenerator(false)} 
+              style={{ background: 'transparent', color: 'var(--tmd-orange)', border: 'none', cursor: 'pointer', fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: '5px' }}
+            >
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+              Voltar à Biblioteca
+            </button>
+          </div>
+          <div style={{ flex: 1, overflow: 'hidden' }}>
+            <Suspense fallback={<div style={{ padding: '20px', color: '#888', textAlign: 'center' }}>Carregando gerador...</div>}>
+              <HatchGenerator lang="pt" isEmbedded={true} />
+            </Suspense>
+          </div>
+        </div>
+      )}
 
-      {/* Header (idéntico a LispCommandPalette) */}
-      <div style={{ margin: '0 auto', width: '100%', maxWidth: '600px' }}>
+      {/* CAPA: Paleta Principal */}
+      <div style={{ display: showGenerator ? 'none' : 'flex', flexDirection: 'column', height: '100%' }}>
+        {/* Header (idéntico a LispCommandPalette) */}
+        <div style={{ margin: '0 auto', width: '100%', maxWidth: '600px' }}>
         <div style={{ padding: '8px 10px', backgroundColor: '#111', display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '2px solid var(--tmd-orange)' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
             <PaletteDropdownMenu myId="resources" />
@@ -533,6 +558,31 @@ export default function ResourcePalette() {
         {filtered.length} padrões · Clique para inserir · Clic derecho para opções
       </div>
 
+      {/* FAB para Gerador Paramétrico */}
+      <button
+        onClick={() => setShowGenerator(true)}
+        style={{
+          position: 'absolute',
+          bottom: '30px',
+          right: '15px',
+          backgroundColor: 'var(--tmd-orange)',
+          color: '#fff',
+          border: 'none',
+          borderRadius: '50px',
+          padding: '12px 20px',
+          boxShadow: '0 4px 12px rgba(0,0,0,0.5)',
+          cursor: 'pointer',
+          fontWeight: 'bold',
+          display: 'flex',
+          alignItems: 'center',
+          gap: '8px',
+          zIndex: 9000
+        }}
+      >
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+        Gerador
+      </button>
+
       {/* Menú contextual */}
       {contextMenu && (
         <ContextMenu
@@ -545,6 +595,7 @@ export default function ResourcePalette() {
           onDownload={() => handleDownload(contextMenu.item)}
         />
       )}
+      </div>
 
       <style>{`
         @keyframes spin {
