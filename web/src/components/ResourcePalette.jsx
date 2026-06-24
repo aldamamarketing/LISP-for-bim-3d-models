@@ -438,7 +438,7 @@ export default function ResourcePalette() {
 
         {/* Búsqueda y Botón Gerador */}
         <div style={{ padding: '8px', display: 'flex', gap: '8px', alignItems: 'center' }}>
-          {!showGenerator ? (
+          {!showGenerator && (
             <>
               <div style={{ flex: 1 }}>
                 <MultiFilter
@@ -447,7 +447,7 @@ export default function ResourcePalette() {
                   onFilterChange={setActiveFilters}
                 />
               </div>
-              {activeTab === 'hatch' && (
+              {activeTab === 'hatch' && !showGenerator && (
                 <button
                   onClick={() => setShowGenerator(true)}
                   style={{
@@ -466,27 +466,6 @@ export default function ResourcePalette() {
                 </button>
               )}
             </>
-          ) : (
-            <button
-              onClick={() => setShowGenerator(false)}
-              style={{
-                backgroundColor: '#333',
-                color: '#fff',
-                border: 'none',
-                borderRadius: '6px',
-                padding: '8px 12px',
-                cursor: 'pointer',
-                fontWeight: 'bold',
-                fontSize: '0.8rem',
-                whiteSpace: 'nowrap',
-                display: 'flex',
-                alignItems: 'center',
-                gap: '5px'
-              }}
-            >
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
-              Voltar à Biblioteca
-            </button>
           )}
         </div>
       </div>
@@ -496,7 +475,7 @@ export default function ResourcePalette() {
         {showGenerator ? (
           <div style={{ flex: 1, overflow: 'hidden' }}>
             <Suspense fallback={<div style={{ padding: '20px', color: '#888', textAlign: 'center' }}>Carregando gerador...</div>}>
-              <HatchGenerator lang="pt" isEmbedded={true} />
+              <HatchGenerator lang="pt" isEmbedded={true} onClose={() => setShowGenerator(false)} />
             </Suspense>
           </div>
         ) : loading ? (

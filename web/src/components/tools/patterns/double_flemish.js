@@ -1,43 +1,29 @@
-export const double_flemish = {
+export const arch_double_flemish = {
   id: 'double_flemish',
-  name: 'Double Flemish Bond',
-  category: 'Brick',
-  controlsType: 'rectangular',
-  iconUrl: '/patterns/stretcher.svg',
-  controls: ['width', 'height', 'joint'],
+  name: 'Double Flemish',
+  categories: ["Brick Bond","Paving"],
+  controlsType: 'lines',
+  iconUrl: '/patterns/double_flemish.svg',
+  controls: ['width', 'height'],
   defaults: {
-    width: 200,
-    height: 100,
+    width: 1800,
+    height: 600,
     joint: 0,
-    rows: 4,
-    columns: 4
+    rows: 2,
+    columns: 2
   },
-  generateSvgRenderer: params => {
-    const w = params.width || 200;
-    const h = params.height || 100;
-    const j = params.joint || 0;
-    const tw = w + j;
-    const th = h + j;
-    const shift = 0.75 * tw;
-    const totalW = 2.5 * tw;
-    let paths = '';
-    const drawBrick = (x, y, bw, bh) => {
-      paths += `<rect x="${x}" y="${y}" width="${bw}" height="${bh}" fill="none" stroke="white" stroke-width="2" vector-effect="non-scaling-stroke" />\n`;
-    };
-    for (let r = 0; r < 6; r++) {
-      let y = r * th;
-      let startX = r % 2 === 1 ? shift : 0;
-      for (let c = -1; c < 4; c++) {
-        let x = startX + c * totalW;
-        drawBrick(x, y, w, h);
-        drawBrick(x + tw, y, w, h);
-        drawBrick(x + 2 * tw, y, w / 2, h);
-      }
+  i18n: {
+    es: {
+      name: 'Double Flemish',
+      description: 'Patrón de mampostería tipo Double Flemish. Ideal en vistas de alzado para fachadas o muros portantes.'
+    },
+    en: {
+      name: 'Double Flemish',
+      description: 'Masonry pattern type Double Flemish. Ideal for elevation views of facades or load-bearing walls.'
+    },
+    pt: {
+      name: 'Double Flemish',
+      description: 'Padrão de alvenaria tipo Double Flemish. Ideal em vistas de elevação para fachadas ou paredes estruturais.'
     }
-    return {
-      w: totalW,
-      h: th * 2,
-      paths
-    };
   }
 };

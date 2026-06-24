@@ -1,37 +1,29 @@
-export const stretcher = {
+export const arch_stretcher = {
   id: 'stretcher',
   name: 'Stretcher',
-  category: 'Brick Bond',
-  controlsType: 'rectangular',
+  categories: ["Brick Bond","Paving","Geometric","Roofing"],
+  controlsType: 'lines',
   iconUrl: '/patterns/stretcher.svg',
-  controls: ['width', 'height', 'joint'],
+  controls: ['width', 'height'],
   defaults: {
-    width: 400,
-    height: 100,
+    width: 200,
+    height: 200,
     joint: 0,
-    rows: 6,
-    columns: 4
+    rows: 2,
+    columns: 2
   },
-  generateSvgRenderer: params => {
-    const w = params.width || 400;
-    const h = params.height || 100;
-    const th = h * 2;
-    const hw = w / 2;
-    const paths = `
-        <!-- Horizontales -->
-        <line x1="0" y1="0" x2="${w}" y2="0" stroke="white" stroke-width="2" vector-effect="non-scaling-stroke" />
-        <line x1="0" y1="${h}" x2="${w}" y2="${h}" stroke="white" stroke-width="2" vector-effect="non-scaling-stroke" />
-        <line x1="0" y1="${th}" x2="${w}" y2="${th}" stroke="white" stroke-width="2" vector-effect="non-scaling-stroke" />
-        <!-- Verticales bordes (Fila 1) -->
-        <line x1="0" y1="0" x2="0" y2="${h}" stroke="white" stroke-width="2" vector-effect="non-scaling-stroke" />
-        <line x1="${w}" y1="0" x2="${w}" y2="${h}" stroke="white" stroke-width="2" vector-effect="non-scaling-stroke" />
-        <!-- Vertical centro (Fila 2) -->
-        <line x1="${hw}" y1="${h}" x2="${hw}" y2="${th}" stroke="white" stroke-width="2" vector-effect="non-scaling-stroke" />
-      `;
-    return {
-      w,
-      h: th,
-      paths
-    };
+  i18n: {
+    es: {
+      name: 'Stretcher',
+      description: 'Patrón de mampostería tipo Stretcher. Ideal en vistas de alzado para fachadas o muros portantes.'
+    },
+    en: {
+      name: 'Stretcher',
+      description: 'Masonry pattern type Stretcher. Ideal for elevation views of facades or load-bearing walls.'
+    },
+    pt: {
+      name: 'Stretcher',
+      description: 'Padrão de alvenaria tipo Stretcher. Ideal em vistas de elevação para fachadas ou paredes estruturais.'
+    }
   }
 };

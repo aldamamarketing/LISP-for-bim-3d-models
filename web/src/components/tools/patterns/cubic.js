@@ -1,28 +1,29 @@
-export const cubic = {
+export const arch_cubic = {
   id: 'cubic',
   name: 'Cubic',
-  category: 'Geometric',
-  controlsType: 'rectangular',
+  categories: ["Paving","Geometric"],
+  controlsType: 'lines',
   iconUrl: '/patterns/cubic.svg',
-  controls: ['size', 'joint'],
+  controls: ['width', 'height'],
   defaults: {
-    size: 200,
+    width: 346,
+    height: 600,
     joint: 0,
-    rows: 4,
-    columns: 4
+    rows: 2,
+    columns: 2
   },
-  generateSvgRenderer: params => {
-    const s = params.size || 200;
-    const paths = `
-        <line x1="0" y1="0" x2="${s}" y2="0" stroke="white" stroke-width="2" vector-effect="non-scaling-stroke" />
-        <line x1="0" y1="${s}" x2="${s}" y2="${s}" stroke="white" stroke-width="2" vector-effect="non-scaling-stroke" />
-        <line x1="0" y1="0" x2="0" y2="${s}" stroke="white" stroke-width="2" vector-effect="non-scaling-stroke" />
-        <line x1="${s}" y1="0" x2="${s}" y2="${s}" stroke="white" stroke-width="2" vector-effect="non-scaling-stroke" />
-      `;
-    return {
-      w: s,
-      h: s,
-      paths
-    };
+  i18n: {
+    es: {
+      name: 'Cubic',
+      description: 'Patrón de pavimento o suelo tipo Cubic. Ideal para plantas arquitectónicas y revestimientos de piso.'
+    },
+    en: {
+      name: 'Cubic',
+      description: 'Paving or flooring pattern type Cubic. Ideal for architectural floor plans and surface coverings.'
+    },
+    pt: {
+      name: 'Cubic',
+      description: 'Padrão de pavimento ou piso tipo Cubic. Ideal para plantas arquitetônicas e revestimentos de piso.'
+    }
   }
 };

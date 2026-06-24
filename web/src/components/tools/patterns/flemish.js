@@ -1,42 +1,29 @@
-export const flemish = {
+export const arch_flemish = {
   id: 'flemish',
   name: 'Flemish',
-  category: 'Brick Bond',
-  controlsType: 'rectangular',
+  categories: ["Geometric","Paving","Brick Bond"],
+  controlsType: 'lines',
   iconUrl: '/patterns/flemish.svg',
-  controls: ['width', 'height', 'joint'],
+  controls: ['width', 'height'],
   defaults: {
-    width: 400,
-    height: 100,
+    width: 450,
+    height: 200,
     joint: 0,
-    rows: 6,
-    columns: 4
+    rows: 2,
+    columns: 2
   },
-  generateSvgRenderer: params => {
-    const w = params.width || 400;
-    const h = params.height || 100;
-    const hw = w / 2;
-    const stepX = w + hw;
-    const th = h * 2;
-    const paths = `
-        <!-- Horizontales -->
-        <line x1="0" y1="0" x2="${stepX}" y2="0" stroke="white" stroke-width="2" vector-effect="non-scaling-stroke" />
-        <line x1="0" y1="${h}" x2="${stepX}" y2="${h}" stroke="white" stroke-width="2" vector-effect="non-scaling-stroke" />
-        <line x1="0" y1="${th}" x2="${stepX}" y2="${th}" stroke="white" stroke-width="2" vector-effect="non-scaling-stroke" />
-        
-        <!-- Verticales Fila 1 (Stretcher, luego Header) -->
-        <line x1="0" y1="0" x2="0" y2="${h}" stroke="white" stroke-width="2" vector-effect="non-scaling-stroke" />
-        <line x1="${w}" y1="0" x2="${w}" y2="${h}" stroke="white" stroke-width="2" vector-effect="non-scaling-stroke" />
-        <line x1="${stepX}" y1="0" x2="${stepX}" y2="${h}" stroke="white" stroke-width="2" vector-effect="non-scaling-stroke" />
-        
-        <!-- Verticales Fila 2 (Descentrado por stepX/2 = 0.75w, envuelto) -->
-        <line x1="${0.75 * w}" y1="${h}" x2="${0.75 * w}" y2="${th}" stroke="white" stroke-width="2" vector-effect="non-scaling-stroke" />
-        <line x1="${0.25 * w}" y1="${h}" x2="${0.25 * w}" y2="${th}" stroke="white" stroke-width="2" vector-effect="non-scaling-stroke" />
-      `;
-    return {
-      w: stepX,
-      h: th,
-      paths
-    };
+  i18n: {
+    es: {
+      name: 'Flemish',
+      description: 'Patrón de mampostería tipo Flemish. Ideal en vistas de alzado para fachadas o muros portantes.'
+    },
+    en: {
+      name: 'Flemish',
+      description: 'Masonry pattern type Flemish. Ideal for elevation views of facades or load-bearing walls.'
+    },
+    pt: {
+      name: 'Flemish',
+      description: 'Padrão de alvenaria tipo Flemish. Ideal em vistas de elevação para fachadas ou paredes estruturais.'
+    }
   }
 };

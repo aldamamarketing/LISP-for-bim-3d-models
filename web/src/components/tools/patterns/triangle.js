@@ -1,30 +1,29 @@
-export const triangle = {
+export const arch_triangle = {
   id: 'triangle',
-  name: 'Triangle Grid',
-  category: 'Geometric',
-  controlsType: 'cubic',
-  iconUrl: '/patterns/hexagonal.svg',
-  controls: ['size'],
+  name: 'Triangle',
+  categories: ["Geometric","Paving"],
+  controlsType: 'lines',
+  iconUrl: '/patterns/triangle.svg',
+  controls: ['width', 'height'],
   defaults: {
-    size: 100,
-    rows: 4,
-    columns: 4
+    width: 400,
+    height: 400,
+    joint: 0,
+    rows: 2,
+    columns: 2
   },
-  generateSvgRenderer: params => {
-    const s = params.size || 100;
-    const h = s * Math.sqrt(3) / 2;
-    let paths = '';
-    for (let i = 0; i <= 10; i++) {
-      paths += `<line x1="0" y1="${i * h}" x2="${10 * s}" y2="${i * h}" stroke="white" stroke-width="2" vector-effect="non-scaling-stroke" />\n`;
-      paths += `<line x1="${i * s}" y1="0" x2="${i * s + 10 * h / Math.sqrt(3)}" y2="${10 * h}" stroke="white" stroke-width="2" vector-effect="non-scaling-stroke" />\n`;
-      paths += `<line x1="${i * s}" y1="0" x2="${i * s - 10 * h / Math.sqrt(3)}" y2="${10 * h}" stroke="white" stroke-width="2" vector-effect="non-scaling-stroke" />\n`;
-      paths += `<line x1="${-i * s}" y1="0" x2="${-i * s + 10 * h / Math.sqrt(3)}" y2="${10 * h}" stroke="white" stroke-width="2" vector-effect="non-scaling-stroke" />\n`;
-      paths += `<line x1="${10 * s - i * s}" y1="0" x2="${10 * s - i * s - 10 * h / Math.sqrt(3)}" y2="${10 * h}" stroke="white" stroke-width="2" vector-effect="non-scaling-stroke" />\n`;
+  i18n: {
+    es: {
+      name: 'Triangle',
+      description: 'Patrón de pavimento o suelo tipo Triangle. Ideal para plantas arquitectónicas y revestimientos de piso.'
+    },
+    en: {
+      name: 'Triangle',
+      description: 'Paving or flooring pattern type Triangle. Ideal for architectural floor plans and surface coverings.'
+    },
+    pt: {
+      name: 'Triangle',
+      description: 'Padrão de pavimento ou piso tipo Triangle. Ideal para plantas arquitetônicas e revestimentos de piso.'
     }
-    return {
-      w: 3 * s,
-      h: 3 * h,
-      paths
-    };
   }
 };

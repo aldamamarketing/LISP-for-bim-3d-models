@@ -1,46 +1,29 @@
-export const triple_herringbone = {
+export const arch_triple_herringbone = {
   id: 'triple_herringbone',
   name: 'Triple Herringbone',
-  category: 'Parquet',
-  controlsType: 'rectangular',
-  iconUrl: '/patterns/herringbone.svg',
-  controls: ['width', 'height', 'joint'],
+  categories: ["Paving","Brick Bond","Parquetry","Geometric"],
+  controlsType: 'lines',
+  iconUrl: '/patterns/triple_herringbone.svg',
+  controls: ['width', 'height'],
   defaults: {
-    width: 300,
-    height: 100,
+    width: 566,
+    height: 382,
     joint: 0,
-    rows: 4,
-    columns: 4
+    rows: 2,
+    columns: 2
   },
-  generateSvgRenderer: params => {
-    const w = params.width || 300;
-    const h = params.height || 100;
-    const j = params.joint || 0;
-    const tw = w + j;
-    const th = h + j;
-    const step = (tw * 2 + 2 * th) / Math.SQRT2;
-    let paths = '';
-    const drawRotatedRect = (x, y, bw, bh, angle) => {
-      paths += `<rect x="${x}" y="${y}" width="${bw}" height="${bh}" transform="rotate(${angle} ${x} ${y})" fill="none" stroke="white" stroke-width="2" vector-effect="non-scaling-stroke" />\n`;
-    };
-    for (let r = -2; r < 5; r++) {
-      for (let c = -2; c < 5; c++) {
-        let ox = (c + r) * step;
-        let oy = (r - c) * step;
-        drawRotatedRect(ox, oy, w, h, -45);
-        drawRotatedRect(ox + th / Math.SQRT2, oy + th / Math.SQRT2, w, h, -45);
-        drawRotatedRect(ox + 2 * th / Math.SQRT2, oy + 2 * th / Math.SQRT2, w, h, -45);
-        let ox2 = ox + (tw + 2 * th) / Math.SQRT2;
-        let oy2 = oy + (tw - 2 * th) / Math.SQRT2;
-        drawRotatedRect(ox2, oy2, w, h, -135);
-        drawRotatedRect(ox2 + th / Math.SQRT2, oy2 - th / Math.SQRT2, w, h, -135);
-        drawRotatedRect(ox2 + 2 * th / Math.SQRT2, oy2 - 2 * th / Math.SQRT2, w, h, -135);
-      }
+  i18n: {
+    es: {
+      name: 'Triple Herringbone',
+      description: 'Patrón de mampostería tipo Triple Herringbone. Ideal en vistas de alzado para fachadas o muros portantes.'
+    },
+    en: {
+      name: 'Triple Herringbone',
+      description: 'Masonry pattern type Triple Herringbone. Ideal for elevation views of facades or load-bearing walls.'
+    },
+    pt: {
+      name: 'Triple Herringbone',
+      description: 'Padrão de alvenaria tipo Triple Herringbone. Ideal em vistas de elevação para fachadas ou paredes estruturais.'
     }
-    return {
-      w: step * 2,
-      h: step * 2,
-      paths
-    };
   }
 };

@@ -20,7 +20,7 @@ const isInsideAutoCAD = typeof window !== 'undefined' && (
   window.location.search.includes('token=')
 );
 
-export default function HatchGenerator({ lang = 'en', isEmbedded = false }) {
+export default function HatchGenerator({ lang = 'en', isEmbedded = false, onClose }) {
   const t = (key) => { const dict = translations[lang] || translations['en']; return dict[key] || key; };
   
   const [activeTab, setActiveTab] = useState('generator'); // 'library' | 'generator'
@@ -29,6 +29,7 @@ export default function HatchGenerator({ lang = 'en', isEmbedded = false }) {
   // Estados de búsqueda para arquetipos
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('All');
+  const [isCategoryDropdownOpen, setIsCategoryDropdownOpen] = useState(false);
   
   const [user, setUser] = useState(null);
   
@@ -82,7 +83,7 @@ export default function HatchGenerator({ lang = 'en', isEmbedded = false }) {
   const filteredArchetypes = React.useMemo(() => {
     return ARCHETYPES.filter(arch => {
       const matchesSearch = arch.name.toLowerCase().includes(searchTerm.toLowerCase());
-      const matchesCategory = selectedCategory === 'All' || arch.category === selectedCategory;
+      const matchesCategory = selectedCategory === 'All' || (arch.categories && arch.categories.includes(selectedCategory));
       return matchesSearch && matchesCategory;
     });
   }, [searchTerm, selectedCategory]);
@@ -255,20 +256,89 @@ export default function HatchGenerator({ lang = 'en', isEmbedded = false }) {
         {/* Pestaña: Constructor Paramétrico */}
         {activeTab === 'generator' && generatorView === 'archetypes' && (
           <div style={{ display: 'flex', flexDirection: 'column', width: '100%', height: '100%', backgroundColor: '#0f172a', borderRadius: '8px', border: '1px solid #334155', overflow: 'hidden' }}>
-            <div style={{ padding: '8px', borderBottom: '1px solid #334155', display: 'flex', gap: '8px', alignItems: 'center', backgroundColor: '#181818' }}>
-              <div style={{ flex: 1 }}>
-                <MultiFilter
-                  storageKey="lc_filters_generator"
-                  placeholder="Procurar arquetipo..."
-                  onFilterChange={(tags) => {
-                    if (tags.length === 0) {
-                      setSearchTerm('');
-                      setSelectedCategory('All');
-                    } else {
-                      setSearchTerm(tags.join(' '));
-                    }
-                  }}
+            {/* Header de Arquetipos con Breadcrumb y Buscador */}
+            <div style={{ padding: '10px 15px', borderBottom: '1px solid #334155', display: 'flex', flexDirection: 'column', gap: '10px', backgroundColor: '#181818' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                {onClose && (
+                  <button onClick={onClose} style={{ background: 'none', border: 'none', color: 'var(--tmd-orange)', cursor: 'pointer', fontSize: '0.9rem', fontWeight: 'bold', padding: 0 }}>← Library</button>
+                )}
+                {onClose && <span style={{ color: '#555' }}>/</span>}
+                <span style={{ color: '#fff', fontSize: '0.9rem', fontWeight: 'bold' }}>Archetypes</span>
+              </div>
+              <div style={{ display: 'flex', gap: '10px' }}>
+                <input 
+                  type="text" 
+                  placeholder="Search archetype..." 
+                  value={searchTerm} 
+                  onChange={e => setSearchTerm(e.target.value)} 
+                  style={{ flex: 1, padding: '8px 12px', borderRadius: '4px', border: '1px solid #333', backgroundColor: '#222', color: '#fff', outline: 'none' }} 
                 />
+                
+                <div style={{ position: 'relative' }}>
+                  <div 
+                    onClick={() => setIsCategoryDropdownOpen(!isCategoryDropdownOpen)}
+                    style={{ 
+                      padding: '8px 12px', 
+                      borderRadius: '4px', 
+                      border: '1px solid #333', 
+                      backgroundColor: '#222', 
+                      color: '#fff', 
+                      cursor: 'pointer',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'space-between',
+                      width: '130px'
+                    }}
+                  >
+                    <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                      {selectedCategory === 'All' ? 'All Categories' : selectedCategory}
+                    </span>
+                    <span style={{ fontSize: '0.6rem', marginLeft: '8px' }}>▼</span>
+                  </div>
+                  
+                  {isCategoryDropdownOpen && (
+                    <>
+                      <div 
+                        style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, zIndex: 9 }} 
+                        onClick={() => setIsCategoryDropdownOpen(false)}
+                      />
+                      <div style={{
+                        position: 'absolute',
+                        top: '100%',
+                        right: 0,
+                        marginTop: '4px',
+                        backgroundColor: '#222',
+                        border: '1px solid #333',
+                        borderRadius: '4px',
+                        zIndex: 10,
+                        maxHeight: '300px',
+                        overflowY: 'auto',
+                        width: '150px',
+                        boxShadow: '0 4px 12px rgba(0,0,0,0.5)'
+                      }}>
+                        <div 
+                          onClick={() => { setSelectedCategory('All'); setIsCategoryDropdownOpen(false); }}
+                          style={{ padding: '8px 12px', cursor: 'pointer', color: selectedCategory === 'All' ? 'var(--tmd-orange)' : '#fff', backgroundColor: selectedCategory === 'All' ? 'rgba(242, 109, 33, 0.1)' : 'transparent' }}
+                          onMouseEnter={(e) => { if(selectedCategory !== 'All') e.currentTarget.style.backgroundColor='#333'; }}
+                          onMouseLeave={(e) => { if(selectedCategory !== 'All') e.currentTarget.style.backgroundColor='transparent'; }}
+                        >
+                          All Categories
+                        </div>
+                        {CATEGORIES.map(cat => (
+                          <div 
+                            key={cat}
+                            onClick={() => { setSelectedCategory(cat); setIsCategoryDropdownOpen(false); }}
+                            style={{ padding: '8px 12px', cursor: 'pointer', color: selectedCategory === cat ? 'var(--tmd-orange)' : '#fff', backgroundColor: selectedCategory === cat ? 'rgba(242, 109, 33, 0.1)' : 'transparent' }}
+                            onMouseEnter={(e) => { if(selectedCategory !== cat) e.currentTarget.style.backgroundColor='#333'; }}
+                            onMouseLeave={(e) => { if(selectedCategory !== cat) e.currentTarget.style.backgroundColor='transparent'; }}
+                          >
+                            {cat}
+                          </div>
+                        ))}
+                      </div>
+                    </>
+                  )}
+                </div>
               </div>
             </div>
             <div style={{ flex: 1, overflowY: 'auto', padding: '10px' }}>
@@ -295,10 +365,10 @@ export default function HatchGenerator({ lang = 'en', isEmbedded = false }) {
                     onMouseLeave={(e) => { e.currentTarget.style.backgroundColor='#1e1e1e'; e.currentTarget.style.borderColor='#333'; }}
                   >
                     <div style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, zIndex: 0, opacity: 0.8 }}>
-                      <div style={{ width: '100%', height: '100%', display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gridTemplateRows: 'repeat(2, 1fr)', gap: 0 }}>
-                        {[1,2,3,4].map(i => {
+                      <div style={{ width: '100%', height: '100%', display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gridTemplateRows: 'repeat(3, 1fr)', gap: 0, overflow: 'hidden' }}>
+                        {[1,2,3,4,5,6,7,8,9].map(i => {
                           const iconSrc = arch.iconUrl?.startsWith('/') ? 'https://lispcentral.firebaseapp.com' + arch.iconUrl : arch.iconUrl;
-                          return <img key={i} src={iconSrc} style={{ width: '100%', height: '100%', objectFit: 'cover', filter: 'invert(1) hue-rotate(180deg)' }} alt="Pattern tile" />
+                          return <img key={i} src={iconSrc} style={{ width: '100%', height: '100%', objectFit: 'fill', filter: 'invert(1) hue-rotate(180deg)' }} alt="Pattern tile" />
                         })}
                       </div>
                     </div>
@@ -323,164 +393,21 @@ export default function HatchGenerator({ lang = 'en', isEmbedded = false }) {
         )}
 
         {activeTab === 'generator' && generatorView === 'builder' && (
-          <div style={{ display: 'flex', width: '100%', gap: '20px', flexDirection: isEmbedded ? 'column-reverse' : 'row', overflowY: isEmbedded ? 'auto' : 'hidden', paddingBottom: isEmbedded ? '20px' : '0' }}>
+          <div style={{ display: 'flex', width: '100%', height: '100%', gap: '0', flexDirection: isEmbedded ? 'column' : 'row', overflow: 'hidden' }}>
             
-            {/* Columna Izquierda: Parámetros */}
-            <div className="panel col-settings" style={{ width: isEmbedded ? '100%' : '320px', flexShrink: 0, overflowY: isEmbedded ? 'visible' : 'auto' }}>
-              <div style={{ padding: '15px', borderBottom: '1px solid #333', backgroundColor: '#1a1a1a', borderTopLeftRadius: '8px', borderTopRightRadius: '8px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <h3 style={{ margin: 0, color: '#fff', fontSize: '1.1rem' }}>{t('hatch.settings')}</h3>
-                <button onClick={() => setGeneratorView('archetypes')} style={{ background: 'none', border: 'none', color: 'var(--tmd-orange)', cursor: 'pointer', fontSize: '0.8rem', fontWeight: 'bold' }}>⬅ Volver</button>
-              </div>
-
-              <div style={{ padding: '20px', display: 'flex', flexDirection: 'column', gap: '20px', position: 'relative' }}>
-                
-                {!currentArchetype.id && (
-                  <div style={{
-                    position: 'absolute',
-                    top: '10px', left: '10px', right: '10px', bottom: '90px',
-                    backgroundColor: 'rgba(26, 26, 26, 0.75)',
-                    backdropFilter: 'blur(3px)',
-                    zIndex: 10,
-                    display: 'flex',
-                    flexDirection: 'column',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    padding: '20px',
-                    textAlign: 'center',
-                    borderRadius: '8px',
-                    border: '1px solid rgba(255,255,255,0.05)'
-                  }}>
-                    <div style={{ marginBottom: '15px' }}>
-                      <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="var(--tmd-orange)" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-                        <circle cx="12" cy="12" r="10"></circle>
-                        <polyline points="12 6 12 12 16 14"></polyline>
-                      </svg>
-                    </div>
-                    <h4 style={{ color: 'white', margin: '0 0 10px 0', fontSize: '1.2rem' }}>{t('hatch.comingSoonTitle')}</h4>
-                    <p style={{ color: '#aaa', fontSize: '0.85rem', lineHeight: '1.4', margin: 0 }}>
-                      {t('hatch.comingSoonDesc')}
-                    </p>
-                  </div>
-                )}
-
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '20px', opacity: currentArchetype.id ? 1 : 0.3, pointerEvents: currentArchetype.id ? 'auto' : 'none' }}>
-
-                {/* Grid Setup */}
-                <div className="form-group" style={{ borderTop: '1px solid #444', paddingTop: '15px' }}>
-                  <label style={{ fontWeight: 'bold' }}>{t('hatch.gridLayout')}</label>
-                  <div style={{ display: 'flex', gap: '10px', marginTop: '5px' }}>
-                    <div style={{ flex: 1 }}>
-                      <span style={{ fontSize: '0.7rem', color: '#aaa' }}>Rows (Max 10)</span>
-                      <input type="number" min="1" max="10" className="form-control" value={rows} onChange={e => setRows(Math.min(10, Number(e.target.value)))} />
-                    </div>
-                    <div style={{ flex: 1 }}>
-                      <span style={{ fontSize: '0.7rem', color: '#aaa' }}>Columns (Max 10)</span>
-                      <input type="number" min="1" max="10" className="form-control" value={columns} onChange={e => setColumns(Math.min(10, Number(e.target.value)))} />
-                    </div>
-                  </div>
-                </div>
-
-                {/* Control Dinámico por Tipo */}
-                <div className="form-group" style={{ borderTop: '1px solid #444', paddingTop: '15px' }}>
-                  <label style={{ fontWeight: 'bold' }}>{t('hatch.dimensions')}</label>
-                  <div style={{ display: 'flex', gap: '15px', marginTop: '10px' }}>
-                    
-                    {currentArchetype.controlsType === 'rectangular' && currentArchetype.controls.includes('width') && (
-                      <div style={{ flex: 1 }}>
-                        <span style={{ fontSize: '0.8rem', color: '#aaa' }}>{t('hatch.length')}</span>
-                        <input type="number" min="1" className="form-control" value={width} onChange={e => setWidth(Number(e.target.value))} />
-                      </div>
-                    )}
-                    
-                    {currentArchetype.controlsType === 'rectangular' && currentArchetype.controls.includes('height') && (
-                      <div style={{ flex: 1 }}>
-                        <span style={{ fontSize: '0.8rem', color: '#aaa' }}>{t('hatch.width')}</span>
-                        <input type="number" min="1" className="form-control" value={height} onChange={e => setHeight(Number(e.target.value))} />
-                      </div>
-                    )}
-
-                    {currentArchetype.controlsType === 'weave' && currentArchetype.controls.includes('width') && (
-                      <div style={{ flex: 1 }}>
-                        <span style={{ fontSize: '0.8rem', color: '#aaa' }}>{t('hatch.spaceS')}</span>
-                        <input type="number" min="1" className="form-control" value={width} onChange={e => setWidth(Number(e.target.value))} />
-                      </div>
-                    )}
-                    
-                    {currentArchetype.controlsType === 'weave' && currentArchetype.controls.includes('height') && (
-                      <div style={{ flex: 1 }}>
-                        <span style={{ fontSize: '0.8rem', color: '#aaa' }}>{t('hatch.ribbonThicknessT')}</span>
-                        <input type="number" min="1" className="form-control" value={height} onChange={e => setHeight(Number(e.target.value))} />
-                      </div>
-                    )}
-
-                    {currentArchetype.controlsType === 'lines' && currentArchetype.controls.includes('spacing') && (
-                      <div style={{ flex: 1 }}>
-                        <span style={{ fontSize: '0.8rem', color: '#aaa' }}>{t('hatch.spaceS')}</span>
-                        <input type="number" min="1" className="form-control" value={spacing} onChange={e => setSpacing(Number(e.target.value))} />
-                      </div>
-                    )}
-
-                    {(currentArchetype.controlsType === 'cubic' || currentArchetype.controlsType === 'cubic3d') && currentArchetype.controls.includes('size') && (
-                      <div style={{ flex: 1 }}>
-                        <span style={{ fontSize: '0.8rem', color: '#aaa' }}>Size (Side)</span>
-                        <input type="number" min="1" className="form-control" value={width} onChange={e => setWidth(Number(e.target.value))} />
-                      </div>
-                    )}
-                  </div>
-                </div>
-
-                {/* Juntas */}
-                {currentArchetype.controls.includes('joint') && (
-                  <div className="form-group" style={{ borderTop: '1px solid #444', paddingTop: '15px' }}>
-                    <label style={{ fontWeight: 'bold' }}>{t('hatch.joints')}</label>
-                    <div style={{ marginTop: '5px' }}>
-                      <span style={{ fontSize: '0.7rem', color: '#aaa' }}>{t('hatch.thickness')}</span>
-                      <input type="number" min="0" className="form-control" value={joint} onChange={e => setJoint(Number(e.target.value))} />
-                    </div>
-                  </div>
-                )}
-                </div>
-
-                <div style={{ display: 'flex', gap: '10px', marginTop: '25px', flexDirection: 'column' }}>
-                  {isInsideAutoCAD && (
-                    <button 
-                      className="btn-primary" 
-                      style={{ padding: '15px', fontSize: '1rem', backgroundColor: 'var(--tmd-orange)', color: '#fff' }}
-                      onClick={handleApplyToAutoCAD}
-                      disabled={saving}
-                    >
-                      {saving ? 'Generando...' : 'Aplicar a AutoCAD 🎯'}
-                    </button>
+            {/* Columna Derecha / Arriba: Preview Canvas */}
+            <div style={{ flex: isEmbedded ? 'none' : 1, minHeight: isEmbedded ? '220px' : 'auto', backgroundColor: '#222', borderBottom: isEmbedded ? '1px solid #333' : 'none', padding: '15px', display: 'flex', flexDirection: 'column' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  {onClose && (
+                    <button onClick={onClose} style={{ background: 'none', border: 'none', color: 'var(--text-muted)', cursor: 'pointer', fontSize: '0.9rem', fontWeight: 'bold', padding: 0 }}>← Library</button>
                   )}
-                  <button 
-                    className="btn-primary" 
-                    style={{ padding: '15px', fontSize: '1rem', backgroundColor: isInsideAutoCAD ? '#333' : 'var(--tmd-orange)' }}
-                    onClick={handleSaveToFavorites}
-                    disabled={saving}
-                  >
-                    {saving ? 'Generando...' : t('hatch.myCollection')}
-                  </button>
-
-                  {isAdmin && (
-                    <button 
-                      className="btn-primary" 
-                      style={{ padding: '15px', fontSize: '1rem', backgroundColor: '#e65c00' }}
-                      onClick={handleSaveToPublicLibrary}
-                      disabled={saving}
-                      title="Solo visible para Administradores"
-                    >
-                      {saving ? 'Generando...' : t('hatch.publish')}
-                    </button>
-                  )}
+                  {onClose && <span style={{ color: '#555' }}>/</span>}
+                  <button onClick={() => setGeneratorView('archetypes')} style={{ background: 'none', border: 'none', color: 'var(--tmd-orange)', cursor: 'pointer', fontSize: '0.9rem', fontWeight: 'bold', padding: 0 }}>Archetypes</button>
+                  <span style={{ color: '#555' }}>/</span>
+                  <span style={{ color: '#fff', fontSize: '0.9rem', fontWeight: 'bold' }}>Settings</span>
                 </div>
-              </div>
-            </div>
-
-            {/* Columna Derecha: Preview Canvas */}
-            <div style={{ flex: isEmbedded ? 'none' : 1, minHeight: isEmbedded ? '300px' : 'auto', backgroundColor: '#222', borderRadius: '8px', padding: '15px', display: 'flex', flexDirection: 'column' }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '15px' }}>
-                <h3 style={{ margin: 0, color: '#fff', fontSize: '1.1rem' }}>{t('hatch.livePreview')}</h3>
-                <span style={{ color: 'var(--tmd-orange)', fontWeight: 'bold' }}>
+                <span style={{ color: 'var(--tmd-orange)', fontWeight: 'bold', fontSize: '0.9rem' }}>
                   {generatePatternName(currentArchetype, width, height, joint)}
                 </span>
               </div>
@@ -495,6 +422,156 @@ export default function HatchGenerator({ lang = 'en', isEmbedded = false }) {
               </div>
             </div>
 
+            {/* Columna Izquierda / Abajo: Parámetros */}
+            <div className="panel col-settings" style={{ flex: 1, display: 'flex', flexDirection: 'column', width: isEmbedded ? '100%' : '350px', overflow: 'hidden' }}>
+              <div style={{ flex: 1, overflowY: 'auto', padding: '20px', display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
+                <div style={{ width: '100%', maxWidth: '350px', display: 'flex', flexDirection: 'column', gap: '20px', position: 'relative' }}>
+                  
+                  {!currentArchetype.id && (
+                    <div style={{
+                      position: 'absolute',
+                      top: '10px', left: '10px', right: '10px', bottom: '90px',
+                      backgroundColor: 'rgba(26, 26, 26, 0.75)',
+                      backdropFilter: 'blur(3px)',
+                      zIndex: 10,
+                      display: 'flex',
+                      flexDirection: 'column',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      padding: '20px',
+                      textAlign: 'center',
+                      borderRadius: '8px',
+                      border: '1px solid rgba(255,255,255,0.05)'
+                    }}>
+                      <div style={{ marginBottom: '15px' }}>
+                        <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="var(--tmd-orange)" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                          <circle cx="12" cy="12" r="10"></circle>
+                          <polyline points="12 6 12 12 16 14"></polyline>
+                        </svg>
+                      </div>
+                      <h4 style={{ color: 'white', margin: '0 0 10px 0', fontSize: '1.2rem' }}>Coming Soon</h4>
+                      <p style={{ color: '#aaa', fontSize: '0.85rem', lineHeight: '1.4', margin: 0 }}>
+                        This archetype is currently in development.
+                      </p>
+                    </div>
+                  )}
+
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '20px', opacity: currentArchetype.id ? 1 : 0.3, pointerEvents: currentArchetype.id ? 'auto' : 'none' }}>
+
+                  {/* Grid Setup */}
+                  <div className="form-group" style={{ borderTop: '1px solid #444', paddingTop: '15px' }}>
+                    <label style={{ fontWeight: 'bold' }}>Grid Layout (Rows x Cols)</label>
+                    <div style={{ display: 'flex', gap: '10px', marginTop: '5px' }}>
+                      <div style={{ flex: 1 }}>
+                        <span style={{ fontSize: '0.7rem', color: '#aaa' }}>Rows (Max 10)</span>
+                        <input type="number" min="1" max="10" className="form-control" value={rows} onChange={e => setRows(Math.min(10, Number(e.target.value)))} />
+                      </div>
+                      <div style={{ flex: 1 }}>
+                        <span style={{ fontSize: '0.7rem', color: '#aaa' }}>Columns (Max 10)</span>
+                        <input type="number" min="1" max="10" className="form-control" value={columns} onChange={e => setColumns(Math.min(10, Number(e.target.value)))} />
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Control Dinámico por Tipo */}
+                  <div className="form-group" style={{ borderTop: '1px solid #444', paddingTop: '15px' }}>
+                    <label style={{ fontWeight: 'bold' }}>Dimensions (mm)</label>
+                    <div style={{ display: 'flex', gap: '15px', marginTop: '10px' }}>
+                      
+                      {currentArchetype.controlsType === 'rectangular' && currentArchetype.controls.includes('width') && (
+                        <div style={{ flex: 1 }}>
+                          <span style={{ fontSize: '0.8rem', color: '#aaa' }}>Length</span>
+                          <input type="number" min="1" className="form-control" value={width} onChange={e => setWidth(Number(e.target.value))} />
+                        </div>
+                      )}
+                      
+                      {currentArchetype.controlsType === 'rectangular' && currentArchetype.controls.includes('height') && (
+                        <div style={{ flex: 1 }}>
+                          <span style={{ fontSize: '0.8rem', color: '#aaa' }}>Width</span>
+                          <input type="number" min="1" className="form-control" value={height} onChange={e => setHeight(Number(e.target.value))} />
+                        </div>
+                      )}
+
+                      {currentArchetype.controlsType === 'weave' && currentArchetype.controls.includes('width') && (
+                        <div style={{ flex: 1 }}>
+                          <span style={{ fontSize: '0.8rem', color: '#aaa' }}>Spacing</span>
+                          <input type="number" min="1" className="form-control" value={width} onChange={e => setWidth(Number(e.target.value))} />
+                        </div>
+                      )}
+                      
+                      {currentArchetype.controlsType === 'weave' && currentArchetype.controls.includes('height') && (
+                        <div style={{ flex: 1 }}>
+                          <span style={{ fontSize: '0.8rem', color: '#aaa' }}>Thickness</span>
+                          <input type="number" min="1" className="form-control" value={height} onChange={e => setHeight(Number(e.target.value))} />
+                        </div>
+                      )}
+
+                      {currentArchetype.controlsType === 'lines' && currentArchetype.controls.includes('spacing') && (
+                        <div style={{ flex: 1 }}>
+                          <span style={{ fontSize: '0.8rem', color: '#aaa' }}>Spacing</span>
+                          <input type="number" min="1" className="form-control" value={spacing} onChange={e => setSpacing(Number(e.target.value))} />
+                        </div>
+                      )}
+
+                      {(currentArchetype.controlsType === 'cubic' || currentArchetype.controlsType === 'cubic3d') && currentArchetype.controls.includes('size') && (
+                        <div style={{ flex: 1 }}>
+                          <span style={{ fontSize: '0.8rem', color: '#aaa' }}>Size (Side)</span>
+                          <input type="number" min="1" className="form-control" value={width} onChange={e => setWidth(Number(e.target.value))} />
+                        </div>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Juntas */}
+                  {currentArchetype.controls.includes('joint') && (
+                    <div className="form-group" style={{ borderTop: '1px solid #444', paddingTop: '15px' }}>
+                      <label style={{ fontWeight: 'bold' }}>Joints</label>
+                      <div style={{ marginTop: '5px' }}>
+                        <span style={{ fontSize: '0.7rem', color: '#aaa' }}>Thickness (mm)</span>
+                        <input type="number" min="0" className="form-control" value={joint} onChange={e => setJoint(Number(e.target.value))} />
+                      </div>
+                    </div>
+                  )}
+                  </div>
+                </div>
+              </div>
+              
+              {/* Action Buttons fijos en la base */}
+              <div style={{ padding: '15px 20px', backgroundColor: '#181818', borderTop: '1px solid #333', display: 'flex', justifyContent: 'flex-start' }}>
+                <div style={{ width: '100%', maxWidth: '350px', display: 'flex', gap: '10px' }}>
+                  {isInsideAutoCAD && (
+                    <button 
+                      className="btn-primary" 
+                      style={{ flex: 1, padding: '12px', fontSize: '0.95rem', backgroundColor: 'var(--tmd-orange)', color: '#fff' }}
+                      onClick={handleApplyToAutoCAD}
+                      disabled={saving}
+                    >
+                      {saving ? 'Generating...' : 'Apply to AutoCAD 🎯'}
+                    </button>
+                  )}
+                  <button 
+                    className="btn-primary" 
+                    style={{ flex: isInsideAutoCAD ? '0 0 auto' : 1, padding: '12px 15px', fontSize: '0.95rem', backgroundColor: '#333' }}
+                    onClick={handleSaveToFavorites}
+                    disabled={saving}
+                    title="Save to My Collection"
+                  >
+                    ⭐
+                  </button>
+                  {isAdmin && (
+                    <button 
+                      className="btn-primary" 
+                      style={{ padding: '12px 15px', fontSize: '0.95rem', backgroundColor: '#e65c00' }}
+                      onClick={handleSaveToPublicLibrary}
+                      disabled={saving}
+                      title="Publish to Global Library"
+                    >
+                      🌍
+                    </button>
+                  )}
+                </div>
+              </div>
+            </div>
           </div>
         )}
       </div>

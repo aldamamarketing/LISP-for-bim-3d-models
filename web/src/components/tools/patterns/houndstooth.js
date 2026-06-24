@@ -1,15 +1,29 @@
-export const houndstooth = {
+export const arch_houndstooth = {
   id: 'houndstooth',
   name: 'Houndstooth',
-  category: 'Fabric',
+  categories: ["Geometric"],
   controlsType: 'lines',
   iconUrl: '/patterns/houndstooth.svg',
   controls: ['width', 'height'],
   defaults: {
-    width: 200,
-    height: 100,
+    width: 400,
+    height: 400,
     joint: 0,
-    rows: 1,
-    columns: 1
+    rows: 2,
+    columns: 2
+  },
+  i18n: {
+    es: {
+      name: 'Houndstooth',
+      description: 'Patrón de sombreado tipo Houndstooth. Uso general para representación CAD geométrica.'
+    },
+    en: {
+      name: 'Houndstooth',
+      description: 'Hatch pattern type Houndstooth. General use for geometric CAD representation.'
+    },
+    pt: {
+      name: 'Houndstooth',
+      description: 'Padrão de hachura tipo Houndstooth. Uso geral para representação CAD geométrica.'
+    }
   }
 };

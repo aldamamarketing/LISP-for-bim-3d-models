@@ -34,12 +34,12 @@ const PATTERN_GENERATORS = {
   let pat = `*Common_${w}x${h}_J${j}, LispCentral Parametric Hatch\n` + `; Generado por LispCentral Hatch Builder\n` + `0, 0,0, 0,${th}\n`;
   for (let i = 0; i < 5; i++) {
     let offsetX = i % 2 !== 0 ? halfTw : 0;
-    pat += `90, ${offsetX},${i * th}, 0,${totalH}, ${h},-${totalH - h}\n`;
+    pat += `90, ${offsetX},${i * th}, 0,${tw}, ${h},-${totalH - h}\n`;
   }
-  pat += `90, 0,${5 * th}, 0,${totalH}, ${h},-${totalH - h}\n`;
-  pat += `90, ${halfTw / 2},${5 * th}, 0,${totalH}, ${h},-${totalH - h}\n`;
-  pat += `90, ${halfTw},${5 * th}, 0,${totalH}, ${h},-${totalH - h}\n`;
-  pat += `90, ${halfTw + halfTw / 2},${5 * th}, 0,${totalH}, ${h},-${totalH - h}\n`;
+  pat += `90, 0,${5 * th}, 0,${tw}, ${h},-${totalH - h}\n`;
+  pat += `90, ${halfTw / 2},${5 * th}, 0,${tw}, ${h},-${totalH - h}\n`;
+  pat += `90, ${halfTw},${5 * th}, 0,${tw}, ${h},-${totalH - h}\n`;
+  pat += `90, ${halfTw + halfTw / 2},${5 * th}, 0,${tw}, ${h},-${totalH - h}\n`;
   return pat;
 },
   "cubic": (s, unused, j) => {
@@ -87,10 +87,10 @@ const PATTERN_GENERATORS = {
   const halfTw = tw / 2;
   const totalH = th * 2;
   let pat = `*EnglishBond_${w}x${h}_J${j}, LispCentral Parametric Hatch\n` + `; Generado por LispCentral Hatch Builder\n` + `0, 0,0, 0,${th}\n`;
-  pat += `90, 0,0, 0,${totalH}, ${h},-${totalH - h}\n`;
+  pat += `90, 0,0, 0,${tw}, ${h},-${totalH - h}\n`;
   const qTw = tw / 4;
-  pat += `90, ${qTw},${th}, 0,${totalH}, ${h},-${totalH - h}\n`;
-  pat += `90, ${qTw + halfTw},${th}, 0,${totalH}, ${h},-${totalH - h}\n`;
+  pat += `90, ${qTw},${th}, 0,${tw}, ${h},-${totalH - h}\n`;
+  pat += `90, ${qTw + halfTw},${th}, 0,${tw}, ${h},-${totalH - h}\n`;
   return pat;
 },
   "13_running_bond": (w, h, j) => {
@@ -99,9 +99,9 @@ const PATTERN_GENERATORS = {
   const shift = tw / 3;
   const totalH = th * 3;
   let pat = `*13_Running_Bond_${w}x${h}_J${j}, LispCentral Parametric Hatch\n` + `; Generado por LispCentral Hatch Builder\n` + `0, 0,0, 0,${th}\n`;
-  pat += `90, 0,0, 0,${totalH}, ${h},-${totalH - h}\n`;
-  pat += `90, ${shift},${th}, 0,${totalH}, ${h},-${totalH - h}\n`;
-  pat += `90, ${shift * 2},${th * 2}, 0,${totalH}, ${h},-${totalH - h}\n`;
+  pat += `90, 0,0, 0,${tw}, ${h},-${totalH - h}\n`;
+  pat += `90, ${shift},${th}, 0,${tw}, ${h},-${totalH - h}\n`;
+  pat += `90, ${shift * 2},${th * 2}, 0,${tw}, ${h},-${totalH - h}\n`;
   return pat;
 },
   "14_running_bond": (w, h, j) => {
@@ -110,10 +110,10 @@ const PATTERN_GENERATORS = {
   const shift = tw / 4;
   const totalH = th * 4;
   let pat = `*14_Running_Bond_${w}x${h}_J${j}, LispCentral Parametric Hatch\n` + `; Generado por LispCentral Hatch Builder\n` + `0, 0,0, 0,${th}\n`;
-  pat += `90, 0,0, 0,${totalH}, ${h},-${totalH - h}\n`;
-  pat += `90, ${shift},${th}, 0,${totalH}, ${h},-${totalH - h}\n`;
-  pat += `90, ${shift * 2},${th * 2}, 0,${totalH}, ${h},-${totalH - h}\n`;
-  pat += `90, ${shift * 3},${th * 3}, 0,${totalH}, ${h},-${totalH - h}\n`;
+  pat += `90, 0,0, 0,${tw}, ${h},-${totalH - h}\n`;
+  pat += `90, ${shift},${th}, 0,${tw}, ${h},-${totalH - h}\n`;
+  pat += `90, ${shift * 2},${th * 2}, 0,${tw}, ${h},-${totalH - h}\n`;
+  pat += `90, ${shift * 3},${th * 3}, 0,${tw}, ${h},-${totalH - h}\n`;
   return pat;
 },
   "double_stretcher": (w, h, j) => {
@@ -142,13 +142,13 @@ const PATTERN_GENERATORS = {
   const totalW = tw * 2.5;
   const totalH = th * 2;
   let pat = `*MonkBond_${w}x${h}_J${j}, LispCentral Parametric Hatch\n` + `; Generado por LispCentral Hatch Builder\n` + `0, 0,0, 0,${th}\n`;
-  pat += `90, 0,0, 0,${totalH}, ${h},-${totalH - h}\n`;
-  pat += `90, ${tw},0, 0,${totalH}, ${h},-${totalH - h}\n`;
-  pat += `90, ${tw * 2},0, 0,${totalH}, ${h},-${totalH - h}\n`;
+  pat += `90, 0,0, 0,${totalW}, ${h},-${totalH - h}\n`;
+  pat += `90, ${tw},0, 0,${totalW}, ${h},-${totalH - h}\n`;
+  pat += `90, ${tw * 2},0, 0,${totalW}, ${h},-${totalH - h}\n`;
   const shift = totalW / 2;
-  pat += `90, ${shift},${th}, 0,${totalH}, ${h},-${totalH - h}\n`;
-  pat += `90, ${shift + tw},${th}, 0,${totalH}, ${h},-${totalH - h}\n`;
-  pat += `90, ${shift + tw * 2},${th}, 0,${totalH}, ${h},-${totalH - h}\n`;
+  pat += `90, ${shift},${th}, 0,${totalW}, ${h},-${totalH - h}\n`;
+  pat += `90, ${shift + tw},${th}, 0,${totalW}, ${h},-${totalH - h}\n`;
+  pat += `90, ${shift + tw * 2},${th}, 0,${totalW}, ${h},-${totalH - h}\n`;
   return pat;
 },
   "silesian_bond": (w, h, j) => {
@@ -157,15 +157,15 @@ const PATTERN_GENERATORS = {
   const totalW = tw * 3.5;
   const totalH = th * 2;
   let pat = `*SilesianBond_${w}x${h}_J${j}, LispCentral Parametric Hatch\n` + `; Generado por LispCentral Hatch Builder\n` + `0, 0,0, 0,${th}\n`;
-  pat += `90, 0,0, 0,${totalH}, ${h},-${totalH - h}\n`;
-  pat += `90, ${tw},0, 0,${totalH}, ${h},-${totalH - h}\n`;
-  pat += `90, ${tw * 2},0, 0,${totalH}, ${h},-${totalH - h}\n`;
-  pat += `90, ${tw * 3},0, 0,${totalH}, ${h},-${totalH - h}\n`;
+  pat += `90, 0,0, 0,${totalW}, ${h},-${totalH - h}\n`;
+  pat += `90, ${tw},0, 0,${totalW}, ${h},-${totalH - h}\n`;
+  pat += `90, ${tw * 2},0, 0,${totalW}, ${h},-${totalH - h}\n`;
+  pat += `90, ${tw * 3},0, 0,${totalW}, ${h},-${totalH - h}\n`;
   const shift = totalW / 2;
-  pat += `90, ${shift},${th}, 0,${totalH}, ${h},-${totalH - h}\n`;
-  pat += `90, ${shift + tw},${th}, 0,${totalH}, ${h},-${totalH - h}\n`;
-  pat += `90, ${shift + tw * 2},${th}, 0,${totalH}, ${h},-${totalH - h}\n`;
-  pat += `90, ${shift + tw * 3},${th}, 0,${totalH}, ${h},-${totalH - h}\n`;
+  pat += `90, ${shift},${th}, 0,${totalW}, ${h},-${totalH - h}\n`;
+  pat += `90, ${shift + tw},${th}, 0,${totalW}, ${h},-${totalH - h}\n`;
+  pat += `90, ${shift + tw * 2},${th}, 0,${totalW}, ${h},-${totalH - h}\n`;
+  pat += `90, ${shift + tw * 3},${th}, 0,${totalW}, ${h},-${totalH - h}\n`;
   return pat;
 },
   "basketweave": (s, unused, j) => {

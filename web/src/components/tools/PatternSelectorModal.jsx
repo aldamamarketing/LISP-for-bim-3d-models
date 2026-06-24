@@ -9,7 +9,7 @@ export default function PatternSelectorModal({ isOpen, onClose, onSelect, curren
   const filteredArchetypes = useMemo(() => {
     return ARCHETYPES.filter(arch => {
       const matchesSearch = arch.name.toLowerCase().includes(searchTerm.toLowerCase());
-      const matchesCategory = selectedCategory === 'All' || arch.category === selectedCategory;
+      const matchesCategory = selectedCategory === 'All' || (arch.categories && arch.categories.includes(selectedCategory));
       return matchesSearch && matchesCategory;
     });
   }, [searchTerm, selectedCategory]);

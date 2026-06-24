@@ -136,7 +136,7 @@ export default function LibraryPanel({ currentType, searchQuery = '', selectedIt
   });
 
   return (
-    <div style={{ flex: 1, backgroundColor: '#222', borderRadius: '8px', padding: '15px', display: 'flex', flexDirection: 'column', height: '100%' }}>
+    <div style={{ flex: 1, backgroundColor: '#222', borderRadius: '8px', padding: '15px', display: 'flex', flexDirection: 'column', height: '100%', overflow: 'hidden' }}>
       <div style={{ marginBottom: '15px' }}>
         <h3 style={{ margin: 0, color: '#fff', fontSize: '1.1rem' }}>Biblioteca Pública ({filtered.length})</h3>
         <p style={{ margin: '5px 0 0 0', color: 'var(--text-muted)', fontSize: '0.8rem' }}>
@@ -169,7 +169,7 @@ export default function LibraryPanel({ currentType, searchQuery = '', selectedIt
         flex: 1, 
         overflowY: 'auto', 
         display: 'grid', 
-        gridTemplateColumns: 'repeat(auto-fill, minmax(90px, 1fr))', 
+        gridTemplateColumns: 'repeat(auto-fill, minmax(100px, 1fr))', 
         gap: '10px', 
         alignContent: 'start'
       }}>
@@ -187,57 +187,69 @@ export default function LibraryPanel({ currentType, searchQuery = '', selectedIt
                 key={item.id} 
                 onClick={() => onToggleSelect && onToggleSelect(item)}
                 onContextMenu={(e) => handleContextMenu(e, item)}
-                style={{ 
-                  backgroundColor: isSelected ? 'rgba(242, 109, 33, 0.2)' : 'transparent', 
-                  padding: '5px', 
-                  borderRadius: '4px', 
-                  border: isSelected ? '2px solid var(--tmd-orange)' : '2px solid transparent',
-                  cursor: 'pointer',
-                  display: 'flex', 
+                style={{
+                  position: 'relative',
+                  height: '120px',
+                  display: 'flex',
                   flexDirection: 'column',
-                  alignItems: 'center',
-                  transition: 'all 0.1s ease',
-                }}
-                onMouseOver={(e) => {
+                  justifyContent: 'flex-end',
+                  overflow: 'hidden',
+                  padding: 0,
+                  backgroundColor: isSelected ? 'rgba(242, 109, 33, 0.1)' : '#1e1e1e',
+                  border: '1px solid',
+                  borderColor: isSelected ? 'var(--tmd-orange)' : '#333',
+                  borderRadius: '6px',
+                  cursor: 'pointer',
+                  transition: 'all 0.15s'
+                }} 
+                onMouseEnter={(e) => { 
                   if (!isSelected) {
-                    e.currentTarget.style.backgroundColor = '#3b4654';
-                    e.currentTarget.style.border = '2px solid #5a6b82';
+                    e.currentTarget.style.backgroundColor='#2a2a2a'; 
+                    e.currentTarget.style.borderColor='var(--tmd-orange)'; 
                   }
-                }}
-                onMouseOut={(e) => {
+                }} 
+                onMouseLeave={(e) => { 
                   if (!isSelected) {
-                    e.currentTarget.style.backgroundColor = 'transparent';
-                    e.currentTarget.style.border = '2px solid transparent';
+                    e.currentTarget.style.backgroundColor='#1e1e1e'; 
+                    e.currentTarget.style.borderColor='#333'; 
                   }
                 }}
               >
-                <div style={{ width: '64px', height: '64px', backgroundColor: '#3b4654', display: 'flex', justifyContent: 'center', alignItems: 'center', overflow: 'hidden' }}>
-                  {currentType === 'icon' && <IconGenerator iconName={item.name} size={64} color="var(--tmd-orange)" />}
-                  {currentType === 'hatch' && (
-                    <div 
-                      title={item.name}
-                      style={{ 
-                        width: '48px', height: '48px', 
-                        backgroundImage: `url(${(item.iconUrl || '/patterns/stack.svg').startsWith('/') ? 'https://lispcentral.firebaseapp.com' + (item.iconUrl || '/patterns/stack.svg') : (item.iconUrl || '/patterns/stack.svg')})`, 
-                        backgroundSize: '50% 50%', backgroundRepeat: 'repeat', 
-                        filter: 'invert(1) hue-rotate(180deg)', opacity: 0.9 
-                      }} 
-                    />
+                <div style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, zIndex: 0, opacity: 0.8 }}>
+                  {currentType === 'icon' && (
+                    <div style={{ width: '100%', height: '100%', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+                      <IconGenerator iconName={item.name} size={64} color="var(--tmd-orange)" />
+                    </div>
                   )}
-                  {currentType === 'lin' && <LinetypePreview linCode={item.code} scale={1} width={64} height={64} />}
+                  {currentType === 'hatch' && (
+                    <div style={{ width: '100%', height: '100%', display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gridTemplateRows: 'repeat(3, 1fr)', gap: 0, overflow: 'hidden' }}>
+                      {[1,2,3,4,5,6,7,8,9].map(i => {
+                        const defaultIcon = '/patterns/stack.svg';
+                        const url = item.iconUrl || defaultIcon;
+                        const iconSrc = url.startsWith('/') ? 'https://lispcentral.firebaseapp.com' + url : url;
+                        return <img key={i} src={iconSrc} style={{ width: '100%', height: '100%', objectFit: 'fill', filter: 'invert(1) hue-rotate(180deg)' }} alt="Pattern tile" />
+                      })}
+                    </div>
+                  )}
+                  {currentType === 'lin' && (
+                    <div style={{ width: '100%', height: '100%', display: 'flex', justifyContent: 'center', alignItems: 'center', padding: '10px' }}>
+                       <LinetypePreview linCode={item.code} scale={1} width="100%" height={64} />
+                    </div>
+                  )}
                 </div>
-                <span style={{ 
-                  color: '#fff', 
-                  fontSize: '0.7rem', 
-                  marginTop: '6px', 
-                  textAlign: 'center', 
+                
+                <div style={{
+                  position: 'relative',
+                  zIndex: 1,
                   width: '100%',
-                  whiteSpace: 'nowrap', 
-                  overflow: 'hidden', 
-                  textOverflow: 'ellipsis' 
-                }} title={item.name}>
-                  {item.name || 'ITEM'}
-                </span>
+                  padding: '6px 8px',
+                  background: 'rgba(255,255,255,0.95)',
+                  borderTop: '1px solid rgba(0,0,0,0.05)',
+                  backdropFilter: 'blur(4px)',
+                }}>
+                  <div style={{ fontWeight: '600', fontSize: '0.75rem', color: '#111', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }} title={item.name}>{item.name || 'ITEM'}</div>
+                  <div style={{ fontSize: '0.65rem', color: '#666', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{item.category || 'General'}</div>
+                </div>
               </div>
             );
           })

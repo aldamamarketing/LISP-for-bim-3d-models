@@ -108,3 +108,34 @@ Como **Desarrollador o Agente Junior**, sigue rigurosamente estos pasos por CADA
    **MANDATORIO:** Traduce la misma lÃ³gica y vÃ©rtices trigonomÃ©tricos usados en `generatePat` hacia etiquetas `<line>` de SVG. No uses copypaste. Calcula las coordenadas `x1, y1, x2, y2` en base a `w, h, j`.
 4. **ValidaciÃ³n:**
    Usa el "Modo CÃ©lula Base" (Rows: 1, Cols: 1) para confirmar visualmente que el SVGRenderer cierra perfecto. Exporta el `.pat` a AutoCAD y verifica a escala. NUNCA procedas sin validar ambas vÃ­as.
+
+
+## 6. Actualización Reciente y Pendientes (Junio 2026)
+
+### ? Lo que hemos hecho hasta ahora
+
+#### Interfaz de Usuario (UI/UX)
+Se implementaron estrictamente las normas de diseño del proyecto:
+*   **Navegación por Breadcrumbs:** Reemplazo del botón flotante por una navegación en la parte superior (? Library / Archetypes / Settings).
+*   **Filtros Clásicos:** Eliminación de los "Pills" de búsqueda a favor de un <input> de texto limpio y un menú desplegable <select> nativo para Categorías.
+*   **Estandarización de Idioma:** Labels en inglés (sin quemado de strings mixtos).
+*   **Diseño de Controles (Builder):**
+    *   El **Visualizador SVG** interactivo ha sido anclado firmemente en la parte superior.
+    *   Ancho máximo de 350px a los controles de parámetros.
+    *   Los botones de acción (Apply to AutoCAD y Favorite) anclados en la base.
+
+#### Lógica Matemática y Backend (Cloud Functions)
+*   **Diagnóstico de Bug Crítico (Solid Fills en AutoCAD):** Se detectó y resolvió el problema por el cual AutoCAD mostraba los patrones generados como un relleno sólido (SOLID).
+*   **Corrección del Estándar PAT:** El generador de la nube inyectaba la *Altura Total* (	otalH) en el parámetro de desplazamiento horizontal (delta-y) para las líneas verticales (Ángulo 90). Se reescribió la lógica matricial en unctions/patterns/index.js para corregir 13_running_bond, 14_running_bond, double_stretcher, 	riple_stretcher, common, monk_bond, silesian_bond, lemish, double_flemish, 	riple_flemish, gothic_bond, y english_cross_bond.
+
+---
+
+### ? Lo que falta por hacer (Pendientes)
+
+1.  **Despliegue del Backend (Troubleshooting)**
+    *   Solucionar el Timeout de Firebase CLI (Cannot determine backend specification) al hacer deploy de unctions. La lógica ya está en código fuente pero necesita desplegarse a producción exitosamente.
+2.  **Verificación de Aparejos Complejos en AutoCAD**
+    *   Patrones históricos complejos (Gothic Bond, Flemish) que utilizan líneas discontinuas en el Eje Y deben ser insertados en AutoCAD y probados visualmente para asegurar que no saturen el límite de MaxHatch.
+3.  **Puente AutoLISP ? UI (Integración Final)**
+    *   Asegurar que el Base64 viaje vía window.chrome.webview.postMessage y sea inyectado en AutoCAD por LC_APPLY_ASSET directamente.
+

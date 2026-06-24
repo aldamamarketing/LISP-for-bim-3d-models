@@ -1,44 +1,29 @@
-export const double_herringbone = {
+export const arch_double_herringbone = {
   id: 'double_herringbone',
   name: 'Double Herringbone',
-  category: 'Parquet',
-  controlsType: 'rectangular',
-  iconUrl: '/patterns/herringbone.svg',
-  controls: ['width', 'height', 'joint'],
+  categories: ["Geometric","Parquetry","Paving","Brick Bond"],
+  controlsType: 'lines',
+  iconUrl: '/patterns/double_herringbone.svg',
+  controls: ['width', 'height'],
   defaults: {
-    width: 400,
-    height: 100,
+    width: 566,
+    height: 283,
     joint: 0,
-    rows: 4,
-    columns: 4
+    rows: 2,
+    columns: 2
   },
-  generateSvgRenderer: params => {
-    const w = params.width || 400;
-    const h = params.height || 100;
-    const j = params.joint || 0;
-    const tw = w + j;
-    const th = h + j;
-    const step = (tw * 2 + th) / Math.SQRT2;
-    let paths = '';
-    const drawRotatedRect = (x, y, bw, bh, angle) => {
-      paths += `<rect x="${x}" y="${y}" width="${bw}" height="${bh}" transform="rotate(${angle} ${x} ${y})" fill="none" stroke="white" stroke-width="2" vector-effect="non-scaling-stroke" />\n`;
-    };
-    for (let r = -2; r < 5; r++) {
-      for (let c = -2; c < 5; c++) {
-        let ox = (c + r) * step;
-        let oy = (r - c) * step;
-        drawRotatedRect(ox, oy, w, h, -45);
-        drawRotatedRect(ox + th / Math.SQRT2, oy + th / Math.SQRT2, w, h, -45);
-        let ox2 = ox + (tw + th) / Math.SQRT2;
-        let oy2 = oy + (tw - th) / Math.SQRT2;
-        drawRotatedRect(ox2, oy2, w, h, -135);
-        drawRotatedRect(ox2 + th / Math.SQRT2, oy2 - th / Math.SQRT2, w, h, -135);
-      }
+  i18n: {
+    es: {
+      name: 'Double Herringbone',
+      description: 'Patrón de mampostería tipo Double Herringbone. Ideal en vistas de alzado para fachadas o muros portantes.'
+    },
+    en: {
+      name: 'Double Herringbone',
+      description: 'Masonry pattern type Double Herringbone. Ideal for elevation views of facades or load-bearing walls.'
+    },
+    pt: {
+      name: 'Double Herringbone',
+      description: 'Padrão de alvenaria tipo Double Herringbone. Ideal em vistas de elevação para fachadas ou paredes estruturais.'
     }
-    return {
-      w: step * 2,
-      h: step * 2,
-      paths
-    };
   }
 };

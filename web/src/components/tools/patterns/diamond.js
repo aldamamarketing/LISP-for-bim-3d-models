@@ -1,29 +1,29 @@
-export const diamond = {
+export const arch_diamond = {
   id: 'diamond',
-  name: 'Diamond Grid',
-  category: 'Geometric',
+  name: 'Diamond',
+  categories: ["Geometric","Paving","Roofing"],
   controlsType: 'lines',
-  iconUrl: '/patterns/cubic.svg',
-  controls: ['spacing'],
+  iconUrl: '/patterns/diamond.svg',
+  controls: ['width', 'height'],
   defaults: {
-    spacing: 100,
-    rows: 4,
-    columns: 4
+    width: 600,
+    height: 100,
+    joint: 0,
+    rows: 2,
+    columns: 2
   },
-  generateSvgRenderer: params => {
-    const s = params.spacing || 100;
-    let paths = '';
-    const w = s * Math.SQRT2;
-    for (let i = 0; i <= 4; i++) {
-      paths += `<line x1="${i * w}" y1="0" x2="${i * w + 4 * w}" y2="${4 * w}" stroke="white" stroke-width="2" vector-effect="non-scaling-stroke" />\n`;
-      paths += `<line x1="0" y1="${i * w}" x2="${4 * w}" y2="${i * w + 4 * w}" stroke="white" stroke-width="2" vector-effect="non-scaling-stroke" />\n`;
-      paths += `<line x1="${i * w}" y1="${4 * w}" x2="${i * w + 4 * w}" y2="0" stroke="white" stroke-width="2" vector-effect="non-scaling-stroke" />\n`;
-      paths += `<line x1="0" y1="${4 * w - i * w}" x2="${4 * w}" y2="${-i * w}" stroke="white" stroke-width="2" vector-effect="non-scaling-stroke" />\n`;
+  i18n: {
+    es: {
+      name: 'Diamond',
+      description: 'Patrón de cubierta. Uso recomendado en planta de techos arquitectónicos.'
+    },
+    en: {
+      name: 'Diamond',
+      description: 'Roofing pattern. Recommended for architectural roof plan views.'
+    },
+    pt: {
+      name: 'Diamond',
+      description: 'Padrão de cobertura. Uso recomendado em plantas de telhados arquitetônicos.'
     }
-    return {
-      w: 2 * w,
-      h: 2 * w,
-      paths
-    };
   }
 };

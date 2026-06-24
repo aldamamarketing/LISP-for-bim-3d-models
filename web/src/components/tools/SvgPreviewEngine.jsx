@@ -44,7 +44,7 @@ export default function SvgPreviewEngine({ archetype, params, gridRows = 3, grid
                 style={{ 
                   width: '100%', 
                   height: '100%', 
-                  objectFit: 'cover', 
+                  objectFit: 'fill', 
                   filter: 'invert(1) hue-rotate(180deg)' 
                 }} 
               />

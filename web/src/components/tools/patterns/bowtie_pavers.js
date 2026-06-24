@@ -1,15 +1,29 @@
-export const bowtie_pavers = {
+export const arch_bowtie_pavers = {
   id: 'bowtie_pavers',
   name: 'Bowtie Pavers',
-  category: 'Paving',
+  categories: ["Geometric","Paving"],
   controlsType: 'lines',
   iconUrl: '/patterns/bowtie_pavers.svg',
   controls: ['width', 'height'],
   defaults: {
-    width: 200,
-    height: 100,
+    width: 746,
+    height: 911,
     joint: 0,
-    rows: 1,
-    columns: 1
+    rows: 2,
+    columns: 2
+  },
+  i18n: {
+    es: {
+      name: 'Bowtie Pavers',
+      description: 'Patrón de pavimento o suelo tipo Bowtie Pavers. Ideal para plantas arquitectónicas y revestimientos de piso.'
+    },
+    en: {
+      name: 'Bowtie Pavers',
+      description: 'Paving or flooring pattern type Bowtie Pavers. Ideal for architectural floor plans and surface coverings.'
+    },
+    pt: {
+      name: 'Bowtie Pavers',
+      description: 'Padrão de pavimento ou piso tipo Bowtie Pavers. Ideal para plantas arquitetônicas e revestimentos de piso.'
+    }
   }
 };

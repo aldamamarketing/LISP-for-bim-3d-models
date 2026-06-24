@@ -1,42 +1,29 @@
-export const windmill = {
+export const arch_windmill = {
   id: 'windmill',
-  name: 'Windmill Pattern',
-  category: 'Parquet',
-  controlsType: 'rectangular',
-  iconUrl: '/patterns/basketweave.svg',
-  controls: ['width', 'height', 'joint'],
+  name: 'Windmill',
+  categories: ["Parquetry","Paving","Geometric"],
+  controlsType: 'lines',
+  iconUrl: '/patterns/windmill.svg',
+  controls: ['width', 'height'],
   defaults: {
-    width: 200,
-    height: 100,
+    width: 300,
+    height: 300,
     joint: 0,
-    rows: 4,
-    columns: 4
+    rows: 2,
+    columns: 2
   },
-  generateSvgRenderer: params => {
-    const w = params.width || 200;
-    const h = params.height || 100;
-    const j = params.joint || 0;
-    const tw = w + j;
-    const th = h + j;
-    const W = tw + th;
-    let paths = '';
-    const drawRect = (x, y, bw, bh) => {
-      paths += `<rect x="${x}" y="${y}" width="${bw}" height="${bh}" fill="none" stroke="white" stroke-width="2" vector-effect="non-scaling-stroke" />\n`;
-    };
-    for (let r = 0; r < 4; r++) {
-      for (let c = 0; c < 4; c++) {
-        let ox = c * W;
-        let oy = r * W;
-        drawRect(ox, oy, w, h);
-        drawRect(ox + tw, oy, h, w);
-        drawRect(ox + th, oy + tw, w, h);
-        drawRect(ox, oy + th, h, w);
-      }
+  i18n: {
+    es: {
+      name: 'Windmill',
+      description: 'Patrón de pavimento o suelo tipo Windmill. Ideal para plantas arquitectónicas y revestimientos de piso.'
+    },
+    en: {
+      name: 'Windmill',
+      description: 'Paving or flooring pattern type Windmill. Ideal for architectural floor plans and surface coverings.'
+    },
+    pt: {
+      name: 'Windmill',
+      description: 'Padrão de pavimento ou piso tipo Windmill. Ideal para plantas arquitetônicas e revestimentos de piso.'
     }
-    return {
-      w: W,
-      h: W,
-      paths
-    };
   }
 };
