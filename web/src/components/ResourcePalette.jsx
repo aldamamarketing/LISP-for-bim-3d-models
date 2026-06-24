@@ -588,7 +588,7 @@ export default function ResourcePalette() {
         {filtered.length} padrões · Clique para inserir · Clic derecho para opções
       </div>
 
-      </div>
+
 
       {/* Menú contextual */}
       {contextMenu && (
