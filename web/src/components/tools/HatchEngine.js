@@ -293,3 +293,47 @@ export const ARCHETYPES = [
   windmill,
   zig_zag_pavers
 ];
+
+export const ARCHETYPE_DESCRIPTIONS = {
+  line: 'Líneas paralelas simples con espaciado uniforme.',
+  net: 'Rejilla ortogonal de cuadros perfectos.',
+  weave: 'Cinta entrelazada simulando un tejido tradicional.',
+  chevron: 'Patrón de zig-zag continuo, ideal para pisos y parquets.',
+  common: 'Aparejo común: 5 hiladas en soga (largo) por 1 hilada en tizón (ancho).',
+  cubic: 'Cuadrícula base.',
+  cubic3d: 'Patrón de cubos isométricos 3D apilados.',
+  flemish: 'Aparejo flamenco: alterna soga y tizón en la misma hilada.',
+  herringbone: 'Aparejo en espiga o hueso de pez a 45 grados.',
+  stack: 'Aparejo apilado, las juntas coinciden perfectamente alineadas.',
+  stretcher: 'Aparejo en soga tradicional desfasado a la mitad.',
+  english_bond: 'Aparejo inglés: alterna una hilada completa de soga con una completa de tizón.',
+  '13_running_bond': 'Ladrillos en soga desfasados un tercio (1/3) de su longitud.',
+  '14_running_bond': 'Ladrillos en soga desfasados un cuarto (1/4) de su longitud.',
+  double_stretcher: 'Dos hiladas de sogas alineadas, seguidas de dos hiladas desfasadas a la mitad.',
+  triple_stretcher: 'Tres hiladas de sogas alineadas, seguidas de tres hiladas desfasadas a la mitad.',
+  monk_bond: 'Aparejo de los monjes: alterna dos sogas y un tizón por cada hilada. Se usaba mucho en iglesias medievales.',
+  silesian_bond: 'Aparejo silesiano: alterna tres sogas y un tizón por hilada.',
+  basketweave: 'Patrón de cesta o trenzado de pares de ladrillos ortogonales.',
+  hexagonal: 'Mosaico de panal de abejas. Formado por hexágonos regulares perfectos.',
+  octagon_square: 'Clásico mosaico victoriano: octágonos regulares conectados por pequeños cuadrados insertados.',
+  double_flemish: 'Aparejo flamenco doble: alterna dos sogas y un tizón centrando este último sobre las sogas.',
+  triple_flemish: 'Aparejo flamenco triple: alterna tres sogas y un tizón.',
+  gothic_bond: 'Aparejo gótico: alterna soga y tizón en cada hilada con un desfase particular.',
+  english_cross_bond: 'Aparejo cruzado inglés: filas puras de soga y tizón, alternadas, con desfase en las sogas.',
+  double_herringbone: 'Doble espiga a 45 grados: bloques de dos ladrillos colocados en zigzag.',
+  triple_herringbone: 'Triple espiga a 45 grados: bloques de tres ladrillos colocados en zigzag.',
+  diamond: 'Retícula de rombos continuos formados por líneas cruzadas a 45 grados.',
+  triangle: 'Triángulos equiláteros perfectos mediante grilla tricruzada.',
+  windmill: 'Parquet de molino de viento: cuatro ladrillos rectangulares rotando sobre un cuadrado central.',
+  hopscotch: 'Rayuela: patrón combinando un cuadrado grande y uno pequeño en una cuadrícula continua.',
+};
+
+export const generatePatternName = (archetype, w, h, j) => {
+  const hasJoint = archetype.controls.includes('joint') && j > 0;
+  if (archetype.controlsType === 'cubic' || archetype.controlsType === 'lines') {
+    if (hasJoint) return `${archetype.id}_${w}_j${j}`;
+    return `${archetype.id}_${w}`;
+  }
+  if (hasJoint) return `${archetype.id}_${w}x${h}_j${j}`;
+  return `${archetype.id}_${w}x${h}`;
+};
