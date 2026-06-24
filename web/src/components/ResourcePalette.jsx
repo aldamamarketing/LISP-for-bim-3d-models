@@ -602,7 +602,7 @@ export default function ResourcePalette() {
           onDownload={() => handleDownload(contextMenu.item)}
         />
       )}
-      </div>
+
 
       <style>{`
         @keyframes spin {
