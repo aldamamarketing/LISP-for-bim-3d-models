@@ -10,6 +10,7 @@ import ToastContainer, { showToast } from '../Toast';
 import { translations } from '../../i18n/translations.js';
 import { ARCHETYPES, generatePatternName, ARCHETYPE_DESCRIPTIONS, CATEGORIES } from './HatchEngine';
 import SvgPreviewEngine from './SvgPreviewEngine';
+import MultiFilter from '../MultiFilter';
 
 
 const isInsideAutoCAD = typeof window !== 'undefined' && (
@@ -254,19 +255,46 @@ export default function HatchGenerator({ lang = 'en', isEmbedded = false }) {
         {/* Pestaña: Constructor Paramétrico */}
         {activeTab === 'generator' && generatorView === 'archetypes' && (
           <div style={{ display: 'flex', flexDirection: 'column', width: '100%', height: '100%', backgroundColor: '#0f172a', borderRadius: '8px', border: '1px solid #334155', overflow: 'hidden' }}>
-            <div style={{ padding: '20px', borderBottom: '1px solid #334155', display: 'flex', gap: '15px', alignItems: 'center', backgroundColor: '#1e293b' }}>
-              <h2 style={{ margin: 0, color: 'var(--tmd-orange)', flexShrink: 0 }}>Arquetipos Paramétricos</h2>
-              <input type="text" placeholder="Buscar patrón..." value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} style={{ flex: 1, padding: '10px 15px', borderRadius: '6px', border: '1px solid #475569', backgroundColor: '#0b0f19', color: 'white' }} />
-              <select value={selectedCategory} onChange={(e) => setSelectedCategory(e.target.value)} style={{ padding: '10px', borderRadius: '6px', border: '1px solid #475569', backgroundColor: '#0b0f19', color: 'white' }}>
-                <option value="All">Todas las Categorías</option>
-                {CATEGORIES.map(cat => (<option key={cat} value={cat}>{cat}</option>))}
-              </select>
+            <div style={{ padding: '8px', borderBottom: '1px solid #334155', display: 'flex', gap: '8px', alignItems: 'center', backgroundColor: '#181818' }}>
+              <div style={{ flex: 1 }}>
+                <MultiFilter
+                  storageKey="lc_filters_generator"
+                  placeholder="Procurar arquetipo..."
+                  onFilterChange={(tags) => {
+                    if (tags.length === 0) {
+                      setSearchTerm('');
+                      setSelectedCategory('All');
+                    } else {
+                      setSearchTerm(tags.join(' '));
+                    }
+                  }}
+                />
+              </div>
             </div>
-            <div style={{ flex: 1, overflowY: 'auto', padding: '20px' }}>
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(180px, 1fr))', gap: '20px' }}>
+            <div style={{ flex: 1, overflowY: 'auto', padding: '10px' }}>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(100px, 1fr))', gap: '10px' }}>
                 {filteredArchetypes.map(arch => (
-                  <div key={arch.id} onClick={() => handleArchetypeChange(arch.id)} style={{ border: '2px solid #334155', borderRadius: '8px', cursor: 'pointer', display: 'flex', flexDirection: 'column', overflow: 'hidden', backgroundColor: '#1e293b', transition: 'all 0.2s ease' }} onMouseEnter={(e) => e.currentTarget.style.borderColor='var(--tmd-orange)'} onMouseLeave={(e) => e.currentTarget.style.borderColor='#334155'}>
-                    <div style={{ width: '100%', height: '140px', opacity: 0.8, overflow: 'hidden' }}>
+                  <div 
+                    key={arch.id} 
+                    onClick={() => handleArchetypeChange(arch.id)} 
+                    style={{
+                      position: 'relative',
+                      height: '120px',
+                      display: 'flex',
+                      flexDirection: 'column',
+                      justifyContent: 'flex-end',
+                      overflow: 'hidden',
+                      padding: 0,
+                      backgroundColor: '#1e1e1e',
+                      border: '1px solid #333',
+                      borderRadius: '6px',
+                      cursor: 'pointer',
+                      transition: 'all 0.15s'
+                    }} 
+                    onMouseEnter={(e) => { e.currentTarget.style.backgroundColor='#2a2a2a'; e.currentTarget.style.borderColor='var(--tmd-orange)'; }} 
+                    onMouseLeave={(e) => { e.currentTarget.style.backgroundColor='#1e1e1e'; e.currentTarget.style.borderColor='#333'; }}
+                  >
+                    <div style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, zIndex: 0, opacity: 0.8 }}>
                       <div style={{ width: '100%', height: '100%', display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gridTemplateRows: 'repeat(2, 1fr)', gap: 0 }}>
                         {[1,2,3,4].map(i => {
                           const iconSrc = arch.iconUrl?.startsWith('/') ? 'https://lispcentral.firebaseapp.com' + arch.iconUrl : arch.iconUrl;
@@ -274,9 +302,18 @@ export default function HatchGenerator({ lang = 'en', isEmbedded = false }) {
                         })}
                       </div>
                     </div>
-                    <div style={{ padding: '15px', width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-                      <div style={{ color: 'white', fontWeight: 'bold', fontSize: '0.9rem', textAlign: 'center' }}>{arch.name}</div>
-                      <div style={{ marginTop: '4px', color: '#94a3b8', fontSize: '0.75rem' }}>{arch.category || 'General'}</div>
+                    
+                    <div style={{
+                      position: 'relative',
+                      zIndex: 1,
+                      width: '100%',
+                      padding: '6px 8px',
+                      background: 'rgba(255,255,255,0.95)',
+                      borderTop: '1px solid rgba(0,0,0,0.05)',
+                      backdropFilter: 'blur(4px)',
+                    }}>
+                      <div style={{ fontWeight: '600', fontSize: '0.75rem', color: '#111', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{arch.name}</div>
+                      <div style={{ fontSize: '0.65rem', color: '#666', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{arch.category || 'General'}</div>
                     </div>
                   </div>
                 ))}

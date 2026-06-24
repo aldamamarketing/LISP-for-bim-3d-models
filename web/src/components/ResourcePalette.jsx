@@ -411,28 +411,7 @@ export default function ResourcePalette() {
   return (
     <div style={{ backgroundColor: '#181818', color: '#fff', height: '100vh', overflow: 'hidden', fontFamily: "'Inter', sans-serif", display: 'flex', flexDirection: 'column', position: 'relative' }}>
       
-      {/* CAPA: Gerador Paramétrico */}
-      {showGenerator && (
-        <div style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, backgroundColor: '#181818', zIndex: 9999, display: 'flex', flexDirection: 'column' }}>
-          <div style={{ padding: '8px 10px', backgroundColor: '#111', borderBottom: '1px solid #333', display: 'flex', alignItems: 'center' }}>
-            <button 
-              onClick={() => setShowGenerator(false)} 
-              style={{ background: 'transparent', color: 'var(--tmd-orange)', border: 'none', cursor: 'pointer', fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: '5px' }}
-            >
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
-              Voltar à Biblioteca
-            </button>
-          </div>
-          <div style={{ flex: 1, overflow: 'hidden' }}>
-            <Suspense fallback={<div style={{ padding: '20px', color: '#888', textAlign: 'center' }}>Carregando gerador...</div>}>
-              <HatchGenerator lang="pt" isEmbedded={true} />
-            </Suspense>
-          </div>
-        </div>
-      )}
 
-      {/* CAPA: Paleta Principal */}
-      <div style={{ display: showGenerator ? 'none' : 'flex', flexDirection: 'column', height: '100%' }}>
         {/* Header (idéntico a LispCommandPalette) */}
         <div style={{ margin: '0 auto', width: '100%', maxWidth: '600px' }}>
         <div style={{ padding: '8px 10px', backgroundColor: '#111', display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '2px solid var(--tmd-orange)' }}>
@@ -457,19 +436,70 @@ export default function ResourcePalette() {
           <button onClick={() => setActiveTab('lin')}   style={tabBtn('lin')}>Linhas</button>
         </div>
 
-        {/* Búsqueda (MultiFilter con pills — idéntico a LispCommandPalette) */}
-        <div style={{ padding: '8px' }}>
-          <MultiFilter
-            storageKey={`lc_filters_res_${activeTab}`}
-            placeholder="Procurar padrão..."
-            onFilterChange={setActiveFilters}
-          />
+        {/* Búsqueda y Botón Gerador */}
+        <div style={{ padding: '8px', display: 'flex', gap: '8px', alignItems: 'center' }}>
+          {!showGenerator ? (
+            <>
+              <div style={{ flex: 1 }}>
+                <MultiFilter
+                  storageKey={`lc_filters_res_${activeTab}`}
+                  placeholder="Procurar padrão..."
+                  onFilterChange={setActiveFilters}
+                />
+              </div>
+              {activeTab === 'hatch' && (
+                <button
+                  onClick={() => setShowGenerator(true)}
+                  style={{
+                    backgroundColor: 'var(--tmd-orange)',
+                    color: '#fff',
+                    border: 'none',
+                    borderRadius: '6px',
+                    padding: '8px 12px',
+                    cursor: 'pointer',
+                    fontWeight: 'bold',
+                    fontSize: '0.8rem',
+                    whiteSpace: 'nowrap'
+                  }}
+                >
+                  + Gerador
+                </button>
+              )}
+            </>
+          ) : (
+            <button
+              onClick={() => setShowGenerator(false)}
+              style={{
+                backgroundColor: '#333',
+                color: '#fff',
+                border: 'none',
+                borderRadius: '6px',
+                padding: '8px 12px',
+                cursor: 'pointer',
+                fontWeight: 'bold',
+                fontSize: '0.8rem',
+                whiteSpace: 'nowrap',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '5px'
+              }}
+            >
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+              Voltar à Biblioteca
+            </button>
+          )}
         </div>
       </div>
 
       {/* Content */}
-      <div style={{ flex: 1, overflowY: 'auto', padding: '0 8px 8px' }}>
-        {loading ? (
+      <div style={{ flex: 1, display: 'flex', flexDirection: 'column', height: '100%' }}>
+        {showGenerator ? (
+          <div style={{ flex: 1, overflow: 'hidden' }}>
+            <Suspense fallback={<div style={{ padding: '20px', color: '#888', textAlign: 'center' }}>Carregando gerador...</div>}>
+              <HatchGenerator lang="pt" isEmbedded={true} />
+            </Suspense>
+          </div>
+        ) : loading ? (
           <div>
             <div style={{ fontSize: '0.7rem', color: '#555', textTransform: 'uppercase', marginBottom: '6px', fontWeight: 'bold' }}>Carregando...</div>
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(75px, 1fr))', gap: '6px' }}>
@@ -558,30 +588,7 @@ export default function ResourcePalette() {
         {filtered.length} padrões · Clique para inserir · Clic derecho para opções
       </div>
 
-      {/* FAB para Gerador Paramétrico */}
-      <button
-        onClick={() => setShowGenerator(true)}
-        style={{
-          position: 'absolute',
-          bottom: '30px',
-          right: '15px',
-          backgroundColor: 'var(--tmd-orange)',
-          color: '#fff',
-          border: 'none',
-          borderRadius: '50px',
-          padding: '12px 20px',
-          boxShadow: '0 4px 12px rgba(0,0,0,0.5)',
-          cursor: 'pointer',
-          fontWeight: 'bold',
-          display: 'flex',
-          alignItems: 'center',
-          gap: '8px',
-          zIndex: 9000
-        }}
-      >
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
-        Gerador
-      </button>
+      </div>
 
       {/* Menú contextual */}
       {contextMenu && (
