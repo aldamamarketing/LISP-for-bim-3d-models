@@ -268,9 +268,10 @@ export default function HatchGenerator({ lang = 'en', isEmbedded = false }) {
                   <div key={arch.id} onClick={() => handleArchetypeChange(arch.id)} style={{ border: '2px solid #334155', borderRadius: '8px', cursor: 'pointer', display: 'flex', flexDirection: 'column', overflow: 'hidden', backgroundColor: '#1e293b', transition: 'all 0.2s ease' }} onMouseEnter={(e) => e.currentTarget.style.borderColor='var(--tmd-orange)'} onMouseLeave={(e) => e.currentTarget.style.borderColor='#334155'}>
                     <div style={{ width: '100%', height: '140px', opacity: 0.8, overflow: 'hidden' }}>
                       <div style={{ width: '100%', height: '100%', display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gridTemplateRows: 'repeat(2, 1fr)', gap: 0 }}>
-                        {[1,2,3,4].map(i => (
-                          <img key={i} src={arch.iconUrl} style={{ width: '100%', height: '100%', objectFit: 'cover', filter: 'invert(1) hue-rotate(180deg)' }} alt="Pattern tile" />
-                        ))}
+                        {[1,2,3,4].map(i => {
+                          const iconSrc = arch.iconUrl?.startsWith('/') ? 'https://lispcentral.firebaseapp.com' + arch.iconUrl : arch.iconUrl;
+                          return <img key={i} src={iconSrc} style={{ width: '100%', height: '100%', objectFit: 'cover', filter: 'invert(1) hue-rotate(180deg)' }} alt="Pattern tile" />
+                        })}
                       </div>
                     </div>
                     <div style={{ padding: '15px', width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>

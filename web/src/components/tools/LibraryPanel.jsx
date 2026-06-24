@@ -218,7 +218,7 @@ export default function LibraryPanel({ currentType, searchQuery = '', selectedIt
                       title={item.name}
                       style={{ 
                         width: '48px', height: '48px', 
-                        backgroundImage: `url(${item.iconUrl || '/patterns/stack.svg'})`, 
+                        backgroundImage: `url(${(item.iconUrl || '/patterns/stack.svg').startsWith('/') ? 'https://lispcentral.firebaseapp.com' + (item.iconUrl || '/patterns/stack.svg') : (item.iconUrl || '/patterns/stack.svg')})`, 
                         backgroundSize: '50% 50%', backgroundRepeat: 'repeat', 
                         filter: 'invert(1) hue-rotate(180deg)', opacity: 0.9 
                       }} 
