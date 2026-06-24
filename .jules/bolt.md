@@ -1,0 +1,3 @@
+## 2024-05-24 - Avoiding O(N*M) string allocations in embedded React
+**Learning:** The React components in LispCommandPalette run inside AutoCAD's embedded HTML5 browser which is less performant than modern desktop browsers. String manipulations like `toLowerCase()` performed inside nested loops or filter operations create a massive number of short-lived string allocations, causing measurable lag on every render or filter keystroke.
+**Action:** Always pre-calculate derived string transformations (like lowercasing filter tags) outside of main data loops. Wrap heavy data transformations (filtering, grouping, sorting) in `useMemo` so they only re-run when the source data (`commands`) or the filter criteria (`activeFilters`) actually change, preserving UI responsiveness.
