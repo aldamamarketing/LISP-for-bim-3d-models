@@ -1,0 +1,3 @@
+## 2024-06-25 - Custom Toggleable Dropdown Accessibility ARIA Patterns
+**Learning:** For custom dropdown menus representing toggleable states, adhering to accessible ARIA patterns is crucial for screen reader compatibility. This involves adding `aria-expanded` and `aria-haspopup='menu'` to the trigger element, `role='menu'` to the dropdown container, and using `role='menuitemcheckbox'` combined with `aria-checked` on the individual items instead of standard buttons or menuitems.
+**Action:** Implemented proper ARIA roles and states on the PaletteDropdownMenu component in `web/src/components/PaletteDropdownMenu.jsx`.
