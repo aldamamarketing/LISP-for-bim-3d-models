@@ -299,7 +299,6 @@ import { arch_aberdeen_bond } from './patterns/aberdeen_bond';
 import { arch_kultura } from './patterns/kultura';
 
 
-export const CATEGORIES = [...new Set(ARCHETYPES.flatMap(a => a.categories || []))].sort();
 
 
 
@@ -792,3 +791,4 @@ export const generatePatternName = (archetype, w, h, j) => {
   if (hasJoint) return `${archetype.id}_${w}x${h}_j${j}`;
   return `${archetype.id}_${w}x${h}`;
 };
+export const CATEGORIES = [...new Set(ARCHETYPES.flatMap(a => a.categories || []))].sort();
