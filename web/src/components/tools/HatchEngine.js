@@ -18,6 +18,7 @@ import { arch_none } from './patterns/none';
 import { arch_rubble } from './patterns/rubble';
 import { arch_drystone } from './patterns/drystone';
 import { arch_coursed_ashlar } from './patterns/coursed_ashlar';
+import { arch_wood_planks } from './patterns/wood_planks';
 import { arch_mansion_weave } from './patterns/mansion_weave';
 import { arch_european_fan } from './patterns/european_fan';
 import { arch_houndstooth } from './patterns/houndstooth';
@@ -298,154 +299,9 @@ import { arch_square_and_a_half_pattern } from './patterns/square_and_a_half_pat
 import { arch_aberdeen_bond } from './patterns/aberdeen_bond';
 import { arch_kultura } from './patterns/kultura';
 
-
-export const CATEGORIES = [...new Set(ARCHETYPES.flatMap(a => a.categories || []))].sort();
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+// URL base del hosting — necesaria para construir URLs absolutas de SVG en el
+// contexto de AutoCAD (HTML embebido sin servidor, rutas relativas fallan con file://).
+export const ASSETS_BASE_URL = 'https://lispcentral.web.app';
 
 export const ARCHETYPES = [
     arch_stack,
@@ -468,6 +324,7 @@ export const ARCHETYPES = [
     arch_rubble,
     arch_drystone,
     arch_coursed_ashlar,
+    arch_wood_planks,
     arch_mansion_weave,
     arch_european_fan,
     arch_houndstooth,
@@ -792,3 +649,4 @@ export const generatePatternName = (archetype, w, h, j) => {
   if (hasJoint) return `${archetype.id}_${w}x${h}_j${j}`;
   return `${archetype.id}_${w}x${h}`;
 };
+export const CATEGORIES = [...new Set(ARCHETYPES.flatMap(a => a.categories || []))].sort();

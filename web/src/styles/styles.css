@@ -130,6 +130,16 @@ header {
   box-shadow: 0 4px 6px rgba(0,0,0,0.3);
 }
 
+/* ─────────────────────────────────────────────
+   AUTO-CAD EMBEDDED PREVIEW OVERRIDES
+   ───────────────────────────────────────────── */
+/* Fuerzas las líneas SVG a color blanco, necesario por override de Chromium dentro de AutoCAD */
+.hatch-preview-layer * {
+  stroke: #ffffff !important;
+  stroke-width: 1.5px !important;
+  fill: none !important;
+}
+
 .card h3 {
   margin-top: 0;
   color: var(--tmd-orange);

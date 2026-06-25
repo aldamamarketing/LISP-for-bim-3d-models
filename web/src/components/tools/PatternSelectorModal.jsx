@@ -1,6 +1,6 @@
 import React, { useState, useMemo } from 'react';
 import { ARCHETYPES, CATEGORIES } from './HatchEngine';
-import SvgPreviewEngine from './SvgPreviewEngine';
+import ThumbnailPreview from './ThumbnailPreview';
 
 export default function PatternSelectorModal({ isOpen, onClose, onSelect, currentSelectedId }) {
   const [searchTerm, setSearchTerm] = useState('');
@@ -67,14 +67,14 @@ export default function PatternSelectorModal({ isOpen, onClose, onSelect, curren
                       height: '80px',
                       display: 'flex',
                       alignItems: 'center',
-                      justifyContent: 'center'
+                      justifyContent: 'center',
+                      overflow: 'hidden'
                     }}>
-                      <div style={{ width: '80%', height: '80%', opacity: 0.8 }}>
-                        <SvgPreviewEngine 
+                      <div style={{ width: '100%', height: '100%', opacity: 0.8 }}>
+                        <ThumbnailPreview 
                           archetype={arch} 
-                          params={arch.defaults} 
-                          gridRows={2} 
-                          gridCols={2} 
+                          containerWidth={150} 
+                          containerHeight={80} 
                         />
                       </div>
                     </div>

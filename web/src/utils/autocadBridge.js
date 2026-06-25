@@ -8,6 +8,7 @@
 
 // Diagnóstico inicial del entorno AutoCAD (se ejecuta al importar el módulo)
 const _diagAcad = () => {
+  if (typeof window === 'undefined') return;
   try {
     const acadExists = typeof Acad !== 'undefined';
     const editorExists = acadExists && !!Acad.Editor;

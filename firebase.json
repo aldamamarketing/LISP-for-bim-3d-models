@@ -20,6 +20,16 @@
         "source": "/properties-palette",
         "destination": "/palette-builds/properties-palette.html"
       }
+    ],
+    "headers": [
+      {
+        "source": "/patterns/**",
+        "headers": [
+          { "key": "Access-Control-Allow-Origin", "value": "*" },
+          { "key": "Access-Control-Allow-Methods", "value": "GET" },
+          { "key": "Cache-Control", "value": "public, max-age=86400" }
+        ]
+      }
     ]
   },
   "functions": {

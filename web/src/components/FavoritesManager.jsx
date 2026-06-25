@@ -4,6 +4,8 @@ import HatchPreview from './tools/HatchPreview';
 import LinetypePreview from './tools/LinetypePreview';
 import JSZip from 'jszip';
 import ToastContainer, { showToast } from './Toast';
+import { ARCHETYPES } from './tools/HatchEngine';
+import ThumbnailPreview from './tools/ThumbnailPreview';
 
 const SvgPreview = ({ svgString }) => (
   <div 
@@ -205,12 +207,26 @@ export default function FavoritesManager() {
 
                           <div style={{ width: '100%', height: '140px', opacity: 0.8, overflow: 'hidden', backgroundColor: '#0b0f19' }}>
                             {activeTab === 'hatch' && (
-                              <div style={{ width: '100%', height: '100%', display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gridTemplateRows: 'repeat(2, 1fr)', gap: 0 }}>
-                                {[1,2,3,4].map(i => (
-                                  <img key={i} src={item.iconUrl || '/patterns/stack.svg'} style={{ width: '100%', height: '100%', objectFit: 'cover', filter: 'invert(1) hue-rotate(180deg)' }} alt="" />
-                                ))}
-                              </div>
-                            )}
+                                <div style={{ width: '100%', height: '100%', opacity: 0.8 }}>
+                                  {(() => {
+                                    const arch = ARCHETYPES.find(a => 
+                                      a.name.toLowerCase() === (item.name || '').toLowerCase() || 
+                                      (a.iconUrl && a.iconUrl === item.iconUrl)
+                                    ) || { 
+                                      id: item.id || 'f', 
+                                      iconUrl: item.iconUrl || '/patterns/stack.svg', 
+                                      defaults: { width: 346, height: 600 } 
+                                    };
+                                    return (
+                                      <ThumbnailPreview 
+                                        archetype={arch} 
+                                        containerWidth={180} 
+                                        containerHeight={150} 
+                                      />
+                                    );
+                                  })()}
+                                </div>
+                              )}
                             {activeTab === 'lin' && (
                               <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                                 <LinetypePreview linCode={item.code} scale={1} />

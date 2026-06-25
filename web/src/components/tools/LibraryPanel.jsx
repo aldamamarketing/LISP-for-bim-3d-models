@@ -6,6 +6,8 @@ import HatchPreview from './HatchPreview';
 import LinetypePreview from './LinetypePreview';
 import ToastContainer, { showToast } from '../Toast';
 import EditMetadataModal from './EditMetadataModal';
+import ThumbnailPreview from './ThumbnailPreview';
+import { ARCHETYPES } from './HatchEngine';
 
 const SvgPreview = ({ svgString }) => (
   <div 
@@ -164,97 +166,104 @@ export default function LibraryPanel({ currentType, searchQuery = '', selectedIt
           </button>
         ))}
       </div>
-
+      
       <div style={{ 
         flex: 1, 
         overflowY: 'auto', 
         display: 'grid', 
-        gridTemplateColumns: 'repeat(auto-fill, minmax(100px, 1fr))', 
-        gap: '10px', 
+        gridTemplateColumns: 'repeat(auto-fill, minmax(130px, 1fr))', 
+        gap: '15px', 
         alignContent: 'start'
       }}>
-        {loading ? (
-          <p style={{ color: 'var(--text-muted)' }}>Carregando biblioteca...</p>
-        ) : filtered.length === 0 ? (
-          <div style={{ textAlign: 'center', gridColumn: '1 / -1', padding: '20px' }}>
-            <p style={{ color: 'var(--text-muted)' }}>Nenhum recurso encontrado.</p>
-          </div>
-        ) : (
-          filtered.map(item => {
-            const isSelected = selectedItems.some(i => i.id === item.id);
-            return (
-              <div 
-                key={item.id} 
-                onClick={() => onToggleSelect && onToggleSelect(item)}
-                onContextMenu={(e) => handleContextMenu(e, item)}
-                style={{
-                  position: 'relative',
-                  height: '120px',
-                  display: 'flex',
-                  flexDirection: 'column',
-                  justifyContent: 'flex-end',
-                  overflow: 'hidden',
-                  padding: 0,
-                  backgroundColor: isSelected ? 'rgba(242, 109, 33, 0.1)' : '#1e1e1e',
-                  border: '1px solid',
-                  borderColor: isSelected ? 'var(--tmd-orange)' : '#333',
-                  borderRadius: '6px',
-                  cursor: 'pointer',
-                  transition: 'all 0.15s'
-                }} 
-                onMouseEnter={(e) => { 
-                  if (!isSelected) {
-                    e.currentTarget.style.backgroundColor='#2a2a2a'; 
-                    e.currentTarget.style.borderColor='var(--tmd-orange)'; 
-                  }
-                }} 
-                onMouseLeave={(e) => { 
-                  if (!isSelected) {
-                    e.currentTarget.style.backgroundColor='#1e1e1e'; 
-                    e.currentTarget.style.borderColor='#333'; 
-                  }
-                }}
-              >
-                <div style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, zIndex: 0, opacity: 0.8 }}>
-                  {currentType === 'icon' && (
-                    <div style={{ width: '100%', height: '100%', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-                      <IconGenerator iconName={item.name} size={64} color="var(--tmd-orange)" />
-                    </div>
-                  )}
-                  {currentType === 'hatch' && (
-                    <div style={{ width: '100%', height: '100%', display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gridTemplateRows: 'repeat(3, 1fr)', gap: 0, overflow: 'hidden' }}>
-                      {[1,2,3,4,5,6,7,8,9].map(i => {
-                        const defaultIcon = '/patterns/stack.svg';
-                        const url = item.iconUrl || defaultIcon;
-                        const iconSrc = url.startsWith('/') ? 'https://lispcentral.firebaseapp.com' + url : url;
-                        return <img key={i} src={iconSrc} style={{ width: '100%', height: '100%', objectFit: 'fill', filter: 'invert(1) hue-rotate(180deg)' }} alt="Pattern tile" />
-                      })}
-                    </div>
-                  )}
-                  {currentType === 'lin' && (
-                    <div style={{ width: '100%', height: '100%', display: 'flex', justifyContent: 'center', alignItems: 'center', padding: '10px' }}>
-                       <LinetypePreview linCode={item.code} scale={1} width="100%" height={64} />
-                    </div>
-                  )}
+          {loading ? (
+            <p style={{ color: 'var(--text-muted)' }}>Carregando biblioteca...</p>
+          ) : filtered.length === 0 ? (
+            <div style={{ textAlign: 'center', gridColumn: '1 / -1', padding: '20px' }}>
+              <p style={{ color: 'var(--text-muted)' }}>Nenhum recurso encontrado.</p>
+            </div>
+          ) : (
+            filtered.map(item => {
+              const isSelected = selectedItems.some(i => i.id === item.id);
+              return (
+                <div 
+                  key={item.id} 
+                  onClick={() => onToggleSelect && onToggleSelect(item)}
+                  onContextMenu={(e) => handleContextMenu(e, item)}
+                  style={{
+                    position: 'relative',
+                    height: '140px',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    alignItems: 'center',
+                    overflow: 'hidden',
+                    padding: '10px',
+                    backgroundColor: isSelected ? 'rgba(242, 109, 33, 0.1)' : '#1e293b',
+                    border: '2px solid',
+                    borderColor: isSelected ? 'var(--tmd-orange)' : '#334155',
+                    borderRadius: '8px',
+                    cursor: 'pointer',
+                    transition: 'all 0.2s ease'
+                  }} 
+                  onMouseEnter={(e) => { 
+                    if (!isSelected) {
+                      e.currentTarget.style.backgroundColor='#2a3a52'; 
+                      e.currentTarget.style.borderColor='var(--tmd-orange)'; 
+                    }
+                  }} 
+                  onMouseLeave={(e) => { 
+                    if (!isSelected) {
+                      e.currentTarget.style.backgroundColor='#1e293b'; 
+                      e.currentTarget.style.borderColor='#334155'; 
+                    }
+                  }}
+                >
+                  <div style={{ width: '100%', flex: 1, position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                    {currentType === 'icon' && (
+                      <div style={{ width: '100%', height: '100%', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+                        <IconGenerator iconName={item.name} size={64} color="var(--tmd-orange)" />
+                      </div>
+                    )}
+                    {currentType === 'hatch' && (
+                      <div style={{ width: '100%', height: '100%', opacity: 0.8 }}>
+                        {(() => {
+                          const arch = ARCHETYPES.find(a => 
+                            a.name.toLowerCase() === (item.name || '').toLowerCase() || 
+                            (a.iconUrl && a.iconUrl === item.iconUrl)
+                          ) || { 
+                            id: item.id || 'f', 
+                            iconUrl: item.iconUrl || '/patterns/stack.svg', 
+                            defaults: { width: 346, height: 600 } 
+                          };
+                          return (
+                            <ThumbnailPreview 
+                              archetype={arch} 
+                              containerWidth={130} 
+                              containerHeight={80} 
+                            />
+                          );
+                        })()}
+                      </div>
+                    )}
+                    {currentType === 'lin' && (
+                      <div style={{ width: '100%', height: '100%', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+                         <LinetypePreview linCode={item.code} scale={1} width="100%" height={64} />
+                      </div>
+                    )}
+                  </div>
+                  
+                  <div style={{
+                    width: '100%',
+                    marginTop: '8px',
+                    textAlign: 'center'
+                  }}>
+                    <div style={{ fontWeight: 'bold', fontSize: '0.85rem', color: 'white', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }} title={item.name}>{item.name || 'ITEM'}</div>
+                    <div style={{ fontSize: '0.7rem', color: '#94a3b8', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', marginTop: '2px' }}>{item.category || 'General'}</div>
+                  </div>
                 </div>
-                
-                <div style={{
-                  position: 'relative',
-                  zIndex: 1,
-                  width: '100%',
-                  padding: '6px 8px',
-                  background: 'rgba(255,255,255,0.95)',
-                  borderTop: '1px solid rgba(0,0,0,0.05)',
-                  backdropFilter: 'blur(4px)',
-                }}>
-                  <div style={{ fontWeight: '600', fontSize: '0.75rem', color: '#111', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }} title={item.name}>{item.name || 'ITEM'}</div>
-                  <div style={{ fontSize: '0.65rem', color: '#666', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{item.category || 'General'}</div>
-                </div>
-              </div>
-            );
-          })
-        )}
-      </div>
+              );
+            })
+          )}
+        </div>
 
       {contextMenu && (
         <>
