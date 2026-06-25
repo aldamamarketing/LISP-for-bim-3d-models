@@ -12,7 +12,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - run: npm install -g pnpm
-      - run: cd web && pnpm config set minimum-release-age 0 && pnpm install --ignore-scripts && pnpm run build
+      - run: cd web && pnpm config set minimum-release-age 0 && pnpm install --shamefully-hoist --ignore-scripts && pnpm run build
       - uses: FirebaseExtended/action-hosting-deploy@v0
         with:
           repoToken: ${{ secrets.GITHUB_TOKEN }}
