@@ -140,10 +140,9 @@ header {
 
 .hatch-preview-layer * {
   stroke: #000000 !important;
-  stroke-width: 1px !important;
-  vector-effect: non-scaling-stroke !important;
   fill: none !important;
 }
+
 
 .card h3 {
   margin-top: 0;

@@ -119,6 +119,12 @@ export default function SvgPreviewEngine({ archetype, params, gridRows = 3, grid
     const maxPatternSide = baseUnit || Math.max(w, h);
     const viewBoxSize = maxGridSide + (1.5 * maxPatternSide);
 
+    // 4. Calcular el stroke-width dinámico.
+    // Si asumiéramos que el previsualizador mide unos 500px en pantalla,
+    // queremos que el stroke se vea como de ~1px físico en todo momento.
+    // Esto evita que 'non-scaling-stroke' destruya las proporciones de los 'dashes' al hacer zoom.
+    const dynamicStrokeWidth = Math.max(0.1, viewBoxSize / 500);
+
     return (
       <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', backgroundColor: '#0b0f19' }}>
         <svg 
@@ -127,7 +133,7 @@ export default function SvgPreviewEngine({ archetype, params, gridRows = 3, grid
         >
           <defs>
             <pattern id={`hatchPattern-${archetype.id}`} patternUnits="userSpaceOnUse" width={w} height={h} patternTransform={archetype.patternTransform || ''}>
-              <g className="hatch-preview-layer" dangerouslySetInnerHTML={{ __html: paths }} />
+              <g className="hatch-preview-layer" strokeWidth={dynamicStrokeWidth} dangerouslySetInnerHTML={{ __html: paths }} />
             </pattern>
           </defs>
           <rect width={viewBoxSize} height={viewBoxSize} fill={`url(#hatchPattern-${archetype.id})`} />
