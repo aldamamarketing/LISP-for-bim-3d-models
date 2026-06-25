@@ -1,0 +1,3 @@
+## 2024-06-25 - Avoid O(N*M) string allocations in filter closures
+**Learning:** In React components rendered in AutoCAD's embedded browser (which executes JS slower than modern browsers), doing `.toLowerCase()` inside a `.filter` or `.some` closure on every render loop causes an O(N*M) performance degradation. This is especially true for list filtering like `LispCommandPalette.jsx`.
+**Action:** Extract expensive string transformations (`.toLowerCase()`) outside of `.filter()`/`.some()` closures, and pre-calculate them. Wrap the derived filtered lists and groupings in `useMemo` hooks so these calculations only run when their dependencies (like the search string or list items) actually change.

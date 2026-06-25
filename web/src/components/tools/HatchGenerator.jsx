@@ -17,7 +17,7 @@ const isInsideAutoCAD = typeof window !== 'undefined' && (
   typeof window.external?.ExecuteAutoCADCommand === 'function' ||
   typeof window.exec === 'function' ||
   typeof window.execAsync === 'function' ||
-  window.location.search.includes('token=')
+  (typeof window.location !== 'undefined' && window.location.search.includes('token='))
 );
 
 export default function HatchGenerator({ lang = 'en', isEmbedded = false, onClose }) {

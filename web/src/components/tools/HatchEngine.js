@@ -299,11 +299,6 @@ import { arch_aberdeen_bond } from './patterns/aberdeen_bond';
 import { arch_kultura } from './patterns/kultura';
 
 
-export const CATEGORIES = [...new Set(ARCHETYPES.flatMap(a => a.categories || []))].sort();
-
-
-
-
 
 
 
@@ -748,6 +743,8 @@ export const ARCHETYPES = [
     arch_aberdeen_bond,
     arch_kultura,
 ];
+
+export const CATEGORIES = [...new Set(ARCHETYPES.flatMap(a => a.categories || []))].sort();
 
 export const ARCHETYPE_DESCRIPTIONS = {
   line: 'Líneas paralelas simples con espaciado uniforme.',
