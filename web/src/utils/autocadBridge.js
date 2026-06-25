@@ -18,7 +18,7 @@ const _diagAcad = () => {
       acadExists,
       editorExists,
       editorMethods: methods,
-      windowExternalType: typeof window.external
+      windowExternalType: typeof window !== 'undefined' ? typeof window.external : 'undefined'
     });
   } catch (e) {
     console.warn('[autocadBridge] Error en diagnóstico:', e);
