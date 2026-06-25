@@ -11,7 +11,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - run: cd web && npm install --legacy-peer-deps && npm run build
+      - run: npm install -g pnpm
+      - run: cd web && pnpm config set minimum-release-age 0 && pnpm install --ignore-scripts && pnpm run build
       - uses: FirebaseExtended/action-hosting-deploy@v0
         with:
           repoToken: ${{ secrets.GITHUB_TOKEN }}
