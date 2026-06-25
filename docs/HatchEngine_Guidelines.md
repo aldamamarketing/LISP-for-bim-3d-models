@@ -110,14 +110,14 @@ Como **Desarrollador o Agente Junior**, sigue rigurosamente estos pasos por CADA
    Usa el "Modo CÃ©lula Base" (Rows: 1, Cols: 1) para confirmar visualmente que el SVGRenderer cierra perfecto. Exporta el `.pat` a AutoCAD y verifica a escala. NUNCA procedas sin validar ambas vÃ­as.
 
 
-## 6. Actualización Reciente y Pendientes (Junio 2026)
+## 6. Actualizaciones y Resoluciones de Bugs (Junio 2026)
 
-### ? Lo que hemos hecho hasta ahora
+### Logros y Soluciones de Bugs Recientes
 
 #### Interfaz de Usuario (UI/UX)
 Se implementaron estrictamente las normas de diseño del proyecto:
-*   **Navegación por Breadcrumbs:** Reemplazo del botón flotante por una navegación en la parte superior (? Library / Archetypes / Settings).
-*   **Filtros Clásicos:** Eliminación de los "Pills" de búsqueda a favor de un <input> de texto limpio y un menú desplegable <select> nativo para Categorías.
+*   **Navegación por Breadcrumbs:** Reemplazo del botón flotante por una navegación en la parte superior (Library / Archetypes / Settings).
+*   **Filtros Clásicos:** Eliminación de los "Pills" de búsqueda a favor de un `<input>` de texto limpio y un menú desplegable `<select>` nativo para Categorías.
 *   **Estandarización de Idioma:** Labels en inglés (sin quemado de strings mixtos).
 *   **Diseño de Controles (Builder):**
     *   El **Visualizador SVG** interactivo ha sido anclado firmemente en la parte superior.
@@ -126,16 +126,21 @@ Se implementaron estrictamente las normas de diseño del proyecto:
 
 #### Lógica Matemática y Backend (Cloud Functions)
 *   **Diagnóstico de Bug Crítico (Solid Fills en AutoCAD):** Se detectó y resolvió el problema por el cual AutoCAD mostraba los patrones generados como un relleno sólido (SOLID).
-*   **Corrección del Estándar PAT:** El generador de la nube inyectaba la *Altura Total* (	otalH) en el parámetro de desplazamiento horizontal (delta-y) para las líneas verticales (Ángulo 90). Se reescribió la lógica matricial en unctions/patterns/index.js para corregir 13_running_bond, 14_running_bond, double_stretcher, 	riple_stretcher, common, monk_bond, silesian_bond, lemish, double_flemish, 	riple_flemish, gothic_bond, y english_cross_bond.
+*   **Corrección del Estándar PAT:** El generador de la nube inyectaba la *Altura Total* (\totalH) en el parámetro de desplazamiento horizontal (delta-y) para las líneas verticales (Ángulo 90). Se reescribió la lógica matricial en `\functions/patterns/index.js` para corregir `\13_running_bond`, `\14_running_bond`, `\double_stretcher`, `\triple_stretcher`, `\common`, `\monk_bond`, `\silesian_bond`, `\flemish`, `\double_flemish`, `\triple_flemish`, `\gothic_bond`, y `\english_cross_bond`.
 
----
-
-### ? Lo que falta por hacer (Pendientes)
-
-1.  **Despliegue del Backend (Troubleshooting)**
-    *   Solucionar el Timeout de Firebase CLI (Cannot determine backend specification) al hacer deploy de unctions. La lógica ya está en código fuente pero necesita desplegarse a producción exitosamente.
-2.  **Verificación de Aparejos Complejos en AutoCAD**
-    *   Patrones históricos complejos (Gothic Bond, Flemish) que utilizan líneas discontinuas en el Eje Y deben ser insertados en AutoCAD y probados visualmente para asegurar que no saturen el límite de MaxHatch.
-3.  **Puente AutoLISP ? UI (Integración Final)**
-    *   Asegurar que el Base64 viaje vía window.chrome.webview.postMessage y sea inyectado en AutoCAD por LC_APPLY_ASSET directamente.
-
+#### Resolución de la Inserción de Recursos y Bridge en AutoCAD
+*   **Bypass de URLs SVG Relativas (`file://`):**
+    Las URLs de arquetipos `/patterns/*.svg` fallaban al renderizarse dentro del browser interno de AutoCAD (WebView2/Chromium) porque este corre de manera local (`file:///...LC_Resource.html`) y resolvía los paths relativos hacia `file:///C:/patterns/*`.
+    **Solución:** Se exportó la constante `ASSETS_BASE_URL = 'https://lispcentral.web.app'` desde `HatchEngine.js` y se reconstruyeron las URLs absolutas para la carga y fetch del SVG en `ThumbnailPreview.jsx`, `SvgPreviewEngine.jsx` y `HatchGenerator.jsx`.
+*   **CORS en Firebase Hosting:**
+    Para que el fetch de los SVGs a la URL de producción no fuese bloqueado por CORS desde el origin local `file://`, se añadieron headers de CORS (`Access-Control-Allow-Origin: *`) en `firebase.json` bajo la regla `/patterns/**`.
+*   **Solución al Rechazo de HPNAME (Mismatch de Nombre):**
+    El generador de la nube (Generator) escribe el PAT con su cabecera matemática real (ej. `*Herringbone_50x260_J0`). Si el LISP intentaba establecer `setvar "HPNAME" "HERRINGBONE_50"`, AutoCAD rechazaba el patrón porque no existía un patrón con ese nombre exacto dentro del archivo `.pat` temporal.
+    **Solución:** Se modificó `core_engine.lsp` para que, si el archivo PAT inicia con `*`, extraiga automáticamente el nombre del patrón definido tras el asterisco (ej. `Herringbone_50x260_J0`) y lo use para `HPNAME`.
+*   **Fix en `vl-catch-all-apply` y Active Search Path:**
+    *   Se corrigió el uso de `vl-catch-all-apply` en `core_engine.lsp` proporcionando `'()` como segundo argumento obligatorio. Sin esto, la función lambda fallaba silenciosamente y nunca agregaba la carpeta temporal `\%TEMP%\LC_Assets` a las rutas de AutoCAD.
+    *   Se reemplazó el obsoleto `setenv "ACAD"` (que requiere reiniciar el software) por `vla-put-SupportPath` vía el objeto `Preferences.Files.SupportPath` de Visual LISP, lo que actualiza el path de soporte de AutoCAD inmediatamente en caliente.
+*   **Solución al Timeout de Despliegue de Functions:**
+    El timeout del CLI de Firebase (`Timeout after 10000. Cannot determine backend specification`) en Windows debido a la carga pesada de `firebase-admin` se solucionó mediante el despliegue selectivo por funciones: `firebase deploy --only functions:getRoutine`.
+*   **Automatización de Build y Sincronización:**
+    Se implementó el plugin `syncToDistPlugin` en `vite.resource-palette.config.mjs` que copia de forma automática el HTML generado en `web/public/palette-builds/` a `web/dist/palette-builds/` usando `import.meta.url` para resolver directorios de forma portable.

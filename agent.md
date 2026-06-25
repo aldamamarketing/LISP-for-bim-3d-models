@@ -104,8 +104,24 @@ Para manejar mltiples paletas (Comandos, Propiedades, IA) sin problemas de dupli
   ```powershell
   $env:FUNCTIONS_DISCOVERY_TIMEOUT=60; npx -y firebase-tools@latest deploy --only functions
   ```
+  3. **Deploy Selectivo**: Para evitar problemas de timeout en despliegues completos del backend, es recomendable desplegar únicamente la función requerida (ej. `getRoutine` para AutoLISP):
+  ```powershell
+  npx firebase-tools deploy --only functions:getRoutine
+  ```
 * **Enrutamiento del Backend:**
   El enrutamiento del backend (`functions/index.js`) ha sido modificado en su regex de saneamiento para admitir guiones medios (`-`), lo que permite que las peticiones a comandos de formato `ARQ-...` se validen y entreguen correctamente.
+* **Flujo de Build & Deploy Automático (Resource Palette):**
+  Para generar y sincronizar la paleta de recursos local en desarrollo y producción:
+  1. **Build e Integración**: Compilar la paleta web. El plugin `syncToDistPlugin` en Vite copiará el bundle HTML automáticamente de `public/palette-builds/` a `dist/palette-builds/`:
+     ```powershell
+     cd web
+     npx vite build --config vite.resource-palette.config.mjs
+     ```
+  2. **Deploy Hosting**: Publicar los archivos HTML y recursos estáticos actualizados a Firebase Hosting:
+     ```powershell
+     cd ..
+     npx firebase-tools deploy --only hosting
+     ```
 
 ---
 
@@ -222,6 +238,27 @@ executeInAutoCAD('LC_APPLY_ASSET');
 ```
 - El Ghost Command `c:LC_APPLY_ASSET` lee las variables, verifica si el patrón ya incluye un encabezado `*` (para no duplicarlo, lo que causaría `Bad pattern definition file`), escribe el `.pat`/`.lin` temporal en `%TEMP%\LC_Assets\`, agrega la ruta al ACAD search path, y limpia las variables globales.
 - Al escribir el temporal (con modo `"w"`), siempre se sobreescribe, garantizando cero acumulación de basura y que AutoCAD lea siempre la versión más actualizada de Firebase.
+
+#### 💡 Resoluciones Críticas de la Resource Palette en AutoCAD (Junio 2026):
+* **Bypass de URLs de SVG Relativas (`file://`):**
+  Debido a que la paleta cargada dentro de AutoCAD requiere ser un archivo local (`file:///...LC_Resource.html`) para evitar el sandbox HTTPS y habilitar `execAsync`, los recursos relativos `/patterns/*.svg` fallaban con error `ERR_FILE_NOT_FOUND` al resolverse como `file:///C:/patterns/*`.
+  **Solución:** Se exportó la constante `ASSETS_BASE_URL = 'https://lispcentral.web.app'` desde `HatchEngine.js` y se reconstruyeron dinámicamente las URLs absolutas en `ThumbnailPreview.jsx`, `SvgPreviewEngine.jsx` y `HatchGenerator.jsx`.
+* **CORS en Firebase Hosting:**
+  Las peticiones `fetch()` a la URL del hosting de producción desde el origen local `file://` dentro de AutoCAD fallaban por restricciones de CORS.
+  **Solución:** Se añadieron headers de CORS (`Access-Control-Allow-Origin: *` y `Access-Control-Allow-Methods: GET`) en `firebase.json` bajo la regla de source `/patterns/**`.
+* **Mismatch de Nombre en `setvar "HPNAME"` (PAT Autogenerados):**
+  AutoCAD requiere que el nombre asignado a la variable de sistema `HPNAME` coincida exactamente con el nombre de la cabecera dentro de su correspondiente archivo `.pat`. En el Generator, los patrones autogenerados inyectan cabeceras descriptivas complejas como `*Herringbone_50x260_J0`, pero el LISP intentaba buscar y aplicar `HERRINGBONE_50` (un mismatch que provocaba el rechazo de `HPNAME`).
+  **Solución:** Se editó `core_engine.lsp` para que si el código PAT inicia con `*`, extraiga el nombre real del patrón definido tras el asterisco y antes de la primera coma, utilizándolo en `HPNAME`.
+* **Registro Inmediato en AutoCAD Search Path y Fix de `vl-catch-all-apply`:**
+  * Se corrigió el bug de `vl-catch-all-apply` en `core_engine.lsp` que carecía del segundo argumento de lista de argumentos (ej. `'()`). Sin este argumento obligatorio, la lambda de registro fallaba de manera silenciosa en LISP.
+  * Se migró la asignación de la ruta temporal de `setenv "ACAD"` a `vla-put-SupportPath` vía ActiveX:
+    ```lisp
+    (vla-put-SupportPath 
+      (vla-get-Files (vla-get-Preferences (vlax-get-acad-object)))
+      nuevoPath
+    )
+    ```
+    Esto agrega el directorio de hatches temporales al search path de AutoCAD de forma inmediata en caliente sin necesidad de reiniciar el programa.
 
 ---
 
