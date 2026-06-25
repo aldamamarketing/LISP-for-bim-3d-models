@@ -133,10 +133,15 @@ header {
 /* ─────────────────────────────────────────────
    AUTO-CAD EMBEDDED PREVIEW OVERRIDES
    ───────────────────────────────────────────── */
-/* Fuerzas las líneas SVG a color blanco, necesario por override de Chromium dentro de AutoCAD */
+/* Usamos filter invert para burlar el inyector de temas oscuros de AutoCAD que ignora !important en stroke */
+.hatch-preview-layer {
+  filter: invert(1) hue-rotate(180deg);
+}
+
 .hatch-preview-layer * {
-  stroke: #ffffff !important;
-  stroke-width: 1.5px !important;
+  stroke: #000000 !important;
+  stroke-width: 1px !important;
+  vector-effect: non-scaling-stroke !important;
   fill: none !important;
 }
 

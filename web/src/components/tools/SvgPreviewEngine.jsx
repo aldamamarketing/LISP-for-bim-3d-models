@@ -26,8 +26,7 @@ export default function SvgPreviewEngine({ archetype, params, gridRows = 3, grid
               .replace(/stroke="[^"]+"/g, '')
               .replace(/fill="[^"]+"/g, '')
               .replace(/style="[^"]+"/g, '');
-            // Inyectar un tag <style> para forzar el color de las líneas
-            cleaned = `<style> .hatch-preview-layer * { stroke: #ffffff !important; stroke-width: 1.5px !important; fill: none !important; } </style>` + cleaned;
+            // Ya no inyectamos <style> aquí porque styles.css maneja el .hatch-preview-layer globalmente
             setSvgContent(cleaned);
           }
         })
@@ -128,7 +127,7 @@ export default function SvgPreviewEngine({ archetype, params, gridRows = 3, grid
         >
           <defs>
             <pattern id={`hatchPattern-${archetype.id}`} patternUnits="userSpaceOnUse" width={w} height={h} patternTransform={archetype.patternTransform || ''}>
-              <g className="hatch-preview-layer" stroke="#ffffff" fill="none" strokeWidth="1.5" dangerouslySetInnerHTML={{ __html: paths }} />
+              <g className="hatch-preview-layer" dangerouslySetInnerHTML={{ __html: paths }} />
             </pattern>
           </defs>
           <rect width={viewBoxSize} height={viewBoxSize} fill={`url(#hatchPattern-${archetype.id})`} />

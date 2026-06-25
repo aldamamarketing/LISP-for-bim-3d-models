@@ -59,7 +59,7 @@ export function generateSvgPathsFromPat(patCode, w, h) {
         (y1 > h * 2 && y2 > h * 2) || (y1 < -h && y2 < -h)
       ) continue;
 
-      svgLines += `<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}"${dashStr}/>\n`;
+      svgLines += `<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}"${dashStr} stroke-dashoffset="${len}"/>\n`;
       lineCount++;
     }
   }
