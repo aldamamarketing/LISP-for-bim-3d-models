@@ -13,8 +13,13 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
       - run: cd web && npm install --legacy-peer-deps && npm run build
       - uses: FirebaseExtended/action-hosting-deploy@v0
+        env:
+          FIREBASE_CLI_EXPERIMENTS: webframeworks
         with:
           repoToken: ${{ secrets.GITHUB_TOKEN }}
           firebaseServiceAccount: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_LISPCENTRAL }}
