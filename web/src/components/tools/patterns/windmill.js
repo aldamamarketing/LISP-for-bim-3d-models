@@ -12,6 +12,7 @@ export const arch_windmill = {
     rows: 2,
     columns: 2
   },
+  hasBackendEngine: true,
   i18n: {
     es: {
       name: 'Windmill',

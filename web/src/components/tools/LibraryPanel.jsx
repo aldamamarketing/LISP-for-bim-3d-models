@@ -224,7 +224,7 @@ export default function LibraryPanel({ currentType, searchQuery = '', selectedIt
                       </div>
                     )}
                     {currentType === 'hatch' && (
-                      <div style={{ width: '100%', height: '100%', opacity: 0.8 }}>
+                      <div style={{ width: '100%', height: '100%' }}>
                         {(() => {
                           const arch = ARCHETYPES.find(a => 
                             a.name.toLowerCase() === (item.name || '').toLowerCase() || 

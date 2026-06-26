@@ -12,6 +12,7 @@ export const arch_double_herringbone = {
     rows: 2,
     columns: 2
   },
+  hasBackendEngine: true,
   i18n: {
     es: {
       name: 'Double Herringbone',

@@ -36,8 +36,7 @@ export default function ThumbnailPreview({ archetype, containerWidth = 130, cont
         backgroundSize: `${tileWidth}px ${tileHeight}px`,
         backgroundRepeat: 'repeat',
         backgroundPosition: 'top left',
-        filter: 'invert(1) hue-rotate(180deg)',
-        opacity: 0.8
+        filter: iconSrc?.endsWith('.svg') ? 'invert(1) hue-rotate(180deg)' : 'none'
       }} />
     </div>
   );

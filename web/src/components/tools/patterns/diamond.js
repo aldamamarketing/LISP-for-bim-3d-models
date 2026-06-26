@@ -2,12 +2,12 @@ export const arch_diamond = {
   id: 'diamond',
   name: 'Diamond',
   categories: ["Geometric","Paving","Roofing"],
-  controlsType: 'lines',
+  controlsType: 'cubic',
   iconUrl: '/patterns/diamond.svg',
-  controls: ['width', 'height'],
+  controls: ['size'],
   defaults: {
     width: 600,
-    height: 100,
+    height: 600,
     joint: 0,
     rows: 2,
     columns: 2
@@ -25,5 +25,28 @@ export const arch_diamond = {
       name: 'Diamond',
       description: 'Padrão de cobertura. Uso recomendado em plantas de telhados arquitetônicos.'
     }
+  },
+  hasBackendEngine: true,
+  generateSvgRenderer: (params) => {
+    // For diamond, we use 'width' as 's' (spacing between parallel lines)
+    const s = params.width || 600;
+    const j = params.joint || 0;
+    
+    const ts = s + j;
+    const D = ts * Math.SQRT2; // Diagonal of the diamond
+    
+    const paths = `
+      <line x1="${D / 2}" y1="0" x2="${D}" y2="${D / 2}" />
+      <line x1="${D}" y1="${D / 2}" x2="${D / 2}" y2="${D}" />
+      <line x1="${D / 2}" y1="${D}" x2="0" y2="${D / 2}" />
+      <line x1="0" y1="${D / 2}" x2="${D / 2}" y2="0" />
+    `;
+    
+    return {
+      w: D,
+      h: D,
+      paths: paths,
+      baseUnit: D
+    };
   }
 };

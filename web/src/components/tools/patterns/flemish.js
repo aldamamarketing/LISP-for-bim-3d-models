@@ -1,5 +1,3 @@
-import { generateSvgPathsFromPat } from '../../../utils/PatToSvgRenderer.js';
-
 export const arch_flemish = {
   id: 'flemish',
   name: 'Flemish',
@@ -39,21 +37,22 @@ export const arch_flemish = {
     const hw = w / 2 + j;
     const stepX = tw + hw;
     
-    const patCode = `*Flemish_${w}x${h}_J${j}, Parametric
-0, 0,0, 0,${th}
-90, 0,0, 0,${th * 2}, ${h},-${th * 2 - h}
-90, ${tw},0, 0,${th * 2}, ${h},-${th * 2 - h}
-90, ${stepX / 2},${th}, 0,${th * 2}, ${h},-${th * 2 - h}
-90, ${stepX / 2 + tw},${th}, 0,${th * 2}, ${h},-${th * 2 - h}`;
-
-    // Tile bounding box
-    const tileW = stepX;
-    const tileH = th * 2;
-    const paths = generateSvgPathsFromPat(patCode, tileW, tileH);
+    const paths = `
+      <line x1="0" y1="0" x2="${stepX}" y2="0" />
+      <line x1="0" y1="${th}" x2="${stepX}" y2="${th}" />
+      <line x1="0" y1="${th * 2}" x2="${stepX}" y2="${th * 2}" />
+      
+      <line x1="0" y1="0" x2="0" y2="${th}" />
+      <line x1="${tw}" y1="0" x2="${tw}" y2="${th}" />
+      <line x1="${stepX}" y1="0" x2="${stepX}" y2="${th}" />
+      
+      <line x1="${tw / 2 - hw / 2}" y1="${th}" x2="${tw / 2 - hw / 2}" y2="${th * 2}" />
+      <line x1="${tw / 2 + hw / 2}" y1="${th}" x2="${tw / 2 + hw / 2}" y2="${th * 2}" />
+    `;
     
     return {
-      w: tileW,
-      h: tileH,
+      w: stepX,
+      h: th * 2,
       paths: paths,
       baseUnit: Math.max(w, h)
     };

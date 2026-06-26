@@ -12,6 +12,7 @@ export const arch_triple_stretcher = {
     rows: 2,
     columns: 2
   },
+  hasBackendEngine: true,
   i18n: {
     es: {
       name: 'Triple Stretcher',

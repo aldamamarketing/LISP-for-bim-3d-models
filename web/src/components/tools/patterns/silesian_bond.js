@@ -12,6 +12,7 @@ export const arch_silesian_bond = {
     rows: 2,
     columns: 2
   },
+  hasBackendEngine: true,
   i18n: {
     es: {
       name: 'Silesian Bond',

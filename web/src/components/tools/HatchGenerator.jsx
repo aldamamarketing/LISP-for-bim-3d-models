@@ -523,15 +523,21 @@ export default function HatchGenerator({ lang = 'en', isEmbedded = false, onClos
 
                   {/* Grid Setup */}
                   <div className="form-group" style={{ borderTop: '1px solid #444', paddingTop: '15px' }}>
-                    <label style={{ fontWeight: 'bold', color: '#ccc' }}>Grid Layout (Rows x Cols)</label>
+                    <label style={{ fontWeight: 'bold', color: '#ccc' }}>{t('hatch.gridLayout')}</label>
                     <div style={{ display: 'flex', gap: '15px', marginTop: '10px' }}>
                       <div style={{ flex: 1 }}>
-                        <span style={{ fontSize: '0.75rem', color: '#aaa', display: 'block', marginBottom: '4px' }}>Rows (Max 10)</span>
-                        <input type="number" min="1" max="10" className="form-control" value={rows} onChange={e => setRows(Math.min(10, Number(e.target.value)))} style={{ width: '100%', padding: '6px', borderRadius: '4px', border: '1px solid #444', backgroundColor: '#222', color: '#fff' }} />
+                        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '4px' }}>
+                          <span style={{ fontSize: '0.75rem', color: '#aaa' }}>{t('hatch.gridRows')}</span>
+                          <span style={{ fontSize: '0.75rem', color: 'var(--tmd-orange)', fontWeight: 'bold' }}>{rows}</span>
+                        </div>
+                        <input type="range" min="1" max="10" value={rows} onChange={e => setRows(Number(e.target.value))} style={{ width: '100%', cursor: 'pointer', accentColor: 'var(--tmd-orange)' }} />
                       </div>
                       <div style={{ flex: 1 }}>
-                        <span style={{ fontSize: '0.75rem', color: '#aaa', display: 'block', marginBottom: '4px' }}>Columns (Max 10)</span>
-                        <input type="number" min="1" max="10" className="form-control" value={columns} onChange={e => setColumns(Math.min(10, Number(e.target.value)))} style={{ width: '100%', padding: '6px', borderRadius: '4px', border: '1px solid #444', backgroundColor: '#222', color: '#fff' }} />
+                        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '4px' }}>
+                          <span style={{ fontSize: '0.75rem', color: '#aaa' }}>{t('hatch.gridCols')}</span>
+                          <span style={{ fontSize: '0.75rem', color: 'var(--tmd-orange)', fontWeight: 'bold' }}>{columns}</span>
+                        </div>
+                        <input type="range" min="1" max="10" value={columns} onChange={e => setColumns(Number(e.target.value))} style={{ width: '100%', cursor: 'pointer', accentColor: 'var(--tmd-orange)' }} />
                       </div>
                     </div>
                   </div>

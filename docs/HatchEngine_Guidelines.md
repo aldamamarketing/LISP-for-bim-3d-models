@@ -3,9 +3,11 @@
 Este documento recopila las lecciones crÃ­ticas, reglas geomÃ©tricas y estÃ¡ndares de programaciÃ³n desarrollados durante la creaciÃ³n del motor paramÃ©trico de patrones `.pat` y renderizado SVG.
 
 > [!IMPORTANT]
-> Todo nuevo patrÃ³n (arquetipo) que se agregue al `HatchEngine.js` debe cumplir rigurosamente con estas reglas para garantizar que lo que el usuario ve en la pantalla sea **exactamente** lo que se exporta hacia AutoCAD.
+> Todo nuevo patrÃ³n (arquetipo) que se agregue al sistema (dentro de la carpeta `web/src/components/tools/patterns/`) debe cumplir rigurosamente con estas reglas para garantizar que lo que el usuario ve en la pantalla sea **exactamente** lo que se exporta hacia AutoCAD.
 
 ## 0. Mapa Arquitectónico del Motor (Tubería Completa)
+
+**Atención:** La arquitectura ya no es monolítica. `HatchEngine.js` funciona únicamente como un índice. Los arquetipos viven de forma modular en múltiples archivos separados dentro de `patterns/`.
 
 Este diagrama representa el flujo de datos desde los sliders interactivos en el navegador hasta que el puntero de AutoCAD dispara el sombreado.
 Asegúrate de respetar este paradigma: **El Frontend dibuja geometría visual pura, y el Backend calcula la trigonometría del `.pat`**.
@@ -48,16 +50,16 @@ La principal causa de errores visuales y desfases es entender de forma equivocad
 - **LÃ³gica**: Dibuja **segmentos de lÃ­nea** con un punto de inicio `(X1, Y1)` y un punto final `(X2, Y2)`.
 - **Comportamiento**: Un patrÃ³n se logra dibujando la "CÃ©lula Base" dentro de un bounding box, y la etiqueta `<pattern>` de SVG se encarga de teselar esa caja una y otra vez en mosaico ortogonal.
 
-### ðŸ�—ï¸� AutoCAD (.PAT)
+### ðŸ—ï¸ AutoCAD (.PAT)
 - **Paradigma**: Vectores de propagaciÃ³n infinita.
-- **LÃ³gica**: Dibuja **lÃ­neas infinitas**. A partir de un Origen `(X, Y)` y un Ã�ngulo `A`, la lÃ­nea viaja infinitamente.
+- **LÃ³gica**: Dibuja **lÃ­neas infinitas**. A partir de un Origen `(X, Y)` y un Ãngulo `A`, la lÃ­nea viaja infinitamente.
 - **Comportamiento**: Los patrones se forman porque esa lÃ­nea infinita se fragmenta (trazos visibles e invisibles) y la familia de lÃ­neas entera se clona desplazÃ¡ndola perpendicularmente (`DeltaY`) y paralelamente (`DeltaX`).
 
-### âš–ï¸� La Regla de Oro
+### âš–ï¸ La Regla de Oro
 **NUNCA se deben usar SVGs estÃ¡ticos pre-diseÃ±ados (imÃ¡genes externas) como la fuente principal en backgrounds CSS (`background-image`).** El CSS repite estas imÃ¡genes usando `preserveAspectRatio="meet"`, lo que destruye el teselado, provoca gaps (mÃ¡rgenes transparentes gigantes) y genera borrosidad masiva por el remuestreo de trazos finos (`non-scaling-stroke` falla en backgrounds).
 
 > [!WARNING]
-> **Norma de VisualizaciÃ³n de Ã�conos EstÃ¡ticos (CatÃ¡logos y Fallbacks):**
+> **Norma de VisualizaciÃ³n de Ãconos EstÃ¡ticos (CatÃ¡logos y Fallbacks):**
 > Cuando se deban renderizar tarjetas de catÃ¡logo de arquetipos (o fallbacks de arquetipos sin motor matemÃ¡tico) utilizando sus Ã­conos `.svg` estÃ¡ticos:
 > 1. **Bypass MatemÃ¡tico:** En vistas de catÃ¡logo o grillas, se debe ignorar el motor `SvgPreviewEngine` y utilizar etiquetas `<img>` nativas, para respetar exactamente el diseÃ±o estÃ©tico del `.svg` original.
 > 2. **Grilla y Object Fit:** Los Ã­conos deben mostrarse en una grilla nativa CSS (ej. `grid-template-columns: repeat(2, 1fr)`). Las imÃ¡genes DEBEN tener `object-fit: cover` con `width: 100%; height: 100%` dentro de un contenedor con `overflow: hidden`.
@@ -78,7 +80,7 @@ Para lograr la verdadera parametrizaciÃ³n, todo arquetipo **debe** tarde o tem
 
 Para que el archivo `.pat` de AutoCAD cierre perfectamente y no genere serruchos o roturas entre las columnas:
 
-- **Ã�ngulos TrigonomÃ©tricos Estrictos:** El Ã¡ngulo de una lÃ­nea inclinada a menudo no puede ser arbitrario si queremos que repita en bloque. En patrones como el Chevron, el Ã�ngulo se deriva estrictamente de las dimensiones: `angle = atan(Height / Width)`.
+- **Ãngulos TrigonomÃ©tricos Estrictos:** El Ã¡ngulo de una lÃ­nea inclinada a menudo no puede ser arbitrario si queremos que repita en bloque. En patrones como el Chevron, el Ãngulo se deriva estrictamente de las dimensiones: `angle = atan(Height / Width)`.
 - **CÃ¡lculo de Desfase (DeltaX, DeltaY):**
   Cuando una lÃ­nea inclinada forma parte de una columna y se repite verticalmente, el desplazamiento global en el `.pat` (`dX`, `dY`) se calcula proyectando la distancia vertical de repeticiÃ³n (`th`) sobre el vector de la lÃ­nea:
   ```javascript
@@ -124,20 +126,21 @@ La interfaz debe forzar restricciones geomÃ©tricas del mundo real para evitar 
 
 ---
 
-## 5. Plan a Largo Plazo: IntegraciÃ³n del JSON Maestro
+## 5. Plan a Largo Plazo: IntegraciÃ³n Modular de Arquetipos
 
-El objetivo final de este proyecto es migrar y parametrizar matemÃ¡ticamente **todos** los arquetipos de patrones estÃ¡ticos a fÃ³rmulas puras en `HatchEngine.js`.
+El objetivo final de este proyecto es migrar y parametrizar matemÃ¡ticamente **todos** los arquetipos de patrones estáticos a módulos independientes en `web/src/components/tools/patterns/`.
 
-### ðŸ› ï¸� Flujo de Trabajo para Agregar un Nuevo Arquetipo
+### ðŸ› ï¸ Flujo de Trabajo para Agregar un Nuevo Arquetipo
 
 Como **Desarrollador o Agente Junior**, sigue rigurosamente estos pasos por CADA nuevo patrÃ³n que abordes:
 
 1. **Seleccionar el PatrÃ³n:**
-   Identifica la cÃ©lula base geomÃ©trica.
-2. **Programar `generatePat(w, h, j)`:**
-   Analiza matemÃ¡ticamente cÃ³mo debe desplazarse la lÃ­nea en AutoCAD usando distancias perpendiculares (`DeltaY`) y de desplazamiento (`DeltaX`).
-3. **Programar `generateSvgRenderer(params)`:**
-   **MANDATORIO:** Traduce la misma lÃ³gica y vÃ©rtices trigonomÃ©tricos usados en `generatePat` hacia etiquetas `<line>` de SVG. No uses copypaste. Calcula las coordenadas `x1, y1, x2, y2` en base a `w, h, j`.
+   Identifica la cÃ©lula base geométrica y las dimensiones físicas.
+2. **Backend (La Matemática del PAT):**
+   La lógica trigonométrica para desplazar líneas en AutoCAD (DeltaX, DeltaY) ahora se gestiona **exclusivamente en las Cloud Functions** de Firebase (`buildHatchPattern`). El Frontend NO debe calcular ni generar cadenas `.pat`.
+3. **Frontend: Programar `generateSvgRenderer(params)`:**
+   **MANDATORIO:** Debes usar geometría SVG nativa pura (`<line>`, `<path>`) calculada en base a los parámetros visuales (ej. `w`, `h`, `j`). 
+   **REGLA CRÍTICA:** ESTÁ ESTRICTAMENTE PROHIBIDO generar cadenas `.pat` en el cliente para luego parsearlas con utilidades como `generateSvgPathsFromPat`. El Frontend dibuja el SVG visual en la rejilla; el Backend se encarga del PAT matemático.
 4. **ValidaciÃ³n:**
    Usa el "Modo CÃ©lula Base" (Rows: 1, Cols: 1) para confirmar visualmente que el SVGRenderer cierra perfecto. Exporta el `.pat` a AutoCAD y verifica a escala. NUNCA procedas sin validar ambas vÃ­as.
 

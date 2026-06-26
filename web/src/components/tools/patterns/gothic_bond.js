@@ -12,6 +12,7 @@ export const arch_gothic_bond = {
     rows: 2,
     columns: 2
   },
+  hasBackendEngine: true,
   i18n: {
     es: {
       name: 'Gothic Bond',

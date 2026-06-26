@@ -21,12 +21,12 @@ export default function SvgPreviewEngine({ archetype, params, gridRows = 3, grid
           if (!isMounted) return;
           const match = text.match(/<svg[^>]*>([\s\S]*?)<\/svg>/i);
           if (match && match[1]) {
-            // Eliminar estilos y colores explícitos problemáticos para forzarlos por CSS
+            // Forzar estilos inline porque los selectores CSS globales fallan dentro de <pattern> en algunos motores
             let cleaned = match[1]
               .replace(/stroke="[^"]+"/g, '')
               .replace(/fill="[^"]+"/g, '')
               .replace(/style="[^"]+"/g, '');
-            // Ya no inyectamos <style> aquí porque styles.css maneja el .hatch-preview-layer globalmente
+            cleaned = `<style>path, line, polyline, polygon, rect, circle { stroke: #e2e8f0 !important; fill: none !important; stroke-width: 1px !important; }</style>` + cleaned;
             setSvgContent(cleaned);
           }
         })

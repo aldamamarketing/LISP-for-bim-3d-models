@@ -1,5 +1,3 @@
-import { generateSvgPathsFromPat } from '../../../utils/PatToSvgRenderer.js';
-
 export const arch_herringbone = {
   id: 'herringbone',
   name: 'Herringbone',
@@ -34,24 +32,33 @@ export const arch_herringbone = {
     const h = params.height || 50;
     const j = params.joint || 0;
     
-    const blockW = w + j;
-    const blockH = h + j;
-    const stepX = (blockW + blockH) / Math.sqrt(2);
-    const stepY = stepX;
+    const tw = w + j;
+    const th = h + j;
+    const S = tw + th;
     
-    const patCode = `*Herringbone_${w}x${h}_J${j}, Parametric
-45, 0,0, ${stepX},${stepY}, ${w},-${blockH}
-135, 0,0, ${stepX},${stepY}, ${w},-${blockH}
-45, 0,${h + j}, ${stepX},${stepY}, ${w},-${blockH}
-135, ${w + j},0, ${stepX},${stepY}, ${w},-${blockH}`;
+    // Generar las 4 líneas base que forman la espina de pez
+    const baseLines = [
+      {x1: 0, y1: 0, x2: tw, y2: tw},
+      {x1: S, y1: 0, x2: th, y2: tw},
+      {x1: 0, y1: th, x2: tw, y2: S},
+      {x1: tw, y1: 0, x2: 0, y2: tw}
+    ];
 
-    // Orthogonal tile bounds for a 45 degree herringbone is blockW + blockH
-    const tileSize = blockW + blockH;
-    const paths = generateSvgPathsFromPat(patCode, tileSize, tileSize);
+    let paths = '';
+    // Duplicar en una matriz 3x3 para asegurar el teselado perfecto en los bordes del SVG <pattern>
+    for (let i = -1; i <= 1; i++) {
+      for (let k = -1; k <= 1; k++) {
+        const dx = i * S;
+        const dy = k * S;
+        baseLines.forEach(l => {
+          paths += `<line x1="${l.x1 + dx}" y1="${l.y1 + dy}" x2="${l.x2 + dx}" y2="${l.y2 + dy}" />`;
+        });
+      }
+    }
     
     return {
-      w: tileSize,
-      h: tileSize,
+      w: S,
+      h: S,
       paths: paths,
       baseUnit: Math.max(w, h)
     };

@@ -12,6 +12,7 @@ export const arch_1_3_running_bond = {
     rows: 2,
     columns: 2
   },
+  hasBackendEngine: true,
   i18n: {
     es: {
       name: '1/3 Running Bond',

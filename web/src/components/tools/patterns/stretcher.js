@@ -1,5 +1,3 @@
-import { generateSvgPathsFromPat } from '../../../utils/PatToSvgRenderer.js';
-
 export const arch_stretcher = {
   id: 'stretcher',
   name: 'Stretcher',
@@ -38,12 +36,14 @@ export const arch_stretcher = {
     const th = h + j;
     const halfTw = tw / 2;
     
-    const patCode = `*Stretcher_${w}x${h}_J${j}, Parametric
-0, 0,0, 0,${th}
-90, 0,0, ${th},${halfTw}, ${h},-${th}`;
-
-    // A single tile of stretcher needs to cover 1 full block width and 2 rows height to repeat properly
-    const paths = generateSvgPathsFromPat(patCode, tw, th * 2);
+    const paths = `
+      <line x1="0" y1="0" x2="${tw}" y2="0" />
+      <line x1="0" y1="${th}" x2="${tw}" y2="${th}" />
+      <line x1="0" y1="${th * 2}" x2="${tw}" y2="${th * 2}" />
+      <line x1="0" y1="0" x2="0" y2="${th}" />
+      <line x1="${tw}" y1="0" x2="${tw}" y2="${th}" />
+      <line x1="${halfTw}" y1="${th}" x2="${halfTw}" y2="${th * 2}" />
+    `;
     
     return {
       w: tw,
