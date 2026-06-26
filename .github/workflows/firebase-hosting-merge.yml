@@ -18,3 +18,4 @@ jobs:
           firebaseServiceAccount: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_LISPCENTRAL }}
           channelId: live
           projectId: lispcentral
+          firebaseToolsVersion: 13.15.1
