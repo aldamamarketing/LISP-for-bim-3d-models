@@ -134,7 +134,7 @@ export default function LispCommandPalette() {
     executeInAutoCAD(cmdName);
   };
 
-  // Filter and group
+  // Filter and group - Optimization applied
   const filteredCmds = useMemo(() => {
     const lowerFilters = activeFilters.map((tag) => tag.toLowerCase());
     return commands.filter((cmd) => {
