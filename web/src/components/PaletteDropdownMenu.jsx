@@ -56,7 +56,7 @@ export default function PaletteDropdownMenu({ myId }) {
   return (
     <div ref={menuRef} style={{ position: 'relative', display: 'inline-block' }}>
       
-      {/* Botón Menu / Hamburguesa */}
+      {/* Botón Menu / Hamburguesa (Trigger) */}
       <button
         onClick={() => setIsOpen(!isOpen)}
         aria-label="Palette options"
