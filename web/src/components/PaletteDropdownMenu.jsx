@@ -2,6 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { executeInAutoCAD, closePaletteInAutoCAD } from '../utils/autocadBridge';
 import { usePalettePresence } from '../utils/usePalettePresence';
 
+// Accessibility improved dropdown menu
 export default function PaletteDropdownMenu({ myId }) {
   const [isOpen, setIsOpen] = useState(false);
   const menuRef = useRef(null);
