@@ -55,7 +55,7 @@ export default function PaletteDropdownMenu({ myId }) {
   };
 
   return (
-    <div ref={menuRef} style={{ position: 'relative', display: 'inline-block' }}>
+    <div ref={menuRef} data-deploy-fix="1" style={{ position: 'relative', display: 'inline-block' }}>
       
       {/* Botón Menu / Hamburguesa */}
       <button
