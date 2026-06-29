@@ -2,6 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { executeInAutoCAD, closePaletteInAutoCAD } from '../utils/autocadBridge';
 import { usePalettePresence } from '../utils/usePalettePresence';
 
+// Accessibility improved dropdown menu
 export default function PaletteDropdownMenu({ myId }) {
   const [isOpen, setIsOpen] = useState(false);
   const menuRef = useRef(null);
@@ -54,11 +55,14 @@ export default function PaletteDropdownMenu({ myId }) {
   };
 
   return (
-    <div ref={menuRef} style={{ position: 'relative', display: 'inline-block' }}>
+    <div ref={menuRef} data-deploy-fix="1" style={{ position: 'relative', display: 'inline-block' }}>
       
       {/* Botón Menu / Hamburguesa */}
       <button
         onClick={() => setIsOpen(!isOpen)}
+        aria-label="Opciones de Paleta"
+        aria-expanded={isOpen}
+        aria-haspopup="menu"
         style={{
           background: 'transparent',
           border: 'none',
@@ -80,7 +84,9 @@ export default function PaletteDropdownMenu({ myId }) {
 
       {/* Menú Desplegable */}
       {isOpen && (
-        <div style={{
+        <div
+          role="menu"
+          style={{
           position: 'absolute',
           top: '100%',
           left: 0,
@@ -100,6 +106,8 @@ export default function PaletteDropdownMenu({ myId }) {
             return (
               <button
                 key={p.id}
+                role="menuitemcheckbox"
+                aria-checked={isActive}
                 onClick={() => handleToggle(p)}
                 style={{
                   background: 'transparent',
