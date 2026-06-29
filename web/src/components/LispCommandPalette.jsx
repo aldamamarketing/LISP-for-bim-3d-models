@@ -135,8 +135,7 @@ export default function LispCommandPalette() {
   }, [commands, activeFilters]);
 
   return (
-    <div style={{ backgroundColor: '#181818', color: '#fff', height: '100vh', overflow: 'hidden', fontFamily: "'Inter', sans-serif", display: 'flex', flexDirection: 'column' }}>
-      {/* FORCE_NEW_HASH_2026 */}
+    <div data-build-hash="2026-v2" style={{ backgroundColor: '#181818', color: '#fff', height: '100vh', overflow: 'hidden', fontFamily: "'Inter', sans-serif", display: 'flex', flexDirection: 'column' }}>
       {/* Header & Search Container (Max Width to prevent over-stretching) */}
       <div style={{ margin: '0 auto', width: '100%', maxWidth: '600px' }}>
         <div style={{ padding: '8px 10px', backgroundColor: '#111', display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '2px solid var(--tmd-orange)' }}>
