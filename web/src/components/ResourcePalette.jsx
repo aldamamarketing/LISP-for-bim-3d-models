@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, useRef, Suspense, lazy } from 'react';
+import React, { useState, useEffect, useCallback, useRef, Suspense, lazy, useMemo } from 'react';
 import PaletteDropdownMenu from './PaletteDropdownMenu';
 import MultiFilter from './MultiFilter';
 import { executeInAutoCAD } from '../utils/autocadBridge';
@@ -399,21 +399,34 @@ export default function ResourcePalette() {
   };
 
   // ── Filtrado y agrupamiento (igual que LispCommandPalette) ──
-  const filtered = catalog.filter(item => {
-    if (activeFilters.length === 0) return true;
-    const text = `${item.name} ${item.desc || ''} ${item.category}`.toLowerCase();
-    return activeFilters.some(tag => text.includes(tag.toLowerCase()));
-  });
+  const { filtered, pinned, grouped, sortedCategories } = useMemo(() => {
+    const normalizedFilters = activeFilters.map(tag => tag.toLowerCase());
 
-  const pinned  = filtered.filter(i => pinnedIds.includes(i.id));
-  const grouped = {};
-  filtered.forEach(item => {
-    if (pinnedIds.includes(item.id)) return; // ya en sección pinned
-    const cat = item.category || 'General';
-    if (!grouped[cat]) grouped[cat] = [];
-    grouped[cat].push(item);
-  });
-  const sortedCategories = Object.keys(grouped).sort();
+    const filteredItems = catalog.filter(item => {
+      if (normalizedFilters.length === 0) return true;
+      const text = `${item.name} ${item.desc || ''} ${item.category}`.toLowerCase();
+      return normalizedFilters.some(tag => text.includes(tag));
+    });
+
+    const pinnedItems = filteredItems.filter(i => pinnedIds.includes(i.id));
+    const groupsMap = {};
+
+    filteredItems.forEach(item => {
+      if (pinnedIds.includes(item.id)) return; // ya en sección pinned
+      const cat = item.category || 'General';
+      if (!groupsMap[cat]) groupsMap[cat] = [];
+      groupsMap[cat].push(item);
+    });
+
+    const sortedCats = Object.keys(groupsMap).sort();
+
+    return {
+      filtered: filteredItems,
+      pinned: pinnedItems,
+      grouped: groupsMap,
+      sortedCategories: sortedCats
+    };
+  }, [catalog, activeFilters, pinnedIds]);
 
   const tabBtn = (id, label) => ({
     flex: 1,

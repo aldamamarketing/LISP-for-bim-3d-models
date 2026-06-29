@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import PaletteDropdownMenu from './PaletteDropdownMenu';
 import MultiFilter from './MultiFilter';
 import { executeInAutoCAD } from '../utils/autocadBridge';
@@ -106,27 +106,33 @@ export default function LispCommandPalette() {
   };
 
   // Filter and group
-  const filteredCmds = commands.filter(cmd => {
-    if (activeFilters.length === 0) return true;
-    const searchableText = `${cmd.name || ''} ${cmd.friendly || ''} ${cmd.desc || ''} ${cmd.group || ''}`.toLowerCase();
-    // Must match at least ONE tag (OR logic)
-    return activeFilters.some(tag => searchableText.includes(tag.toLowerCase()));
-  });
+  const { filteredCmds, sortedGroups, grouped } = useMemo(() => {
+    const normalizedFilters = activeFilters.map(tag => tag.toLowerCase());
 
-  const grouped = {};
-  filteredCmds.forEach(cmd => {
-    const g = cmd.group || 'Outros';
-    if (!grouped[g]) grouped[g] = [];
-    grouped[g].push(cmd);
-  });
+    const filtered = commands.filter(cmd => {
+      if (normalizedFilters.length === 0) return true;
+      const searchableText = `${cmd.name || ''} ${cmd.friendly || ''} ${cmd.desc || ''} ${cmd.group || ''}`.toLowerCase();
+      // Must match at least ONE tag (OR logic)
+      return normalizedFilters.some(tag => searchableText.includes(tag));
+    });
 
-  const sortedGroups = Object.keys(grouped).sort((a, b) => {
-    let iA = GROUP_ORDER.indexOf(a);
-    let iB = GROUP_ORDER.indexOf(b);
-    if (iA === -1) iA = 99;
-    if (iB === -1) iB = 99;
-    return iA - iB;
-  });
+    const groupsMap = {};
+    filtered.forEach(cmd => {
+      const g = cmd.group || 'Outros';
+      if (!groupsMap[g]) groupsMap[g] = [];
+      groupsMap[g].push(cmd);
+    });
+
+    const sortedKeys = Object.keys(groupsMap).sort((a, b) => {
+      let iA = GROUP_ORDER.indexOf(a);
+      let iB = GROUP_ORDER.indexOf(b);
+      if (iA === -1) iA = 99;
+      if (iB === -1) iB = 99;
+      return iA - iB;
+    });
+
+    return { filteredCmds: filtered, sortedGroups: sortedKeys, grouped: groupsMap };
+  }, [commands, activeFilters]);
 
   return (
     <div style={{ backgroundColor: '#181818', color: '#fff', height: '100vh', overflow: 'hidden', fontFamily: "'Inter', sans-serif", display: 'flex', flexDirection: 'column' }}>
