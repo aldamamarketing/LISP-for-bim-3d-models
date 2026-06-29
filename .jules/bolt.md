@@ -1,0 +1,3 @@
+## 2024-06-29 - O(N*M) String Allocation Blocking in AutoCAD Palettes
+**Learning:** React components running directly inside AutoCAD's embedded HTML5 browser controls execute JavaScript much slower than modern desktop browsers. String allocations (like `.toLowerCase()`) inside `.filter()` and `.some()` array loops cause major UI blocking due to O(N*M) recalculations on every keystroke.
+**Action:** Always extract expensive string transformations outside of closures, and strictly wrap all derived lists (like filtering and grouping items) in a `useMemo` hook to ensure calculations only run when dependencies change, protecting main-thread UI responsiveness in embedded environments.
