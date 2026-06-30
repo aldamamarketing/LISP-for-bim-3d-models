@@ -129,7 +129,7 @@ export default function LispCommandPalette() {
   });
 
   return (
-    <div style={{ backgroundColor: '#181818', color: '#fff', height: '100vh', overflow: 'hidden', fontFamily: "'Inter', sans-serif", display: 'flex', flexDirection: 'column' }}>
+    <div data-build-hash="1782791341" style={{ backgroundColor: '#181818', color: '#fff', height: '100vh', overflow: 'hidden', fontFamily: "'Inter', sans-serif", display: 'flex', flexDirection: 'column' }}>
       
       {/* Header & Search Container (Max Width to prevent over-stretching) */}
       <div style={{ margin: '0 auto', width: '100%', maxWidth: '600px' }}>
