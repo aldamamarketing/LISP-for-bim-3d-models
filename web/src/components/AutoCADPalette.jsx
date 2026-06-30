@@ -11,7 +11,7 @@ import React from 'react';
  */
 export default function AutoCADPalette() {
   return (
-    <div data-build-hash="1782787755" style={{
+    <div data-build-hash="1782789898" style={{
       backgroundColor: '#181818',
       color: '#fff',
       minHeight: '100vh',
@@ -25,7 +25,7 @@ export default function AutoCADPalette() {
     }}>
 
       {/* Ícone animado */}
-      <div style={{
+      <div data-build-hash="1782789898" style={{
         width: '72px',
         height: '72px',
         marginBottom: '24px',
@@ -60,7 +60,7 @@ export default function AutoCADPalette() {
       </h2>
 
       {/* Badge */}
-      <div style={{
+      <div data-build-hash="1782789898" style={{
         display: 'inline-flex',
         alignItems: 'center',
         gap: '6px',
@@ -102,7 +102,7 @@ export default function AutoCADPalette() {
       </p>
 
       {/* Lista de features próximas */}
-      <div style={{
+      <div data-build-hash="1782789898" style={{
         width: '100%',
         maxWidth: '280px',
         display: 'flex',
