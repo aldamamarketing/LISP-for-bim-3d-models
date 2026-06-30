@@ -2,13 +2,14 @@
 import { getCollection, render } from 'astro:content';
 import DocsLayout from '../../../layouts/DocsLayout.astro';
 import { getLangFromUrl, localizeUrl } from '../../../i18n/utils';
+import { translations } from '../../../i18n/translations.js';
 
 export async function getStaticPaths() {
   const docs = await getCollection('docs');
   return docs.map(doc => {
     const [lang, ...slugParts] = doc.id.split('/');
     return {
-      params: { lang, slug: slugParts.join('/') },
+      params: { lang: lang === 'en' ? undefined : lang, slug: slugParts.join('/') || undefined },
       props: { doc },
     };
   });
@@ -17,6 +18,11 @@ export async function getStaticPaths() {
 const { doc } = Astro.props;
 const { Content } = await render(doc);
 const lang = getLangFromUrl(Astro.url);
+const currentLocale = lang || 'en';
+const t = (key) => {
+    const dict = translations[currentLocale] || translations['en'];
+    return dict[key] || key;
+};
 ---
 
 <DocsLayout 
@@ -27,9 +33,9 @@ const lang = getLangFromUrl(Astro.url);
     <!-- Breadcrumbs -->
     <nav class="breadcrumbs mb-8" aria-label="Breadcrumb">
       <ol class="flex items-center gap-2 text-sm text-on-surface-variant">
-        <li><a href={localizeUrl("/", lang)} class="hover:text-primary-container">Home</a></li>
+        <li><a href={localizeUrl("/", lang)} class="hover:text-primary-container">{t("nav.home")}</a></li>
         <li><span class="separator material-symbols-outlined text-[16px]">chevron_right</span></li>
-        <li><a href={localizeUrl("/help", lang)} class="hover:text-primary-container">Help</a></li>
+        <li><a href={localizeUrl("/help", lang)} class="hover:text-primary-container">{t("nav.help")}</a></li>
         <li><span class="separator material-symbols-outlined text-[16px]">chevron_right</span></li>
         <li aria-current="page" class="text-white">{doc.data.title}</li>
       </ol>

@@ -4,6 +4,7 @@ import Footer from '../components/layout/Footer.astro';
 import { trackDocView } from '../utils/analytics.js';
 import { getCollection } from 'astro:content';
 import { getLangFromUrl, localizeUrl } from '../i18n/utils';
+import { translations } from '../i18n/translations.js';
 
 const lang = getLangFromUrl(Astro.url);
 
@@ -11,6 +12,12 @@ const { frontmatter } = Astro.props;
 const { title, description, pubDate, updatedDate, heroImage, author, tags } = frontmatter || Astro.props;
 
 const canonicalUrl = Astro.url.href;
+
+const currentLocale = lang || 'en';
+const t = (key) => {
+    const dict = translations[currentLocale] || translations['en'];
+    return dict[key] || key;
+};
 
 // Busca todos os posts para a seção de "Conteúdo Relacionado"
 const allPosts = await getCollection('blog');
@@ -39,9 +46,9 @@ const formattedDate = new Date(pubDate).toLocaleDateString('pt-BR', {
     <!-- Breadcrumbs (Migas de pão) -->
     <nav class="breadcrumbs" aria-label="Breadcrumb">
       <ol>
-        <li><a href={localizeUrl("/", lang)}>Home</a></li>
+        <li><a href={localizeUrl("/", lang)}>{t("nav.home")}</a></li>
         <li><span class="separator">/</span></li>
-        <li><a href={localizeUrl("/blog", lang)}>Blog</a></li>
+        <li><a href={localizeUrl("/blog", lang)}>{t("header.blog")}</a></li>
         <li><span class="separator">/</span></li>
         <li aria-current="page" class="current">{title.substring(0, 40)}{title.length > 40 ? '...' : ''}</li>
       </ol>
@@ -77,11 +84,11 @@ const formattedDate = new Date(pubDate).toLocaleDateString('pt-BR', {
     <!-- CTA B2B (App & Ferramentas) -->
     <div class="post-cta">
       <div class="cta-content">
-        <h3>Pare de lutar com rotinas LISP locais</h3>
-        <p>Acelere sua equipe com nossos Geradores com Inteligência Artificial e nossa nuvem JIT para AutoCAD.</p>
+        <h3>{t("blog.cta.title")}</h3>
+        <p>{t("blog.cta.desc")}</p>
         <div class="cta-buttons">
-          <a href={localizeUrl("/login", lang)} class="btn-primary">Criar Conta Gratuita</a>
-          <a href={localizeUrl("/tools/icon-generator", lang)} class="btn-ghost">Testar Ferramentas de IA</a>
+          <a href={localizeUrl("/login", lang)} class="btn-primary">{t("blog.cta.btnFree")}</a>
+          <a href={localizeUrl("/tools/icon-generator", lang)} class="btn-ghost">{t("blog.cta.btnTools")}</a>
         </div>
       </div>
     </div>
@@ -89,7 +96,7 @@ const formattedDate = new Date(pubDate).toLocaleDateString('pt-BR', {
     <!-- Conteúdo Relacionado -->
     {relatedPosts.length > 0 && (
       <div class="related-content">
-        <h3>Leia Também</h3>
+        <h3>{t("blog.related")}</h3>
         <div class="related-grid">
           {relatedPosts.map((post) => {
             const slug = post.id.replace(`${lang}/`, '');

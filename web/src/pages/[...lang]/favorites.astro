@@ -1,16 +1,16 @@
 ---
 export function getStaticPaths() {
   return [
-    { params: { lang: 'en' } },
+    { params: { lang: undefined } },
     { params: { lang: 'es' } },
     { params: { lang: 'pt' } },
   ];
 }
 
 import DocsLayout from '../../layouts/DocsLayout.astro';
-import Dashboard from '../../components/Dashboard.jsx';
+import FavoritesManager from '../../components/FavoritesManager.jsx';
 ---
 
-<DocsLayout title="LispCentral - Painel do Cliente">
-  <Dashboard client:load mode="dashboard" />
+<DocsLayout title="LispCentral - Mis Favoritos">
+  <FavoritesManager client:load />
 </DocsLayout>

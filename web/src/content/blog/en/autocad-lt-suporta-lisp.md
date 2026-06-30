@@ -1,56 +1,54 @@
 ---
-title: 'O AutoCAD LT agora suporta LISP: Como preparar seu escritório'
-description: 'Entenda a recente atualização da Autodesk que liberou o uso de rotinas AutoLISP no AutoCAD LT e descubra como distribuir ferramentas corporativas.'
+title: 'AutoCAD LT Now Supports LISP: How to Prepare Your Office'
+description: 'Understand Autodesk\'s recent update that released the use of AutoLISP routines in AutoCAD LT and discover how to distribute corporate tools.'
 pubDate: 2026-05-28
 heroImage: 'https://images.unsplash.com/photo-1581092921461-7d603a115ab3?q=80&w=1200&auto=format&fit=crop'
 author: 'Equipe LispCentral'
 tags: ["autocad lt lisp", "autocad 2023 lisp", "autolisp autocad"]
----
+---**TL;DR:** For nearly three decades, **AutoCAD LT** ("Lite") was strictly limited and locked to automation via AutoLISP, forcing companies to purchase "Full" licenses just to run productivity macros. Starting with the 2024 update, Autodesk surprised the market by activating native LISP support in AutoCAD LT.
 
-**TL;DR:** Por quase três décadas, o **AutoCAD LT** ("Lite") foi estritamente limitado e bloqueado para automação via AutoLISP, forçando empresas a comprar licenças "Full" apenas para rodar macros de produtividade. A partir da atualização 2024, a Autodesk surpreendeu o mercado ativando o suporte nativo a LISP no AutoCAD LT.
+The search for *"autocad lt lisp"* took off on the CAD and Google forums. This happens because a huge portion of the market uses the LT version for cost reasons. The release of automation in AutoCAD LT drastically changes the enterprise game.
 
-A busca por *"autocad lt lisp"* disparou nos fóruns de CAD e Google. Isso acontece porque uma enorme parcela do mercado utiliza a versão LT por questões de custo. A liberação da automação no AutoCAD LT muda drasticamente o jogo corporativo.
+## The History: The Cost Barrier
 
-## O Histórico: A Barreira do Custo
+Until recently, the primary selling point for the Full version of AutoCAD was not necessarily 3D modeling capability, but rather **API Support and Extensibility** (AutoLISP, .NET, ObjectARX).
 
-Até recentemente, o argumento de vendas primário para a versão Completa (Full) do AutoCAD não era necessariamente a capacidade de modelagem 3D, mas sim o **Suporte a API e Extensibilidade** (AutoLISP, .NET, ObjectARX).
+If an engineering office had 15 designers who needed to run a simple "Block Quantitative" routine developed in-house, the BIM Manager was forced to approve the purchase of 15 expensive AutoCAD Full subscriptions, justifying the monstrous difference in price annually.
 
-Se um escritório de engenharia tivesse 15 desenhistas que precisassem rodar uma simples rotina de "Quantitativo de Blocos" desenvolvida internamente, o BIM Manager era forçado a aprovar a compra de 15 assinaturas caras do AutoCAD Full, justificando a diferença monstruosa de preço anualmente.
+## What changes with AutoLISP in AutoCAD LT?
 
-## O que muda com o AutoLISP no AutoCAD LT?
-
-Com a atualização recente, os usuários do AutoCAD LT ganharam o superpoder de carregar arquivos `.lsp`, `.fas` e `.vlx`.
+With the recent update, AutoCAD LT users have gained the superpower of loading `.lsp`, `.fas` and `.vlx` files.
 
 > [!TIP]
-> **O que você JÁ PODE fazer no AutoCAD LT:**
-> *   Carregar rotinas LISP (.lsp) que automatizam desenhos 2D.
-> *   Usar o comando `APPLOAD`.
-> *   Criar atalhos customizados baseados em rotinas.
+> **What you CAN ALREADY do in AutoCAD LT:**
+> * Load LISP routines (. lsp) that automate 2D drawings.
+> * Use the `APPLOAD` command.
+> * Create custom shortcuts based on routines.
 
 > [!WARNING]
-> **O que o AutoCAD LT AINDA NÃO PODE fazer:**
-> *   Executar plugins complexos em `.NET` (DLLs) ou `ObjectARX` nativos.
-> *   Rotinas LISP que invoquem comandos 3D complexos ou renderização (já que o motor do LT carece do *Solid Modeler* completo).
+> **What AutoCAD LT CANNOT YET do:**
+> * Run complex plugins in native `.NET` (DLLs) or `ObjectARX`.
+> * LISP routines that invoke complex 3D commands or rendering (as the LT engine lacks the full *Solid Modeler*).
 
-## O Novo Desafio: Distribuição de Ferramentas Corporativas
+## The New Challenge: Distribution of Corporate Tools
 
-A liberação gerou um efeito colateral inesperado: dezenas de escritórios que antes não usavam LISP por limitação técnica agora estão inundando seus servidores locais com rotinas baixadas da internet para toda a equipe. Isso criou um pesadelo de gestão e segurança (o caos das versões e vírus de macros).
+The release generated an unexpected side effect: dozens of offices that previously did not use LISP due to technical limitations are now flooding their local servers with routines downloaded from the internet for the entire team. This created a management and security nightmare (the chaos of macro versions and viruses).
 
-### A Solução LispCentral
+### The LispCentral Solution
 
-É aqui que a transição de um "cadista isolado" para uma **gestão corporativa** se faz necessária.
+This is where the transition from an "isolated cadre" to **corporate management** becomes necessary.
 
-Se você tem 20 desenhistas usando AutoCAD LT e acabou de comprar/desenvolver uma *Suite de Arquitetura* em LISP, como garantir que todos usem a mesma versão e ninguém copie o arquivo para casa?
+If you have 20 designers using AutoCAD LT and you have just purchased/developed an *Architecture Suite* in LISP, how do you ensure that everyone uses the same version and no one copies the file home?
 
-O **LispCentral** permite que você assuma o controle. Ao invés de enviar o arquivo LISP por e-mail, você o sobe na nossa plataforma na Nuvem. O LispCentral funciona como um conector (JIT Compiler): o usuário do AutoCAD LT clica no botão, e a nuvem entrega a rotina direto na memória RAM da máquina, criptografada.
+**LispCentral** lets you take control. Instead of sending the LISP file by email, you upload it to our Cloud platform. LispCentral works as a connector (JIT Compiler): the AutoCAD LT user clicks the button, and the cloud delivers the routine directly to the machine's RAM, encrypted.
 
-## Perguntas Frequentes (FAQ)
+## Frequently Asked Questions (FAQ)
 
-### 1. O AutoCAD LT 2022 ou 2023 roda LISP?
-Não nativamente. A Autodesk liberou oficialmente a funcionalidade a partir do AutoCAD LT 2024. Versões anteriores do LT continuam bloqueadas para automação AutoLISP.
+### 1. Does AutoCAD LT 2022 or 2023 run LISP?
+Not natively. Autodesk has officially released the functionality starting with AutoCAD LT 2024. Previous versions of LT remain blocked for AutoLISP automation.
 
-### 2. Rotinas antigas de AutoLISP vão rodar no novo AutoCAD LT?
-Na vasta maioria dos casos, sim. Desde que a rotina manipule entidades 2D (Linhas, Polilinhas, Círculos, Textos, Blocos) ou extraia dados (Atributos, DXF), ela rodará perfeitamente. Se a rotina invocar modelagem de `3DSOLID`, ela irá falhar.
+### 2. Will old AutoLISP routines run in the new AutoCAD LT?
+In the vast majority of cases, yes. As long as the routine manipulates 2D entities (Lines, Polylines, Circles, Text, Blocks) or extracts data (Attributes, DXF), it will rotate perfectly. If the routine invokes `3DSOLID` modeling, it fails.
 
-### 3. Posso usar a plataforma LispCentral no meu AutoCAD LT?
-Sim! O "Loader" do LispCentral foi projetado para ser universal e roda nativamente no novo AutoCAD LT, permitindo que escritórios com licenças mistas (Full e LT) utilizem o mesmo Hub na nuvem para gerenciar suas automações.
+### 3. Can I use the LispCentral platform on my AutoCAD LT?
+Yes! LispCentral's "Loader" was designed to be universal and runs natively on the new AutoCAD LT, allowing offices with mixed licenses (Full and LT) to use the same cloud Hub to manage their automations.

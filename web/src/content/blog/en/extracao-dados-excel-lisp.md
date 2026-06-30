@@ -1,63 +1,61 @@
 ---
-title: 'Extração de Dados BIM e Excel via LISP: Automatizando o Quantitativo'
-description: 'Aprenda a extrair quantitativos (BOM) e dados estruturados diretamente do AutoCAD para o Excel usando as funções nativas de AutoLISP e XDATA.'
+title: 'BIM and Excel Data Extraction via LISP: Automating Quantitative'
+description: 'Learn how to extract quantitative (BOM) and structured data directly from AutoCAD into Excel using the native AutoLISP and XDATA functions.'
 pubDate: 2026-05-28
 heroImage: 'https://images.unsplash.com/photo-1543286386-713bdd548da4?q=80&w=1200&auto=format&fit=crop'
 author: 'Equipe LispCentral'
 tags: ["autocad data extraction lisp", "autocad excel lisp", "cad lisp routines"]
----
+---**TL;DR:** Extracting tables and bills of materials (BOM - *Bill of Materials*) manually from AutoCAD into Excel is the most common (and expensive) mistake in engineering. Using AutoLISP to read attributes from hidden blocks or dictionaries (LDATA/XDATA) allows you to generate perfect spreadsheets with zero margin for human error, in a matter of seconds.
 
-**TL;DR:** Extrair tabelas e listas de materiais (BOM - *Bill of Materials*) manualmente do AutoCAD para o Excel é o erro mais comum (e caro) na engenharia. Usar AutoLISP para ler atributos de blocos ou dicionários ocultos (LDATA/XDATA) permite gerar planilhas perfeitas com zero margem de erro humano, em questão de segundos.
+In the engineering of structural and infrastructure projects, *"the drawing is just an excuse to generate the quantitative table"*. One of the most valuable searches that engineers do online is for *"autocad data extraction lisp"* and *"autocad excel lisp"*.
 
-Na engenharia de projetos estruturais e de infraestrutura, *"o desenho é apenas uma desculpa para gerar a tabela de quantitativos"*. Uma das pesquisas mais valiosas que engenheiros fazem online é por *"autocad data extraction lisp"* e *"autocad excel lisp"*.
+## Why is AutoCAD native extraction sometimes not enough?
 
-## Por que a extração nativa do AutoCAD às vezes não é suficiente?
+AutoCAD's native `DATAEXTRACTION` command is powerful, but it has two major flaws when applied to agile corporate offices:
+1. Requires a repetitive *Wizard* (step by step) process that takes time.
+2. It is excessively fragile if there are changes to block attributes or naming.
 
-O comando `DATAEXTRACTION` nativo do AutoCAD é poderoso, porém possui duas grandes falhas quando aplicado a escritórios corporativos ágeis:
-1. Requer um processo de *Wizard* (passo a passo) repetitivo que toma tempo.
-2. É excessivamente frágil se houver alterações nos atributos ou nomenclatura dos blocos.
+## The Power of LISP in Data Extraction (BOM)
 
-## O Poder do LISP na Extração de Dados (BOM)
+Writing a custom LISP routine for your office solves this problem elegantly. An extraction routine can focus on the “DNA” of your parts.
 
-Escrever uma rotina LISP customizada para o seu escritório resolve este problema de forma elegante. Uma rotina de extração pode focar no "DNA" das suas peças.
+In advanced LISP architecture (such as the V5 standard adopted by experienced developers), structural elements such as "Metal Beams" do not depend on dynamic blocks. Instead, your dimensional data and parameters are injected directly into the 3D (or 2D) geometry via **LDATA** or **XDATA**.
 
-Na arquitetura avançada de LISP (como o padrão V5 adotado por desenvolvedores experientes), elementos estruturais como "Vigas Metálicas" não dependem de blocos dinâmicos. Em vez disso, seus dados dimensionais e parâmetros são injetados diretamente na geometria 3D (ou 2D) através de **LDATA** ou **XDATA**.
+### The Logical Structure of a "GOOD Extractor"
+A classic LISP routine for extracting data into Excel follows this structure:
 
-### A Estrutura Lógica de um "BOM Extractor"
-Uma rotina LISP clássica para extrair dados para o Excel segue esta estrutura:
-
-1.  **Seleção:** Filtrar automaticamente todos os elementos da camada `EST-VIGAS` (`ssget "X" '((8 . "EST-VIGAS"))`).
-2.  **Iteração e Leitura:** Abrir cada elemento e ler seus dicionários LDATA (ex: ler o peso por metro do catálogo metálico atrelado à linha).
-3.  **Processamento:** Somar os comprimentos de perfis idênticos (agrupamento).
-4.  **Exportação:** Usar as funções `open` e `write-line` do AutoLISP para escrever um arquivo CSV, separado por vírgulas, que o Excel lê instantaneamente.
+1. **Selection:** Automatically filter all elements of the `EST-BEAM` layer (`ssget "X" '((8 . "EST-BEAM"))`).
+2. **Iteration and Reading:** Open each element and read its LDATA dictionaries (e.g. read the weight per meter of the metal catalog linked to the line).
+3. **Processing:** Add the lengths of identical profiles (grouping).
+4. **Export:** Use AutoLISP's `open` and `write-line` functions to write a comma-separated CSV file that Excel reads instantly.
 
 > [!TIP]
-> **Exportando CSV Rápido em AutoLISP:**
-> O comando `(setq file (open "C:\\dados.csv" "w"))` cria o arquivo.
-> `(write-line "ITEM,PERFIL,PESO_TOTAL" file)` escreve os cabeçalhos.
-> `(close file)` libera o arquivo para o Windows.
+> **Quick CSV export in AutoLISP:**
+> The command `(setq file (open "C:\\data.csv" "w"))` creates the file.
+> `(write-line "ITEM,PROFILE,PESO_TOTAL" file)` writes the headers.
+> `(close file)` releases the file to Windows.
 
-## A Padronização: O maior obstáculo
+## Standardization: The biggest obstacle
 
-Extrair dados via LISP é relativamente fácil. O verdadeiro obstáculo é **A Padronização**.
-Se o Engenheiro A insere a viga como "W150x13" e o Desenhista B insere a viga como "W-150-13", a rotina de quantitativo vai tratar como duas peças diferentes, arruinando a compra de materiais.
+Extracting data via LISP is relatively easy. The real obstacle is **Standardization**.
+If Engineer A inserts the beam as "W150x13" and Designer B inserts the beam as "W-150-13", the quantitative routine will treat it as two different pieces, ruining the purchase of materials.
 
-É por isso que a automação LISP corporativa deve ser estrita.
+This is why enterprise LISP automation must be strict.
 
-### Gestão Centralizada com LispCentral
+### Centralized Management with LispCentral
 
-Com a plataforma SaaS B2B **LispCentral**, você resolve o caos da padronização.
-Ao invés de deixar sua equipe usar macros "soltos" da internet, o BIM Manager aloca rotinas certificadas na nuvem.
+With the SaaS B2B platform **LispCentral**, you solve the chaos of standardization.
+Instead of letting your team use “loose” macros from the internet, BIM Manager allocates certified routines in the cloud.
 
-Se você utilizar a **Suite Estrutura Pro**, a paleta na nuvem garante que toda a sua equipe construa elementos com o *mesmo banco de dados de propriedades*. Quando chegar o momento de executar o comando de extração (BOM) ao final do mês, não haverá inconsistências ortográficas ou dados corrompidos.
+If you use the **Structure Suite Pro**, the cloud palette ensures that your entire team builds elements with the *same property database*. When it comes time to run the extract command (BOM) at the end of the month, there will be no spelling inconsistencies or corrupted data.
 
-## Perguntas Frequentes (FAQ)
+## Frequently Asked Questions (FAQ)
 
-### 1. Uma rotina LISP pode ler arquivos Excel em tempo real?
-Sim. É possível usar a tecnologia ActiveX / COM do AutoLISP (`vlax-get-or-create-object "Excel.Application"`) para abrir, ler células em tempo real e fechar planilhas Excel enquanto o usuário desenha no AutoCAD.
+### 1. Can a LISP routine read Excel files in real time?
+Yes. You can use AutoLISP's ActiveX/COM technology (`vlax-get-or-create-object "Excel.Application"`) to open, read real-time cells, and close Excel spreadsheets while the user draws in AutoCAD.
 
-### 2. O XDATA e o LDATA sobrevivem se eu exportar o DWG?
-O **XDATA** é suportado universalmente, mesmo se salvo em versões antigas do DXF ou lido em softwares concorrentes (BricsCAD, ZWCAD). O **LDATA** é um dicionário mais moderno que permite armazenar listas nativas, mas é atrelado primariamente ao motor LISP do Autodesk AutoCAD.
+### 2. Do XDATA and LDATA survive if I export DWG?
+**XDATA** is universally supported, even if saved in old versions of DXF or read in competing software (BricsCAD, ZWCAD). **LDATA** is a more modern dictionary that allows you to store native lists, but is primarily linked to the Autodesk AutoCAD LISP engine.
 
-### 3. Como eu distribuo uma rotina de Extração de Dados para a minha empresa?
-Em vez de enviar o arquivo `.lsp` por pendrive, crie uma conta corporativa (Tenant) no **LispCentral**. Suba a sua rotina BOM para o Workspace e gere o acesso instantâneo para todos os desenhistas da equipe via Nuvem.
+### 3. How do I distribute a Data Extraction routine for my company?
+Instead of sending the `. lsp` by pendrive, create a corporate account (Tenant) on **LispCentral**. Upload your BOM routine to Workspace and generate instant access for all designers on the team via the Cloud.

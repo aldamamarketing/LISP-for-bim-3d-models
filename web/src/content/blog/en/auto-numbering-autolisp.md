@@ -1,45 +1,45 @@
 ---
-title: 'Auto Numbering em AutoLISP: A Lógica de Laços (Loops) para Textos Sequenciais'
-description: 'Aprenda a criar rotinas AutoLISP de auto-numeração usando laços while e repeat. Oculte a matemática complexa e emita textos em série no AutoCAD.'
+title: 'Auto Numbering in AutoLISP: The Logic of Loops for Sequential Texts'
+description: 'Learn how to create AutoLISP auto-numbering routines using while and repeat loops. Hide complex math and output serial texts in AutoCAD.'
 pubDate: 2026-05-28
 heroImage: 'https://images.unsplash.com/photo-1518770660439-4636190af475?q=80&w=1200&auto=format&fit=crop'
-author: 'Equipe LispCentral'
+author: 'LispCentral Team'
 tags: ["auto numbering in autocad lisp", "cad lisp routines", "autolisp macro application"]
 ---
 
-**TL;DR:** Criar textos sequenciais (1, 2, 3...) manualmente no AutoCAD é propenso a erros. Um simples laço `(while)` em AutoLISP pode solicitar o clique do usuário indefinidamente, incrementando um número inicial e desenhando a entidade de texto (`entmake`) dinamicamente. Esta é a essência da automação paramétrica na engenharia.
+**TL;DR:** Creating sequential texts (1, 2, 3...) manually in AutoCAD is prone to errors. A simple `(while)` loop in AutoLISP can prompt the user to click indefinitely, incrementing a starting number and drawing the text entity (`entmake`) dynamically. This is the essence of parametric automation in engineering.
 
-Se você está projetando vagas de estacionamento, numerando estacas topográficas ou identificando eixos de estrutura, digitar "1", copiar, colar e editar para "2" é o extremo oposto de produtividade.
+If you are designing parking spaces, numbering topographic stakes, or identifying structural axes, typing "1", copying, pasting, and editing it to "2" is the polar opposite of productivity.
 
-Por isso, "auto numbering in autocad lisp" é uma das buscas mais tradicionais para quem quer aprender a programar em LISP.
+That is why "auto numbering in autocad lisp" is one of the most traditional searches for those who want to learn how to program in LISP.
 
-## A Anatomia Lógica do "Auto-Numerador"
+## The Logical Anatomy of the "Auto-Numberer"
 
-Para que uma rotina LISP emita números em sequência clicando na tela, você precisa dominar três conceitos fundamentais da linguagem:
+For a LISP routine to output sequential numbers by clicking on the screen, you need to master three fundamental concepts of the language:
 
-1.  **Variáveis Globais (Memória Dinâmica):** Armazenar qual foi o "último número" utilizado, para que na próxima vez que você chame o comando, ele continue do número correto.
-2.  **O Laço de Repetição (`while`):** Fazer com que o AutoCAD "prenda" o usuário no comando até que ele aperte *Esc* ou *Enter*.
-3.  **Criação Rápida de Entidades (`entmake`):** Evitar o comando nativo `_TEXT` (que é lento e sujeito a configurações de estilos locais) e injetar o objeto Text diretamente no banco de dados do AutoCAD.
+1.  **Global Variables (Dynamic Memory):** Storing what the "last number" used was, so that the next time you call the command, it continues from the correct number.
+2.  **The Repetition Loop (`while`):** Making AutoCAD "lock" the user in the command until they press *Esc* or *Enter*.
+3.  **Fast Entity Creation (`entmake`):** Avoiding the native `_TEXT` command (which is slow and subject to local style settings) and injecting the Text object directly into the AutoCAD database.
 
-### O Snippet de Código Básico
+### The Basic Code Snippet
 
-Abaixo está um pseudo-código demonstrando a lógica matemática do incremento contínuo (loop):
+Below is pseudo-code demonstrating the mathematical logic of continuous incrementation (looping):
 
 ```lisp
 (defun c:AutoNum ( / pto str)
-  ;; Pede ao usuário o número inicial caso não exista
+  ;; Asks the user for the starting number if it doesn't exist
   (if (not *LispCentral-Num*) (setq *LispCentral-Num* 1))
   
-  ;; O loop 'while' prende o usuário solicitando pontos na tela
-  (while (setq pto (getpoint "\nClique para inserir o número: "))
+  ;; The 'while' loop traps the user asking for points on the screen
+  (while (setq pto (getpoint "\nClick to insert the number: "))
     
-    ;; Converte o número inteiro (1) para string ("1")
+    ;; Converts the integer (1) to string ("1")
     (setq str (itoa *LispCentral-Num*))
     
-    ;; Cria o texto via manipulação direta de banco de dados (rápido e seguro)
+    ;; Creates the text via direct database manipulation (fast and safe)
     (entmake (list '(0 . "TEXT") (cons 10 pto) (cons 40 2.5) (cons 1 str)))
     
-    ;; Incrementa a variável matemática em +1
+    ;; Increments the math variable by +1
     (setq *LispCentral-Num* (1+ *LispCentral-Num*))
   )
   (princ)
@@ -47,24 +47,24 @@ Abaixo está um pseudo-código demonstrando a lógica matemática do incremento 
 ```
 
 > [!IMPORTANT]
-> **Dica Pro:** Perceba o asterisco `*LispCentral-Num*`. Na nomenclatura LISP, variáveis com asterisco em ambos os lados não são limpas ao final do comando (`/ pto str`). Isso garante que elas "lembrem" do seu valor entre um comando e outro.
+> **Pro Tip:** Notice the asterisk in `*LispCentral-Num*`. In LISP nomenclature, variables with an asterisk on both sides are not cleared at the end of the command (`/ pto str`). This ensures that they "remember" their value between one command and the next.
 
-## Escalando o Problema: Equipes e Prefixos Complexos
+## Scaling the Problem: Teams and Complex Prefixes
 
-A lógica acima resolve o problema para 1 desenhista fazendo estacas simples.
-No entanto, na realidade corporativa (BIM), a nomenclatura costuma ser complexa: `"ESTACA-01-A"`, `"VIGA-P02-L1"`. 
+The logic above solves the problem for 1 drafter doing simple stakes.
+However, in corporate reality (BIM), nomenclature is usually complex: `"STAKE-01-A"`, `"BEAM-P02-L1"`. 
 
-Quando a complexidade aumenta e você precisa de painéis HTML elegantes no AutoCAD (`OpenDCL` ou Paletas React), a programação manual em AutoLISP começa a ficar pesada. 
+When complexity increases and you need elegant HTML panels in AutoCAD (`OpenDCL` or React Palettes), manual AutoLISP programming starts getting heavy. 
 
-É neste ponto que a tecnologia do **LispCentral** entra. Nós permitimos que você crie interfaces web belíssimas que se comunicam nativamente com o AutoCAD. Sua equipe só precisará preencher um formulário "Prefixo: VIGA-", "Início: 1", e a nuvem cuida de todo o resto.
+This is where **LispCentral** technology comes in. We allow you to create beautiful web interfaces that communicate natively with AutoCAD. Your team will only need to fill out a form "Prefix: BEAM-", "Start: 1", and the cloud takes care of all the rest.
 
-## Perguntas Frequentes (FAQ)
+## Frequently Asked Questions (FAQ)
 
-### 1. O auto-numerador LISP substitui o AutoCAD Civil 3D ou Revit?
-Depende do caso de uso. Softwares estritamente BIM ou de infraestrutura (Civil 3D) possuem rotulação automática inteligente atrelada aos eixos (Alignments). Contudo, usar LISP no AutoCAD é milhares de vezes mais leve e versátil para marcações genéricas, diagramas elétricos e esquemáticos P&ID.
+### 1. Does the LISP auto-numberer replace AutoCAD Civil 3D or Revit?
+It depends on the use case. Strictly BIM or infrastructure (Civil 3D) software has intelligent automatic labeling tied to axes (Alignments). However, using LISP in AutoCAD is thousands of times lighter and more versatile for generic markers, electrical diagrams, and P&ID schematics.
 
-### 2. O comando "TCOUNT" (Express Tools) já não faz auto-numbering?
-Sim, a Express Tools possui o comando nativo `TCOUNT`. A diferença é que o TCOUNT *substitui* textos já existentes. Você precisa ter os textos já desenhados na tela para depois aplicar o TCOUNT. O LISP customizado (mostrado neste artigo) desenha os textos *ao clicar*, sendo muito mais dinâmico para mapeamento de pontos.
+### 2. Doesn't the "TCOUNT" (Express Tools) command already do auto-numbering?
+Yes, Express Tools has the native `TCOUNT` command. The difference is that TCOUNT *replaces* existing texts. You need to have the texts already drawn on the screen and then apply TCOUNT. The custom LISP (shown in this article) draws the texts *on click*, making it much more dynamic for point mapping.
 
-### 3. Como eu posso testar esta rotina de número?
-Você pode colar o snippet de código acima na linha de comando do AutoCAD, digitar `AutoNum` e testar. Se você quiser criar uma interface profissional para esta ferramenta, e distribuí-la para a sua empresa de engenharia em nuvem sem medo de roubo de código, crie sua conta *Beta* no portal LispCentral.
+### 3. How can I test this numbering routine?
+You can paste the code snippet above into the AutoCAD command line, type `AutoNum` and test it. If you want to create a professional interface for this tool, and distribute it to your engineering company in the cloud without fear of code theft, create your *Beta* account in the LispCentral portal.

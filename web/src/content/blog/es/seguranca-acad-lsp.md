@@ -1,54 +1,52 @@
 ---
-title: 'O Caos do acad.lsp: Como gerenciar e proteger a Propriedade Intelectual (IP) do seu código'
-description: 'Aprenda como vírus de AutoCAD utilizam o acad.lsp e entenda por que armazenar rotinas LISP em pastas de rede expõe sua empresa ao roubo de Propriedade Intelectual.'
+title: 'El Caos de acad.lsp: Cómo gestionar y proteger la Propiedad Intelectual (IP) de su código'
+description: 'Descubra cómo los virus de AutoCAD utilizan acad.lsp y comprenda por qué almacenar rutinas LISP en carpetas de red expone a su empresa al robo de propiedad intelectual.'
 pubDate: 2026-05-28
 heroImage: 'https://images.unsplash.com/photo-1510511459019-5efa32f5fb1b?q=80&w=1200&auto=format&fit=crop'
 author: 'Equipe LispCentral'
 tags: ["lisp programming", "acad lsp", "autocad lisp command"]
----
+---**TL;DR:** Administrar la automatización de su LISP mediante la distribución de archivos en la red de la empresa a través de `acad.lsp` es un modelo obsoleto. Además de la gran vulnerabilidad a los virus de macro que destruyen los archivos DWG, el código fuente propietario de la empresa está expuesto a robos en pendrives e intrusiones fuera de línea. El mercado avanza hacia plataformas SaaS (como LispCentral), donde el código reside en servidores cifrados y se ejecuta mediante inyección de RAM (Zero-Disk).
 
-**TL;DR:** Gerenciar sua automação LISP espalhando arquivos pela rede da empresa via `acad.lsp` é um modelo ultrapassado. Além da grande vulnerabilidade a vírus de macro que destroem arquivos DWG, o código-fonte proprietário da empresa fica exposto ao roubo em pen-drives e invasões offline. O mercado se move para plataformas SaaS (como LispCentral), onde o código reside em servidores criptografados e executa via injeção RAM (Zero-Disk).
+Todo administrador CAD/BIM experimentado conoce el valor de un código bien construido. Una rutina de AutoLISP capaz de detallar escaleras, perfiles metálicos estructurales o extraer cantidades complejas representa decenas de horas y miles de dólares en investigación y desarrollo.
 
-Todo CAD/BIM Manager experiente sabe o valor de um código bem construído. Uma rotina AutoLISP capaz de detalhar escadas, perfis metálicos estruturais ou extrair quantitativos complexos representa dezenas de horas e milhares de dólares em pesquisa e desenvolvimento.
+Sin embargo, muchas empresas tratan esta *Propiedad Intelectual (PI)* de la peor manera posible: guardando el archivo `rotina-miraculosa.lsp` en el disco `Z:\Rede\CAD\`.
 
-Contudo, muitas empresas tratam essa *Propriedade Intelectual (IP)* da pior forma possível: salvando o arquivo `rotina-milagrosa.lsp` na unidade `Z:\Rede\CAD\`.
+## El fallo de seguridad fundamental de "acad.lsp"
 
-## A Falha Fundamental de Segurança do "acad.lsp"
+Cuando se inicia AutoCAD o cuando se abre un nuevo proyecto (`.dwg`), sigue una rutina de verificación. Si existe un archivo llamado `acad.lsp` o `acaddoc.lsp` en el mismo directorio que el archivo del proyecto, o en la red configurada como *Ruta de soporte*, AutoCAD carga y ejecuta este código LISP de forma ciega.
 
-Quando o AutoCAD é iniciado ou quando um novo projeto (`.dwg`) é aberto, ele obedece a uma rotina de checagem. Se existir um arquivo chamado `acad.lsp` ou `acaddoc.lsp` no mesmo diretório do arquivo do projeto, ou na rede configurada como *Support Path*, o AutoCAD carrega e executa esse código LISP cegamente.
+> [!ADVERTENCIA]
+> **El vector de ataque de virus de AutoCAD:**
+> Los piratas informáticos y los primeros programas maliciosos escriben "virus de macro" en AutoCAD utilizando este defecto. El virus LISP se copia a sí mismo en todas las carpetas de la red infectando archivos `acad.lsp`. Al abrir el DWG, bloquea los comandos `EXPLODE` o `BURST`, dañando la usabilidad del proyecto hasta que se escanea manualmente.
 
-> [!WARNING]
-> **O Vetor de Ataque de Vírus do AutoCAD:**
-> Hackers e malwares antigos escrevem "vírus de macro" no AutoCAD usando esta falha. O vírus LISP se auto-copia para todas as pastas de rede infectando os arquivos `acad.lsp`. Ao abrir o DWG, ele bloqueia os comandos `EXPLODE` ou `BURST`, danificando a usabilidade do projeto até que seja varrido manualmente.
+### ¿Por qué el cifrado NATIVO (.FAS/.VLX) no es suficiente?
 
-### Por que a Criptografia NATIVA (.FAS/.VLX) não é o suficiente?
+Autodesk ofrece una herramienta de compilación visual (Make Application) que convierte el archivo de texto `.lsp` en archivos binarios indescifrables: `.fas` (Fast Load) o `.vlx` (Visual Lisp Executable).
 
-A Autodesk oferece uma ferramenta de compilação visual (Make Application) que converte o arquivo texto `.lsp` em arquivos binários indecifráveis: `.fas` (Fast Load) ou `.vlx` (Visual Lisp Executable).
+Esto protege su "secreto comercial" contra competidores que lean su código, ¿verdad? **Parcialmente.**
+Incluso si el empleado malintencionado (o competidor) no puede "leer" el código fuente de su `.vlx`, aún puede **robar y ejecutar el archivo**. Si copia el archivo compilado en el pendrive y lo lleva a abrir su propia empresa, la herramienta (que rentabiliza toda la automatización de su empresa) seguirá funcionando perfectamente allí.
 
-Isto protege o seu "Segredo Industrial" contra concorrentes lendo seu código, certo? **Parcialmente.**
-Mesmo que o funcionário mal intencionado (ou concorrente) não consiga "ler" o código fonte do seu `.vlx`, ele ainda pode **roubar e executar o arquivo**. Se ele copiar o arquivo compilado no pen-drive e o levar para abrir a própria empresa dele, a ferramenta (que faz toda a automação da sua empresa lucrar) continuará funcionando perfeitamente lá.
+## La respuesta del mercado moderno: arquitectura SaaS JIT
 
-## A Resposta do Mercado Moderno: Arquitetura SaaS JIT
+Por eso las empresas de tecnología dejaron de distribuir CD y empezaron a ofrecer servicios en la nube (Netflix vs Blockbuster).
 
-É por isso que as empresas de tecnologia pararam de distribuir CDs e começaram a oferecer serviços nas nuvens (Netflix vs Blockbuster).
+La plataforma **LispCentral** trae esta tecnología SaaS a AutoLISP, protegiendo su infraestructura con lo que llamamos **Compilación y ejecución JIT (Just-In-Time)**.
 
-A plataforma **LispCentral** traz essa tecnologia SaaS para o AutoLISP, blindando sua infraestrutura com o que chamamos de **Compilação e Execução JIT (Just-In-Time)**.
+**Cómo tu automatización es 100% segura con LispCentral:**
+1. No guarda LISP en la red local. Los registras (subes) en tu Panel LispCentral vía web (Firebase Hosting de alta seguridad).
+2. Su empleado utiliza AutoCAD con la **Paleta LispCentral**. Cuando hace clic en "Generar Pilar", la Paleta envía una solicitud de autenticación a través de Token (HTTPS).
+3. El servidor verifica: "¿Tiene este usuario una licencia y permiso activos en su Panel?"
+4. En caso afirmativo, el servidor devuelve el código LISP y se inyecta directamente en la **RAM** de AutoCAD.
 
-**Como sua automação fica 100% segura com o LispCentral:**
-1. Você não salva os LISPs na rede local. Você os cadastra (upload) no seu Painel LispCentral via web (Firebase Hosting de alta segurança).
-2. O seu funcionário utiliza o AutoCAD com a **Paleta LispCentral**. Quando ele clica em "Gerar Pilar", a Paleta envia um pedido de autenticação via Token (HTTPS).
-3. O servidor checa: "Este usuário tem licença e permissão ativa no seu Dashboard?".
-4. Se sim, o servidor devolve o código LISP de volta, e ele é injetado diretamente na **Memória RAM** do AutoCAD.
+El *archivo LISP nunca escribe ni un solo byte en el disco duro* de la computadora local del empleado. Si el empleado deja la empresa y usted apaga su llave en el Panel LispCentral, en el siguiente segundo ya no se ejecuta nada. No se robaron IP corporativas.
 
-O arquivo *LISP nunca escreve nem um único byte no disco rígido* do computador local do funcionário. Se o funcionário sair da empresa e você desligar a chave dele no Painel LispCentral, no segundo seguinte, nada roda mais. Nenhuma IP corporativa foi roubada.
+## Preguntas frecuentes (FAQ)
 
-## Perguntas Frequentes (FAQ)
+### 1. Mi servidor tiene bloqueo de puertos y Active Directory (AD). ¿Son seguros mis LISP en la red?
+Quizás contra hackers externos. Contra *amenazas internas* (el ex empleado con un pendrive/Google Drive copiando las herramientas para abrir su propia consultoría), no. La única forma de proteger las amenazas internas es eliminar el código local de la ecuación.
 
-### 1. Meu servidor tem bloqueio de portas e Active Directory (AD). Meus LISPs na rede estão seguros?
-Contra hackers externos, talvez. Contra *ameaças internas* (o ex-funcionário com pen-drive/Google Drive copiando as ferramentas para abrir sua própria consultoria), não. A única forma de blindar ameaças internas é retirando o código local da equação.
+### 2. ¿Qué pasa si AutoCAD no tiene acceso a Internet cuando ejecuta LispCentral JIT?
+La arquitectura de LispCentral se basa en la filosofía de **Seguridad sólo en línea**. En ubicaciones remotas sin ninguna señal (sitios de construcción aislados vía satélite), la rutina no validará la sesión (para evitar el secuestro de la versión en caché) y no se ejecutará. El costo es insignificante dada la garantía de propiedad intelectual inviolable.
 
-### 2. E se o AutoCAD estiver sem acesso à internet no momento de rodar o LispCentral JIT?
-A arquitetura do LispCentral é pautada na filosofia de **Segurança Online-Only**. Em locais remotos sem absolutamente nenhum sinal (canteiros de obra isolados via satélite), a rotina não validará a sessão (para prevenir sequestros de versão cacheada) e não executará. O custo é ínfimo perante a garantia de IP inviolável.
-
-### 3. Como limpar um vírus alojado em arquivos "acad.lsp"?
-A Autodesk disponibiliza gratuitamente no repositório App Store a ferramenta **AutoCAD Security Tool** ou o simples bloqueio da variável de sistema `ACADLSPASDOC=0` e o uso rigoroso de `SECURELOAD`. Consulte nossa documentação oficial para mitigações técnicas.
+### 3. ¿Cómo limpiar un virus alojado en archivos "acad.lsp"?
+Autodesk pone a disposición la herramienta **AutoCAD Security Tool** de forma gratuita en el repositorio de App Store o simplemente bloqueando la variable del sistema `ACADLSPASDOC=0` y el uso estricto de `SECURELOAD`. Consulte nuestra documentación oficial para conocer las mitigaciones técnicas.

@@ -1,69 +1,67 @@
 ---
-title: 'O Guia Definitivo: Autoload LISP no AutoCAD (Tradicional vs Cloud JIT)'
-description: 'Aprenda como carregar suas rotinas AutoLISP de forma automática no AutoCAD. Comparamos o método appload/acad.lsp com a nova tecnologia JIT.'
+title: 'La guía definitiva: Autoload LISP y AutoCAD (tradicional frente a Cloud JIT)'
+description: 'Aprenda a cargar sus rutinas de AutoLISP automáticamente en AutoCAD. Comparamos el método appload/acad.lsp con la nueva tecnología JIT.'
 pubDate: 2026-05-28
 heroImage: 'https://images.unsplash.com/photo-1555066931-4365d14bab8c?q=80&w=1200&auto=format&fit=crop'
 author: 'Equipe LispCentral'
 tags: ["add lisp to autocad", "autocad autoload lisp", "acad lsp"]
----
+---**TL;DR:** Hay tres formas principales de *cargar automáticamente* rutinas LISP en AutoCAD: usar la carpeta *Startup Suite* (comando APPLOAD), editar el archivo `acaddoc.lsp` malicioso/propenso a fallas o adoptar la arquitectura de nube corporativa (compilación JIT), que evita la pérdida de propiedad intelectual y garantiza que todo el equipo use la misma versión del código.
 
-**TL;DR:** Existem três formas principais de fazer *autoload* de rotinas LISP no AutoCAD: usando a pasta *Startup Suite* (comando APPLOAD), editando o arquivo malicioso/propenso a falhas `acaddoc.lsp`, ou adotando a arquitetura corporativa em Nuvem (JIT Compilation), que previne perda de Propriedade Intelectual e garante que toda a equipe use a mesma versão do código.
+Una de las búsquedas más frecuentes en el universo CAD es *"add lisp to autocad"* o *"autocad autoload lisp"*. Es el principal problema de cualquier usuario avanzado: descargas o desarrollas una rutina increíble, pero no quieres tener que arrastrarla a la pantalla o usar el comando "APPLOAD" cada vez que abres un nuevo dibujo.
 
-Uma das buscas mais frequentes no universo CAD é *"add lisp to autocad"* ou *"autocad autoload lisp"*. É a dor primária de qualquer usuário avançado: você baixa ou desenvolve uma rotina incrível, mas não quer ter que arrastá-la para a tela ou usar o comando `APPLOAD` toda vez que abre um desenho novo.
+En esta guía detallamos los métodos tradicionales y presentamos la evolución definitiva para las oficinas de ingeniería.
 
-Neste guia, detalhamos os métodos tradicionais e apresentamos a evolução definitiva para escritórios de engenharia.
+## Método 1: Startup Suite (el camino del principiante)
 
-## Método 1: A Startup Suite (O Caminho do Iniciante)
+La forma más sencilla y accesible de forma nativa en AutoCAD.
 
-A forma mais simples e acessível nativamente no AutoCAD.
+1. Escriba `APPLOAD` en la línea de comando y presione Enter.
+2.En la ventana que se abre, busque la sección "Startup Suite" (generalmente en la esquina inferior derecha) y haga clic en el botón **Contenido...**
+3. Haga clic en **Agregar...** y busque su archivo `.lsp`, `.fas` o `.vlx`.
+4. Cierra las ventanas. AutoCAD ahora cargará este archivo cada vez que se inicie.
 
-1. Digite `APPLOAD` na linha de comando e aperte Enter.
-2. Na janela que se abre, procure a seção "Startup Suite" (geralmente no canto inferior direito) e clique no botão **Contents...**
-3. Clique em **Add...** e navegue até o seu arquivo `.lsp`, `.fas` ou `.vlx`.
-4. Feche as janelas. O AutoCAD agora carregará este arquivo toda vez que for iniciado.
+**El problema:** Funciona bien para un usuario aislado. Pero si eres un BIM Manager con 20 diseñadores, tendrás que hacer esto máquina a máquina. Si actualiza la rutina, deberá pedirles a todos que reemplacen el archivo en C:.
 
-**O Problema:** Funciona bem para um usuário isolado. Mas se você é um BIM Manager com 20 projetistas, terá que fazer isso máquina por máquina. Se atualizar a rotina, precisará pedir para todos substituírem o arquivo no C:.
+## Método 2: Los infames `acad.lsp` y `acaddoc.lsp` (la antigua forma de CAD Manager)
 
-## Método 2: O infame `acad.lsp` e `acaddoc.lsp` (O Caminho do CAD Manager Antigo)
+Las oficinas que mantienen sus LISP en servidores de red (por ejemplo, `Z:\Routines\`) generalmente utilizan archivos de inicialización global.
+AutoCAD, cuando se abre, busca automáticamente archivos llamados `acad.lsp` (se carga una vez por sesión) o `acaddoc.lsp` (se carga con cada pestaña de dibujo abierta).
 
-Escritórios que mantêm seus LISPs em servidores de rede (ex: `Z:\Rotinas\`) geralmente utilizam arquivos de inicialização globais.
-O AutoCAD, ao abrir, busca automaticamente por arquivos chamados `acad.lsp` (carrega uma vez por sessão) ou `acaddoc.lsp` (carrega a cada aba de desenho aberta).
-
-Você pode criar um arquivo `acaddoc.lsp` contendo:
-```lisp
-(load "Z:\\Rotinas\\minha-rotina-1.lsp")
-(load "Z:\\Rotinas\\minha-rotina-2.lsp")
-(princ "\nRotinas carregadas com sucesso!")
-(princ)
+Puede crear un archivo `acaddoc.lsp` que contenga:
+```ceceo
+(cargar "Z:\\Rutinas\\mi-rutina-1.lsp")
+(cargar "Z:\\Rutinas\\mi-rutina-2.lsp")
+(princ "\n¡Rutinas cargadas exitosamente!")
+(principal)
 ```
 
-**Os Riscos Elevados:**
-*   **Lentidão Extrema:** Se a rede (VPN) estiver lenta, o AutoCAD vai travar por minutos tentando carregar dezenas de LISPs em toda nova aba.
-*   **Vulnerabilidade:** Os arquivos `acad.lsp` são o vetor número um para "vírus de AutoCAD" (macros maliciosos que se replicam apagando comandos ou bloqueando o save).
-*   **Roubo de IP:** Qualquer ex-funcionário pode espetar um pendrive e copiar toda a pasta da rede que custou milhares de reais para ser desenvolvida.
+**Altos riesgos:**
+* **Lentitud extrema:** Si la red (VPN) es lenta, AutoCAD se bloqueará durante minutos al intentar cargar docenas de LISP en cada pestaña nueva.
+* **Vulnerabilidad:** Los archivos `acad.lsp` son el vector número uno para los "virus de AutoCAD" (macros maliciosos que se replican eliminando comandos o bloqueando archivos guardados).
+* **Robo de propiedad intelectual:** Cualquier ex empleado puede insertar un pendrive y copiar toda la carpeta de red cuyo desarrollo costó miles de reales.
 
-## Método 3: Compilação JIT na Nuvem (O Caminho SaaS Corporativo)
+## Método 3: Compilación JIT en la nube (el modo SaaS empresarial)
 
-Se a sua equipe passa de 3 desenhistas, a "pasta na rede" é uma bomba relógio de versão e segurança. É aqui que entra a tecnologia *Just-In-Time* introduzida pelo **LispCentral**.
+Si su equipo tiene más de 3 diseñadores, la "carpeta de red" es una bomba de tiempo de seguridad y versiones. Aquí es donde entra en juego la tecnología *Just-In-Time* introducida por **LispCentral**.
 
-Ao invés de carregar o código fonte no computador local do funcionário, o LispCentral funciona como um "Loader" transparente.
+En lugar de cargar el código fuente en el ordenador local del empleado, LispCentral funciona como un "cargador" transparente.
 
-> [!IMPORTANT]
-> **Como Funciona a Arquitetura Zero-Disk:**
-> O usuário clica no botão "Gerar Viga" no AutoCAD. Neste exato milissegundo, nosso loader faz uma requisição HTTPS criptografada para os servidores do LispCentral, verifica as permissões/licenças do funcionário, descarrega a rotina diretamente na Memória RAM (sem nunca tocar no HD) e executa o código.
+> [!IMPORTANTE]
+> **Cómo funciona la arquitectura de disco cero:**
+> El usuario hace clic en el botón "Generar Viga" en AutoCAD. En este milisegundo exacto, nuestro cargador realiza una solicitud HTTPS cifrada a los servidores LispCentral, verifica los permisos/licencias del empleado, descarga la rutina directamente en la RAM (sin siquiera tocar el disco duro) y ejecuta el código.
 
-### Vantagens do Método JIT (LispCentral):
-1. **Deploy Instantâneo:** Achou um bug no seu LISP? Corrija e suba no painel web. No próximo clique da sua equipe, todos estarão rodando a versão corrigida automaticamente.
-2. **Proteção Total:** O código `.lsp` original nunca chega ao computador físico, anulando as chances de roubo de Propriedade Intelectual (IP).
-3. **Gestão de Licenças (Seats):** Via dashboard web, você pode bloquear o acesso de um computador específico em um clique.
+### Ventajas del Método JIT (LispCentral):
+1. **Implementación instantánea:** ¿Ha encontrado un error en su LISP? Corregir y subir al panel web. La próxima vez que su equipo haga clic, todos ejecutarán la versión parcheada automáticamente.
+2. **Protección total:** El código `.lsp` original nunca llega a la computadora física, lo que elimina las posibilidades de robo de propiedad intelectual (IP).
+3. **Administración de licencias (puestos):** A través del panel web, puede bloquear el acceso a una computadora específica con un solo clic.
 
-## Perguntas Frequentes (FAQ)
+## Preguntas frecuentes (FAQ)
 
-### 1. O que acontece se o computador do funcionário ficar sem internet usando JIT?
-Na fase atual do LispCentral, a arquitetura garante segurança máxima através do acesso online-only. Se o usuário estiver desconectado, o LISP não rodará, protegendo o código da empresa contra exportações não autorizadas em modo offline.
+### 1. ¿Qué sucede si la computadora del empleado pierde Internet usando JIT?
+En la fase actual de LispCentral, la arquitectura garantiza la máxima seguridad a través del acceso únicamente en línea. Si el usuario está desconectado, LISP no se activará, protegiendo el código de la empresa de exportaciones no autorizadas en el modo fuera de línea.
 
-### 2. O APPLOAD aceita lisp compilado?
-Sim. Você pode dar autoload em arquivos `.lsp` (texto plano), `.fas` (compilado rápido) ou `.vlx` (projeto compilado). No entanto, todos eles ainda são suscetíveis à cópia física por funcionários mal intencionados se armazenados localmente.
+### 2. ¿APPLOAD acepta lisp compilado?
+Sí. Puede cargar automáticamente archivos `.lsp` (texto sin formato), `.fas` (compilación rápida) o `.vlx` (proyecto compilado). Sin embargo, todos ellos siguen siendo susceptibles de ser copiados físicamente por empleados malintencionados si se almacenan localmente.
 
-### 3. Como migrar minhas rotinas locais para a nuvem do LispCentral?
-Basta criar uma conta corporativa no portal, acessar o **Workspace LISPs (Admin)** e fazer o upload direto. Você gerencia as assinaturas e as permissões de acesso da sua equipe em um único painel web.
+### 3. ¿Cómo migro mis rutinas locales a la nube de LispCentral?
+Simplemente cree una cuenta corporativa en el portal, acceda a **Workspace LISPs (Admin)** y cárguela directamente. Gestionas las suscripciones de tu equipo y los permisos de acceso desde un único panel web.

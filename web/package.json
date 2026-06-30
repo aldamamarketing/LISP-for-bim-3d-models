@@ -19,6 +19,7 @@
     "@google/generative-ai": "^0.24.1",
     "@types/react": "^18.3.3",
     "@types/react-dom": "^18.3.0",
+    "@vitalets/google-translate-api": "^9.2.1",
     "astro": "^6.3.7",
     "file-saver": "^2.0.5",
     "firebase": "^12.13.0",

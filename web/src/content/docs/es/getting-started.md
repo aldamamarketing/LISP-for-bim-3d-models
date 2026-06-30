@@ -1,9 +1,8 @@
 ---
-title: "Primeros Pasos"
-description: "Cómo instalar LispCentral Loader en AutoCAD y conectar tu cuenta por primera vez."
+title: 'Primeros Pasos'
+description: 'Cómo instalar LispCentral Loader en AutoCAD y conectar tu cuenta por primera vez.'
 icon: "rocket_launch"
----
-LispCentral no requiere instalaciones pesadas. Todo funciona a través de un pequeño script LISP llamado Loader.
+---LispCentral no requiere instalaciones pesadas. Todo funciona a través de un pequeño script LISP llamado Loader.
 
 1. Inicia sesión en el Portal del Cliente.
 2. Navega a la pestaña Licencias y Acceso.

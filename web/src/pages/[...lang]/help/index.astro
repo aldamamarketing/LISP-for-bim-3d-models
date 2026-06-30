@@ -6,7 +6,7 @@ import { getLangFromUrl, localizeUrl } from '../../../i18n/utils';
 
 export function getStaticPaths() {
   return [
-    { params: { lang: 'en' } },
+    { params: { lang: undefined } },
     { params: { lang: 'es' } },
     { params: { lang: 'pt' } },
   ];

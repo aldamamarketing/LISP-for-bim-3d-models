@@ -273,7 +273,14 @@ export const translations = {
     "store.platform_any": "Platform (Any)",
     "store.version_any": "Version (Any)",
     "store.all": "All",
-    "store.no_results": "No suites found with these filters."
+    "store.no_results": "No suites found with these filters.",
+
+    // Blog CTA
+    "blog.cta.title": "Stop struggling with local LISP routines",
+    "blog.cta.desc": "Accelerate your team with our AI Generators and our JIT cloud for AutoCAD.",
+    "blog.cta.btnFree": "Create Free Account",
+    "blog.cta.btnTools": "Try AI Tools",
+    "blog.related": "Read Also"
   },
   es: {
     // Header
@@ -549,7 +556,14 @@ export const translations = {
     "store.platform_any": "Plataforma (Cualquiera)",
     "store.version_any": "Versión (Cualquiera)",
     "store.all": "Todas",
-    "store.no_results": "No se encontraron suites con estos filtros."
+    "store.no_results": "No se encontraron suites con estos filtros.",
+
+    // Blog CTA
+    "blog.cta.title": "Deja de luchar con rutinas LISP locales",
+    "blog.cta.desc": "Acelera tu equipo con nuestros Generadores con Inteligencia Artificial y nuestra nube JIT para AutoCAD.",
+    "blog.cta.btnFree": "Crear Cuenta Gratis",
+    "blog.cta.btnTools": "Probar Herramientas de IA",
+    "blog.related": "Lee También"
   },
   pt: {
     // Header
@@ -825,6 +839,13 @@ export const translations = {
     "store.platform_any": "Plataforma (Qualquer)",
     "store.version_any": "Versão (Qualquer)",
     "store.all": "Todas",
-    "store.no_results": "Nenhuma suite encontrada com estes filtros."
+    "store.no_results": "Nenhuma suite encontrada com esses filtros.",
+
+    // Blog CTA
+    "blog.cta.title": "Pare de lutar com rotinas LISP locais",
+    "blog.cta.desc": "Acelere sua equipe com nossos Geradores com Inteligência Artificial e nossa nuvem JIT para AutoCAD.",
+    "blog.cta.btnFree": "Criar Conta Gratuita",
+    "blog.cta.btnTools": "Testar Ferramentas de IA",
+    "blog.related": "Leia Também"
   }
 };
