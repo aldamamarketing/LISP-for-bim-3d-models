@@ -1,6 +1,14 @@
 ---
-import DocsLayout from '../layouts/DocsLayout.astro';
-import Dashboard from '../components/Dashboard.jsx';
+export function getStaticPaths() {
+  return [
+    { params: { lang: 'en' } },
+    { params: { lang: 'es' } },
+    { params: { lang: 'pt' } },
+  ];
+}
+
+import DocsLayout from '../../layouts/DocsLayout.astro';
+import Dashboard from '../../components/Dashboard.jsx';
 ---
 
 <DocsLayout title="LispCentral - Portal do Cliente">

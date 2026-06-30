@@ -1,43 +1,48 @@
-# Astro Starter Kit: Minimal
+# LispCentral Web Portal
 
-```sh
-npm create astro@latest -- --template minimal
-```
+Plataforma definitiva para BIM Managers y Arquitectos. Sistema construido con Astro, React, y TailwindCSS, con autenticación y bases de datos vía Firebase.
 
-> 🧑‍🚀 **Seasoned astronaut?** Delete this file. Have fun!
+## 🏗 Arquitectura y Estructura
 
-## 🚀 Project Structure
-
-Inside of your Astro project, you'll see the following folders and files:
+El proyecto está diseñado con un enfoque fuerte en SEO e i18n (Internacionalización) estática.
 
 ```text
 /
-├── public/
+├── public/                 # Assets estáticos (imágenes, SVGs)
 ├── src/
+│   ├── components/         # Componentes UI (Astro y React)
+│   ├── content/
+│   │   ├── docs/           # Artículos de Ayuda (Markdown) localizados en /en, /es, /pt
+│   │   └── blog/           # Artículos de Blog (Markdown) localizados
+│   ├── i18n/               # Diccionarios de traducción y utilidades (localizeUrl)
+│   ├── layouts/            # Layouts base (Layout.astro, DocsLayout.astro)
 │   └── pages/
-│       └── index.astro
-└── package.json
+│       ├── index.astro     # Landing page (Inglés por defecto con auto-redirección)
+│       └── [lang]/         # Páginas estáticas para cada idioma (es, pt, en)
+│           ├── dashboard.astro
+│           ├── help/       # Renderiza Content Collections de Ayuda
+│           └── ...
+└── astro.config.mjs        # Configuración de Astro e integraciones
 ```
 
-Astro looks for `.astro` or `.md` files in the `src/pages/` directory. Each page is exposed as a route based on its file name.
+## 🌍 Sistema i18n y Colecciones de Contenido
 
-There's nothing special about `src/components/`, but that's where we like to put any Astro/React/Vue/Svelte/Preact components.
+- **Rutas Prefijadas Estáticamente**: Utilizamos generación estática (SSG) mediante el directorio `src/pages/[lang]/`. Cada página del sitio existe físicamente bajo su ruta de idioma (ej. `/es/dashboard`, `/pt/help`), garantizando perfecta indexación por motores de búsqueda sin 404s ni redirecciones dinámicas rotas.
+- **Content Collections**: Los artículos de ayuda y blog se administran como archivos `.md` en `src/content/`. Utilizamos `getStaticPaths` para mapear los slugs según su idioma de forma nativa.
+- **Auto-Redirección (Root)**: Al visitar la raíz (`/`), un script evalúa el `localStorage` o el idioma del navegador (`navigator.language`) para redirigir automáticamente al usuario a su idioma de preferencia (`/es/` o `/pt/`), respetando el estándar moderno de navegación.
 
-Any static assets, like images, can be placed in the `public/` directory.
+## 🚀 Comandos
 
-## 🧞 Commands
-
-All commands are run from the root of the project, from a terminal:
-
-| Command                   | Action                                           |
+| Comando                   | Acción                                           |
 | :------------------------ | :----------------------------------------------- |
-| `npm install`             | Installs dependencies                            |
-| `npm run dev`             | Starts local dev server at `localhost:4321`      |
-| `npm run build`           | Build your production site to `./dist/`          |
-| `npm run preview`         | Preview your build locally, before deploying     |
-| `npm run astro ...`       | Run CLI commands like `astro add`, `astro check` |
-| `npm run astro -- --help` | Get help using the Astro CLI                     |
+| `npm install`             | Instala las dependencias                         |
+| `npm run dev`             | Inicia el servidor local en `localhost:4321`     |
+| `npm run build`           | Construye el sitio de producción en `./dist/`    |
+| `npm run preview`         | Vista previa local de la build generada          |
+| `firebase deploy`         | Despliega la carpeta `dist/` a Firebase Hosting  |
 
-## 👀 Want to learn more?
-
-Feel free to check [our documentation](https://docs.astro.build) or jump into our [Discord server](https://astro.build/chat).
+## 🛠 Tecnologías Principales
+- **Astro**: Framework web para contenido estático ultrarrápido.
+- **React**: Componentes interactivos (Dashboard, calculadoras) que se hidratan con `client:load`.
+- **Tailwind CSS**: Utilidades de diseño responsivo y sistema de diseño.
+- **Firebase**: Autenticación, Storage, Firestore y Hosting.

@@ -1,0 +1,26 @@
+[BROKEN PAGE] 404 at http://localhost:4321/blog
+[BROKEN PAGE] 404 at http://localhost:4321/dashboard
+[BROKEN PAGE] 404 at http://localhost:4321/login
+[BROKEN PAGE] 404 at http://localhost:4321/store
+[ERROR] Failed to load http://localhost:4321/es/store: Timeout 30000ms exceeded.
+[ERROR] Failed to load http://localhost:4321/es/tools/hatch-generator: Timeout 30000ms exceeded.
+[ERROR] Failed to load http://localhost:4321/es/tools/icon-generator: Timeout 30000ms exceeded.
+[ERROR] Failed to load http://localhost:4321/es/tools/linetype-generator: Timeout 30000ms exceeded.
+[ERROR] Failed to load http://localhost:4321/pt/store: Timeout 30000ms exceeded.
+[ERROR] Failed to load http://localhost:4321/pt/tools/hatch-generator: Timeout 30000ms exceeded.
+[ERROR] Failed to load http://localhost:4321/pt/tools/icon-generator: Timeout 30000ms exceeded.
+[ERROR] Failed to load http://localhost:4321/pt/tools/linetype-generator: Timeout 30000ms exceeded.
+[ERROR] Failed to load http://localhost:4321/tools/hatch-generator: Timeout 30000ms exceeded.
+[ERROR] Failed to load http://localhost:4321/tools/icon-generator: Timeout 30000ms exceeded.
+[ERROR] Failed to load http://localhost:4321/tools/linetype-generator: Timeout 30000ms exceeded.
+[I18N CONTEXT LOST] From http://localhost:4321/es/ -> /login (Does not maintain /es/ prefix)
+[I18N CONTEXT LOST] From http://localhost:4321/es/blog/ia-autolisp-geradores/ -> /pt/tools/hatch-generator (Does not maintain /es/ prefix)
+[I18N CONTEXT LOST] From http://localhost:4321/es/dashboard -> / (Does not maintain /es/ prefix)
+[I18N CONTEXT LOST] From http://localhost:4321/es/login -> / (Does not maintain /es/ prefix)
+[I18N CONTEXT LOST] From http://localhost:4321/es/privacy -> / (Does not maintain /es/ prefix)
+[I18N CONTEXT LOST] From http://localhost:4321/es/terms -> / (Does not maintain /es/ prefix)
+[I18N CONTEXT LOST] From http://localhost:4321/pt/ -> /login (Does not maintain /pt/ prefix)
+[I18N CONTEXT LOST] From http://localhost:4321/pt/dashboard -> / (Does not maintain /pt/ prefix)
+[I18N CONTEXT LOST] From http://localhost:4321/pt/login -> / (Does not maintain /pt/ prefix)
+[I18N CONTEXT LOST] From http://localhost:4321/pt/privacy -> / (Does not maintain /pt/ prefix)
+[I18N CONTEXT LOST] From http://localhost:4321/pt/terms -> / (Does not maintain /pt/ prefix)

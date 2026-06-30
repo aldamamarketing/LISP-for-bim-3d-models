@@ -12,3 +12,12 @@ export function useTranslations(lang) {
     return dict[key] || key;
   }
 }
+
+export function localizeUrl(path, lang) {
+  if (lang === 'en' || !lang) {
+    return path;
+  }
+  // Remove leading slash if exists to avoid double slash
+  const cleanPath = path.startsWith('/') ? path.slice(1) : path;
+  return `/${lang}/${cleanPath}`;
+}

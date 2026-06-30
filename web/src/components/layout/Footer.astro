@@ -1,14 +1,11 @@
 ---
 import { translations } from '../../i18n/translations.js';
+import { getLangFromUrl, localizeUrl } from '../../i18n/utils.js';
 
-const currentLocale = Astro.currentLocale || 'en';
+const currentLocale = getLangFromUrl(Astro.url);
 const t = (key) => {
     const dict = translations[currentLocale] || translations['en'];
     return dict[key] || key;
-};
-
-const getPath = (path) => {
-    return currentLocale === 'en' ? path : `/${currentLocale}${path}`;
 };
 ---
 <footer class="bg-surface-container-lowest dark:bg-surface-container-lowest w-full mt-auto border-t border-surface-variant dark:border-surface-variant">
@@ -18,8 +15,8 @@ const getPath = (path) => {
             <p class="font-body-sm text-body-sm text-on-secondary-container">{t("footer.desc")}</p>
         </div>
         <div class="md:col-span-3 flex flex-wrap justify-start md:justify-end gap-x-6 gap-y-2 md:ml-auto mt-2 md:mt-0 items-center">
-            <a class="font-label-sm text-label-sm text-on-secondary-container hover:text-primary transition-colors" href={getPath('/privacy')}>{t("footer.privacy")}</a>
-            <a class="font-label-sm text-label-sm text-on-secondary-container hover:text-primary transition-colors" href={getPath('/terms')}>{t("footer.terms")}</a>
+            <a class="font-label-sm text-label-sm text-on-secondary-container hover:text-primary transition-colors" href={localizeUrl('/privacy', currentLocale)}>{t("footer.privacy")}</a>
+            <a class="font-label-sm text-label-sm text-on-secondary-container hover:text-primary transition-colors" href={localizeUrl('/terms', currentLocale)}>{t("footer.terms")}</a>
         </div>
     </div>
 </footer>

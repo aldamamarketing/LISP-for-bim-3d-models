@@ -1,7 +1,15 @@
 ---
-import DocsLayout from '../layouts/DocsLayout.astro';
-import StoreFront from '../components/store/StoreFront.jsx';
-import { getLangFromUrl, useTranslations } from '../i18n/utils';
+export function getStaticPaths() {
+  return [
+    { params: { lang: 'en' } },
+    { params: { lang: 'es' } },
+    { params: { lang: 'pt' } },
+  ];
+}
+
+import DocsLayout from '../../layouts/DocsLayout.astro';
+import StoreFront from '../../components/store/StoreFront.jsx';
+import { getLangFromUrl, useTranslations } from '../../i18n/utils';
 
 const lang = getLangFromUrl(Astro.url);
 const t = useTranslations(lang);

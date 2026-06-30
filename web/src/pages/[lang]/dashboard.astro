@@ -1,0 +1,16 @@
+---
+export function getStaticPaths() {
+  return [
+    { params: { lang: 'en' } },
+    { params: { lang: 'es' } },
+    { params: { lang: 'pt' } },
+  ];
+}
+
+import DocsLayout from '../../layouts/DocsLayout.astro';
+import Dashboard from '../../components/Dashboard.jsx';
+---
+
+<DocsLayout title="LispCentral - Painel do Cliente">
+  <Dashboard client:load mode="dashboard" />
+</DocsLayout>

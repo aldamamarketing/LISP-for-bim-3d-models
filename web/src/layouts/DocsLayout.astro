@@ -2,7 +2,7 @@
 import '../styles/global.css';
 import '../styles/styles.css';
 import Header from '../components/layout/Header.astro';
-import { getLangFromUrl } from '../i18n/utils';
+import { getLangFromUrl, localizeUrl } from '../i18n/utils';
 import { translations } from '../i18n/translations.js';
 
 const { 
@@ -58,10 +58,10 @@ const t = (key) => {
         <div>
           <h4 class="text-primary-container uppercase text-xs font-bold tracking-wider mb-2 px-2" data-i18n="dashboard.sidebar.sectionGeneral">{t("dashboard.sidebar.sectionGeneral")}</h4>
           <ul class="list-none p-0 m-0 space-y-1">
-            <li><a href="/dashboard#notifications" class="flex items-center gap-3 py-1.5 px-3 text-on-surface-variant hover:text-white hover:bg-[#1a1c1c] rounded-md transition-colors text-sm">
+            <li><a href={localizeUrl("/dashboard#notifications", lang)} class="flex items-center gap-3 py-1.5 px-3 text-on-surface-variant hover:text-white hover:bg-[#1a1c1c] rounded-md transition-colors text-sm">
               <span class="material-symbols-outlined text-[18px]">notifications</span> <span data-i18n="dashboard.sidebar.notifications">{t("dashboard.sidebar.notifications")}</span>
             </a></li>
-            <li><a href="/dashboard#licenses" class="flex items-center gap-3 py-1.5 px-3 text-on-surface-variant hover:text-white hover:bg-[#1a1c1c] rounded-md transition-colors text-sm">
+            <li><a href={localizeUrl("/dashboard#licenses", lang)} class="flex items-center gap-3 py-1.5 px-3 text-on-surface-variant hover:text-white hover:bg-[#1a1c1c] rounded-md transition-colors text-sm">
               <span class="material-symbols-outlined text-[18px]">vpn_key</span> <span data-i18n="dashboard.sidebar.licenses">{t("dashboard.sidebar.licenses")}</span>
             </a></li>
           </ul>
@@ -72,10 +72,10 @@ const t = (key) => {
           <hr class="border-[#262626] my-2" />
           <h4 class="text-primary-container uppercase text-xs font-bold tracking-wider mb-2 px-2" data-i18n="dashboard.sidebar.sectionStore">{t("dashboard.sidebar.sectionStore")}</h4>
           <ul class="list-none p-0 m-0 space-y-1">
-            <li><a href="/store" class="flex items-center gap-3 py-1.5 px-3 text-on-surface-variant hover:text-white hover:bg-[#1a1c1c] rounded-md transition-colors text-sm">
+            <li><a href={localizeUrl("/store", lang)} class="flex items-center gap-3 py-1.5 px-3 text-on-surface-variant hover:text-white hover:bg-[#1a1c1c] rounded-md transition-colors text-sm">
               <span class="material-symbols-outlined text-[18px]">storefront</span> <span data-i18n="dashboard.sidebar.store">{t("dashboard.sidebar.store")}</span>
             </a></li>
-            <li><a href="/dashboard#subscriptions" class="flex items-center gap-3 py-1.5 px-3 text-on-surface-variant hover:text-white hover:bg-[#1a1c1c] rounded-md transition-colors text-sm">
+            <li><a href={localizeUrl("/dashboard#subscriptions", lang)} class="flex items-center gap-3 py-1.5 px-3 text-on-surface-variant hover:text-white hover:bg-[#1a1c1c] rounded-md transition-colors text-sm">
               <span class="material-symbols-outlined text-[18px]">shopping_bag</span> <span data-i18n="dashboard.subscriptions.title">{t("dashboard.subscriptions.title")}</span>
             </a></li>
           </ul>
@@ -86,16 +86,16 @@ const t = (key) => {
           <hr class="border-[#262626] my-2" />
           <h4 class="text-primary-container uppercase text-xs font-bold tracking-wider mb-2 px-2" data-i18n="dashboard.sidebar.sectionStudio">{t("dashboard.sidebar.sectionStudio")}</h4>
           <ul class="list-none p-0 m-0 space-y-1">
-            <li><a href="/dashboard#files" class="flex items-center gap-3 py-1.5 px-3 text-on-surface-variant hover:text-white hover:bg-[#1a1c1c] rounded-md transition-colors text-sm">
+            <li><a href={localizeUrl("/dashboard#files", lang)} class="flex items-center gap-3 py-1.5 px-3 text-on-surface-variant hover:text-white hover:bg-[#1a1c1c] rounded-md transition-colors text-sm">
               <span class="material-symbols-outlined text-[18px]">upload_file</span> <span data-i18n="dashboard.sidebar.files">{t("dashboard.sidebar.files")}</span>
             </a></li>
-            <li><a href="/dashboard#suites" class="flex items-center gap-3 py-1.5 px-3 text-on-surface-variant hover:text-white hover:bg-[#1a1c1c] rounded-md transition-colors text-sm">
+            <li><a href={localizeUrl("/dashboard#suites", lang)} class="flex items-center gap-3 py-1.5 px-3 text-on-surface-variant hover:text-white hover:bg-[#1a1c1c] rounded-md transition-colors text-sm">
               <span class="material-symbols-outlined text-[18px]">folder_copy</span> <span data-i18n="dashboard.sidebar.suites">{t("dashboard.sidebar.suites")}</span>
             </a></li>
-            <li><a href="/dashboard#income" class="flex items-center gap-3 py-1.5 px-3 text-on-surface-variant hover:text-white hover:bg-[#1a1c1c] rounded-md transition-colors text-sm">
+            <li><a href={localizeUrl("/dashboard#income", lang)} class="flex items-center gap-3 py-1.5 px-3 text-on-surface-variant hover:text-white hover:bg-[#1a1c1c] rounded-md transition-colors text-sm">
               <span class="material-symbols-outlined text-[18px]">bar_chart</span> <span data-i18n="dashboard.sidebar.income">{t("dashboard.sidebar.income")}</span>
             </a></li>
-            <li id="sidebar-admin-catalog" class="hidden"><a href="/dashboard#catalog-admin" class="flex items-center gap-3 py-1.5 px-3 text-on-surface-variant hover:text-white hover:bg-primary-container/20 rounded-md transition-colors text-sm text-primary-container font-bold">
+            <li id="sidebar-admin-catalog" class="hidden"><a href={localizeUrl("/dashboard#catalog-admin", lang)} class="flex items-center gap-3 py-1.5 px-3 text-on-surface-variant hover:text-white hover:bg-primary-container/20 rounded-md transition-colors text-sm text-primary-container font-bold">
               <span class="material-symbols-outlined text-[18px]">key</span> <span>Gestão de Catálogos</span>
             </a></li>
           </ul>
@@ -106,23 +106,23 @@ const t = (key) => {
           <hr class="border-[#262626] my-2" />
           <h4 class="text-primary-container uppercase text-xs font-bold tracking-wider mb-2 px-2" data-i18n="dashboard.sidebar.sectionTools">{t("dashboard.sidebar.sectionTools")}</h4>
           <ul class="list-none p-0 m-0 space-y-1">
-            <li><a href="/tools/hatch-generator" class="flex items-center gap-3 py-1.5 px-3 text-on-surface-variant hover:text-white hover:bg-[#1a1c1c] rounded-md transition-colors text-sm">
+            <li><a href={localizeUrl("/tools/hatch-generator", lang)} class="flex items-center gap-3 py-1.5 px-3 text-on-surface-variant hover:text-white hover:bg-[#1a1c1c] rounded-md transition-colors text-sm">
               <span class="material-symbols-outlined text-[18px]">grid_view</span> <span data-i18n="header.hatch">{t("header.hatch")}</span>
             </a></li>
-            <li><a href="/tools/linetype-generator" class="flex items-center gap-3 py-1.5 px-3 text-on-surface-variant hover:text-white hover:bg-[#1a1c1c] rounded-md transition-colors text-sm">
+            <li><a href={localizeUrl("/tools/linetype-generator", lang)} class="flex items-center gap-3 py-1.5 px-3 text-on-surface-variant hover:text-white hover:bg-[#1a1c1c] rounded-md transition-colors text-sm">
               <span class="material-symbols-outlined text-[18px]">line_style</span> <span data-i18n="header.lines">{t("header.lines")}</span>
             </a></li>
-            <li><a href="/tools/icon-generator" class="flex items-center gap-3 py-1.5 px-3 text-on-surface-variant hover:text-white hover:bg-[#1a1c1c] rounded-md transition-colors text-sm">
+            <li><a href={localizeUrl("/tools/icon-generator", lang)} class="flex items-center gap-3 py-1.5 px-3 text-on-surface-variant hover:text-white hover:bg-[#1a1c1c] rounded-md transition-colors text-sm">
               <span class="material-symbols-outlined text-[18px]">image</span> <span data-i18n="header.icons">{t("header.icons")}</span>
             </a></li>
-            <li><a href="/tools/calc-viga" class="flex items-center gap-3 py-1.5 px-3 text-on-surface-variant hover:text-white hover:bg-[#1a1c1c] rounded-md transition-colors text-sm">
+            <li><a href={localizeUrl("/tools/calc-viga", lang)} class="flex items-center gap-3 py-1.5 px-3 text-on-surface-variant hover:text-white hover:bg-[#1a1c1c] rounded-md transition-colors text-sm">
               <span class="material-symbols-outlined text-[18px]">architecture</span> <span data-i18n="header.profiles">{t("header.profiles")}</span>
             </a></li>
           </ul>
           
           <hr class="border-[#262626] border-dashed my-2 mx-2" />
           <ul class="list-none p-0 m-0 space-y-1">
-            <li><a href="/dashboard#favorites" class="flex items-center gap-3 py-1.5 px-3 text-on-surface-variant hover:text-white hover:bg-[#1a1c1c] rounded-md transition-colors text-sm">
+            <li><a href={localizeUrl("/dashboard#favorites", lang)} class="flex items-center gap-3 py-1.5 px-3 text-on-surface-variant hover:text-white hover:bg-[#1a1c1c] rounded-md transition-colors text-sm">
               <span class="material-symbols-outlined text-[18px]">star</span> <span data-i18n="dashboard.sidebar.collection">{t("dashboard.sidebar.collection")}</span>
             </a></li>
           </ul>
@@ -133,16 +133,16 @@ const t = (key) => {
           <hr class="border-[#262626] my-2" />
           <h4 class="text-primary-container uppercase text-xs font-bold tracking-wider mb-2 px-2" data-i18n="dashboard.sidebar.sectionAccount">{t("dashboard.sidebar.sectionAccount")}</h4>
           <ul class="list-none p-0 m-0 space-y-1">
-            <li><a href="/dashboard#profile" class="flex items-center gap-3 py-1.5 px-3 text-on-surface-variant hover:text-white hover:bg-[#1a1c1c] rounded-md transition-colors text-sm">
+            <li><a href={localizeUrl("/dashboard#profile", lang)} class="flex items-center gap-3 py-1.5 px-3 text-on-surface-variant hover:text-white hover:bg-[#1a1c1c] rounded-md transition-colors text-sm">
               <span class="material-symbols-outlined text-[18px]">person</span> <span data-i18n="dashboard.sidebar.profile">{t("dashboard.sidebar.profile")}</span>
             </a></li>
             <li><a href="#" id="sidebar-report-bug" class="flex items-center gap-3 py-1.5 px-3 text-on-surface-variant hover:text-white hover:bg-[#1a1c1c] rounded-md transition-colors text-sm">
               <span class="material-symbols-outlined text-[18px]">bug_report</span> <span data-i18n="dashboard.sidebar.reportBug">{t("dashboard.sidebar.reportBug")}</span>
             </a></li>
-            <li><a href="/blog" class="flex items-center gap-3 py-1.5 px-3 text-on-surface-variant hover:text-white hover:bg-[#1a1c1c] rounded-md transition-colors text-sm">
+            <li><a href={localizeUrl("/blog", lang)} class="flex items-center gap-3 py-1.5 px-3 text-on-surface-variant hover:text-white hover:bg-[#1a1c1c] rounded-md transition-colors text-sm">
               <span class="material-symbols-outlined text-[18px]">article</span> <span data-i18n="header.blog">{t("header.blog")}</span>
             </a></li>
-            <li><a href="/help" class="flex items-center gap-3 py-1.5 px-3 text-on-surface-variant hover:text-white hover:bg-[#1a1c1c] rounded-md transition-colors text-sm">
+            <li><a href={localizeUrl("/help", lang)} class="flex items-center gap-3 py-1.5 px-3 text-on-surface-variant hover:text-white hover:bg-[#1a1c1c] rounded-md transition-colors text-sm">
               <span class="material-symbols-outlined text-[18px]">help</span> <span data-i18n="header.help">{t("header.help")}</span>
             </a></li>
           </ul>
@@ -235,34 +235,7 @@ const t = (key) => {
     });
   </script>
 
-  <!-- Client-side Translation Hydration -->
-  <script>
-    import { translations } from '../i18n/translations.js';
 
-    function applyClientTranslations() {
-      const path = window.location.pathname;
-      let lang = 'en';
-      if (path.startsWith('/es/')) {
-        lang = 'es';
-      } else if (path.startsWith('/pt/')) {
-        lang = 'pt';
-      } else {
-        lang = localStorage.getItem('lc-lang') || 'en';
-      }
-
-      const dict = translations[lang] || translations['en'];
-
-      document.querySelectorAll('[data-i18n]').forEach(el => {
-        const key = el.getAttribute('data-i18n');
-        if (key && dict[key]) {
-          el.textContent = dict[key];
-        }
-      });
-    }
-
-    document.addEventListener('DOMContentLoaded', applyClientTranslations);
-    window.addEventListener('languagechange', applyClientTranslations);
-  </script>
 
   <style>
     /* Keep doc layout column styles */

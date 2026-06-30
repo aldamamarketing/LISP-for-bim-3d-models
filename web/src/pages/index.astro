@@ -11,6 +11,30 @@ import CTA from '../components/landing/CTA.astro';
 ---
 
 <Layout title="LispCentral | A Plataforma Definitiva para BIM Managers e Engenheiros">
+    <script is:inline>
+      (function() {
+        if (window.location.pathname !== '/') return;
+        
+        const savedLang = localStorage.getItem('lc-lang');
+        if (savedLang) {
+          if (savedLang === 'es') window.location.replace('/es/');
+          if (savedLang === 'pt') window.location.replace('/pt/');
+          return;
+        }
+        
+        const browserLang = navigator.language || navigator.userLanguage;
+        if (browserLang) {
+          const lowerLang = browserLang.toLowerCase();
+          if (lowerLang.startsWith('es')) {
+            localStorage.setItem('lc-lang', 'es');
+            window.location.replace('/es/');
+          } else if (lowerLang.startsWith('pt')) {
+            localStorage.setItem('lc-lang', 'pt');
+            window.location.replace('/pt/');
+          }
+        }
+      })();
+    </script>
     <Header />
     
     <main>

@@ -1,0 +1,16 @@
+---
+export function getStaticPaths() {
+  return [
+    { params: { lang: 'en' } },
+    { params: { lang: 'es' } },
+    { params: { lang: 'pt' } },
+  ];
+}
+
+import DocsLayout from '../../layouts/DocsLayout.astro';
+import FavoritesManager from '../../components/FavoritesManager.jsx';
+---
+
+<DocsLayout title="LispCentral - Mis Favoritos">
+  <FavoritesManager client:load />
+</DocsLayout>

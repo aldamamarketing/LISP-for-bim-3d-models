@@ -1,14 +1,11 @@
 ---
 import { translations } from '../../i18n/translations.js';
+import { getLangFromUrl, localizeUrl } from '../../i18n/utils.js';
 
-const currentLocale = Astro.currentLocale || 'en';
+const currentLocale = getLangFromUrl(Astro.url);
 const t = (key) => {
     const dict = translations[currentLocale] || translations['en'];
     return dict[key] || key;
-};
-
-const getPath = (path) => {
-    return currentLocale === 'en' ? path : `/${currentLocale}${path}`;
 };
 ---
 
@@ -16,7 +13,7 @@ const getPath = (path) => {
     <div class="flex justify-between items-center px-6 py-3 max-w-[1400px] mx-auto">
         
         <!-- Logo -->
-        <a href={getPath('/')} class="flex items-center gap-2 text-white hover:text-primary-container transition-colors group">
+        <a href={localizeUrl('/', currentLocale)} class="flex items-center gap-2 text-white hover:text-primary-container transition-colors group">
             <span class="material-symbols-outlined text-primary-container group-hover:text-white transition-colors">code_blocks</span>
             <span class="font-bold text-xl tracking-tight">LispCentral</span>
         </a>
@@ -33,7 +30,7 @@ const getPath = (path) => {
                     <option value="pt" selected={currentLocale === 'pt'} class="bg-[#0D0D0D]">PT</option>
                 </select>
             </div>
-            <a id="desktop-login-btn" href={getPath('/login')} class="text-on-surface-variant hover:text-white font-medium transition-colors text-sm" data-i18n="header.login">
+            <a id="desktop-login-btn" href={localizeUrl('/login', currentLocale)} class="text-on-surface-variant hover:text-white font-medium transition-colors text-sm" data-i18n="header.login">
                 {t("header.login")}
             </a>
         </div>
@@ -56,20 +53,20 @@ const getPath = (path) => {
     </div>
     <div class="flex-1 overflow-y-auto p-6 flex flex-col gap-6">
         <nav class="flex flex-col gap-4">
-            <a href={getPath('/')} class="text-white font-medium text-lg border-l-2 border-primary-container pl-3"><span data-i18n="header.home">{t("header.home")}</span></a>
+            <a href={localizeUrl('/', currentLocale)} class="text-white font-medium text-lg border-l-2 border-primary-container pl-3"><span data-i18n="header.home">{t("header.home")}</span></a>
             
             <div class="flex flex-col gap-2 mt-2">
                 <span class="text-primary-container text-xs font-bold uppercase tracking-wider pl-3" data-i18n="header.tools">{t("header.tools") || "Tools"}</span>
-                <a href={getPath('/tools/hatch-generator')} class="flex items-center gap-3 text-on-surface-variant hover:text-white pl-3 py-2 rounded-lg hover:bg-surface-container-high transition-colors">
+                <a href={localizeUrl('/tools/hatch-generator', currentLocale)} class="flex items-center gap-3 text-on-surface-variant hover:text-white pl-3 py-2 rounded-lg hover:bg-surface-container-high transition-colors">
                     <span class="material-symbols-outlined text-[20px]">grid_view</span> <span data-i18n="header.hatch">{t("header.hatch")}</span>
                 </a>
-                <a href={getPath('/tools/linetype-generator')} class="flex items-center gap-3 text-on-surface-variant hover:text-white pl-3 py-2 rounded-lg hover:bg-surface-container-high transition-colors">
+                <a href={localizeUrl('/tools/linetype-generator', currentLocale)} class="flex items-center gap-3 text-on-surface-variant hover:text-white pl-3 py-2 rounded-lg hover:bg-surface-container-high transition-colors">
                     <span class="material-symbols-outlined text-[20px]">line_style</span> <span data-i18n="header.lines">{t("header.lines")}</span>
                 </a>
-                <a href={getPath('/tools/icon-generator')} class="flex items-center gap-3 text-on-surface-variant hover:text-white pl-3 py-2 rounded-lg hover:bg-surface-container-high transition-colors">
+                <a href={localizeUrl('/tools/icon-generator', currentLocale)} class="flex items-center gap-3 text-on-surface-variant hover:text-white pl-3 py-2 rounded-lg hover:bg-surface-container-high transition-colors">
                     <span class="material-symbols-outlined text-[20px]">image</span> <span data-i18n="header.icons">{t("header.icons")}</span>
                 </a>
-                <a href={getPath('/tools/calc-viga')} class="flex items-center gap-3 text-on-surface-variant hover:text-white pl-3 py-2 rounded-lg hover:bg-surface-container-high transition-colors">
+                <a href={localizeUrl('/tools/calc-viga', currentLocale)} class="flex items-center gap-3 text-on-surface-variant hover:text-white pl-3 py-2 rounded-lg hover:bg-surface-container-high transition-colors">
                     <span class="material-symbols-outlined text-[20px]">architecture</span> <span data-i18n="header.profiles">{t("header.profiles")}</span>
                 </a>
             </div>
@@ -77,34 +74,34 @@ const getPath = (path) => {
             <!-- Contextual Dashboard Menu (Visible only when logged in) -->
             <div id="mobile-dashboard-nav" class="hidden flex-col gap-2 mt-2">
                 <span class="text-primary-container text-xs font-bold uppercase tracking-wider pl-3" data-i18n="dashboard.sidebar.sectionMain">{t("dashboard.sidebar.sectionMain")}</span>
-                <a href={getPath('/dashboard#lisp')} class="dashboard-link flex items-center gap-3 text-on-surface-variant hover:text-white pl-3 py-2 rounded-lg hover:bg-surface-container-high transition-colors">
+                <a href={localizeUrl('/dashboard#files', currentLocale)} class="dashboard-link flex items-center gap-3 text-on-surface-variant hover:text-white pl-3 py-2 rounded-lg hover:bg-surface-container-high transition-colors">
                     <span class="material-symbols-outlined text-[20px]">folder_copy</span> <span data-i18n="dashboard.sidebar.manager">{t("dashboard.sidebar.manager")}</span>
                 </a>
-                <a href={getPath('/dashboard#favorites')} class="dashboard-link flex items-center gap-3 text-on-surface-variant hover:text-white pl-3 py-2 rounded-lg hover:bg-surface-container-high transition-colors">
+                <a href={localizeUrl('/dashboard#favorites', currentLocale)} class="dashboard-link flex items-center gap-3 text-on-surface-variant hover:text-white pl-3 py-2 rounded-lg hover:bg-surface-container-high transition-colors">
                     <span class="material-symbols-outlined text-[20px]">star</span> <span data-i18n="dashboard.sidebar.collection">{t("dashboard.sidebar.collection")}</span>
                 </a>
-                <a href={getPath('/dashboard#profile')} class="dashboard-link flex items-center gap-3 text-on-surface-variant hover:text-white pl-3 py-2 rounded-lg hover:bg-surface-container-high transition-colors">
+                <a href={localizeUrl('/dashboard#profile', currentLocale)} class="dashboard-link flex items-center gap-3 text-on-surface-variant hover:text-white pl-3 py-2 rounded-lg hover:bg-surface-container-high transition-colors">
                     <span class="material-symbols-outlined text-[20px]">person</span> <span data-i18n="dashboard.sidebar.profile">{t("dashboard.sidebar.profile")}</span>
                 </a>
-                <a href={getPath('/dashboard#subscriptions')} class="dashboard-link flex items-center gap-3 text-on-surface-variant hover:text-white pl-3 py-2 rounded-lg hover:bg-surface-container-high transition-colors">
+                <a href={localizeUrl('/dashboard#subscriptions', currentLocale)} class="dashboard-link flex items-center gap-3 text-on-surface-variant hover:text-white pl-3 py-2 rounded-lg hover:bg-surface-container-high transition-colors">
                     <span class="material-symbols-outlined text-[20px]">shopping_bag</span> <span data-i18n="dashboard.subscriptions.title">{t("dashboard.subscriptions.title")}</span>
                 </a>
-                <a href={getPath('/dashboard#licenses')} class="dashboard-link flex items-center gap-3 text-on-surface-variant hover:text-white pl-3 py-2 rounded-lg hover:bg-surface-container-high transition-colors">
+                <a href={localizeUrl('/dashboard#licenses', currentLocale)} class="dashboard-link flex items-center gap-3 text-on-surface-variant hover:text-white pl-3 py-2 rounded-lg hover:bg-surface-container-high transition-colors">
                     <span class="material-symbols-outlined text-[20px]">vpn_key</span> <span data-i18n="dashboard.sidebar.licenses">{t("dashboard.sidebar.licenses")}</span>
                 </a>
-                <a href={getPath('/dashboard#notifications')} class="dashboard-link flex items-center gap-3 text-on-surface-variant hover:text-white pl-3 py-2 rounded-lg hover:bg-surface-container-high transition-colors">
+                <a href={localizeUrl('/dashboard#notifications', currentLocale)} class="dashboard-link flex items-center gap-3 text-on-surface-variant hover:text-white pl-3 py-2 rounded-lg hover:bg-surface-container-high transition-colors">
                     <span class="material-symbols-outlined text-[20px]">notifications</span> <span data-i18n="dashboard.sidebar.notifications">{t("dashboard.sidebar.notifications")}</span>
                 </a>
             </div>
 
-            <a href={getPath('/blog')} class="text-on-surface-variant hover:text-white font-medium text-base pl-3 mt-2" data-i18n="header.blog">{t("header.blog") || "Blog"}</a>
+            <a href={localizeUrl('/blog', currentLocale)} class="text-on-surface-variant hover:text-white font-medium text-base pl-3 mt-2" data-i18n="header.blog">{t("header.blog") || "Blog"}</a>
         </nav>
         
         <div class="mt-auto pt-6 border-t border-surface-variant flex flex-col gap-4">
-            <a id="mobile-login-btn" href={getPath('/login')} class="text-center font-medium text-white bg-surface-container-high py-3 rounded-lg hover:bg-surface-variant transition-colors" data-i18n="header.login">
+            <a id="mobile-login-btn" href={localizeUrl('/login', currentLocale)} class="text-center font-medium text-white bg-surface-container-high py-3 rounded-lg hover:bg-surface-variant transition-colors" data-i18n="header.login">
                 {t("header.login")}
             </a>
-            <a id="mobile-help-btn" href={getPath('/help')} class="text-center font-bold text-white bg-primary-container py-3 rounded-lg hover:bg-[#e66000] shadow-glow-orange transition-all" data-i18n="header.help">
+            <a id="mobile-help-btn" href={localizeUrl('/help', currentLocale)} class="text-center font-bold text-white bg-primary-container py-3 rounded-lg hover:bg-[#e66000] shadow-glow-orange transition-all" data-i18n="header.help">
                 {t("header.help")}
             </a>
             <div class="flex items-center justify-center gap-2 mt-4">
@@ -126,36 +123,38 @@ const getPath = (path) => {
     localStorage.setItem('lc-lang', newLang);
     const currentPath = window.location.pathname;
     
-    const noI18nPages = ['/dashboard', '/login', '/favorites', '/feedback', '/store'];
-    const isNoI18n = noI18nPages.some(p => currentPath.endsWith(p) || currentPath.endsWith(p + '/'));
-    
-    if (isNoI18n) {
-        window.location.reload();
-        return;
-    }
-    
-    let pathWithoutLang = currentPath;
-    if (currentPath.startsWith('/es/')) pathWithoutLang = currentPath.replace('/es/', '/');
-    else if (currentPath.startsWith('/pt/')) pathWithoutLang = currentPath.replace('/pt/', '/');
+    // Safely remove /es or /pt prefix, handling trailing slashes correctly
+    let pathWithoutLang = currentPath.replace(/^\/(es|pt)(\/|$)/, '/');
     
     if (newLang === 'en') {
         window.location.href = pathWithoutLang;
     } else {
-        const separator = pathWithoutLang.startsWith('/') ? '' : '/';
-        window.location.href = `/${newLang}${pathWithoutLang}`;
+        // Since pathWithoutLang always starts with '/', we just prepend /lang
+        // e.g. pathWithoutLang = '/help' -> '/es/help'
+        // If pathWithoutLang = '/' -> '/es/'
+        let target = `/${newLang}${pathWithoutLang}`;
+        // Prevent double slashes at the end like /es//
+        if (target.endsWith('//')) target = target.slice(0, -1);
+        window.location.href = target;
     }
   };
 
   const langDesktop = document.getElementById('lang-selector-desktop');
   const langMobile = document.getElementById('lang-selector-mobile');
-  if(langDesktop) langDesktop.addEventListener('change', handleLangChange);
-  if(langMobile) langMobile.addEventListener('change', handleLangChange);
+  
+  if (langDesktop) langDesktop.addEventListener('change', handleLangChange);
+  if (langMobile) langMobile.addEventListener('change', handleLangChange);
 
-  const storedLang = localStorage.getItem('lc-lang');
-  if (storedLang) {
-    if (langDesktop) langDesktop.value = storedLang;
-    if (langMobile) langMobile.value = storedLang;
-  }
+  // Sync selector and localStorage with the actual URL language
+  const path = window.location.pathname;
+  let urlLang = 'en';
+  if (path === '/es' || path.startsWith('/es/')) urlLang = 'es';
+  else if (path === '/pt' || path.startsWith('/pt/')) urlLang = 'pt';
+  
+  localStorage.setItem('lc-lang', urlLang);
+  
+  if (langDesktop) langDesktop.value = urlLang;
+  if (langMobile) langMobile.value = urlLang;
 
   // Mobile Menu Logic
   const menuBtn = document.getElementById('mobile-menu-btn');
@@ -229,9 +228,9 @@ const getPath = (path) => {
                     // el botón "Login" cambia a "Dashboard" y lo lleva al portal.
                     // Desde el dashboard podrá hacer logout en el sidebar.
                     desktopLoginBtn.textContent = dict['header.portal'] || 'Dashboard';
-                    desktopLoginBtn.href = '/dashboard';
-                    // Removemos cualquier listener previo reemplazando el nodo si es necesario,
-                    // pero como no agregamos listeners a desktopLoginBtn, solo cambiar el href es seguro.
+                    const currentLang = window.location.pathname.split('/')[1];
+                    const isLangPrefix = currentLang === 'es' || currentLang === 'pt';
+                    desktopLoginBtn.href = isLangPrefix ? `/${currentLang}/dashboard` : '/dashboard';
                 }
                 // Optionally hide help btn to save space
                 if (helpBtn) {
@@ -245,11 +244,15 @@ const getPath = (path) => {
                 }
                 if (desktopLoginBtn) {
                     desktopLoginBtn.textContent = dict['header.login'] || 'Login';
-                    desktopLoginBtn.href = '/login';
+                    const currentLang = window.location.pathname.split('/')[1];
+                    const isLangPrefix = currentLang === 'es' || currentLang === 'pt';
+                    desktopLoginBtn.href = isLangPrefix ? `/${currentLang}/login` : '/login';
                 }
                 if (loginBtn) {
                     loginBtn.textContent = dict['header.login'] || 'Login';
-                    loginBtn.href = '/login';
+                    const currentLang = window.location.pathname.split('/')[1];
+                    const isLangPrefix = currentLang === 'es' || currentLang === 'pt';
+                    loginBtn.href = isLangPrefix ? `/${currentLang}/login` : '/login';
                 }
             }
         });
