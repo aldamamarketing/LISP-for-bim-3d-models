@@ -5,6 +5,9 @@ import { onAuthStateChanged } from 'firebase/auth';
 import HatchPreview from './HatchPreview';
 import LinetypePreview from './LinetypePreview';
 import ToastContainer, { showToast } from '../Toast';
+import EditMetadataModal from './EditMetadataModal';
+import ThumbnailPreview from './ThumbnailPreview';
+import { ARCHETYPES } from './HatchEngine';
 
 const SvgPreview = ({ svgString }) => (
   <div 
@@ -19,6 +22,11 @@ export default function LibraryPanel({ currentType, searchQuery = '', selectedIt
   const [activeCategory, setActiveCategory] = useState('Todas');
   const [saving, setSaving] = useState(null);
   const [user, setUser] = useState(null);
+  
+  const [contextMenu, setContextMenu] = useState(null);
+  const [editingHatch, setEditingHatch] = useState(null);
+
+  const isAdmin = user && user.email === 'aldamadaniel1984@gmail.com';
 
   useEffect(() => {
     const unsub = onAuthStateChanged(auth, u => setUser(u));
@@ -93,6 +101,25 @@ export default function LibraryPanel({ currentType, searchQuery = '', selectedIt
     );
   };
 
+  const handleContextMenu = (e, item) => {
+    if (!isAdmin) return;
+    e.preventDefault();
+    setContextMenu({
+      x: e.pageX,
+      y: e.pageY,
+      item
+    });
+  };
+
+  const handleEditMetadata = () => {
+    setEditingHatch(contextMenu.item);
+    setContextMenu(null);
+  };
+
+  const handleMetadataSaved = (updatedHatch) => {
+    setAssets(assets.map(a => a.id === updatedHatch.id ? updatedHatch : a));
+  };
+
   const categories = ['Todas', ...new Set(assets.map(a => a.category || 'General'))];
 
   const filtered = assets.filter(a => {
@@ -111,7 +138,7 @@ export default function LibraryPanel({ currentType, searchQuery = '', selectedIt
   });
 
   return (
-    <div style={{ flex: 1, backgroundColor: '#222', borderRadius: '8px', padding: '15px', display: 'flex', flexDirection: 'column', height: '100%' }}>
+    <div style={{ flex: 1, backgroundColor: '#222', borderRadius: '8px', padding: '15px', display: 'flex', flexDirection: 'column', height: '100%', overflow: 'hidden' }}>
       <div style={{ marginBottom: '15px' }}>
         <h3 style={{ margin: 0, color: '#fff', fontSize: '1.1rem' }}>Biblioteca Pública ({filtered.length})</h3>
         <p style={{ margin: '5px 0 0 0', color: 'var(--text-muted)', fontSize: '0.8rem' }}>
@@ -139,74 +166,156 @@ export default function LibraryPanel({ currentType, searchQuery = '', selectedIt
           </button>
         ))}
       </div>
-
+      
       <div style={{ 
         flex: 1, 
         overflowY: 'auto', 
         display: 'grid', 
-        gridTemplateColumns: 'repeat(auto-fill, minmax(90px, 1fr))', 
-        gap: '10px', 
+        gridTemplateColumns: 'repeat(auto-fill, minmax(130px, 1fr))', 
+        gap: '15px', 
         alignContent: 'start'
       }}>
-        {loading ? (
-          <p style={{ color: 'var(--text-muted)' }}>Carregando biblioteca...</p>
-        ) : filtered.length === 0 ? (
-          <div style={{ textAlign: 'center', gridColumn: '1 / -1', padding: '20px' }}>
-            <p style={{ color: 'var(--text-muted)' }}>Nenhum recurso encontrado.</p>
-          </div>
-        ) : (
-          filtered.map(item => {
-            const isSelected = selectedItems.some(i => i.id === item.id);
-            return (
-              <div 
-                key={item.id} 
-                onClick={() => onToggleSelect && onToggleSelect(item)}
-                style={{ 
-                  backgroundColor: isSelected ? 'rgba(242, 109, 33, 0.2)' : 'transparent', 
-                  padding: '5px', 
-                  borderRadius: '4px', 
-                  border: isSelected ? '2px solid var(--tmd-orange)' : '2px solid transparent',
-                  cursor: 'pointer',
-                  display: 'flex', 
-                  flexDirection: 'column',
-                  alignItems: 'center',
-                  transition: 'all 0.1s ease',
-                }}
-                onMouseOver={(e) => {
-                  if (!isSelected) {
-                    e.currentTarget.style.backgroundColor = '#3b4654';
-                    e.currentTarget.style.border = '2px solid #5a6b82';
-                  }
-                }}
-                onMouseOut={(e) => {
-                  if (!isSelected) {
-                    e.currentTarget.style.backgroundColor = 'transparent';
-                    e.currentTarget.style.border = '2px solid transparent';
-                  }
-                }}
-              >
-                <div style={{ width: '64px', height: '64px', backgroundColor: '#3b4654', display: 'flex', justifyContent: 'center', alignItems: 'center', overflow: 'hidden' }}>
-                  {currentType === 'icon' && <IconGenerator iconName={item.name} size={64} color="var(--tmd-orange)" />}
-                  {currentType === 'hatch' && <HatchPreview patCode={item.code} scale={1} width={64} height={64} />}
-                  {currentType === 'lin' && <LinetypePreview linCode={item.code} scale={1} width={64} height={64} />}
+          {loading ? (
+            <p style={{ color: 'var(--text-muted)' }}>Carregando biblioteca...</p>
+          ) : filtered.length === 0 ? (
+            <div style={{ textAlign: 'center', gridColumn: '1 / -1', padding: '20px' }}>
+              <p style={{ color: 'var(--text-muted)' }}>Nenhum recurso encontrado.</p>
+            </div>
+          ) : (
+            filtered.map(item => {
+              const isSelected = selectedItems.some(i => i.id === item.id);
+              return (
+                <div 
+                  key={item.id} 
+                  onClick={() => onToggleSelect && onToggleSelect(item)}
+                  onContextMenu={(e) => handleContextMenu(e, item)}
+                  style={{
+                    position: 'relative',
+                    height: '140px',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    alignItems: 'center',
+                    overflow: 'hidden',
+                    padding: '10px',
+                    backgroundColor: isSelected ? 'rgba(242, 109, 33, 0.1)' : '#1e293b',
+                    border: '2px solid',
+                    borderColor: isSelected ? 'var(--tmd-orange)' : '#334155',
+                    borderRadius: '8px',
+                    cursor: 'pointer',
+                    transition: 'all 0.2s ease'
+                  }} 
+                  onMouseEnter={(e) => { 
+                    if (!isSelected) {
+                      e.currentTarget.style.backgroundColor='#2a3a52'; 
+                      e.currentTarget.style.borderColor='var(--tmd-orange)'; 
+                    }
+                  }} 
+                  onMouseLeave={(e) => { 
+                    if (!isSelected) {
+                      e.currentTarget.style.backgroundColor='#1e293b'; 
+                      e.currentTarget.style.borderColor='#334155'; 
+                    }
+                  }}
+                >
+                  <div style={{ width: '100%', flex: 1, position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                    {currentType === 'icon' && (
+                      <div style={{ width: '100%', height: '100%', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+                        <IconGenerator iconName={item.name} size={64} color="var(--tmd-orange)" />
+                      </div>
+                    )}
+                    {currentType === 'hatch' && (
+                      <div style={{ width: '100%', height: '100%' }}>
+                        {(() => {
+                          const arch = ARCHETYPES.find(a => 
+                            a.name.toLowerCase() === (item.name || '').toLowerCase() || 
+                            (a.iconUrl && a.iconUrl === item.iconUrl)
+                          ) || { 
+                            id: item.id || 'f', 
+                            iconUrl: item.iconUrl || '/patterns/stack.svg', 
+                            defaults: { width: 346, height: 600 } 
+                          };
+                          return (
+                            <ThumbnailPreview 
+                              archetype={arch} 
+                              containerWidth={130} 
+                              containerHeight={80} 
+                            />
+                          );
+                        })()}
+                      </div>
+                    )}
+                    {currentType === 'lin' && (
+                      <div style={{ width: '100%', height: '100%', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+                         <LinetypePreview linCode={item.code} scale={1} width="100%" height={64} />
+                      </div>
+                    )}
+                  </div>
+                  
+                  <div style={{
+                    width: '100%',
+                    marginTop: '8px',
+                    textAlign: 'center'
+                  }}>
+                    <div style={{ fontWeight: 'bold', fontSize: '0.85rem', color: 'white', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }} title={item.name}>{item.name || 'ITEM'}</div>
+                    <div style={{ fontSize: '0.7rem', color: '#94a3b8', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', marginTop: '2px' }}>{item.category || 'General'}</div>
+                  </div>
                 </div>
-                <span style={{ 
-                  color: '#fff', 
-                  fontSize: '0.7rem', 
-                  marginTop: '6px', 
-                  textAlign: 'center', 
-                  width: '100%',
-                  whiteSpace: 'nowrap', 
-                  overflow: 'hidden', 
-                  textOverflow: 'ellipsis' 
-                }} title={item.name}>
-                  {item.name || 'ITEM'}
-                </span>
-              </div>
-            );
-          })
-        )}
-      </div>
+              );
+            })
+          )}
+        </div>
+
+      {contextMenu && (
+        <>
+          <div 
+            style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, zIndex: 999 }} 
+            onClick={() => setContextMenu(null)} 
+            onContextMenu={(e) => { e.preventDefault(); setContextMenu(null); }}
+          />
+          <div style={{
+            position: 'absolute',
+            top: contextMenu.y,
+            left: contextMenu.x,
+            backgroundColor: '#1e293b',
+            border: '1px solid #475569',
+            borderRadius: '6px',
+            boxShadow: '0 4px 6px rgba(0,0,0,0.3)',
+            zIndex: 1000,
+            overflow: 'hidden',
+            display: 'flex',
+            flexDirection: 'column',
+            width: '160px'
+          }}>
+            <button 
+              onClick={handleEditMetadata}
+              style={{ padding: '10px 15px', backgroundColor: 'transparent', border: 'none', color: 'white', textAlign: 'left', cursor: 'pointer', fontSize: '0.85rem' }}
+              onMouseOver={(e) => e.target.style.backgroundColor = '#334155'}
+              onMouseOut={(e) => e.target.style.backgroundColor = 'transparent'}
+            >
+              ✏️ Editar Metadatos
+            </button>
+            <button 
+              onClick={() => {
+                showToast("Para editar geometría, selecciona un arquetipo en el constructor y sobreescribe este patrón.", "info", 5000);
+                setContextMenu(null);
+              }}
+              style={{ padding: '10px 15px', backgroundColor: 'transparent', border: 'none', color: 'white', textAlign: 'left', cursor: 'pointer', fontSize: '0.85rem', borderTop: '1px solid #334155' }}
+              onMouseOver={(e) => e.target.style.backgroundColor = '#334155'}
+              onMouseOut={(e) => e.target.style.backgroundColor = 'transparent'}
+            >
+              📐 Editar Geometría
+            </button>
+          </div>
+        </>
+      )}
+
+      {editingHatch && (
+        <EditMetadataModal 
+          hatch={editingHatch} 
+          onClose={() => setEditingHatch(null)} 
+          onSaved={handleMetadataSaved} 
+        />
+      )}
     </div>
   );
 }

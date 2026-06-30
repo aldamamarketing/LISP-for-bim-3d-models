@@ -104,8 +104,24 @@ Para manejar mltiples paletas (Comandos, Propiedades, IA) sin problemas de dupli
   ```powershell
   $env:FUNCTIONS_DISCOVERY_TIMEOUT=60; npx -y firebase-tools@latest deploy --only functions
   ```
+  3. **Deploy Selectivo**: Para evitar problemas de timeout en despliegues completos del backend, es recomendable desplegar únicamente la función requerida (ej. `getRoutine` para AutoLISP):
+  ```powershell
+  npx firebase-tools deploy --only functions:getRoutine
+  ```
 * **Enrutamiento del Backend:**
   El enrutamiento del backend (`functions/index.js`) ha sido modificado en su regex de saneamiento para admitir guiones medios (`-`), lo que permite que las peticiones a comandos de formato `ARQ-...` se validen y entreguen correctamente.
+* **Flujo de Build & Deploy Automático (Resource Palette):**
+  Para generar y sincronizar la paleta de recursos local en desarrollo y producción:
+  1. **Build e Integración**: Compilar la paleta web. El plugin `syncToDistPlugin` en Vite copiará el bundle HTML automáticamente de `public/palette-builds/` a `dist/palette-builds/`:
+     ```powershell
+     cd web
+     npx vite build --config vite.resource-palette.config.mjs
+     ```
+  2. **Deploy Hosting**: Publicar los archivos HTML y recursos estáticos actualizados a Firebase Hosting:
+     ```powershell
+     cd ..
+     npx firebase-tools deploy --only hosting
+     ```
 
 ---
 
@@ -200,18 +216,49 @@ La plataforma provee la **estructura** para multi-idioma. El programador elige i
 - El backend (`getRoutine`) leerá el parámetro `?lang=pt|es|en` y el script de preprocessing filtrará solo los `(princ)` del idioma solicitado antes de servir el código.
 - Si el archivo no tiene bloques `;;[lang:]`, se sirve sin modificación (compatibilidad total con LISPs existentes).
 
-### 5. Ghost Command: LC_APPLY_ASSET (Bridge Seguro)
-El `ResourcePalette` usa el patrón bridge de dos canales para evitar el bug de repetición de comandos:
+### 5. Ghost Command: LC_APPLY_ASSET y Bridge Seguro (Inyección sin Base64)
+El `ResourcePalette` usa el patrón bridge de dos canales para inyectar recursos (patrones `.pat` o `.lin`) en AutoCAD de forma silenciosa y evitar el bug de repetición de comandos.
+
+Inicialmente se usó codificación Base64, pero resultó en bugs matemáticos en LISP y corrupciones de texto. La solución definitiva (Implementada en v5) consiste en:
+1. Escapar de forma nativa los caracteres problemáticos en JS (`\n` -> `\\n`, `"` -> `\\"`).
+2. Cortar el texto **antes** de escapar en "chunks" de 100 caracteres. Esto previene que se parta un carácter de escape por la mitad (lo que colgaría AutoCAD con errores de sintaxis tipo `((("_>`).
+3. Inyectar silenciosamente envolviendo con `(progn ... (princ))` para suprimir el molesto eco en la consola de AutoCAD.
+
 ```js
-// Canal 1 (evaluateLisp): inyección silenciosa de datos en RAM LISP
+// Canal 1 (evaluateLisp): inyección silenciosa y segura en RAM LISP
 executeInAutoCAD(`(setq *LC-ASSET-TYPE* "hatch")`);
 executeInAutoCAD(`(setq *LC-ASSET-NAME* "BRICK_45")`);
-executeInAutoCAD(`(setq *LC-ASSET-CODE* "base64...")`);
+executeInAutoCAD(`(setq *LC-ASSET-CODE* "")`);
+// Chunking iterativo para evadir el límite de 256 chars del buffer de comandos:
+executeInAutoCAD(`(progn (setq *LC-ASSET-CODE* (strcat *LC-ASSET-CODE* "chunk1_escapado")) (princ))`);
+// ...
+
 // Canal 2 (executeCommandAsync): disparo del Ghost Command limpio
 executeInAutoCAD('LC_APPLY_ASSET');
 ```
-- El Ghost Command `c:LC_APPLY_ASSET` lee las variables, escribe el `.pat`/`.lin` en `%TEMP%\LC_Assets\`, agrega la ruta al ACAD search path, y limpia las variables globales.
-- Los archivos temporales persisten durante la sesión para re-uso (cache Nivel 2).
+- El Ghost Command `c:LC_APPLY_ASSET` lee las variables, verifica si el patrón ya incluye un encabezado `*` (para no duplicarlo, lo que causaría `Bad pattern definition file`), escribe el `.pat`/`.lin` temporal en `%TEMP%\LC_Assets\`, agrega la ruta al ACAD search path, y limpia las variables globales.
+- Al escribir el temporal (con modo `"w"`), siempre se sobreescribe, garantizando cero acumulación de basura y que AutoCAD lea siempre la versión más actualizada de Firebase.
+
+#### 💡 Resoluciones Críticas de la Resource Palette en AutoCAD (Junio 2026):
+* **Bypass de URLs de SVG Relativas (`file://`):**
+  Debido a que la paleta cargada dentro de AutoCAD requiere ser un archivo local (`file:///...LC_Resource.html`) para evitar el sandbox HTTPS y habilitar `execAsync`, los recursos relativos `/patterns/*.svg` fallaban con error `ERR_FILE_NOT_FOUND` al resolverse como `file:///C:/patterns/*`.
+  **Solución:** Se exportó la constante `ASSETS_BASE_URL = 'https://lispcentral.web.app'` desde `HatchEngine.js` y se reconstruyeron dinámicamente las URLs absolutas en `ThumbnailPreview.jsx`, `SvgPreviewEngine.jsx` y `HatchGenerator.jsx`.
+* **CORS en Firebase Hosting:**
+  Las peticiones `fetch()` a la URL del hosting de producción desde el origen local `file://` dentro de AutoCAD fallaban por restricciones de CORS.
+  **Solución:** Se añadieron headers de CORS (`Access-Control-Allow-Origin: *` y `Access-Control-Allow-Methods: GET`) en `firebase.json` bajo la regla de source `/patterns/**`.
+* **Mismatch de Nombre en `setvar "HPNAME"` (PAT Autogenerados):**
+  AutoCAD requiere que el nombre asignado a la variable de sistema `HPNAME` coincida exactamente con el nombre de la cabecera dentro de su correspondiente archivo `.pat`. En el Generator, los patrones autogenerados inyectan cabeceras descriptivas complejas como `*Herringbone_50x260_J0`, pero el LISP intentaba buscar y aplicar `HERRINGBONE_50` (un mismatch que provocaba el rechazo de `HPNAME`).
+  **Solución:** Se editó `core_engine.lsp` para que si el código PAT inicia con `*`, extraiga el nombre real del patrón definido tras el asterisco y antes de la primera coma, utilizándolo en `HPNAME`.
+* **Registro Inmediato en AutoCAD Search Path y Fix de `vl-catch-all-apply`:**
+  * Se corrigió el bug de `vl-catch-all-apply` en `core_engine.lsp` que carecía del segundo argumento de lista de argumentos (ej. `'()`). Sin este argumento obligatorio, la lambda de registro fallaba de manera silenciosa en LISP.
+  * Se migró la asignación de la ruta temporal de `setenv "ACAD"` a `vla-put-SupportPath` vía ActiveX:
+    ```lisp
+    (vla-put-SupportPath 
+      (vla-get-Files (vla-get-Preferences (vlax-get-acad-object)))
+      nuevoPath
+    )
+    ```
+    Esto agrega el directorio de hatches temporales al search path de AutoCAD de forma inmediata en caliente sin necesidad de reiniciar el programa.
 
 ---
 
@@ -270,3 +317,45 @@ Incluso con la paleta funcionando localmente, descubrimos bugs severos al comuni
 - **Inputs**: Width, Height, Gap/Joint size, Angle, Pattern Type (Stack, Stretcher, Herringbone, Wood, etc).
 - **Preview**: Real-time SVG vector rendering of the hatch in the palette before insertion (60fps, no server lag).
 - **Execution**: Clicking 'Insert' calculates the `.pat` mathematics entirely in JavaScript on the client side, base64 encodes it, and uses the `LC_APPLY_ASSET` Ghost Command / JIT flow to apply it directly in AutoCAD with zero server processing cost.
+
+## 🚀 Logros Recientes (Núcleo Funcional B2B)
+El núcleo de la plataforma SaaS (LispCentral B2B) ha sido estabilizado y testeado exitosamente en producción:
+- **Desnormalización NoSQL:** Se eliminaron consultas anidadas costosas introduciendo `suiteIds` inyectados asíncronamente vía Triggers (Firestore) en `lispFiles`, logrando respuestas instantáneas en la API `INDEX`.
+- **Live Sync & JIT Garbage Collection:** Al hacer click en "Sync" desde la paleta, AutoCAD envía internamente el comando nativo `LC_SYNC`. Esto elimina de la memoria LISP (`undefine`) los comandos a los que el usuario ya no tiene acceso, vacía la caché JIT y fuerza la regeneración estricta de permisos en cuestión de milisegundos sin necesidad de reiniciar la sesión de trabajo.
+
+## 🔮 Roadmap (Fase 2 - Optimizaciones B2B y Performance)
+La Fase 2 se enfocará en optimizar payloads y modernizar la gestión de activos nativos de AutoCAD:
+
+1. **Desnormalización Profunda de Comandos:** Mover la estructura de comandos (Name, Desc, Icon) adentro de `lispFiles`. Esto simplificará drásticamente la API `INDEX`, eliminando pasos innecesarios.
+2. **Optimización Extrema de SVGs:** Reemplazar el inyectado de SVGs literales en el JSON por un sistema de `iconId` (diccionarios), reduciendo dramáticamente el peso de red y el consumo de memoria en AutoCAD.
+3. **Contexto Visual de Grupos en el Payload:** Inyectar los nombres amigables de los grupos directamente en la carga que va a AutoCAD. Esto permitirá a la paleta agrupar visualmente la interfaz de forma robusta sin adivinanzas.
+4. **Soft Deletes en Firestore:** Pasar de borrados destructivos a "borrados lógicos" añadiendo *flags* para proteger la propiedad intelectual de las empresas frente a accidentes.
+5. **Estrategia Integral de Hatches (NUEVO):** 
+   - Transicionar del modelo actual (Generar hatches con IA en caliente y descargarlos) hacia una **Colección Organizada Permanente de Hatches** pre-cargados.
+   - El objetivo es que la Paleta Web funcione como un catálogo robusto donde el usuario pueda hacer click en un Hatch y usarlo "directamente" en el dibujo, con gestión unificada de descargas. Esto requiere replantear la inyección de `LC_ApplyAsset` para que soporte librerías amplias, control de escalas y visualizaciones precisas sin generar basura en `%TEMP%`.
+
+---
+
+## 🚨 Resolución de Bugs Críticos: Lag de Conexión Inicial (21 segundos)
+
+**El Problema:**
+Usuarios reportaron un retraso congelante de entre 20 a 40 segundos al iniciar la aplicación (al cargar `LC_Loader.lsp` o realizar la primera petición HTTP). 
+Inicialmente se sospechaba de AutoCAD, de los servidores Cloud Functions, o de verificaciones estrictas de revocación de certificados SSL. Sin embargo, el diagnóstico comprobó que el lag de exactamente **21 segundos** se debe a la característica de **IPv6 Blackholing** de Windows.
+
+**Causa Raíz:**
+Cuando el loader usa `MSXML2.XMLHTTP.6.0` o `MSXML2.ServerXMLHTTP.6.0`, Windows resuelve el dominio `cloudfunctions.net` y encuentra registros IPv4 e IPv6. Windows prioriza IPv6 y envía un paquete TCP SYN. Si el router del usuario tiene el IPv6 mal configurado (hace "blackhole" descartando el paquete sin rechazarlo activamente), Windows espera por 3 segundos, reintenta (espera 6s), y vuelve a reintentar (espera 12s). Total: **21 segundos exactos** antes de abortar y saltar exitosamente al IPv4 en ~14ms. Windows cachea el fallo, haciendo que subsiguientes peticiones sean instantáneas hasta que el caché expire.
+
+**La Solución Propuesta (Fase 3):**
+Se comprobó que usar el motor **`WinHttp.WinHttpRequest.5.1`** junto con la inyección explícita de `SetTimeouts` resuelve el problema obligando a Windows a abortar el intento fallido mucho antes de los 21 segundos.
+El código óptimo a implementar en el Loader y en `core_engine.lsp` a futuro es:
+```lisp
+(setq winhttp (vlax-create-object "WinHttp.WinHttpRequest.5.1"))
+;; Timeouts en MS: Resolve=10000, Connect=2000, Send=30000, Receive=30000
+;; Esto fuerza a abortar el IPv6 roto en solo 2 segundos y saltar a IPv4.
+(vlax-invoke-method winhttp 'SetTimeouts 10000 2000 30000 30000)
+(vlax-invoke-method winhttp 'Open "GET" url :vlax-false)
+;; Opcional: Ignorar errores SSL de validación para entornos restrictivos
+(vlax-put-property winhttp 'Option 4 13056)
+(vlax-invoke-method winhttp 'Send)
+```
+*Recomendación:* Migrar todos los HTTP Getters nativos en LISP al objeto `WinHttpRequest.5.1` con timeouts acelerados para proteger la experiencia del usuario SaaS (B2B) en redes corporativas defectuosas.

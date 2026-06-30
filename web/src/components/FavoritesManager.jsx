@@ -4,6 +4,8 @@ import HatchPreview from './tools/HatchPreview';
 import LinetypePreview from './tools/LinetypePreview';
 import JSZip from 'jszip';
 import ToastContainer, { showToast } from './Toast';
+import { ARCHETYPES } from './tools/HatchEngine';
+import ThumbnailPreview from './tools/ThumbnailPreview';
 
 const SvgPreview = ({ svgString }) => (
   <div 
@@ -66,6 +68,13 @@ export default function FavoritesManager() {
   });
 
   const selectedItems = favorites.filter(f => selectedIds.includes(f.id));
+
+  const groupedFavorites = filteredFavorites.reduce((acc, item) => {
+    const cat = item.category || 'General';
+    if (!acc[cat]) acc[cat] = [];
+    acc[cat].push(item);
+    return acc;
+  }, {});
 
   const handleBulkDownload = async () => {
     if (selectedItems.length === 0) return;
@@ -177,46 +186,82 @@ export default function FavoritesManager() {
               <span style={{ color: 'var(--text-muted)', fontSize: '0.9rem' }}>{selectedIds.length} selecionado(s)</span>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {filteredFavorites.map(item => {
-                const isSelected = selectedIds.includes(item.id);
-                return (
-                  <button type="button" key={item.id} onClick={() => toggleSelection(item.id)} className={`cursor-pointer rounded border transition-colors flex flex-col relative text-left group ${isSelected ? 'bg-primary-container/10 border-primary-container focus-visible:ring-2 focus-visible:ring-primary-container outline-none' : 'bg-white/5 border-[#262626] hover:bg-[#1a1c1c] hover:border-[#343535] focus-visible:ring-2 focus-visible:ring-white/50 outline-none'}`}>
-                    
-                    <div className="absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity">
-                      <input type="checkbox" checked={isSelected} readOnly className="cursor-pointer accent-primary-container" />
-                    </div>
-                    {(isSelected) && (
-                      <div className="absolute top-3 right-3">
-                        <span className="material-symbols-outlined text-primary-container text-[18px]">check_circle</span>
-                      </div>
-                    )}
+            <div className="flex flex-col gap-10">
+              {Object.keys(groupedFavorites).sort().map(category => (
+                <div key={category}>
+                  <h3 className="text-lg font-bold text-white mb-4 border-b border-[#333] pb-2">{category}</h3>
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(180px, 1fr))', gap: '20px' }}>
+                    {groupedFavorites[category].map(item => {
+                      const isSelected = selectedIds.includes(item.id);
+                      return (
+                        <div key={item.id} onClick={() => toggleSelection(item.id)} style={{ border: '2px solid #334155', borderRadius: '8px', cursor: 'pointer', display: 'flex', flexDirection: 'column', overflow: 'hidden', backgroundColor: '#1e293b', transition: 'all 0.2s ease', position: 'relative' }} className={`${isSelected ? 'border-primary-container bg-primary-container/10' : ''}`} onMouseEnter={(e) => { if(!isSelected) e.currentTarget.style.borderColor='var(--tmd-orange)'; }} onMouseLeave={(e) => { if(!isSelected) e.currentTarget.style.borderColor='#334155'; }}>
+                          
+                          <div className="absolute top-3 right-3 opacity-0 hover:opacity-100 transition-opacity z-10" style={{ opacity: isSelected ? 1 : undefined }}>
+                            <input type="checkbox" checked={isSelected} readOnly className="cursor-pointer accent-primary-container" />
+                          </div>
+                          {(isSelected) && (
+                            <div className="absolute top-3 right-3 z-10 bg-[#1e293b] rounded-full">
+                              <span className="material-symbols-outlined text-primary-container text-[20px]">check_circle</span>
+                            </div>
+                          )}
 
-                    <div className="p-4 flex-1">
-                      <strong className="text-white font-bold block mb-1 pr-6 font-code-sm">{item.name}</strong>
-                      <p className="text-on-surface-variant text-xs mb-4 line-clamp-2">{item.description}</p>
-                      
-                      <div className="pointer-events-none bg-[#0A0A0A] rounded border border-[#262626] overflow-hidden p-2 flex items-center justify-center min-h-[80px]">
-                        {activeTab === 'hatch' && <HatchPreview patCode={item.code} scale={0.5} />}
-                        {activeTab === 'lin' && <LinetypePreview linCode={item.code} scale={1} />}
-                        {activeTab === 'icon' && <SvgPreview svgString={item.svgCode || item.code} />}
-                      </div>
-                    </div>
-                    
-                    <div className="p-3 border-t border-[#262626] flex justify-end">
-                      <button 
-                        type="button"
-                        onClick={(e) => { e.stopPropagation(); handleRemove(item.id); }}
-                        className="text-on-surface-variant hover:text-error transition-colors flex items-center gap-1 text-xs focus-visible:ring-2 focus-visible:ring-error outline-none rounded"
-                        title="Apagar"
-                        aria-label="Apagar favorito"
-                      >
-                        <span className="material-symbols-outlined text-[16px]" aria-hidden="true">delete</span>
-                      </button>
-                    </div>
-                  </button>
-                );
-              })}
+                          <div style={{ width: '100%', height: '140px', opacity: 0.8, overflow: 'hidden', backgroundColor: '#0b0f19' }}>
+                            {activeTab === 'hatch' && (
+                                <div style={{ width: '100%', height: '100%', opacity: 0.8 }}>
+                                  {(() => {
+                                    const arch = ARCHETYPES.find(a => 
+                                      a.name.toLowerCase() === (item.name || '').toLowerCase() || 
+                                      (a.iconUrl && a.iconUrl === item.iconUrl)
+                                    ) || { 
+                                      id: item.id || 'f', 
+                                      iconUrl: item.iconUrl || '/patterns/stack.svg', 
+                                      defaults: { width: 346, height: 600 } 
+                                    };
+                                    return (
+                                      <ThumbnailPreview 
+                                        archetype={arch} 
+                                        containerWidth={180} 
+                                        containerHeight={150} 
+                                      />
+                                    );
+                                  })()}
+                                </div>
+                              )}
+                            {activeTab === 'lin' && (
+                              <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                                <LinetypePreview linCode={item.code} scale={1} />
+                              </div>
+                            )}
+                            {activeTab === 'icon' && (
+                              <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                                <SvgPreview svgString={item.svgCode || item.code} />
+                              </div>
+                            )}
+                          </div>
+
+                          <div style={{ padding: '15px', width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                            <div style={{ color: 'white', fontWeight: 'bold', fontSize: '0.9rem', textAlign: 'center', width: '100%', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{item.name}</div>
+                            <div style={{ marginTop: '4px', color: '#94a3b8', fontSize: '0.75rem', textAlign: 'center', width: '100%', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{item.description || 'Recurso guardado'}</div>
+                          </div>
+                          
+                          <div style={{ padding: '10px', borderTop: '1px solid #334155', display: 'flex', justifyContent: 'center', backgroundColor: 'rgba(0,0,0,0.2)' }}>
+                            <button 
+                              type="button"
+                              onClick={(e) => { e.stopPropagation(); handleRemove(item.id); }}
+                              style={{ background: 'transparent', border: 'none', color: '#94a3b8', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '4px', fontSize: '0.75rem' }}
+                              onMouseEnter={(e) => e.currentTarget.style.color = '#ef4444'}
+                              onMouseLeave={(e) => e.currentTarget.style.color = '#94a3b8'}
+                              title="Apagar"
+                            >
+                              <span className="material-symbols-outlined" style={{ fontSize: '16px' }}>delete</span>
+                            </button>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              ))}
             </div>
           </div>
 
@@ -244,7 +289,17 @@ export default function FavoritesManager() {
                     {selectedItems.map(item => (
                       <div key={'mock-'+item.id} className="bg-[#2A2B2C] border border-[#444] h-[70px] flex flex-col items-center justify-center p-1 relative hover:border-[#666] cursor-pointer" title={item.name}>
                         <div className="w-full h-[40px] overflow-hidden flex items-center justify-center opacity-90 mix-blend-screen">
-                          {activeTab === 'hatch' && <HatchPreview patCode={item.code} scale={0.2} />}
+                          {activeTab === 'hatch' && (
+                            <div 
+                              title={item.name}
+                              style={{ 
+                                width: '32px', height: '32px', 
+                                backgroundImage: `url(${item.iconUrl || '/patterns/stack.svg'})`, 
+                                backgroundSize: '50% 50%', backgroundRepeat: 'repeat', 
+                                filter: 'invert(1) hue-rotate(180deg)' 
+                              }} 
+                            />
+                          )}
                           {activeTab === 'lin' && <LinetypePreview linCode={item.code} scale={0.5} />}
                           {activeTab === 'icon' && <SvgPreview svgString={item.svgCode || item.code} />}
                         </div>

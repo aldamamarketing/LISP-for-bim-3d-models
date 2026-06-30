@@ -1,0 +1,2423 @@
+[
+  {
+    "svg": "stack.svg",
+    "name": "Stack",
+    "categories": [
+      "Brick Bond",
+      "Paving",
+      "Geometric",
+      "Roofing"
+    ]
+  },
+  {
+    "svg": "stretcher.svg",
+    "name": "Stretcher",
+    "categories": [
+      "Brick Bond",
+      "Paving",
+      "Geometric",
+      "Roofing"
+    ]
+  },
+  {
+    "svg": "herringbone.svg",
+    "name": "Herringbone",
+    "categories": [
+      "Geometric",
+      "Paving",
+      "Brick Bond",
+      "Parquetry"
+    ]
+  },
+  {
+    "svg": "flemish.svg",
+    "name": "Flemish",
+    "categories": [
+      "Geometric",
+      "Paving",
+      "Brick Bond"
+    ]
+  },
+  {
+    "svg": "common.svg",
+    "name": "Common",
+    "categories": [
+      "Brick Bond",
+      "Paving",
+      "Geometric"
+    ]
+  },
+  {
+    "svg": "chevron.svg",
+    "name": "Chevron",
+    "categories": [
+      "Paving",
+      "Geometric",
+      "Parquetry"
+    ]
+  },
+  {
+    "svg": "staggered.svg",
+    "name": "Staggered",
+    "categories": [
+      "Brick Bond",
+      "Geometric",
+      "Paving",
+      "Roofing"
+    ]
+  },
+  {
+    "svg": "ashlar.svg",
+    "name": "Ashlar",
+    "categories": [
+      "Paving",
+      "Geometric"
+    ]
+  },
+  {
+    "svg": "cubic.svg",
+    "name": "Cubic",
+    "categories": [
+      "Paving",
+      "Geometric"
+    ]
+  },
+  {
+    "svg": "hexagonal.svg",
+    "name": "Hexagonal",
+    "categories": [
+      "Roofing",
+      "Geometric",
+      "Paving"
+    ]
+  },
+  {
+    "svg": "basketweave.svg",
+    "name": "Basketweave",
+    "categories": [
+      "Brick Bond",
+      "Paving",
+      "Parquetry",
+      "Geometric"
+    ]
+  },
+  {
+    "svg": "hopscotch.svg",
+    "name": "Hopscotch",
+    "categories": [
+      "Geometric",
+      "Paving",
+      "Parquetry"
+    ]
+  },
+  {
+    "svg": "diamond.svg",
+    "name": "Diamond",
+    "categories": [
+      "Geometric",
+      "Paving",
+      "Roofing"
+    ]
+  },
+  {
+    "svg": "circular.svg",
+    "name": "Circular",
+    "categories": [
+      "Paving",
+      "Organic"
+    ]
+  },
+  {
+    "svg": "fishscale.svg",
+    "name": "Fishscale",
+    "categories": [
+      "Organic",
+      "Roofing"
+    ]
+  },
+  {
+    "svg": "french.svg",
+    "name": "French",
+    "categories": [
+      "Paving",
+      "Parquetry",
+      "Geometric"
+    ]
+  },
+  {
+    "svg": "none.svg",
+    "name": "None",
+    "categories": []
+  },
+  {
+    "svg": "rubble.svg",
+    "name": "Rubble",
+    "categories": [
+      "Random",
+      "Paving"
+    ]
+  },
+  {
+    "svg": "drystone.svg",
+    "name": "Drystone",
+    "categories": [
+      "Random",
+      "Paving"
+    ]
+  },
+  {
+    "svg": "coursed_ashlar.svg",
+    "name": "Coursed Ashlar",
+    "categories": [
+      "Brick Bond",
+      "Paving",
+      "Geometric"
+    ]
+  },
+  {
+    "svg": "mansion_weave.svg",
+    "name": "Mansion Weave",
+    "categories": [
+      "Parquetry",
+      "Geometric"
+    ]
+  },
+  {
+    "svg": "european_fan.svg",
+    "name": "European Fan",
+    "categories": [
+      "Paving",
+      "Geometric"
+    ]
+  },
+  {
+    "svg": "houndstooth.svg",
+    "name": "Houndstooth",
+    "categories": [
+      "Geometric"
+    ]
+  },
+  {
+    "svg": "windmill.svg",
+    "name": "Windmill",
+    "categories": [
+      "Parquetry",
+      "Paving",
+      "Geometric"
+    ]
+  },
+  {
+    "svg": "hexagon_weave.svg",
+    "name": "Hexagon Weave",
+    "categories": [
+      "Parquetry",
+      "Paving",
+      "Geometric"
+    ]
+  },
+  {
+    "svg": "plus.svg",
+    "name": "Plus",
+    "categories": [
+      "Paving",
+      "Geometric"
+    ]
+  },
+  {
+    "svg": "plus_and_square.svg",
+    "name": "Plus and Square",
+    "categories": [
+      "Paving",
+      "Geometric"
+    ]
+  },
+  {
+    "svg": "swiss_cross.svg",
+    "name": "Swiss Cross",
+    "categories": [
+      "Paving",
+      "Geometric",
+      "Parquetry"
+    ]
+  },
+  {
+    "svg": "swiss_cross_and_square.svg",
+    "name": "Swiss Cross and Square",
+    "categories": [
+      "Paving",
+      "Parquetry",
+      "Geometric"
+    ]
+  },
+  {
+    "svg": "triangle.svg",
+    "name": "Triangle",
+    "categories": [
+      "Geometric",
+      "Paving"
+    ]
+  },
+  {
+    "svg": "triangle_chevron.svg",
+    "name": "Triangle Chevron",
+    "categories": [
+      "Paving",
+      "Parquetry",
+      "Geometric"
+    ]
+  },
+  {
+    "svg": "triangle_diamond.svg",
+    "name": "Triangle Diamond",
+    "categories": [
+      "Parquetry",
+      "Geometric",
+      "Paving"
+    ]
+  },
+  {
+    "svg": "isosceles.svg",
+    "name": "Isosceles",
+    "categories": [
+      "Geometric"
+    ]
+  },
+  {
+    "svg": "staggered_isosceles.svg",
+    "name": "Staggered Isosceles",
+    "categories": [
+      "Geometric",
+      "Roofing"
+    ]
+  },
+  {
+    "svg": "compass.svg",
+    "name": "Compass",
+    "categories": [
+      "Geometric",
+      "Paving"
+    ]
+  },
+  {
+    "svg": "octagon_star.svg",
+    "name": "Octagon Star",
+    "categories": [
+      "Geometric",
+      "Paving"
+    ]
+  },
+  {
+    "svg": "octagon_square.svg",
+    "name": "Octagon Square",
+    "categories": [
+      "Geometric",
+      "Paving"
+    ]
+  },
+  {
+    "svg": "intersecting_circle.svg",
+    "name": "Intersecting Circle",
+    "categories": [
+      "Organic"
+    ]
+  },
+  {
+    "svg": "hourglass.svg",
+    "name": "Hourglass",
+    "categories": [
+      "Paving",
+      "Organic"
+    ]
+  },
+  {
+    "svg": "alternating_fishscale.svg",
+    "name": "Alternating Fishscale",
+    "categories": [
+      "Organic"
+    ]
+  },
+  {
+    "svg": "ogee_fishscale.svg",
+    "name": "Ogee Fishscale",
+    "categories": [
+      "Organic"
+    ]
+  },
+  {
+    "svg": "hexagon_and_triangle.svg",
+    "name": "Hexagon and Triangle",
+    "categories": [
+      "Geometric",
+      "Paving"
+    ]
+  },
+  {
+    "svg": "star_and_hexagon.svg",
+    "name": "Star and Hexagon",
+    "categories": [
+      "Paving",
+      "Geometric"
+    ]
+  },
+  {
+    "svg": "star_and_cross.svg",
+    "name": "Star and Cross",
+    "categories": [
+      "Paving",
+      "Geometric"
+    ]
+  },
+  {
+    "svg": "chantilly.svg",
+    "name": "Chantilly",
+    "categories": [
+      "Parquetry",
+      "Geometric"
+    ]
+  },
+  {
+    "svg": "versailles.svg",
+    "name": "Versailles",
+    "categories": [
+      "Parquetry",
+      "Geometric"
+    ]
+  },
+  {
+    "svg": "haddon_hall.svg",
+    "name": "Haddon Hall",
+    "categories": [
+      "Parquetry",
+      "Geometric"
+    ]
+  },
+  {
+    "svg": "double_herringbone.svg",
+    "name": "Double Herringbone",
+    "categories": [
+      "Geometric",
+      "Parquetry",
+      "Paving",
+      "Brick Bond"
+    ]
+  },
+  {
+    "svg": "triple_herringbone.svg",
+    "name": "Triple Herringbone",
+    "categories": [
+      "Paving",
+      "Brick Bond",
+      "Parquetry",
+      "Geometric"
+    ]
+  },
+  {
+    "svg": "45_chevron.svg",
+    "name": "45° Chevron",
+    "categories": [
+      "Paving",
+      "Geometric",
+      "Parquetry"
+    ]
+  },
+  {
+    "svg": "crosshatch.svg",
+    "name": "Crosshatch",
+    "categories": [
+      "Parquetry",
+      "Paving",
+      "Geometric"
+    ]
+  },
+  {
+    "svg": "ionian.svg",
+    "name": "Ionian",
+    "categories": [
+      "Random",
+      "Paving"
+    ]
+  },
+  {
+    "svg": "rounded_rubble.svg",
+    "name": "Rounded Rubble",
+    "categories": [
+      "Paving",
+      "Random"
+    ]
+  },
+  {
+    "svg": "corfiot.svg",
+    "name": "Corfiot",
+    "categories": [
+      "Random",
+      "Paving"
+    ]
+  },
+  {
+    "svg": "variable_hexagon.svg",
+    "name": "Variable Hexagon",
+    "categories": [
+      "Geometric",
+      "Roofing",
+      "Paving"
+    ]
+  },
+  {
+    "svg": "varied_terrazzo.svg",
+    "name": "Varied Terrazzo",
+    "categories": [
+      "Random"
+    ]
+  },
+  {
+    "svg": "consistent_width_terrazzo.svg",
+    "name": "Consistent Width Terrazzo",
+    "categories": [
+      "Random"
+    ]
+  },
+  {
+    "svg": "varied_size_terrazzo.svg",
+    "name": "Varied Size Terrazzo",
+    "categories": [
+      "Random"
+    ]
+  },
+  {
+    "svg": "rounded_rectangle_terrazzo.svg",
+    "name": "Rounded Rectangle Terrazzo",
+    "categories": [
+      "Random"
+    ]
+  },
+  {
+    "svg": "leaf.svg",
+    "name": "Leaf",
+    "categories": [
+      "Paving",
+      "Organic"
+    ]
+  },
+  {
+    "svg": "diamond_weave.svg",
+    "name": "Diamond Weave",
+    "categories": [
+      "Parquetry",
+      "Geometric"
+    ]
+  },
+  {
+    "svg": "angled_chevron.svg",
+    "name": "Angled Chevron",
+    "categories": [
+      "Paving",
+      "Geometric"
+    ]
+  },
+  {
+    "svg": "true_chevron.svg",
+    "name": "True Chevron",
+    "categories": [
+      "Paving",
+      "Geometric",
+      "Parquetry"
+    ]
+  },
+  {
+    "svg": "diamond_in_diamond.svg",
+    "name": "Diamond in Diamond",
+    "categories": [
+      "Paving",
+      "Geometric",
+      "Parquetry"
+    ]
+  },
+  {
+    "svg": "trapeze.svg",
+    "name": "Trapeze",
+    "categories": [
+      "Paving",
+      "Geometric",
+      "Roofing"
+    ]
+  },
+  {
+    "svg": "paseo.svg",
+    "name": "Paseo",
+    "categories": [
+      "Paving",
+      "Organic"
+    ]
+  },
+  {
+    "svg": "unified_herringbone.svg",
+    "name": "Unified Herringbone",
+    "categories": [
+      "Paving",
+      "Geometric"
+    ]
+  },
+  {
+    "svg": "arabesque_lantern.svg",
+    "name": "Arabesque Lantern",
+    "categories": [
+      "Paving",
+      "Organic"
+    ]
+  },
+  {
+    "svg": "arabesque_floral.svg",
+    "name": "Arabesque Floral",
+    "categories": [
+      "Organic",
+      "Paving"
+    ]
+  },
+  {
+    "svg": "four_leaf.svg",
+    "name": "Four Leaf",
+    "categories": [
+      "Organic",
+      "Paving"
+    ]
+  },
+  {
+    "svg": "half_hexagon.svg",
+    "name": "Half Hexagon",
+    "categories": [
+      "Geometric",
+      "Paving"
+    ]
+  },
+  {
+    "svg": "picket_and_square.svg",
+    "name": "Picket and Square",
+    "categories": [
+      "Paving",
+      "Geometric",
+      "Parquetry"
+    ]
+  },
+  {
+    "svg": "interlocking_wave.svg",
+    "name": "Interlocking Wave",
+    "categories": [
+      "Paving",
+      "Organic"
+    ]
+  },
+  {
+    "svg": "angled_trapezoids.svg",
+    "name": "Angled Trapezoids",
+    "categories": [
+      "Paving",
+      "Geometric"
+    ]
+  },
+  {
+    "svg": "trapezoid_triangle.svg",
+    "name": "Trapezoid Triangle",
+    "categories": [
+      "Paving",
+      "Geometric"
+    ]
+  },
+  {
+    "svg": "bowtie_pavers.svg",
+    "name": "Bowtie Pavers",
+    "categories": [
+      "Geometric",
+      "Paving"
+    ]
+  },
+  {
+    "svg": "kite.svg",
+    "name": "Kite",
+    "categories": [
+      "Geometric",
+      "Paving"
+    ]
+  },
+  {
+    "svg": "scarpa.svg",
+    "name": "Scarpa",
+    "categories": [
+      "Random",
+      "Paving"
+    ]
+  },
+  {
+    "svg": "zig_zag_pavers.svg",
+    "name": "Zig-Zag Pavers",
+    "categories": [
+      "Geometric",
+      "Paving"
+    ]
+  },
+  {
+    "svg": "double_stretcher.svg",
+    "name": "Double Stretcher",
+    "categories": [
+      "Brick Bond",
+      "Geometric"
+    ]
+  },
+  {
+    "svg": "double_chevron_diamond.svg",
+    "name": "Double Chevron Diamond",
+    "categories": [
+      "Paving",
+      "Parquetry",
+      "Geometric"
+    ]
+  },
+  {
+    "svg": "chevron_diamond.svg",
+    "name": "Chevron Diamond",
+    "categories": [
+      "Paving",
+      "Parquetry",
+      "Geometric"
+    ]
+  },
+  {
+    "svg": "propeller_pavers.svg",
+    "name": "Propeller Pavers",
+    "categories": [
+      "Paving"
+    ]
+  },
+  {
+    "svg": "tri_hex_pavers.svg",
+    "name": "Tri Hex Pavers",
+    "categories": [
+      "Paving",
+      "Geometric"
+    ]
+  },
+  {
+    "svg": "v_pavers.svg",
+    "name": "V Pavers ",
+    "categories": [
+      "Paving",
+      "Geometric"
+    ]
+  },
+  {
+    "svg": "crazy_paving.svg",
+    "name": "Crazy Paving",
+    "categories": [
+      "Paving",
+      "Random"
+    ]
+  },
+  {
+    "svg": "triple_stretcher.svg",
+    "name": "Triple Stretcher",
+    "categories": [
+      "Paving",
+      "Brick Bond",
+      "Geometric"
+    ]
+  },
+  {
+    "svg": "single_basketweave.svg",
+    "name": "Single Basketweave",
+    "categories": [
+      "Brick Bond",
+      "Paving",
+      "Parquetry",
+      "Geometric"
+    ]
+  },
+  {
+    "svg": "t_vora.svg",
+    "name": "Távora",
+    "categories": [
+      "Paving",
+      "Geometric"
+    ]
+  },
+  {
+    "svg": "1_4_running_bond.svg",
+    "name": "1/4 Running Bond",
+    "categories": [
+      "Brick Bond",
+      "Geometric",
+      "Paving"
+    ]
+  },
+  {
+    "svg": "1_3_running_bond.svg",
+    "name": "1/3 Running Bond",
+    "categories": [
+      "Brick Bond",
+      "Paving",
+      "Geometric"
+    ]
+  },
+  {
+    "svg": "double_stretcher_with_header.svg",
+    "name": "Double Stretcher with Header",
+    "categories": [
+      "Brick Bond",
+      "Paving"
+    ]
+  },
+  {
+    "svg": "interlocking_rectangle_pavers.svg",
+    "name": "Interlocking Rectangle Pavers",
+    "categories": [
+      "Geometric",
+      "Paving"
+    ]
+  },
+  {
+    "svg": "interlocking_rectangle_with_square.svg",
+    "name": "Interlocking Rectangle with Square",
+    "categories": [
+      "Paving",
+      "Parquetry",
+      "Geometric"
+    ]
+  },
+  {
+    "svg": "double_flemish.svg",
+    "name": "Double Flemish",
+    "categories": [
+      "Brick Bond",
+      "Paving"
+    ]
+  },
+  {
+    "svg": "1_3_stretcher.svg",
+    "name": "1/3 Stretcher ",
+    "categories": [
+      "Brick Bond",
+      "Paving",
+      "Geometric"
+    ]
+  },
+  {
+    "svg": "1_4_stretcher.svg",
+    "name": "1/4 Stretcher",
+    "categories": [
+      "Brick Bond",
+      "Paving",
+      "Geometric"
+    ]
+  },
+  {
+    "svg": "6_point_intersecting_circle.svg",
+    "name": "6 Point Intersecting Circle",
+    "categories": [
+      "Organic"
+    ]
+  },
+  {
+    "svg": "broken_herringbone.svg",
+    "name": "Broken Herringbone",
+    "categories": [
+      "Brick Bond",
+      "Paving"
+    ]
+  },
+  {
+    "svg": "snowflake.svg",
+    "name": "Snowflake",
+    "categories": [
+      "Geometric"
+    ]
+  },
+  {
+    "svg": "cross_versailles.svg",
+    "name": "Cross Versailles",
+    "categories": [
+      "Parquetry"
+    ]
+  },
+  {
+    "svg": "pyramid_versailles.svg",
+    "name": "Pyramid Versailles",
+    "categories": [
+      "Parquetry"
+    ]
+  },
+  {
+    "svg": "cyclone_versailles.svg",
+    "name": "Cyclone Versailles",
+    "categories": [
+      "Parquetry"
+    ]
+  },
+  {
+    "svg": "diamond_continuous_versailles.svg",
+    "name": "Diamond Continuous Versailles",
+    "categories": [
+      "Parquetry"
+    ]
+  },
+  {
+    "svg": "framed_versailles.svg",
+    "name": "Framed Versailles",
+    "categories": [
+      "Parquetry"
+    ]
+  },
+  {
+    "svg": "random_bond.svg",
+    "name": "Random Bond",
+    "categories": [
+      "Brick Bond"
+    ]
+  },
+  {
+    "svg": "triple_flemish.svg",
+    "name": "Triple Flemish",
+    "categories": [
+      "Brick Bond",
+      "Paving"
+    ]
+  },
+  {
+    "svg": "gothic_bond.svg",
+    "name": "Gothic Bond",
+    "categories": [
+      "Brick Bond"
+    ]
+  },
+  {
+    "svg": "silesian_bond.svg",
+    "name": "Silesian Bond",
+    "categories": [
+      "Brick Bond"
+    ]
+  },
+  {
+    "svg": "monk_bond.svg",
+    "name": "Monk Bond",
+    "categories": [
+      "Brick Bond"
+    ]
+  },
+  {
+    "svg": "english_bond.svg",
+    "name": "English Bond",
+    "categories": [
+      "Brick Bond"
+    ]
+  },
+  {
+    "svg": "venetian.svg",
+    "name": "Venetian",
+    "categories": [
+      "Parquetry",
+      "Geometric"
+    ]
+  },
+  {
+    "svg": "banner.svg",
+    "name": "Banner",
+    "categories": [
+      "Parquetry"
+    ]
+  },
+  {
+    "svg": "cloud_weave.svg",
+    "name": "Cloud Weave",
+    "categories": [
+      "Parquetry"
+    ]
+  },
+  {
+    "svg": "trapeze_hex.svg",
+    "name": "Trapeze Hex",
+    "categories": [
+      "Geometric",
+      "Paving"
+    ]
+  },
+  {
+    "svg": "parallelogram.svg",
+    "name": "Parallelogram",
+    "categories": [
+      "Paving",
+      "Parquetry",
+      "Geometric"
+    ]
+  },
+  {
+    "svg": "triangle_square_mosaic.svg",
+    "name": "Triangle Square Mosaic",
+    "categories": [
+      "Geometric"
+    ]
+  },
+  {
+    "svg": "petal_mosaic.svg",
+    "name": "Petal Mosaic",
+    "categories": []
+  },
+  {
+    "svg": "octagon_picket.svg",
+    "name": "Octagon Picket",
+    "categories": [
+      "Parquetry",
+      "Geometric"
+    ]
+  },
+  {
+    "svg": "uncoursed_ashlar.svg",
+    "name": "Uncoursed Ashlar",
+    "categories": [
+      "Paving",
+      "Geometric"
+    ]
+  },
+  {
+    "svg": "broken_range_ashlar.svg",
+    "name": "Broken Range Ashlar",
+    "categories": [
+      "Paving",
+      "Geometric"
+    ]
+  },
+  {
+    "svg": "three_piece_modular_paver.svg",
+    "name": "Three Piece Modular Paver",
+    "categories": [
+      "Paving",
+      "Geometric"
+    ]
+  },
+  {
+    "svg": "four_piece_modular_paver.svg",
+    "name": "Four Piece Modular Paver",
+    "categories": [
+      "Paving",
+      "Geometric"
+    ]
+  },
+  {
+    "svg": "octagram_mosaic.svg",
+    "name": "Octagram Mosaic",
+    "categories": [
+      "Geometric"
+    ]
+  },
+  {
+    "svg": "star_mosaic.svg",
+    "name": "Star Mosaic",
+    "categories": [
+      "Geometric"
+    ]
+  },
+  {
+    "svg": "6_point_star_mosaic.svg",
+    "name": "6 Point Star Mosaic",
+    "categories": [
+      "Geometric"
+    ]
+  },
+  {
+    "svg": "hexagon_diamond.svg",
+    "name": "Hexagon Diamond",
+    "categories": [
+      "Parquetry",
+      "Geometric"
+    ]
+  },
+  {
+    "svg": "diamond_square.svg",
+    "name": "Diamond Square",
+    "categories": [
+      "Parquetry",
+      "Geometric",
+      "Paving"
+    ]
+  },
+  {
+    "svg": "diamond_cross.svg",
+    "name": "Diamond Cross",
+    "categories": []
+  },
+  {
+    "svg": "double_basketweave.svg",
+    "name": "Double Basketweave",
+    "categories": [
+      "Parquetry",
+      "Geometric"
+    ]
+  },
+  {
+    "svg": "double_zig_zag.svg",
+    "name": "Double Zig-Zag",
+    "categories": [
+      "Paving",
+      "Geometric"
+    ]
+  },
+  {
+    "svg": "varied_ashlar.svg",
+    "name": "Varied Ashlar",
+    "categories": []
+  },
+  {
+    "svg": "rectangular_ashlar.svg",
+    "name": "Rectangular Ashlar",
+    "categories": []
+  },
+  {
+    "svg": "crosshair.svg",
+    "name": "Crosshair",
+    "categories": []
+  },
+  {
+    "svg": "60_chevron.svg",
+    "name": "60° Chevron",
+    "categories": [
+      "Paving",
+      "Geometric",
+      "Parquetry"
+    ]
+  },
+  {
+    "svg": "wild_bond_dutch.svg",
+    "name": "Wild bond (Dutch)",
+    "categories": [
+      "Brick Bond",
+      "Paving"
+    ]
+  },
+  {
+    "svg": "kruis_bond_dutch.svg",
+    "name": "Kruis bond (Dutch)",
+    "categories": [
+      "Brick Bond",
+      "Paving"
+    ]
+  },
+  {
+    "svg": "basketweave_flow.svg",
+    "name": "Basketweave flow",
+    "categories": [
+      "Paving",
+      "Geometric"
+    ]
+  },
+  {
+    "svg": "basketweave_square.svg",
+    "name": "Basketweave square",
+    "categories": [
+      "Paving",
+      "Geometric"
+    ]
+  },
+  {
+    "svg": "cambridge_cobble.svg",
+    "name": "Cambridge Cobble",
+    "categories": [
+      "Paving"
+    ]
+  },
+  {
+    "svg": "diamond_point_mosaic.svg",
+    "name": "Diamond point mosaic",
+    "categories": [
+      "Paving",
+      "Geometric"
+    ]
+  },
+  {
+    "svg": "double_linear_basketweave.svg",
+    "name": "Double Linear basketweave",
+    "categories": [
+      "Paving",
+      "Geometric"
+    ]
+  },
+  {
+    "svg": "linear_basketweave.svg",
+    "name": "Linear basketweave",
+    "categories": [
+      "Paving",
+      "Geometric"
+    ]
+  },
+  {
+    "svg": "oval_tiles.svg",
+    "name": "Oval tiles",
+    "categories": [
+      "Geometric"
+    ]
+  },
+  {
+    "svg": "portuguese_azulejo.svg",
+    "name": "Portuguese Azulejo",
+    "categories": [
+      "Geometric"
+    ]
+  },
+  {
+    "svg": "separated_picket.svg",
+    "name": "Separated Picket",
+    "categories": [
+      "Geometric"
+    ]
+  },
+  {
+    "svg": "single_basketweave_square.svg",
+    "name": "Single Basketweave Square",
+    "categories": [
+      "Paving",
+      "Geometric"
+    ]
+  },
+  {
+    "svg": "star_pattern.svg",
+    "name": "Star pattern",
+    "categories": [
+      "Paving",
+      "Geometric"
+    ]
+  },
+  {
+    "svg": "stars_and_crosses.svg",
+    "name": "Stars and Crosses",
+    "categories": [
+      "Paving",
+      "Geometric"
+    ]
+  },
+  {
+    "svg": "turfstone_paver_2.svg",
+    "name": "Turfstone Paver 2",
+    "categories": [
+      "Paving",
+      "Geometric"
+    ]
+  },
+  {
+    "svg": "varied_basketweave.svg",
+    "name": "Varied Basketweave",
+    "categories": [
+      "Paving",
+      "Geometric"
+    ]
+  },
+  {
+    "svg": "triangular_houndstooth.svg",
+    "name": "Triangular Houndstooth",
+    "categories": [
+      "Paving",
+      "Geometric"
+    ]
+  },
+  {
+    "svg": "interlocking_polygons.svg",
+    "name": "Interlocking polygons",
+    "categories": [
+      "Paving",
+      "Geometric"
+    ]
+  },
+  {
+    "svg": "interlocking_v_pavers_hexagon.svg",
+    "name": "Interlocking V Pavers Hexagon",
+    "categories": [
+      "Paving",
+      "Geometric"
+    ]
+  },
+  {
+    "svg": "domino_paving.svg",
+    "name": "Domino paving",
+    "categories": [
+      "Paving",
+      "Geometric"
+    ]
+  },
+  {
+    "svg": "offset_checkered.svg",
+    "name": "Offset checkered",
+    "categories": [
+      "Paving",
+      "Geometric"
+    ]
+  },
+  {
+    "svg": "v_herringbone_varied.svg",
+    "name": "V Herringbone varied",
+    "categories": [
+      "Paving",
+      "Geometric"
+    ]
+  },
+  {
+    "svg": "interlocking_triangular_pattern.svg",
+    "name": "Interlocking triangular pattern",
+    "categories": [
+      "Paving",
+      "Geometric"
+    ]
+  },
+  {
+    "svg": "zig_zag_cross.svg",
+    "name": "Zig Zag Cross",
+    "categories": [
+      "Paving",
+      "Geometric"
+    ]
+  },
+  {
+    "svg": "octagonal_tile_with_corner_squares.svg",
+    "name": "Octagonal tile with corner squares",
+    "categories": [
+      "Paving",
+      "Geometric"
+    ]
+  },
+  {
+    "svg": "hexagon_and_dot.svg",
+    "name": "Hexagon and dot",
+    "categories": [
+      "Paving",
+      "Geometric"
+    ]
+  },
+  {
+    "svg": "h_tiles.svg",
+    "name": "H tiles",
+    "categories": [
+      "Paving",
+      "Geometric"
+    ]
+  },
+  {
+    "svg": "interlocking_pattern.svg",
+    "name": "Interlocking pattern",
+    "categories": [
+      "Paving",
+      "Geometric"
+    ]
+  },
+  {
+    "svg": "tumbling_blocks.svg",
+    "name": "Tumbling blocks",
+    "categories": [
+      "Paving",
+      "Geometric"
+    ]
+  },
+  {
+    "svg": "square_tile_with_circle_at_corner.svg",
+    "name": "Square tile with circle at corner",
+    "categories": [
+      "Geometric"
+    ]
+  },
+  {
+    "svg": "interlocking_rounded_tiles.svg",
+    "name": "Interlocking rounded tiles",
+    "categories": [
+      "Paving",
+      "Geometric"
+    ]
+  },
+  {
+    "svg": "parallelogram_with_vertical_borders.svg",
+    "name": "Parallelogram with vertical borders",
+    "categories": [
+      "Geometric"
+    ]
+  },
+  {
+    "svg": "polygonal_parallelogram.svg",
+    "name": "Polygonal Parallelogram",
+    "categories": [
+      "Paving",
+      "Geometric"
+    ]
+  },
+  {
+    "svg": "offset_parallelogram.svg",
+    "name": "Offset Parallelogram",
+    "categories": [
+      "Paving",
+      "Geometric"
+    ]
+  },
+  {
+    "svg": "art_deco_tile_pattern_1.svg",
+    "name": "Art Deco tile pattern 1",
+    "categories": [
+      "Paving",
+      "Geometric"
+    ]
+  },
+  {
+    "svg": "art_deco_tile_pattern_2.svg",
+    "name": "Art Deco tile pattern 2",
+    "categories": [
+      "Geometric"
+    ]
+  },
+  {
+    "svg": "oval_tiles_interlocking_pattern.svg",
+    "name": "Oval tiles interlocking pattern",
+    "categories": [
+      "Geometric"
+    ]
+  },
+  {
+    "svg": "alternating_oval_tiles_interlocking_pattern.svg",
+    "name": "Alternating oval tiles interlocking pattern",
+    "categories": [
+      "Geometric"
+    ]
+  },
+  {
+    "svg": "alternating_oval_tiles.svg",
+    "name": "Alternating oval tiles",
+    "categories": [
+      "Geometric"
+    ]
+  },
+  {
+    "svg": "alternating_round_and_oval_tiles.svg",
+    "name": "Alternating round and oval tiles",
+    "categories": [
+      "Geometric"
+    ]
+  },
+  {
+    "svg": "alternating_tile_weave.svg",
+    "name": "Alternating tile weave",
+    "categories": [
+      "Geometric"
+    ]
+  },
+  {
+    "svg": "helix_tile_pattern.svg",
+    "name": "Helix tile pattern",
+    "categories": [
+      "Paving",
+      "Geometric"
+    ]
+  },
+  {
+    "svg": "rotating_tile_pattern_2.svg",
+    "name": "Rotating tile pattern 2",
+    "categories": [
+      "Paving",
+      "Geometric"
+    ]
+  },
+  {
+    "svg": "geometric_mirrored_pattern.svg",
+    "name": "Geometric mirrored pattern",
+    "categories": [
+      "Geometric"
+    ]
+  },
+  {
+    "svg": "rotating_tile_pattern_1.svg",
+    "name": "Rotating tile pattern 1",
+    "categories": [
+      "Paving",
+      "Geometric"
+    ]
+  },
+  {
+    "svg": "rectangular_weave_through_pattern.svg",
+    "name": "Rectangular weave through pattern",
+    "categories": [
+      "Geometric"
+    ]
+  },
+  {
+    "svg": "alternating_rounded_tiles.svg",
+    "name": "Alternating rounded tiles",
+    "categories": [
+      "Paving",
+      "Geometric"
+    ]
+  },
+  {
+    "svg": "long_fish_scale_pattern.svg",
+    "name": "Long fish scale pattern",
+    "categories": [
+      "Geometric"
+    ]
+  },
+  {
+    "svg": "polygonal_interlocking_pattern.svg",
+    "name": "Polygonal interlocking pattern",
+    "categories": [
+      "Paving",
+      "Geometric"
+    ]
+  },
+  {
+    "svg": "geometric_tile_pattern.svg",
+    "name": "Geometric tile pattern",
+    "categories": [
+      "Paving",
+      "Geometric"
+    ]
+  },
+  {
+    "svg": "zellige_tile_pattern_1.svg",
+    "name": "Zellige tile pattern 1",
+    "categories": [
+      "Paving",
+      "Geometric"
+    ]
+  },
+  {
+    "svg": "zellige_tile_pattern_2.svg",
+    "name": "Zellige tile pattern 2",
+    "categories": [
+      "Paving",
+      "Geometric"
+    ]
+  },
+  {
+    "svg": "abstract_checkered_pattern.svg",
+    "name": "Abstract checkered pattern",
+    "categories": [
+      "Paving",
+      "Geometric"
+    ]
+  },
+  {
+    "svg": "cross_tile_weave_pattern.svg",
+    "name": "Cross tile weave pattern",
+    "categories": [
+      "Paving",
+      "Geometric"
+    ]
+  },
+  {
+    "svg": "geometric_mosaic_pattern.svg",
+    "name": "Geometric mosaic pattern",
+    "categories": [
+      "Paving",
+      "Geometric"
+    ]
+  },
+  {
+    "svg": "fishtail_roof_tile.svg",
+    "name": "Fishtail roof tile",
+    "categories": [
+      "Geometric",
+      "Roofing"
+    ]
+  },
+  {
+    "svg": "geometric_thin_tile_pattern.svg",
+    "name": "Geometric thin tile pattern",
+    "categories": [
+      "Paving",
+      "Geometric"
+    ]
+  },
+  {
+    "svg": "moroccan_geometric_tiles.svg",
+    "name": "Moroccan Geometric Tiles",
+    "categories": [
+      "Paving",
+      "Geometric"
+    ]
+  },
+  {
+    "svg": "alternating_geometric_tile_pattern.svg",
+    "name": "Alternating geometric tile pattern",
+    "categories": [
+      "Paving",
+      "Geometric"
+    ]
+  },
+  {
+    "svg": "alternating_round_pattern.svg",
+    "name": "Alternating round pattern",
+    "categories": [
+      "Paving",
+      "Geometric",
+      "Organic"
+    ]
+  },
+  {
+    "svg": "geometric_interlocking_pattern.svg",
+    "name": "Geometric interlocking pattern",
+    "categories": [
+      "Paving",
+      "Geometric"
+    ]
+  },
+  {
+    "svg": "weaved_geometric_pattern.svg",
+    "name": "Weaved geometric pattern",
+    "categories": []
+  },
+  {
+    "svg": "alternating_semi_circle_pattern.svg",
+    "name": "Alternating semi circle pattern",
+    "categories": [
+      "Paving",
+      "Geometric"
+    ]
+  },
+  {
+    "svg": "geometric_alternating_circles_pattern.svg",
+    "name": "Geometric alternating circles pattern",
+    "categories": [
+      "Paving",
+      "Geometric"
+    ]
+  },
+  {
+    "svg": "alternating_round_tiles.svg",
+    "name": "Alternating round tiles",
+    "categories": []
+  },
+  {
+    "svg": "fishtail_roof_tiles_2.svg",
+    "name": "Fishtail roof tiles 2",
+    "categories": [
+      "Geometric",
+      "Roofing"
+    ]
+  },
+  {
+    "svg": "wave_pattern_tiles.svg",
+    "name": "Wave pattern tiles",
+    "categories": [
+      "Paving",
+      "Geometric",
+      "Organic"
+    ]
+  },
+  {
+    "svg": "alternating_interlocking_pattern_tile.svg",
+    "name": "Alternating interlocking pattern tile",
+    "categories": [
+      "Paving",
+      "Geometric"
+    ]
+  },
+  {
+    "svg": "alternating_striped_and_diagonal_tile_pattern.svg",
+    "name": "Alternating striped and diagonal tile pattern",
+    "categories": [
+      "Paving",
+      "Parquetry",
+      "Geometric"
+    ]
+  },
+  {
+    "svg": "alternating_tile_size_grid.svg",
+    "name": "Alternating tile size grid",
+    "categories": [
+      "Paving",
+      "Parquetry",
+      "Geometric"
+    ]
+  },
+  {
+    "svg": "alternating_tile_weave_2.svg",
+    "name": "Alternating tile weave 2",
+    "categories": [
+      "Paving",
+      "Parquetry",
+      "Geometric"
+    ]
+  },
+  {
+    "svg": "alternating_tile_weave_3.svg",
+    "name": "Alternating tile weave 3",
+    "categories": [
+      "Paving",
+      "Parquetry",
+      "Geometric"
+    ]
+  },
+  {
+    "svg": "alternating_cross_weave_tile_pattern.svg",
+    "name": "Alternating cross weave tile pattern",
+    "categories": [
+      "Paving",
+      "Parquetry",
+      "Geometric"
+    ]
+  },
+  {
+    "svg": "diagonal_cross_pattern.svg",
+    "name": "Diagonal cross pattern",
+    "categories": [
+      "Paving",
+      "Geometric"
+    ]
+  },
+  {
+    "svg": "diagonal_split_tile_pattern.svg",
+    "name": "Diagonal split tile pattern",
+    "categories": [
+      "Paving",
+      "Parquetry",
+      "Geometric"
+    ]
+  },
+  {
+    "svg": "diagonal_triangle_split_and_squared_tile_pattern.svg",
+    "name": "Diagonal triangle split and squared tile pattern",
+    "categories": [
+      "Paving",
+      "Parquetry",
+      "Geometric"
+    ]
+  },
+  {
+    "svg": "diamond_square_mosaic.svg",
+    "name": "Diamond square mosaic",
+    "categories": [
+      "Paving",
+      "Parquetry",
+      "Geometric"
+    ]
+  },
+  {
+    "svg": "double_linear_basketweave_2.svg",
+    "name": "Double Linear basketweave 2",
+    "categories": []
+  },
+  {
+    "svg": "interlocking_stripe_pattern.svg",
+    "name": "Interlocking stripe pattern",
+    "categories": [
+      "Paving",
+      "Parquetry",
+      "Geometric"
+    ]
+  },
+  {
+    "svg": "mazelike_pattern.svg",
+    "name": "Mazelike pattern",
+    "categories": [
+      "Paving",
+      "Geometric"
+    ]
+  },
+  {
+    "svg": "polygonal_mirrored_pattern.svg",
+    "name": "Polygonal mirrored pattern",
+    "categories": [
+      "Geometric",
+      "Random"
+    ]
+  },
+  {
+    "svg": "rhombus_split_tile.svg",
+    "name": "Rhombus split tile",
+    "categories": [
+      "Paving",
+      "Parquetry",
+      "Geometric"
+    ]
+  },
+  {
+    "svg": "rounded_corner_alternating_tile_pattern.svg",
+    "name": "Rounded corner alternating tile pattern",
+    "categories": [
+      "Paving",
+      "Geometric",
+      "Organic"
+    ]
+  },
+  {
+    "svg": "rounded_cross_pattern.svg",
+    "name": "Rounded cross pattern",
+    "categories": [
+      "Paving",
+      "Organic"
+    ]
+  },
+  {
+    "svg": "split_fishscale.svg",
+    "name": "Split fishscale",
+    "categories": [
+      "Paving",
+      "Geometric",
+      "Organic"
+    ]
+  },
+  {
+    "svg": "split_round_square_pattern.svg",
+    "name": "Split round / square pattern",
+    "categories": [
+      "Paving",
+      "Geometric",
+      "Random"
+    ]
+  },
+  {
+    "svg": "square_tile_with_triangle_corner_pattern.svg",
+    "name": "Square tile with triangle corner pattern",
+    "categories": [
+      "Paving",
+      "Parquetry",
+      "Geometric"
+    ]
+  },
+  {
+    "svg": "venetian_2.svg",
+    "name": "Venetian 2",
+    "categories": [
+      "Paving",
+      "Parquetry",
+      "Geometric"
+    ]
+  },
+  {
+    "svg": "wavy_tile_pattern.svg",
+    "name": "Wavy tile pattern",
+    "categories": [
+      "Paving",
+      "Geometric",
+      "Organic"
+    ]
+  },
+  {
+    "svg": "alternating_square_and_split_tiles.svg",
+    "name": "Alternating square and split tiles",
+    "categories": [
+      "Paving",
+      "Geometric"
+    ]
+  },
+  {
+    "svg": "alternating_tile_weave_4.svg",
+    "name": "Alternating tile weave 4",
+    "categories": [
+      "Paving",
+      "Parquetry",
+      "Geometric"
+    ]
+  },
+  {
+    "svg": "square_and_metro_tile_pattern.svg",
+    "name": "Square and metro tile pattern",
+    "categories": [
+      "Paving",
+      "Geometric"
+    ]
+  },
+  {
+    "svg": "alternating_split_square_pattern.svg",
+    "name": "Alternating split square pattern",
+    "categories": [
+      "Geometric"
+    ]
+  },
+  {
+    "svg": "alternating_stripe_pattern.svg",
+    "name": "Alternating stripe pattern",
+    "categories": [
+      "Paving",
+      "Parquetry",
+      "Geometric"
+    ]
+  },
+  {
+    "svg": "interlocking_stripe_pattern_2.svg",
+    "name": "Interlocking stripe pattern 2",
+    "categories": [
+      "Geometric"
+    ]
+  },
+  {
+    "svg": "patterned_edge_tile.svg",
+    "name": "Patterned edge tile",
+    "categories": [
+      "Paving",
+      "Geometric",
+      "Organic",
+      "Random"
+    ]
+  },
+  {
+    "svg": "split_rectangle_pattern.svg",
+    "name": "Split rectangle pattern",
+    "categories": [
+      "Paving",
+      "Parquetry",
+      "Geometric"
+    ]
+  },
+  {
+    "svg": "split_square_pattern.svg",
+    "name": "Split square pattern",
+    "categories": [
+      "Paving",
+      "Geometric"
+    ]
+  },
+  {
+    "svg": "varied_stripe_pattern_alternating.svg",
+    "name": "Varied stripe pattern alternating",
+    "categories": [
+      "Paving",
+      "Geometric"
+    ]
+  },
+  {
+    "svg": "varied_stripe_pattern.svg",
+    "name": "Varied stripe pattern",
+    "categories": []
+  },
+  {
+    "svg": "playful_curved_tile_pattern.svg",
+    "name": "Playful curved tile pattern",
+    "categories": [
+      "Geometric",
+      "Organic"
+    ]
+  },
+  {
+    "svg": "geometric_alternating_pattern.svg",
+    "name": "Geometric alternating pattern",
+    "categories": [
+      "Geometric",
+      "Organic",
+      "Random"
+    ]
+  },
+  {
+    "svg": "fishtail_circles.svg",
+    "name": "Fishtail circles",
+    "categories": [
+      "Geometric",
+      "Organic"
+    ]
+  },
+  {
+    "svg": "interlocking_curved_tiles.svg",
+    "name": "Interlocking curved tiles",
+    "categories": [
+      "Geometric",
+      "Organic"
+    ]
+  },
+  {
+    "svg": "split_checkered_pattern.svg",
+    "name": "Split checkered pattern",
+    "categories": [
+      "Paving",
+      "Geometric"
+    ]
+  },
+  {
+    "svg": "wavy_pattern_with_split_tiles.svg",
+    "name": "Wavy pattern with split tiles",
+    "categories": [
+      "Paving",
+      "Geometric",
+      "Organic"
+    ]
+  },
+  {
+    "svg": "wavy_rounded_tiles.svg",
+    "name": "Wavy rounded tiles",
+    "categories": [
+      "Paving",
+      "Geometric",
+      "Organic"
+    ]
+  },
+  {
+    "svg": "patterned_tiles_variation.svg",
+    "name": "Patterned tiles variation",
+    "categories": [
+      "Geometric",
+      "Random"
+    ]
+  },
+  {
+    "svg": "curved_interlocking_tiles.svg",
+    "name": "Curved interlocking tiles",
+    "categories": [
+      "Geometric",
+      "Organic"
+    ]
+  },
+  {
+    "svg": "cross_and_square_pattern.svg",
+    "name": "Cross and square pattern",
+    "categories": [
+      "Paving",
+      "Geometric"
+    ]
+  },
+  {
+    "svg": "checkerboard_split_pattern.svg",
+    "name": "Checkerboard split pattern",
+    "categories": [
+      "Paving",
+      "Geometric"
+    ]
+  },
+  {
+    "svg": "checkered_stripe_tiles_variation.svg",
+    "name": "Checkered stripe tiles variation",
+    "categories": [
+      "Geometric"
+    ]
+  },
+  {
+    "svg": "checkered_tiles_variation.svg",
+    "name": "Checkered tiles variation",
+    "categories": [
+      "Paving",
+      "Geometric"
+    ]
+  },
+  {
+    "svg": "crossing_split_tiles_pattern.svg",
+    "name": "Crossing split tiles pattern",
+    "categories": [
+      "Paving",
+      "Geometric"
+    ]
+  },
+  {
+    "svg": "geometric_compass_pattern.svg",
+    "name": "Geometric compass pattern",
+    "categories": [
+      "Paving",
+      "Parquetry",
+      "Geometric"
+    ]
+  },
+  {
+    "svg": "long_rhombus_and_square_pattern.svg",
+    "name": "Long rhombus and square pattern",
+    "categories": [
+      "Paving",
+      "Parquetry",
+      "Geometric"
+    ]
+  },
+  {
+    "svg": "mosaic_tile.svg",
+    "name": "Mosaic tile",
+    "categories": [
+      "Paving",
+      "Geometric"
+    ]
+  },
+  {
+    "svg": "star_and_cross_variation.svg",
+    "name": "Star and cross variation",
+    "categories": [
+      "Paving",
+      "Geometric"
+    ]
+  },
+  {
+    "svg": "star_and_square_variation.svg",
+    "name": "Star and square variation",
+    "categories": [
+      "Paving",
+      "Geometric",
+      "Organic"
+    ]
+  },
+  {
+    "svg": "triangle_split_tiles_variation.svg",
+    "name": "Triangle split tiles variation",
+    "categories": [
+      "Paving",
+      "Parquetry",
+      "Geometric"
+    ]
+  },
+  {
+    "svg": "wavy_triangle_pattern.svg",
+    "name": "Wavy triangle pattern",
+    "categories": [
+      "Paving",
+      "Geometric",
+      "Organic"
+    ]
+  },
+  {
+    "svg": "zig_zag_alternating_tiles.svg",
+    "name": "Zig zag alternating tiles",
+    "categories": [
+      "Paving",
+      "Geometric"
+    ]
+  },
+  {
+    "svg": "alternating_square_and_split_tiles_2.svg",
+    "name": "Alternating square and split tiles 2",
+    "categories": [
+      "Paving",
+      "Parquetry",
+      "Geometric"
+    ]
+  },
+  {
+    "svg": "metro_tiles_with_interlocking_element.svg",
+    "name": "Metro tiles with interlocking element",
+    "categories": []
+  },
+  {
+    "svg": "mirrored_caved_tiles.svg",
+    "name": "Mirrored caved tiles",
+    "categories": [
+      "Paving",
+      "Geometric",
+      "Organic"
+    ]
+  },
+  {
+    "svg": "moroccan_geometric_tiles_2.svg",
+    "name": "Moroccan Geometric Tiles 2",
+    "categories": [
+      "Paving",
+      "Geometric"
+    ]
+  },
+  {
+    "svg": "rounded_edge_cross_pattern.svg",
+    "name": "Rounded edge cross pattern",
+    "categories": [
+      "Paving",
+      "Geometric"
+    ]
+  },
+  {
+    "svg": "spanish_antique_tile.svg",
+    "name": "Spanish antique tile",
+    "categories": [
+      "Paving",
+      "Geometric",
+      "Organic"
+    ]
+  },
+  {
+    "svg": "star_and_cross_variation_2.svg",
+    "name": "Star and Cross variation 2",
+    "categories": [
+      "Paving",
+      "Geometric"
+    ]
+  },
+  {
+    "svg": "star_and_cross_variation_3.svg",
+    "name": "Star and Cross variation 3",
+    "categories": [
+      "Paving",
+      "Geometric"
+    ]
+  },
+  {
+    "svg": "zellige_tile_pattern_3.svg",
+    "name": "Zellige tile pattern 3",
+    "categories": [
+      "Paving",
+      "Geometric"
+    ]
+  },
+  {
+    "svg": "alternating_geometric_split_tile_pattern.svg",
+    "name": "Alternating geometric split tile pattern",
+    "categories": [
+      "Paving",
+      "Geometric",
+      "Organic"
+    ]
+  },
+  {
+    "svg": "sculptural_diagonal_tile_pattern.svg",
+    "name": "Sculptural diagonal tile pattern",
+    "categories": []
+  },
+  {
+    "svg": "sculptural_triangle_and_circle_alternating_pattern.svg",
+    "name": "Sculptural Triangle and circle alternating pattern",
+    "categories": [
+      "Paving",
+      "Geometric"
+    ]
+  },
+  {
+    "svg": "alternating_square_and_metro_tiles.svg",
+    "name": "Alternating square and metro tiles",
+    "categories": [
+      "Paving",
+      "Parquetry",
+      "Geometric"
+    ]
+  },
+  {
+    "svg": "alternating_round_tile_pattern.svg",
+    "name": "Alternating round tile pattern",
+    "categories": [
+      "Paving",
+      "Geometric",
+      "Organic"
+    ]
+  },
+  {
+    "svg": "alternating_semicircle_split_tiles.svg",
+    "name": "Alternating semicircle split tiles",
+    "categories": [
+      "Paving",
+      "Geometric",
+      "Organic"
+    ]
+  },
+  {
+    "svg": "geometric_split_tiles.svg",
+    "name": "Geometric split tiles",
+    "categories": [
+      "Paving",
+      "Parquetry",
+      "Geometric",
+      "Random"
+    ]
+  },
+  {
+    "svg": "locked_square_pattern_1.svg",
+    "name": "Locked square pattern 1",
+    "categories": [
+      "Paving",
+      "Parquetry",
+      "Geometric",
+      "Random"
+    ]
+  },
+  {
+    "svg": "mirrored_geometric_pattern_tile_2.svg",
+    "name": "Mirrored geometric pattern tile 2",
+    "categories": [
+      "Paving",
+      "Geometric",
+      "Organic",
+      "Random"
+    ]
+  },
+  {
+    "svg": "mirrored_geometric_pattern_tile.svg",
+    "name": "Mirrored geometric pattern tile",
+    "categories": [
+      "Paving",
+      "Geometric",
+      "Organic",
+      "Random"
+    ]
+  },
+  {
+    "svg": "mirrored_sun_pattern.svg",
+    "name": "Mirrored sun pattern",
+    "categories": [
+      "Geometric",
+      "Organic",
+      "Random"
+    ]
+  },
+  {
+    "svg": "rounded_edge_tile_pattern.svg",
+    "name": "Rounded edge tile pattern",
+    "categories": [
+      "Paving",
+      "Geometric",
+      "Organic",
+      "Random"
+    ]
+  },
+  {
+    "svg": "square_and_striped_tiles_variation.svg",
+    "name": "Square and striped tiles variation",
+    "categories": [
+      "Paving",
+      "Parquetry",
+      "Geometric",
+      "Random"
+    ]
+  },
+  {
+    "svg": "tangram_pattern.svg",
+    "name": "Tangram pattern",
+    "categories": [
+      "Paving",
+      "Geometric",
+      "Organic",
+      "Random"
+    ]
+  },
+  {
+    "svg": "triangle_split_rectangle.svg",
+    "name": "Triangle split rectangle",
+    "categories": [
+      "Parquetry",
+      "Geometric",
+      "Random"
+    ]
+  },
+  {
+    "svg": "moroccan_geometric_tiles_3.svg",
+    "name": "Moroccan Geometric Tiles 3",
+    "categories": [
+      "Paving",
+      "Geometric",
+      "Random"
+    ]
+  },
+  {
+    "svg": "diagonal_checkered_pattern.svg",
+    "name": "Diagonal checkered pattern",
+    "categories": [
+      "Paving",
+      "Geometric",
+      "Organic",
+      "Random"
+    ]
+  },
+  {
+    "svg": "split_square_pattern_2.svg",
+    "name": "Split square pattern 2",
+    "categories": []
+  },
+  {
+    "svg": "square_and_cross_pattern.svg",
+    "name": "Square and cross pattern",
+    "categories": [
+      "Paving",
+      "Geometric",
+      "Organic",
+      "Random"
+    ]
+  },
+  {
+    "svg": "square_and_split_cross_pattern.svg",
+    "name": "Square and split cross pattern",
+    "categories": []
+  },
+  {
+    "svg": "rectangle_split_pattern.svg",
+    "name": "Rectangle split pattern",
+    "categories": [
+      "Paving",
+      "Parquetry",
+      "Geometric",
+      "Random"
+    ]
+  },
+  {
+    "svg": "square_pattern_with_flower_element.svg",
+    "name": "Square pattern with flower element",
+    "categories": [
+      "Paving",
+      "Parquetry",
+      "Geometric"
+    ]
+  },
+  {
+    "svg": "square_with_corner_element_grid.svg",
+    "name": "Square with corner element grid",
+    "categories": []
+  },
+  {
+    "svg": "square_with_corner_element_random.svg",
+    "name": "Square with corner element random",
+    "categories": [
+      "Paving",
+      "Parquetry",
+      "Geometric"
+    ]
+  },
+  {
+    "svg": "split_rectangle_pattern_2.svg",
+    "name": "Split rectangle pattern 2",
+    "categories": [
+      "Paving",
+      "Parquetry",
+      "Geometric"
+    ]
+  },
+  {
+    "svg": "locked_square_pattern_2.svg",
+    "name": "Locked square pattern 2",
+    "categories": [
+      "Paving",
+      "Parquetry",
+      "Geometric"
+    ]
+  },
+  {
+    "svg": "zellige_square_pattern.svg",
+    "name": "Zellige square pattern",
+    "categories": [
+      "Paving",
+      "Parquetry",
+      "Geometric"
+    ]
+  },
+  {
+    "svg": "alternating_split_square_tile_pattern.svg",
+    "name": "Alternating split square tile pattern",
+    "categories": [
+      "Geometric",
+      "Random"
+    ]
+  },
+  {
+    "svg": "geometric_split_tile_pattern.svg",
+    "name": "Geometric split tile pattern",
+    "categories": [
+      "Parquetry",
+      "Geometric",
+      "Organic",
+      "Random"
+    ]
+  },
+  {
+    "svg": "zellige_tile_pattern_4.svg",
+    "name": "Zellige tile pattern 4",
+    "categories": [
+      "Paving",
+      "Parquetry",
+      "Geometric"
+    ]
+  },
+  {
+    "svg": "square_and_a_half_pattern.svg",
+    "name": "Square and a half pattern",
+    "categories": [
+      "Paving",
+      "Parquetry",
+      "Geometric"
+    ]
+  },
+  {
+    "svg": "aberdeen_bond.svg",
+    "name": "Aberdeen Bond",
+    "categories": [
+      "Brick Bond",
+      "Paving",
+      "Geometric"
+    ]
+  },
+  {
+    "svg": "kultura.svg",
+    "name": "Kultura",
+    "categories": [
+      "Paving",
+      "Geometric",
+      "Random"
+    ]
+  }
+]

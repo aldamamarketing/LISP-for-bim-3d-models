@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1000" height="1000" viewBox="0 0 1000 1000">
+  <defs>
+    <style type="text/css">path {stroke-width: 1; vector-effect: non-scaling-stroke; fill:none; stroke: #000; stroke-linecap: round; stroke-linejoin: round;}</style>
+  </defs>
+  <path d="M499.915-.226c0,276.1-223.82,499.915-499.915,499.915"/>
+  <path d="M500.085-.226c0,276.1,223.82,499.915,499.915,499.915"/>
+  <path d="M1000,499.688c0,276.134-223.851,499.985-499.985,499.985S0.03,775.822.03,499.688"/>
+  <path d="M1000-500.312C1000-224.178,776.149-.327,500.015-0.327S0.03-224.178.03-500.312"/>
+</svg>

@@ -1,9 +1,13 @@
-import React, { useState, useEffect, useCallback, useRef } from 'react';
+import React, { useState, useEffect, useCallback, useRef, Suspense, lazy } from 'react';
 import PaletteDropdownMenu from './PaletteDropdownMenu';
 import MultiFilter from './MultiFilter';
 import { executeInAutoCAD } from '../utils/autocadBridge';
 import { db } from '../firebase';
 import { doc, getDoc } from 'firebase/firestore';
+import { ARCHETYPES } from './tools/HatchEngine';
+import ThumbnailPreview from './tools/ThumbnailPreview';
+
+const HatchGenerator = lazy(() => import('./tools/HatchGenerator'));
 
 /**
  * ResourcePalette
@@ -46,7 +50,7 @@ const CATALOG_TTL_MS = 60 * 60 * 1000; // 1 hora
 const sessionPatCache = {};
 
 function SvgIcon({ svgString, category }) {
-  const isUrl = typeof svgString === 'string' && svgString.startsWith('http');
+  const isUrl = typeof svgString === 'string' && (svgString.startsWith('http') || svgString.startsWith('/'));
   const icon = svgString || CATEGORY_ICONS[category] || CATEGORY_ICONS['General'];
 
   if (isUrl) {
@@ -162,19 +166,37 @@ function ResourceItem({ item, isPinned, activeTab, onContextMenu, onInsert }) {
       title={`${item.name}\n${item.desc || ''}\n\nClique para inserir · Clic derecho para opções`}
       style={{
         position: 'relative',
-        height: '120px',
+        height: '100px', // Reducido para formato más apaisado
         display: 'flex',
         flexDirection: 'column',
         justifyContent: 'flex-end',
         overflow: 'hidden',
         padding: 0,
-        backgroundColor: '#1e1e1e', // Fondo oscuro para que resalten las líneas WebP blancas
+        backgroundColor: '#1e1e1e',
         border: '1px solid #333',
         borderRadius: '6px',
         cursor: 'pointer',
       }}
     >
-      <SvgIcon svgString={item.icon} category={item.category} />
+      <div style={{ position: 'relative', width: '100%', height: '100%', backgroundColor: '#1a1a1a' }}>
+        {(() => {
+          const arch = ARCHETYPES.find(a => 
+            a.name.toLowerCase() === (item.name || '').toLowerCase() || 
+            (a.iconUrl && a.iconUrl === (item.iconUrl || item.icon))
+          ) || { 
+            id: item.id || 'f', 
+            iconUrl: item.iconUrl || item.icon || '/patterns/stack.svg', 
+            defaults: { width: 346, height: 600 } 
+          };
+          return (
+            <ThumbnailPreview 
+              archetype={arch} 
+              containerWidth={180} 
+              containerHeight={100} 
+            />
+          );
+        })()}
+      </div>
 
       <button
         onClick={(e) => { e.stopPropagation(); onContextMenu(e, item, true); }}
@@ -194,20 +216,19 @@ function ResourceItem({ item, isPinned, activeTab, onContextMenu, onInsert }) {
         📌
       </button>
 
+      {/* Texto superpuesto al estilo AutoCAD */}
       <div style={{
-        position: 'relative',
+        position: 'absolute',
+        bottom: 0,
+        left: 0,
         zIndex: 1,
         width: '100%',
         padding: '6px 8px',
-        background: 'rgba(255,255,255,0.95)',
-        borderTop: '1px solid rgba(0,0,0,0.05)',
-        backdropFilter: 'blur(4px)',
+        background: 'rgba(0, 0, 0, 0.7)',
+        backdropFilter: 'blur(2px)',
       }}>
-        <div style={{ fontWeight: '600', fontSize: '0.75rem', color: '#111', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+        <div style={{ fontWeight: '600', fontSize: '0.75rem', color: '#fff', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', textShadow: '1px 1px 2px #000' }}>
           {item.name}
-        </div>
-        <div style={{ fontSize: '0.65rem', color: '#666', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-          {item.category}
         </div>
       </div>
     </div>
@@ -226,6 +247,7 @@ export default function ResourcePalette() {
   const [pinnedIds, setPinnedIds]       = useState([]);
   const [contextMenu, setContextMenu]   = useState(null); // { item, position, pinTrigger }
   const [applying, setApplying]         = useState(null); // id del item en proceso
+  const [showGenerator, setShowGenerator] = useState(false);
 
   // Credenciales del Loader (igual que LispCommandPalette)
   const urlParams = new URLSearchParams(typeof window !== 'undefined' ? window.location.search : '');
@@ -240,12 +262,13 @@ export default function ResourcePalette() {
       const tsKey    = `lc_catalog_${activeTab}_ts`;
       const cached   = localStorage.getItem(cacheKey);
       const ts       = parseInt(localStorage.getItem(tsKey) || '0', 10);
-      const expired  = Date.now() - ts > CATALOG_TTL_MS;
+      const expired  = Date.now() - ts > 3600000; // 1 hora TTL
 
       if (cached && !expired && !forceRefresh) {
         setCatalog(JSON.parse(cached));
       } else {
-        const res  = await fetch(`../api/${activeTab}-catalog.json`);
+        const url = `https://us-central1-lispcentral.cloudfunctions.net/getUserResources?token=${encodeURIComponent(token)}&type=${encodeURIComponent(activeTab)}&_t=${Date.now()}`;
+        const res  = await fetch(url, { cache: 'no-store' });
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
         const data = await res.json();
         localStorage.setItem(cacheKey, JSON.stringify(data));
@@ -254,10 +277,10 @@ export default function ResourcePalette() {
       }
     } catch (err) {
       console.error('[ResourcePalette] fetchCatalog error:', err);
-      setError('Falha ao carregar catálogo.');
+      setError('Failed to load catalog.');
     }
     setLoading(false);
-  }, [activeTab]);
+  }, [activeTab, token]);
 
   useEffect(() => {
     fetchCatalog();
@@ -276,21 +299,37 @@ export default function ResourcePalette() {
       // Nivel 3: no está en cache de sesión, bajar desde Firestore
       if (!patCode) {
         const snap = await getDoc(doc(db, 'publicAssets', item.id));
-        if (!snap.exists()) throw new Error('Asset não encontrado no servidor.');
+        if (!snap.exists()) throw new Error('Asset not found on server.');
         patCode = snap.data().code;
         // Guardar en cache de sesión RAM (no en disco)
         sessionPatCache[item.id] = patCode;
       }
 
       const safeName = item.name.replace(/[^a-zA-Z0-9_]/g, '_').toUpperCase();
-      const codeB64  = btoa(unescape(encodeURIComponent(patCode)));
 
       // ── Bridge seguro: inyectar datos silenciosamente via evaluateLisp ──
       // Luego disparar el Ghost Command limpio via executeCommandAsync
       // NUNCA enviar expresiones LISP completas via executeCommandAsync (bug de repetición)
       executeInAutoCAD(`(setq *LC-ASSET-TYPE* "${activeTab}")`);
       executeInAutoCAD(`(setq *LC-ASSET-NAME* "${safeName}")`);
-      executeInAutoCAD(`(setq *LC-ASSET-CODE* "${codeB64}")`);
+      
+      // FIX: Chunk string to avoid Access Violation y Syntax Errors.
+      // 1. Tamaño seguro (100) para evitar buffer overflow en línea de comandos.
+      // 2. Trocear el texto PRIMERO y escapar DESPUÉS, para no romper secuencias de escape.
+      executeInAutoCAD(`(setq *LC-ASSET-CODE* "")`);
+      const chunkSize = 100;
+      for (let i = 0; i < patCode.length; i += chunkSize) {
+        const rawChunk = patCode.substring(i, i + chunkSize);
+        const escapedChunk = rawChunk
+          .replace(/\\/g, '\\\\')
+          .replace(/"/g, '\\"')
+          .replace(/\n/g, '\\n')
+          .replace(/\r/g, '\\r')
+          .replace(/\t/g, '\\t');
+        
+        executeInAutoCAD(`(progn (setq *LC-ASSET-CODE* (strcat *LC-ASSET-CODE* "${escapedChunk}")) (princ))`);
+      }
+      
       executeInAutoCAD('LC_APPLY_ASSET');
 
     } catch (err) {
@@ -390,71 +429,111 @@ export default function ResourcePalette() {
   });
 
   return (
-    <div style={{ backgroundColor: '#181818', color: '#fff', height: '100vh', overflow: 'hidden', fontFamily: "'Inter', sans-serif", display: 'flex', flexDirection: 'column' }}>
+    <div style={{ backgroundColor: '#181818', color: '#fff', height: '100vh', overflow: 'hidden', fontFamily: "'Inter', sans-serif", display: 'flex', flexDirection: 'column', position: 'relative' }}>
+      
 
-      {/* Header (idéntico a LispCommandPalette) */}
-      <div style={{ margin: '0 auto', width: '100%', maxWidth: '600px' }}>
+        {/* Header (idéntico a LispCommandPalette) */}
+        <div style={{ margin: '0 auto', width: '100%', maxWidth: '600px' }}>
         <div style={{ padding: '8px 10px', backgroundColor: '#111', display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '2px solid var(--tmd-orange)' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
             <PaletteDropdownMenu myId="resources" />
-            <span style={{ fontSize: '0.75rem', fontWeight: 'bold', color: 'var(--tmd-orange)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
-              LispCentral Recursos
-            </span>
+            
+            {!showGenerator ? (
+              <select 
+                value={activeTab} 
+                onChange={(e) => setActiveTab(e.target.value)}
+                style={{ 
+                  background: 'transparent', 
+                  color: 'var(--tmd-orange)', 
+                  border: 'none', 
+                  fontSize: '0.75rem', 
+                  fontWeight: 'bold', 
+                  textTransform: 'uppercase', 
+                  letterSpacing: '0.5px',
+                  outline: 'none',
+                  cursor: 'pointer'
+                }}
+              >
+                <option value="hatch">Hatches</option>
+                <option value="lin">Lines</option>
+              </select>
+            ) : (
+              <span style={{ fontSize: '0.75rem', fontWeight: 'bold', color: 'var(--tmd-orange)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+                LispCentral Hatches
+              </span>
+            )}
+            
           </div>
           <button
             onClick={() => fetchCatalog(true)}
             style={{ background: 'transparent', border: '1px solid #444', color: '#aaa', borderRadius: '4px', cursor: 'pointer', padding: '3px 8px', fontSize: '0.7rem' }}
-            title="Atualizar catálogo"
+            title="Update catalog"
           >
             Sync
           </button>
         </div>
 
-        {/* Tabs */}
-        <div style={{ display: 'flex', gap: '2px', padding: '8px 8px 0' }}>
-          <button onClick={() => setActiveTab('hatch')} style={tabBtn('hatch')}>Hachuras</button>
-          <button onClick={() => setActiveTab('lin')}   style={tabBtn('lin')}>Linhas</button>
-        </div>
-
-        {/* Búsqueda (MultiFilter con pills — idéntico a LispCommandPalette) */}
-        <div style={{ padding: '8px' }}>
-          <MultiFilter
-            storageKey={`lc_filters_res_${activeTab}`}
-            placeholder="Procurar padrão..."
-            onFilterChange={setActiveFilters}
-          />
+        {/* Búsqueda y Botón Gerador */}
+        <div style={{ padding: '8px', display: 'flex', gap: '8px', alignItems: 'center' }}>
+          {!showGenerator && (
+            <>
+              <div style={{ flex: 1 }}>
+                <MultiFilter
+                  storageKey={`lc_filters_res_${activeTab}`}
+                  placeholder="Search pattern..."
+                  onFilterChange={setActiveFilters}
+                />
+              </div>
+              {activeTab === 'hatch' && !showGenerator && (
+                <button
+                  onClick={() => setShowGenerator(true)}
+                  style={{
+                    backgroundColor: 'var(--tmd-orange)',
+                    color: '#fff',
+                    border: 'none',
+                    borderRadius: '6px',
+                    padding: '8px 12px',
+                    cursor: 'pointer',
+                    fontWeight: 'bold',
+                    fontSize: '0.8rem',
+                    whiteSpace: 'nowrap'
+                  }}
+                >
+                  + Generator
+                </button>
+              )}
+            </>
+          )}
         </div>
       </div>
 
       {/* Content */}
-      <div style={{ flex: 1, overflowY: 'auto', padding: '0 8px 8px' }}>
-        {loading ? (
-          <div>
-            <div style={{ fontSize: '0.7rem', color: '#555', textTransform: 'uppercase', marginBottom: '6px', fontWeight: 'bold' }}>Carregando...</div>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(75px, 1fr))', gap: '6px' }}>
-              {[1, 2, 3, 4, 5, 6, 7, 8].map(i => (
-                <div key={i} style={{ backgroundColor: '#222', borderRadius: '4px', padding: '8px', display: 'flex', flexDirection: 'column', alignItems: 'center', height: '80px', animation: 'pulse 1.5s infinite' }}>
-                  <div style={{ width: '32px', height: '32px', backgroundColor: '#333', borderRadius: '4px', marginBottom: '10px' }}></div>
-                  <div style={{ width: '80%', height: '10px', backgroundColor: '#333', borderRadius: '2px' }}></div>
-                </div>
-              ))}
-            </div>
-            <style>{`@keyframes pulse { 0% { opacity: 0.6; } 50% { opacity: 1; } 100% { opacity: 0.6; } }`}</style>
+      <div style={{ flex: 1, display: 'flex', flexDirection: 'column', height: '100%', minHeight: 0 }}>
+        {showGenerator ? (
+          <div style={{ flex: 1, overflow: 'hidden' }}>
+            <Suspense fallback={<div style={{ padding: '20px', color: '#888', textAlign: 'center' }}>Loading generator...</div>}>
+              <HatchGenerator lang="en" isEmbedded={true} onClose={() => setShowGenerator(false)} />
+            </Suspense>
+          </div>
+        ) : loading ? (
+          <div style={{ textAlign: 'center', padding: '30px', color: '#666' }}>
+            <div style={{ width: '24px', height: '24px', border: '2px solid rgba(242,109,33,0.3)', borderTop: '2px solid var(--tmd-orange)', borderRadius: '50%', animation: 'spin 1s linear infinite', margin: '0 auto 10px' }}></div>
+            Loading Catalog...
           </div>
         ) : error ? (
           <div style={{ textAlign: 'center', padding: '20px', color: '#e74c3c', fontSize: '0.85rem' }}>
             {error}
             <button onClick={() => fetchCatalog(true)} style={{ display: 'block', margin: '10px auto', padding: '6px 16px', backgroundColor: 'var(--tmd-orange)', color: '#fff', border: 'none', borderRadius: '4px', cursor: 'pointer' }}>
-              Tentar novamente
+              Try again
             </button>
           </div>
         ) : (
-          <div>
+          <div style={{ flex: 1, overflowY: 'auto', paddingRight: '4px' }}>
             {/* Seção Favoritos (pinned) */}
             {pinned.length > 0 && activeFilters.length === 0 && (
               <div style={{ marginBottom: '14px' }}>
-                <div style={{ fontSize: '0.7rem', color: '#888', textTransform: 'uppercase', marginBottom: '6px', fontWeight: 'bold' }}>📌 Fixados</div>
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(75px, 1fr))', gap: '6px' }}>
+                <div style={{ fontSize: '0.7rem', color: '#888', textTransform: 'uppercase', marginBottom: '6px', fontWeight: 'bold' }}>📌 Favorites</div>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(130px, 1fr))', gap: '8px' }}>
                   {pinned.map(item => (
                     <ResourceItem
                       key={`pin-${item.id}`}
@@ -476,7 +555,7 @@ export default function ResourcePalette() {
                   <span>{cat}</span>
                   <span>{grouped[cat].length}</span>
                 </div>
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(75px, 1fr))', gap: '6px' }}>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(130px, 1fr))', gap: '8px' }}>
                   {grouped[cat].map(item => (
                     <ResourceItem
                       key={item.id}
@@ -493,9 +572,9 @@ export default function ResourcePalette() {
 
             {filtered.length === 0 && (
               <div style={{ textAlign: 'center', padding: '30px', color: '#666', fontSize: '0.85rem' }}>
-                <p>Nenhum padrão encontrado.</p>
+                <p>No patterns found.</p>
                 <p style={{ fontSize: '0.75rem', marginTop: '8px' }}>
-                  Adicione padrões em{' '}
+                  Add patterns at{' '}
                   <strong style={{ color: 'var(--tmd-orange)' }}>lispcentral.web.app</strong>
                 </p>
               </div>
@@ -517,6 +596,8 @@ export default function ResourcePalette() {
         {filtered.length} padrões · Clique para inserir · Clic derecho para opções
       </div>
 
+
+
       {/* Menú contextual */}
       {contextMenu && (
         <ContextMenu
@@ -529,6 +610,7 @@ export default function ResourcePalette() {
           onDownload={() => handleDownload(contextMenu.item)}
         />
       )}
+
 
       <style>{`
         @keyframes spin {

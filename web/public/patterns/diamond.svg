@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="600" height="100" viewBox="0 0 600 100">
+  <defs>
+    <style type="text/css">path {stroke-width: 1; vector-effect: non-scaling-stroke; fill:none; stroke: #000; stroke-linecap: round; stroke-linejoin: round;}</style>
+  </defs>
+  <path d="M2,49L150,0,450,100,599,50"/>
+  <path d="M2,51l148,49L450,0,599,50"/>
+</svg>

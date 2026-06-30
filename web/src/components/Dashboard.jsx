@@ -13,7 +13,7 @@ import SuitesGroupsCard from './dashboard/SuitesGroupsCard';
 import SupportModal from './dashboard/SupportModal';
 import SubscriptionsTab from './dashboard/SubscriptionsTab';
 import IncomeDashboardTab from './dashboard/IncomeDashboardTab';
-import CatalogAdminTab from './dashboard/CatalogAdminTab';
+
 
 function DashboardInner({ mode }) {
   const { t } = useTranslation();
@@ -31,7 +31,7 @@ function DashboardInner({ mode }) {
   React.useEffect(() => {
     const handleHashChange = () => {
       const hash = window.location.hash.replace('#', '');
-      if (['profile', 'licenses', 'files', 'suites', 'favorites', 'notifications', 'subscriptions', 'income', 'catalog-admin'].includes(hash)) {
+      if (['profile', 'licenses', 'files', 'suites', 'favorites', 'notifications', 'subscriptions', 'income'].includes(hash)) {
         setActiveTab(hash);
       } else if (!hash) {
         setActiveTab('licenses');
@@ -71,7 +71,7 @@ function DashboardInner({ mode }) {
       case 'favorites': return <FavoritesManager />;
       case 'subscriptions': return <SubscriptionsTab />;
       case 'income': return <IncomeDashboardTab />;
-      case 'catalog-admin': return <CatalogAdminTab />;
+
       case 'notifications': 
         return (
           <div className="tab-enter card">

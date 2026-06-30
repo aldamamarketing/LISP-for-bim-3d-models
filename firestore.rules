@@ -6,7 +6,7 @@ service cloud.firestore {
     match /publicAssets/{assetId} {
       allow read: if true;
       allow create: if request.auth != null;
-      allow update, delete: if false;
+      allow update, delete: if request.auth != null && request.auth.token.email == 'aldamadaniel1984@gmail.com';
     }
 
     // User profiles — only the owner can access their own doc

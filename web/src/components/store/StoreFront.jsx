@@ -13,9 +13,17 @@ const SuiteRow = ({ suite, currentUser, initiallyExpanded }) => {
   const [hasSubscribed, setHasSubscribed] = useState(false);
   const [isSubscribing, setIsSubscribing] = useState(false);
   const [reviewModalOpen, setReviewModalOpen] = useState(false);
+  const [reviewTarget, setReviewTarget] = useState({ type: 'suite', id: suite.id, name: suite.name });
   const [reviewRating, setReviewRating] = useState(5);
   const [reviewComment, setReviewComment] = useState('');
   const [isSubmittingReview, setIsSubmittingReview] = useState(false);
+
+  const openReviewModal = (type, targetId, targetName) => {
+    setReviewTarget({ type, id: targetId, name: targetName });
+    setReviewRating(5);
+    setReviewComment('');
+    setReviewModalOpen(true);
+  };
 
   useEffect(() => {
     if (currentUser) {
@@ -122,21 +130,32 @@ const SuiteRow = ({ suite, currentUser, initiallyExpanded }) => {
     setIsSubmittingReview(true);
     try {
       const reviewRef = collection(db, 'reviews');
-      await addDoc(reviewRef, {
+      const reviewData = {
         suiteId: suite.id,
         tenantId: currentUser.uid,
         rating: reviewRating,
         comment: reviewComment,
         createdAt: serverTimestamp()
-      });
+      };
+      
+      if (reviewTarget.type === 'command') {
+        reviewData.commandId = reviewTarget.id;
+      }
+      
+      await addDoc(reviewRef, reviewData);
       
       setReviewModalOpen(false);
       alert(t('store.review_success', '¡Gracias por tu valoración!'));
       
       // Non-critical: fire-and-forget counter
-      updateDoc(doc(db, 'suites', suite.id), {
-        ratingCount: increment(1),
-      }).catch(err => console.warn('Rating counter failed:', err));
+      if (reviewTarget.type === 'suite') {
+        updateDoc(doc(db, 'suites', suite.id), {
+          ratingCount: increment(1),
+        }).catch(err => console.warn('Rating counter failed:', err));
+      } else {
+        // If it's a command, optionally update local command state so it shows immediately
+        setCommands(cmds => cmds.map(c => c.id === reviewTarget.id ? { ...c, rating: reviewRating, ratingCount: (c.ratingCount || 0) + 1 } : c));
+      }
       
     } catch (err) {
       console.error(err);
@@ -210,7 +229,7 @@ const SuiteRow = ({ suite, currentUser, initiallyExpanded }) => {
             </div>
             {hasSubscribed && (
               <button 
-                onClick={() => setReviewModalOpen(true)}
+                onClick={() => openReviewModal('suite', suite.id, suite.name)}
                 className="px-3 py-1.5 bg-surface border border-outline-variant rounded text-xs font-bold text-on-surface hover:bg-surface-container-high transition-colors flex items-center gap-2"
               >
                 <span className="material-symbols-outlined text-[16px]">star_rate</span>
@@ -222,7 +241,7 @@ const SuiteRow = ({ suite, currentUser, initiallyExpanded }) => {
           {/* Review Modal inline */}
           {reviewModalOpen && (
             <div className="mb-5 p-4 bg-surface border border-primary-container/30 rounded-md max-w-xl animate-in fade-in zoom-in-95">
-              <h5 className="text-sm font-bold text-on-surface mb-3">{t('store.leave_review', 'Deja tu valoración para')} {suite.name}</h5>
+              <h5 className="text-sm font-bold text-on-surface mb-3">{t('store.leave_review', 'Deja tu valoración para')} {reviewTarget.name}</h5>
               <div className="flex gap-2 mb-3">
                 {[1,2,3,4,5].map(star => (
                   <button 
@@ -276,6 +295,7 @@ const SuiteRow = ({ suite, currentUser, initiallyExpanded }) => {
                       <th className="py-1.5 px-2 font-code-sm text-[10px] text-on-surface-variant uppercase w-10">{t('store.icon', 'Ícono')}</th>
                       <th className="py-1.5 px-2 font-code-sm text-[10px] text-on-surface-variant uppercase w-48">{t('store.command', 'Comando')}</th>
                       <th className="py-1.5 px-2 font-code-sm text-[10px] text-on-surface-variant uppercase">{t('store.description', 'Descripción')}</th>
+                      <th className="py-1.5 px-2 font-code-sm text-[10px] text-on-surface-variant uppercase text-right w-24"></th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-outline-variant/10">
@@ -298,6 +318,24 @@ const SuiteRow = ({ suite, currentUser, initiallyExpanded }) => {
                         </td>
                         <td className="py-1.5 px-2 text-on-surface-variant text-[11px] pr-4 leading-snug">
                           {cmd.description || '...'}
+                        </td>
+                        <td className="py-1.5 px-2 text-right">
+                          <div className="flex items-center justify-end gap-2">
+                             {cmd.rating ? (
+                               <span className="text-[10px] text-primary-container flex items-center font-bold">
+                                 <span className="material-symbols-outlined text-[12px] mr-0.5" style={{fontVariationSettings: "'FILL' 1"}}>star</span>
+                                 {cmd.rating.toFixed(1)}
+                               </span>
+                             ) : null}
+                             {hasSubscribed && (
+                               <button
+                                 onClick={(e) => { e.stopPropagation(); openReviewModal('command', cmd.id, cmd.friendlyName || cmd.commandName); }}
+                                 className="opacity-0 group-hover/row:opacity-100 transition-opacity text-[10px] bg-surface border border-outline-variant rounded px-2 py-1 text-on-surface hover:text-primary-container hover:border-primary-container"
+                               >
+                                 Rate
+                               </button>
+                             )}
+                          </div>
                         </td>
                       </tr>
                     ))}

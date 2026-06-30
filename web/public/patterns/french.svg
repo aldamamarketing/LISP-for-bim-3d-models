@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1000" height="1000" viewBox="0 0 1000 1000">
+  <defs>
+    <style type="text/css">path {stroke-width: 1; vector-effect: non-scaling-stroke; fill:none; stroke: #000; stroke-linecap: round; stroke-linejoin: round;}</style>
+  </defs>
+  <path d="M46,380H379"/>
+  <path d="M0,713H213"/>
+  <path d="M879,46h121"/>
+  <path d="M0,46H379"/>
+  <path d="M0,212.5H46"/>
+  <path d="M379,545.993V0"/>
+  <path d="M213,1000.01V380"/>
+  <path d="M46,713.006V46"/>
+  <path d="M213,46V0"/>
+  <path d="M879,212V0"/>
+  <path d="M879,1000V712"/>
+  <path d="M379,1000V879"/>
+  <path d="M1000.01,212H379"/>
+  <path d="M712.505,546H213"/>
+  <path d="M713,712.005V212"/>
+  <path d="M546,879.414V546"/>
+  <path d="M1000.01,712H546"/>
+  <path d="M879.015,879H213"/>
+</svg>

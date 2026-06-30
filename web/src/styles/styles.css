@@ -130,6 +130,18 @@ header {
   box-shadow: 0 4px 6px rgba(0,0,0,0.3);
 }
 
+/* ─────────────────────────────────────────────
+   AUTO-CAD EMBEDDED PREVIEW OVERRIDES
+   ───────────────────────────────────────────── */
+/* Color de trazo directo para evitar fallos de renderizado de filtros CSS en el navegador embebido de AutoCAD */
+.hatch-preview-layer * {
+  stroke: #f26d21 !important;
+  stroke-opacity: 1 !important;
+  opacity: 1 !important;
+  fill: none !important;
+}
+
+
 .card h3 {
   margin-top: 0;
   color: var(--tmd-orange);

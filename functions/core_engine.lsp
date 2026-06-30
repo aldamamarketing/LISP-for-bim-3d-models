@@ -286,7 +286,7 @@
         (progn
           (if codeB64
             (progn
-              (setq decoded (LC:b64-decode codeB64))
+              (setq decoded codeB64)
               ;; Guardar en cache de sesión RAM (sin disco)
               (setq *LC-ASSET-CACHE* (cons (cons assetName decoded) *LC-ASSET-CACHE*))
               (setq cachedCode decoded)
@@ -303,20 +303,47 @@
 
           (if (= assetType "hatch")
             (progn
-              ;; Escrever .pat temporário e registrar no search path
-              (setq tmpFile (strcat tmpDir "\\" assetName ".pat"))
+              ;; Determinar el nombre real del patrón dentro del archivo .pat.
+              ;; Si el código empieza con "*", el nombre real está entre "*" y ","
+              ;; y puede diferir de assetName (Generator genera nombres con dimensiones).
+              ;; Library no empieza con "*", así que assetName ya es correcto.
+              (if (= (substr cachedCode 1 1) "*")
+                (progn
+                  (setq comma-pos (vl-string-search "," cachedCode))
+                  (if comma-pos
+                    (setq hpname-to-use (substr cachedCode 2 (1- comma-pos)))
+                    (setq hpname-to-use assetName)
+                  )
+                )
+                (setq hpname-to-use assetName)
+              )
+              ;; Escrever .pat temporário (usando o nome real hpname-to-use)
+              (setq tmpFile (strcat tmpDir "\\" hpname-to-use ".pat"))
               (setq f (open tmpFile "w"))
               (if f
                 (progn
-                  (write-line (strcat "*" assetName ", LispCentral") f)
+                  (if (not (= (substr cachedCode 1 1) "*"))
+                    (write-line (strcat "*" hpname-to-use ", LispCentral") f)
+                  )
                   (write-line cachedCode f)
                   (close f)
-                  ;; Adicionar diretório temporário ao search path (se ainda não estiver)
-                  (if (not (vl-string-search tmpDir (getenv "ACAD")))
-                    (setenv "ACAD" (strcat (getenv "ACAD") ";" tmpDir))
+                  ;; Registrar el directório temporário no SupportPath activo del AutoCAD.
+                  ;; NOTA: vl-catch-all-apply requiere segundo argumento '() aunque no haya args.
+                  (vl-catch-all-apply
+                    '(lambda (/ acadObj prefObj curPaths)
+                       (setq acadObj (vlax-get-acad-object))
+                       (setq prefObj (vla-get-Preferences acadObj))
+                       (setq curPaths (vla-get-SupportPath (vla-get-Files prefObj)))
+                       (if (not (vl-string-search (strcase tmpDir) (strcase curPaths)))
+                         (vla-put-SupportPath (vla-get-Files prefObj)
+                                              (strcat curPaths ";" tmpDir))
+                       )
+                     )
+                    '()
                   )
-                  (setvar "HPNAME" assetName)
-                  (princ (strcat "\n[LC] Hachura '" assetName "' disponivel. Selecione a area interna..."))
+                  ;; Usar el nombre real extraído del header del .pat
+                  (setvar "HPNAME" hpname-to-use)
+                  (princ (strcat "\n[LC] Hachura '" hpname-to-use "' disponivel. Selecione a area interna..."))
                   (vla-sendcommand (vla-get-ActiveDocument (vlax-get-acad-object)) "._BHATCH ")
                 )
                 (princ "\n[LC][ERRO] Falha ao criar arquivo temporário. Verifique permissões do %TEMP%.")
@@ -328,7 +355,9 @@
               (setq f (open tmpFile "w"))
               (if f
                 (progn
-                  (write-line (strcat "*" assetName ", LispCentral") f)
+                  (if (not (= (substr cachedCode 1 1) "*"))
+                    (write-line (strcat "*" assetName ", LispCentral") f)
+                  )
                   (write-line cachedCode f)
                   (close f)
                   (vl-cmdf "._-LINETYPE" "_Load" assetName tmpFile "")

@@ -588,19 +588,9 @@ exports.getUserResources = onRequest({ cors: true }, async (req, res) => {
     const userDoc = userSnap.docs[0];
     const userId = userDoc.id;
 
-    // Obtener IDs de favoritos del usuario
-    const favSnap = await db.collection(`users/${userId}/favorites`).get();
-    const favIds = favSnap.docs.map(d => d.id);
-
-    if (favIds.length === 0) {
-      return res.status(200).json([]);
-    }
-
-    // Obtener los assets públicos que coincidan con los favoritos y el tipo
+    // Obtener los assets públicos que coincidan con el tipo
     const assetsSnap = await db.collection("publicAssets").where("type", "==", type).get();
-    const results = assetsSnap.docs
-      .filter(d => favIds.includes(d.id))
-      .map(d => ({ id: d.id, ...d.data() }));
+    const results = assetsSnap.docs.map(d => ({ id: d.id, ...d.data() }));
 
     res.setHeader("Cache-Control", "public, max-age=30"); // Cache corto para sync rápido
     return res.status(200).json(results);
@@ -744,45 +734,116 @@ exports.onSubscriptionCreated = onDocumentCreated("subscriptions/{subId}", async
   }
 });
 
-// Recalcular el rating de la suite cuando hay una nueva o modificada reseña
+// Recalcular el rating de la suite o del comando cuando hay una nueva o modificada reseña
 exports.onReviewWritten = onDocumentWritten("reviews/{reviewId}", async (event) => {
   const db = getDb();
   
-  // Si se borró, el doc posterior no existe. Tomamos el previo para saber qué suiteId es.
+  // Si se borró, el doc posterior no existe. Tomamos el previo.
   const docData = event.data.after.exists ? event.data.after.data() : event.data.before.data();
-  if (!docData || !docData.suiteId) return;
+  if (!docData) return;
 
   const suiteId = docData.suiteId;
+  const commandId = docData.commandId;
 
-  try {
-    const reviewsSnap = await db.collection("reviews").where("suiteId", "==", suiteId).get();
-    
-    let totalRating = 0;
-    let count = 0;
-    
-    reviewsSnap.forEach(doc => {
-      const rData = doc.data();
-      if (typeof rData.rating === "number") {
-        totalRating += rData.rating;
-        count++;
-      }
-    });
+  // Lógica para recalcular el promedio de la Suite
+  if (suiteId && !commandId) {
+    try {
+      // Nota: Si una reseña es de un comando, NO recalculamos el promedio de la suite con esa reseña,
+      // para mantener las reseñas de comandos separadas de la reseña general de la suite.
+      const reviewsSnap = await db.collection("reviews")
+        .where("suiteId", "==", suiteId)
+        // Solo contamos reseñas de la suite que no sean específicas de un comando
+        // Como Firestore no soporta un simple isNull nativo combinado con '==', 
+        // filtramos en memoria las que tengan commandId.
+        .get();
+      
+      let totalRating = 0;
+      let count = 0;
+      
+      reviewsSnap.forEach(doc => {
+        const rData = doc.data();
+        if (typeof rData.rating === "number" && !rData.commandId) {
+          totalRating += rData.rating;
+          count++;
+        }
+      });
 
-    const averageRating = count > 0 ? (totalRating / count) : 0;
+      const averageRating = count > 0 ? (totalRating / count) : 0;
 
-    await db.collection("suites").doc(suiteId).update({
-      rating: averageRating,
-      ratingCount: count
-    });
-    console.log(`Recalculated rating for suite ${suiteId}: ${averageRating} (${count} reviews)`);
-  } catch (err) {
-    console.error(`Error recalculating rating for suite ${suiteId}:`, err);
+      await db.collection("suites").doc(suiteId).update({
+        rating: averageRating,
+        ratingCount: count
+      });
+      console.log(`Recalculated rating for suite ${suiteId}: ${averageRating} (${count} reviews)`);
+    } catch (err) {
+      console.error(`Error recalculating rating for suite ${suiteId}:`, err);
+    }
+  }
+
+  // Lógica para recalcular el promedio del Comando Individual
+  if (commandId) {
+    try {
+      const reviewsSnap = await db.collection("reviews")
+        .where("commandId", "==", commandId)
+        .get();
+      
+      let totalRating = 0;
+      let count = 0;
+      
+      reviewsSnap.forEach(doc => {
+        const rData = doc.data();
+        if (typeof rData.rating === "number") {
+          totalRating += rData.rating;
+          count++;
+        }
+      });
+
+      const averageRating = count > 0 ? (totalRating / count) : 0;
+
+      await db.collection("commands").doc(commandId).update({
+        rating: averageRating,
+        ratingCount: count
+      });
+      console.log(`Recalculated rating for command ${commandId}: ${averageRating} (${count} reviews)`);
+    } catch (err) {
+      console.error(`Error recalculating rating for command ${commandId}:`, err);
+    }
   }
 });
 
 // ==========================================
 // DATA LIFECYCLE & CASCADE DELETES
 // ==========================================
+
+// Cascade delete when a Device is hard-deleted from a user's pool
+exports.onDeviceDeleted = onDocumentDeleted({ document: "users/{userId}/devices/{deviceId}", timeoutSeconds: 60 }, async (event) => {
+  const userId = event.params.userId;
+  const deviceId = event.params.deviceId;
+  const db = getDb();
+  const { admin } = getDeps();
+  
+  try {
+    // Find all subscriptions for this user where assignedDevices contains deviceId
+    const subsSnap = await db.collection("subscriptions")
+      .where("tenantId", "==", userId)
+      .where("assignedDevices", "array-contains", deviceId)
+      .get();
+      
+    if (subsSnap.empty) return;
+    
+    const batch = db.batch();
+    subsSnap.forEach(docSnap => {
+      batch.update(docSnap.ref, {
+        assignedDevices: admin.firestore.FieldValue.arrayRemove(deviceId)
+      });
+    });
+    
+    await batch.commit();
+    console.log(`Removed deleted device ${deviceId} from ${subsSnap.size} subscriptions for user ${userId}`);
+  } catch (err) {
+    console.error(`Error removing deleted device ${deviceId} from subscriptions:`, err);
+  }
+});
 
 // Cascade delete when a Suite is hard-deleted
 exports.onSuiteDeleted = onDocumentDeleted({ document: "suites/{suiteId}", timeoutSeconds: 60 }, async (event) => {
@@ -978,211 +1039,20 @@ exports.onLispFileDeleted = onDocumentDeleted({ document: "lispFiles/{fileId}", 
   }
 });
 
-// ============================================================================
-// V2 ARCHITECTURE: DENORMALIZATION TRIGGERS
-// ============================================================================
 
-// 1. Sync suiteIds array on LispFiles when a groupFile is written or deleted
-exports.syncSuiteIdsOnGroupFile = onDocumentWritten({ document: "groupFiles/{gfileId}", timeoutSeconds: 60 }, async (event) => {
-  const db = getDb();
-  const dataAfter = event.data.after.data();
-  const dataBefore = event.data.before.data();
-  const fileId = dataAfter ? dataAfter.fileId : (dataBefore ? dataBefore.fileId : null);
 
-  if (!fileId) return;
-
-  try {
-    // A. Find all groupFiles for this specific fileId
-    const groupFilesSnap = await db.collection("groupFiles").where("fileId", "==", fileId).get();
-    const groupIds = groupFilesSnap.docs.map(d => d.data().groupId);
-
-    // B. Resolve unique suiteIds from those groups
-    const uniqueSuiteIds = new Set();
-    if (groupIds.length > 0) {
-      // Chunking for safety if > 10, though rare for a single file
-      for (let i = 0; i < groupIds.length; i += 10) {
-        const chunk = groupIds.slice(i, i + 10);
-        const groupsSnap = await db.collection("groups").where("__name__", "in", chunk).get();
-        groupsSnap.docs.forEach(doc => {
-          if (doc.data().suiteId) uniqueSuiteIds.add(doc.data().suiteId);
-        });
-      }
-    }
-
-    // C. Update the lispFiles document
-    await db.collection("lispFiles").doc(fileId).update({
-      suiteIds: Array.from(uniqueSuiteIds)
-    });
-    console.log(`Synced suiteIds for file ${fileId}:`, Array.from(uniqueSuiteIds));
-  } catch (err) {
-    console.error(`Error syncing suiteIds for file ${fileId}:`, err);
+// Endpoint para generar el patrón Hatch algorítmico en la nube
+exports.buildHatchPattern = onCall(async (request) => {
+  const { archetypeId, params } = request.data;
+  if (!archetypeId || !params) {
+    throw new HttpsError('invalid-argument', 'Missing archetypeId or params');
   }
-});
-
-// 2. Cascade delete groups when a suite is deleted
-exports.onSuiteDeleted = onDocumentDeleted({ document: "suites/{suiteId}", timeoutSeconds: 60 }, async (event) => {
-  const suiteId = event.params.suiteId;
-  const db = getDb();
+  const { generatePatternString } = require('./patterns/index.js');
   try {
-    const groupsSnap = await db.collection("groups").where("suiteId", "==", suiteId).get();
-    const batch = db.batch();
-    let count = 0;
-    groupsSnap.docs.forEach(doc => {
-      batch.delete(doc.ref);
-      count++;
-    });
-    if (count > 0) {
-      await batch.commit();
-      console.log(`Cascade delete: removed ${count} groups for suite ${suiteId}`);
-    }
+    const patCode = generatePatternString(archetypeId, params);
+    return { patCode };
   } catch (err) {
-    console.error(`Error in cascade delete for suite ${suiteId}:`, err);
-  }
-});
-// Cascade delete when a Group is hard-deleted
-exports.onGroupDeleted = onDocumentDeleted({ document: "groups/{groupId}", timeoutSeconds: 60 }, async (event) => {
-  const groupId = event.params.groupId;
-  const db = getDb();
-  
-  try {
-    const gfSnap = await db.collection("groupFiles").where("groupId", "==", groupId).get();
-    const batch = db.batch();
-    gfSnap.docs.forEach(doc => batch.delete(doc.ref));
-    
-    if (!gfSnap.empty) {
-      await batch.commit();
-      console.log(`Cascade delete: removed ${gfSnap.size} groupFiles for group ${groupId}`);
-    }
-  } catch (err) {
-    console.error(`Error in cascade delete for group ${groupId}:`, err);
-  }
-});
-
-// Cascade delete when a LispFile is hard-deleted
-exports.onLispFileDeleted = onDocumentDeleted({ document: "lispFiles/{fileId}", timeoutSeconds: 60 }, async (event) => {
-  const fileId = event.params.fileId;
-  const fileData = event.data.data();
-  const db = getDb();
-  const { admin } = getDeps();
-  const batch = db.batch();
-  let count = 0;
-
-  try {
-    const cmdsSnap = await db.collection("commands").where("lispFileId", "==", fileId).get();
-    cmdsSnap.docs.forEach(doc => {
-      batch.delete(doc.ref);
-      count++;
-    });
-
-    const gfSnap = await db.collection("groupFiles").where("fileId", "==", fileId).get();
-    gfSnap.docs.forEach(doc => {
-      batch.delete(doc.ref);
-      count++;
-    });
-
-    if (count > 0) {
-      await batch.commit();
-    }
-
-    if (fileData && fileData.storagePath) {
-      try {
-        const bucket = admin.storage().bucket("lispcentral.firebasestorage.app");
-        await bucket.file(fileData.storagePath).delete();
-        console.log(`Storage file deleted: ${fileData.storagePath}`);
-      } catch (storageErr) {
-        if (storageErr.code !== 404) {
-          console.error(`Failed to delete storage file ${fileData.storagePath}:`, storageErr);
-        }
-      }
-    }
-    
-    console.log(`Cascade delete completed for lispFile ${fileId}. Deleted ${count} docs.`);
-  } catch (err) {
-    console.error(`Error in cascade delete for lispFile ${fileId}:`, err);
-  }
-});
-
-// ============================================================================
-// V2 ARCHITECTURE: DENORMALIZATION TRIGGERS
-// ============================================================================
-
-// 1. Sync suiteIds array on LispFiles when a groupFile is written or deleted
-exports.syncSuiteIdsOnGroupFile = onDocumentWritten({ document: "groupFiles/{gfileId}", timeoutSeconds: 60 }, async (event) => {
-  const db = getDb();
-  const dataAfter = event.data.after.data();
-  const dataBefore = event.data.before.data();
-  const fileId = dataAfter ? dataAfter.fileId : (dataBefore ? dataBefore.fileId : null);
-
-  if (!fileId) return;
-
-  try {
-    // A. Find all groupFiles for this specific fileId
-    const groupFilesSnap = await db.collection("groupFiles").where("fileId", "==", fileId).get();
-    const groupIds = groupFilesSnap.docs.map(d => d.data().groupId);
-
-    // B. Resolve unique suiteIds from those groups
-    const uniqueSuiteIds = new Set();
-    if (groupIds.length > 0) {
-      // Chunking for safety if > 10, though rare for a single file
-      for (let i = 0; i < groupIds.length; i += 10) {
-        const chunk = groupIds.slice(i, i + 10);
-        const groupsSnap = await db.collection("groups").where("__name__", "in", chunk).get();
-        groupsSnap.docs.forEach(doc => {
-          if (doc.data().suiteId) uniqueSuiteIds.add(doc.data().suiteId);
-        });
-      }
-    }
-
-    // C. Update the lispFiles document
-    await db.collection("lispFiles").doc(fileId).update({
-      suiteIds: Array.from(uniqueSuiteIds)
-    });
-    console.log(`Synced suiteIds for file ${fileId}:`, Array.from(uniqueSuiteIds));
-  } catch (err) {
-    console.error(`Error syncing suiteIds for file ${fileId}:`, err);
-  }
-});
-
-// 2. Cascade delete groups when a suite is deleted
-exports.onSuiteDeleted = onDocumentDeleted({ document: "suites/{suiteId}", timeoutSeconds: 60 }, async (event) => {
-  const suiteId = event.params.suiteId;
-  const db = getDb();
-  try {
-    const groupsSnap = await db.collection("groups").where("suiteId", "==", suiteId).get();
-    const batch = db.batch();
-    let count = 0;
-    groupsSnap.docs.forEach(doc => {
-      batch.delete(doc.ref);
-      count++;
-    });
-    if (count > 0) {
-      await batch.commit();
-      console.log(`Cascade delete: removed ${count} groups for suite ${suiteId}`);
-    }
-  } catch (err) {
-    console.error(`Error in cascade delete for suite ${suiteId}:`, err);
-  }
-});
-
-// 3. Cascade delete groupFiles when a group is deleted
-// Note: This will trigger syncSuiteIdsOnGroupFile for each deleted groupFile, 
-// cleanly removing the suiteId from the lispFiles array if needed!
-exports.onGroupDeleted = onDocumentDeleted({ document: "groups/{groupId}", timeoutSeconds: 60 }, async (event) => {
-  const groupId = event.params.groupId;
-  const db = getDb();
-  try {
-    const gfSnap = await db.collection("groupFiles").where("groupId", "==", groupId).get();
-    const batch = db.batch();
-    let count = 0;
-    gfSnap.docs.forEach(doc => {
-      batch.delete(doc.ref);
-      count++;
-    });
-    if (count > 0) {
-      await batch.commit();
-      console.log(`Cascade delete: removed ${count} groupFiles for group ${groupId}`);
-    }
-  } catch (err) {
-    console.error(`Error in cascade delete for group ${groupId}:`, err);
+    console.error('Error in buildHatchPattern:', err);
+    throw new HttpsError('internal', err.message);
   }
 });
