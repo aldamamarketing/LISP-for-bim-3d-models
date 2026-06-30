@@ -458,6 +458,11 @@
     (setq *LC-PALETTE-URL* (strcat "https://lispcentral.web.app/palette?token=" *LC-SEAT-TOKEN* "&hwid=" *LC-HWID*))
   )
 
+  (if (not (vl-bb-ref '*LC-SESSION-VERSION*))
+    (vl-bb-set '*LC-SESSION-VERSION* (rtos (getvar "MILLISECS") 2 0))
+  )
+
+
   (setq loader-js (strcat (getenv "TEMP") "\\LC_Palette_Loader.js"))
   (setq f-js (open loader-js "w"))
   (if f-js 
@@ -468,7 +473,7 @@
       (setq temp-html (strcat (getenv "TEMP") "\\LC_Palette.html"))
       (princ "\n[LispCentral] Syncing latest UI from cloud...")
       (LC:Download-Asset source-url temp-html)
-      (setq local-html (strcat "file:///" (vl-string-translate "\\" "/" temp-html) "?token=" *LC-SEAT-TOKEN* "&hwId=" (LC:url-encode *LC-HWID*) "&v=" (rtos (getvar "MILLISECS") 2 0)))
+      (setq local-html (strcat "file:///" (vl-string-translate "\\" "/" temp-html) "?token=" *LC-SEAT-TOKEN* "&hwId=" (LC:url-encode *LC-HWID*) "&v=" (vl-bb-ref '*LC-SESSION-VERSION*)))
       (write-line (strcat "    Acad.Application.addPalette(\"Command Palette\", \"" local-html "\");") f-js)
       (write-line "    Acad.Editor.writeMessage(\"\\n[SUCCESS] LispCentral Palette is ready.\\n\");" f-js)
       (write-line "} else {" f-js)
@@ -498,6 +503,10 @@
   (if (not (boundp '*LC-RESOURCE-URL*)) 
     (setq *LC-RESOURCE-URL* (strcat "https://lispcentral.web.app/resource-palette?token=" *LC-SEAT-TOKEN* "&hwid=" *LC-HWID*))
   )
+
+  (if (not (vl-bb-ref '*LC-SESSION-VERSION*))
+    (vl-bb-set '*LC-SESSION-VERSION* (rtos (getvar "MILLISECS") 2 0))
+  )
   (setq loader-js (strcat (getenv "TEMP") "\\LC_Resource_Loader.js"))
   (setq f-js (open loader-js "w"))
   (if f-js 
@@ -508,7 +517,7 @@
       (setq temp-html (strcat (getenv "TEMP") "\\LC_Resource.html"))
       (princ "\n[LispCentral] Syncing Resource UI from cloud...")
       (LC:Download-Asset source-url temp-html)
-      (setq local-html (strcat "file:///" (vl-string-translate "\\" "/" temp-html) "?token=" *LC-SEAT-TOKEN* "&hwId=" (LC:url-encode *LC-HWID*) "&v=" (rtos (getvar "MILLISECS") 2 0)))
+      (setq local-html (strcat "file:///" (vl-string-translate "\\" "/" temp-html) "?token=" *LC-SEAT-TOKEN* "&hwId=" (LC:url-encode *LC-HWID*) "&v=" (vl-bb-ref '*LC-SESSION-VERSION*)))
       (write-line (strcat "    Acad.Application.addPalette(\"LispCentral Resources\", \"" local-html "\");") f-js)
       (write-line "    Acad.Editor.writeMessage(\"\\n[SUCCESS] Resource Palette is ready.\\n\");" f-js)
       (write-line "} else {" f-js)
@@ -567,6 +576,7 @@
   (setq *LC-RESOURCE-URL* nil)
   (setq *LC-PROPERTIES-URL* nil)
   (setq *LC-FORCE-RELOAD* T)
+  (vl-bb-set '*LC-SESSION-VERSION* (rtos (getvar "MILLISECS") 2 0))
   (princ "\n[LispCentral] Palette state reset.")
   (c:LC_PALETTE)
   (c:LC_RESOURCES)

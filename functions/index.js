@@ -31,6 +31,41 @@ function getDb() {
   return getAdmin().firestore();
 }
 
+// Función segura para minificar LISP respetando strings y DCL
+function stripLispComments(code) {
+  let result = "";
+  let inString = false;
+  let inComment = false;
+  for (let i = 0; i < code.length; i++) {
+    const char = code[i];
+    const prevChar = i > 0 ? code[i - 1] : '';
+
+    if (inComment) {
+      if (char === '\n' || char === '\r') {
+        inComment = false;
+        result += char;
+      }
+      continue;
+    }
+
+    // Toggle de estado de string si no está escapado
+    if (char === '"' && prevChar !== '\\') {
+      inString = !inString;
+      result += char;
+      continue;
+    }
+
+    // Iniciar comentario si encontramos ; y no estamos en un string
+    if (!inString && char === ';') {
+      inComment = true;
+      continue;
+    }
+
+    result += char;
+  }
+  return result;
+}
+
 exports.getRoutine = onRequest({ cors: true, minInstances: 1 }, async (req, res) => {
   const { fs, path } = getDeps();
   // Soporte de compatibilidad y arquitectura SaaS: token/lispId (Nuevo) o apiKey/routine (Legacy)
@@ -261,7 +296,7 @@ exports.getRoutine = onRequest({ cors: true, minInstances: 1 }, async (req, res)
           const filepath = path.join(lispDir, file);
           let filecode = fs.readFileSync(filepath, "utf8");
           
-          filecode = filecode.replace(/;+.*$/gm, ""); 
+          filecode = stripLispComments(filecode);
           filecode = filecode.replace(/^\s*[\r\n]/gm, "");
           
           const escapedCode = filecode
@@ -380,7 +415,7 @@ exports.getRoutine = onRequest({ cors: true, minInstances: 1 }, async (req, res)
       }
 
       // Minificación LISP estricta para inyección en RAM (Zero-Disk)
-      code = code.replace(/;.*$/gm, ""); // Remover todos los comentarios
+      code = stripLispComments(code); // Remover todos los comentarios de forma segura
       code = code.replace(/\r\n/g, "\n"); // Normalizar saltos de línea
       // Envolvemos en progn en el backend para entregar una S-Expression perfecta
       code = `(progn\n${code}\n(princ)\n)`;
