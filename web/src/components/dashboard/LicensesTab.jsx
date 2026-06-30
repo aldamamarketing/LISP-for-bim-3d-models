@@ -201,6 +201,7 @@ export default function LicensesTab() {
                         className="bg-transparent text-on-surface-variant hover:text-error transition-colors flex items-center justify-center w-6 h-6 rounded hover:bg-error/10" 
                         onClick={() => handleDeleteDevice(dev)}
                         title="Eliminar Equipo Permanentemente"
+                        aria-label="Eliminar Equipo Permanentemente"
                       >
                         <span className="material-symbols-outlined text-[16px]">delete</span>
                       </button>
