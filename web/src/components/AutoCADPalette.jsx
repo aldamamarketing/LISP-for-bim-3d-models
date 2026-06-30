@@ -11,7 +11,7 @@ import React from 'react';
  */
 export default function AutoCADPalette() {
   return (
-    <div style={{
+    <div data-build-hash="1782787755" style={{
       backgroundColor: '#181818',
       color: '#fff',
       minHeight: '100vh',
