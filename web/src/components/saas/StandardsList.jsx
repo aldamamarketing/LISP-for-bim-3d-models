@@ -162,6 +162,8 @@ export default function StandardsList({ teamId, searchFilters = [], isExtracting
             cmds.push(`(tmd:apply-mleaderstyle "${item.key.replace(/"/g, '\\"')}")`);
           } else if (item.type === 'tableStyle') {
             cmds.push(`(tmd:apply-tablestyle "${item.key.replace(/"/g, '\\"')}")`);
+          } else if (item.type === 'scaleList') {
+            cmds.push(`(tmd:apply-scale "${item.key.replace(/"/g, '\\"')}")`);
           }
         });
       };
@@ -257,6 +259,7 @@ export default function StandardsList({ teamId, searchFilters = [], isExtracting
     linetypes: Object.entries(standard.linetypes || {}).filter(([name]) => passesFilter(name)).sort((a, b) => a[0].localeCompare(b[0])),
     mleaderStyles: Object.entries(standard.mleaderStyles || {}).filter(([name]) => passesFilter(name)).sort((a, b) => a[0].localeCompare(b[0])),
     tableStyles: Object.entries(standard.tableStyles || {}).filter(([name]) => passesFilter(name)).sort((a, b) => a[0].localeCompare(b[0])),
+    scaleLists: Object.entries(standard.scaleLists || {}).filter(([name]) => passesFilter(name)).sort((a, b) => a[0].localeCompare(b[0])),
   };
 
   const formatGlobalVar = (name, value) => {
@@ -312,6 +315,7 @@ export default function StandardsList({ teamId, searchFilters = [], isExtracting
     { key: 'linetypes', label: 'Tipos de Línea' },
     { key: 'mleaderStyles', label: 'Directrices Múltiples' },
     { key: 'tableStyles', label: 'Estilos de Tabla' },
+    { key: 'scaleLists', label: 'Escalas Anotativas' },
   ];
 
   const toggleGroup = (key) => {
