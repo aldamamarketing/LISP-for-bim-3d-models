@@ -89,6 +89,23 @@
   (princ)
 )
 
+(defun c:RESET_SAAS_PALETTE (/ reset-js f)
+  (vl-bb-set '*LC-SAAS-PALETTE-OPEN* nil)
+  
+  (setq reset-js (strcat (getenv "TEMP") "\\LC_Reset_Loader.js"))
+  (setq f (open reset-js "w"))
+  (if f
+    (progn
+      (write-line "if (typeof window !== 'undefined') window._lcPaletteActive = false;" f)
+      (close f)
+      (command "_.WEBLOAD" "_L" (strcat "\"" reset-js "\""))
+    )
+  )
+
+  (princ "\n[DEV] Estado global reseteado. Ya puedes ejecutar TEST_SAAS_PALETTE de nuevo.")
+  (princ)
+)
+
 (princ "\n[DEV] test_saas_palette.lsp listo.")
-(princ "\n[DEV] Comandos disponibles: TEST_SAAS_PALETTE | TMD_LOAD_CORE")
+(princ "\n[DEV] Comandos disponibles: TEST_SAAS_PALETTE | TMD_LOAD_CORE | RESET_SAAS_PALETTE")
 (princ)

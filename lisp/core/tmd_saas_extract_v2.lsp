@@ -87,6 +87,71 @@
   (tmd:list->json-object (reverse entries))
 )
 
+;; Linetypes
+(defun tmd:get-linetypes-json (/ tbl entries name desc)
+  (setq tbl (tblnext "LTYPE" T))
+  (setq entries '())
+  (while tbl
+    (setq name (cdr (assoc 2 tbl)))
+    (setq desc (cdr (assoc 3 tbl)))
+    (if (not (vl-string-search "|" name))
+      (setq entries (cons
+        (strcat "\"" (tmd:escape-json-string name) "\":{\"desc\":\"" (tmd:escape-json-string (if desc desc "")) "\"}")
+      entries))
+    )
+    (setq tbl (tblnext "LTYPE"))
+  )
+  (tmd:list->json-object (reverse entries))
+)
+
+;; GlobalVars
+(defun tmd:get-globalvars-json (/ ins lt ds meas)
+  (setq ins (getvar "INSUNITS"))
+  (setq lt  (getvar "LTSCALE"))
+  (setq ds  (getvar "DIMSCALE"))
+  (setq meas(getvar "MEASUREMENT"))
+  (strcat "{"
+    "\"INSUNITS\":{\"value\":" (itoa ins) "},"
+    "\"LTSCALE\":{\"value\":" (rtos lt 2 4) "},"
+    "\"DIMSCALE\":{\"value\":" (rtos ds 2 4) "},"
+    "\"MEASUREMENT\":{\"value\":" (itoa meas) "}"
+  "}")
+)
+
+;; MLeaderStyles
+(defun tmd:get-mleaderstyles-json (/ doc dicts mldict entries name result)
+  (setq doc (vla-get-activedocument (vlax-get-acad-object)))
+  (setq dicts (vla-get-dictionaries doc))
+  (setq result (vl-catch-all-apply 'vla-item (list dicts "ACAD_MLEADERSTYLE")))
+  (setq entries '())
+  (if (not (vl-catch-all-error-p result))
+    (vlax-for obj result
+      (setq name (vla-get-name obj))
+      (if (not (vl-string-search "|" name))
+        (setq entries (cons (strcat "\"" (tmd:escape-json-string name) "\":{}") entries))
+      )
+    )
+  )
+  (tmd:list->json-object (reverse entries))
+)
+
+;; TableStyles
+(defun tmd:get-tablestyles-json (/ doc dicts entries name result)
+  (setq doc (vla-get-activedocument (vlax-get-acad-object)))
+  (setq dicts (vla-get-dictionaries doc))
+  (setq result (vl-catch-all-apply 'vla-item (list dicts "ACAD_TABLESTYLE")))
+  (setq entries '())
+  (if (not (vl-catch-all-error-p result))
+    (vlax-for obj result
+      (setq name (vla-get-name obj))
+      (if (not (vl-string-search "|" name))
+        (setq entries (cons (strcat "\"" (tmd:escape-json-string name) "\":{}") entries))
+      )
+    )
+  )
+  (tmd:list->json-object (reverse entries))
+)
+
 ;;; --- Main command ---
 
 (defun tmd:extract-stds (teamId token / payload url res)
@@ -95,9 +160,13 @@
     "\"token\":\""     (tmd:escape-json-string token)  "\","
     "\"teamId\":\""    (tmd:escape-json-string teamId) "\","
     "\"standardData\":{"
-      "\"layers\":"     (tmd:get-layers-json)     ","
-      "\"textStyles\":" (tmd:get-textstyles-json) ","
-      "\"dimStyles\":"  (tmd:get-dimstyles-json)
+      "\"layers\":"         (tmd:get-layers-json)         ","
+      "\"textStyles\":"     (tmd:get-textstyles-json)     ","
+      "\"dimStyles\":"      (tmd:get-dimstyles-json)      ","
+      "\"linetypes\":"      (tmd:get-linetypes-json)      ","
+      "\"globalVars\":"     (tmd:get-globalvars-json)     ","
+      "\"mleaderStyles\":"  (tmd:get-mleaderstyles-json)  ","
+      "\"tableStyles\":"    (tmd:get-tablestyles-json)
     "}}"
   ))
   (setq url (strcat (tmd:api-base) "/uploadDraft"))

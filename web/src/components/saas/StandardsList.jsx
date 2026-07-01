@@ -152,6 +152,17 @@ export default function StandardsList({ teamId, searchFilters = [], isExtracting
               const escapedName = item.key.replace(/"/g, '\\"');
               cmds.push(`(tmd:apply-dimstyle "${escapedName}" ${p.dimscale || 0} ${p.dimtxt || 0} ${p.dimdec || 0})`);
             }
+          } else if (item.type === 'globalVar') {
+            const p = sourceMap.globalVars[item.key];
+            if (p && p.value !== undefined) {
+              cmds.push(`(setvar "${item.key}" ${p.value})`);
+            }
+          } else if (item.type === 'linetype') {
+            cmds.push(`(tmd:apply-linetype "${item.key.replace(/"/g, '\\"')}")`);
+          } else if (item.type === 'mleaderStyle') {
+            cmds.push(`(tmd:apply-mleaderstyle "${item.key.replace(/"/g, '\\"')}")`);
+          } else if (item.type === 'tableStyle') {
+            cmds.push(`(tmd:apply-tablestyle "${item.key.replace(/"/g, '\\"')}")`);
           }
         });
       };

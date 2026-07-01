@@ -132,5 +132,51 @@
   (princ)
 )
 
+;; Creates or loads a linetype
+;; Called from JS: (tmd:apply-linetype "NAME")
+(defun tmd:apply-linetype (name / doc)
+  (setq doc (vla-get-activedocument (vlax-get-acad-object)))
+  (tmd:ensure-linetype name doc)
+  (princ (strcat "\n[TMD] Linetype ensured: " name))
+)
+
+;; Creates a basic MLeaderStyle
+;; Called from JS: (tmd:apply-mleaderstyle "NAME")
+(defun tmd:apply-mleaderstyle (name / doc dicts mlDict result styleObj)
+  (setq doc (vla-get-activedocument (vlax-get-acad-object)))
+  (setq dicts (vla-get-dictionaries doc))
+  (setq mlDict (vl-catch-all-apply 'vla-item (list dicts "ACAD_MLEADERSTYLE")))
+  (if (not (vl-catch-all-error-p mlDict))
+    (progn
+      (setq result (vl-catch-all-apply 'vla-item (list mlDict name)))
+      (if (vl-catch-all-error-p result)
+        (progn
+          (vl-catch-all-apply 'vla-addobject (list mlDict name "AcDbMLeaderStyle"))
+          (princ (strcat "\n[TMD] MLeaderStyle created: " name))
+        )
+      )
+    )
+  )
+)
+
+;; Creates a basic TableStyle
+;; Called from JS: (tmd:apply-tablestyle "NAME")
+(defun tmd:apply-tablestyle (name / doc dicts tblDict result styleObj)
+  (setq doc (vla-get-activedocument (vlax-get-acad-object)))
+  (setq dicts (vla-get-dictionaries doc))
+  (setq tblDict (vl-catch-all-apply 'vla-item (list dicts "ACAD_TABLESTYLE")))
+  (if (not (vl-catch-all-error-p tblDict))
+    (progn
+      (setq result (vl-catch-all-apply 'vla-item (list tblDict name)))
+      (if (vl-catch-all-error-p result)
+        (progn
+          (vl-catch-all-apply 'vla-addobject (list tblDict name "AcDbTableStyle"))
+          (princ (strcat "\n[TMD] TableStyle created: " name))
+        )
+      )
+    )
+  )
+)
+
 (princ "\n[TMD] tmd_saas_apply_v2.lsp loaded.")
 (princ)

@@ -12,8 +12,8 @@ const ACI_COLORS = {
 };
 const getAciColor = (aci) => ACI_COLORS[aci] || '#AAAAAA';
 
-const TYPE_LABELS = { layer: 'Layers', style: 'TextStyles', dimStyle: 'DimStyles' };
-const TYPE_ORDER = ['layer', 'style', 'dimStyle'];
+const TYPE_LABELS = { globalVar: 'Global Variables', layer: 'Layers', style: 'TextStyles', dimStyle: 'DimStyles', linetype: 'Linetypes', mleaderStyle: 'MLeader Styles', tableStyle: 'Table Styles' };
+const TYPE_ORDER = ['globalVar', 'layer', 'style', 'dimStyle', 'linetype', 'mleaderStyle', 'tableStyle'];
 
 export default function DiffMergePanel({ draft, currentStandard, searchFilters = [], onCommit, onCancel, mode = 'extract' }) {
   const [diff, setDiff] = useState({ newItems: [], modifiedItems: [], missingItems: [] });
@@ -34,9 +34,18 @@ export default function DiffMergePanel({ draft, currentStandard, searchFilters =
     const draftLayers  = draft.layers     || {};
     const draftStyles  = draft.textStyles || {};
     const draftDims    = draft.dimStyles  || {};
+    const draftGlobals = draft.globalVars || {};
+    const draftLtypes  = draft.linetypes  || {};
+    const draftMLdrs   = draft.mleaderStyles || {};
+    const draftTables  = draft.tableStyles || {};
+
     const curLayers    = currentStandard?.layers     || {};
     const curStyles    = currentStandard?.textStyles || {};
     const curDims      = currentStandard?.dimStyles  || {};
+    const curGlobals   = currentStandard?.globalVars || {};
+    const curLtypes    = currentStandard?.linetypes  || {};
+    const curMLdrs     = currentStandard?.mleaderStyles || {};
+    const curTables    = currentStandard?.tableStyles || {};
 
     // --- Layers ---
     Object.keys(draftLayers).forEach(key => {
@@ -88,6 +97,42 @@ export default function DiffMergePanel({ draft, currentStandard, searchFilters =
       if (!draftDims[key]) missingItems.push({ type: 'dimStyle', key, data: curDims[key] });
     });
 
+    // --- Global Vars ---
+    // Global vars never "miss" or are "new", they only deviate (modify).
+    Object.keys(draftGlobals).forEach(key => {
+      const d = draftGlobals[key], c = curGlobals[key];
+      if (c && d.value !== c.value) {
+        modifiedItems.push({ type: 'globalVar', key, data: d, changes: [`Value: ${c.value} → ${d.value}`] });
+      } else if (!c) {
+        // Technically standard doesn't have it, we could treat as new
+        newItems.push({ type: 'globalVar', key, data: d });
+      }
+    });
+
+    // --- Linetypes ---
+    Object.keys(draftLtypes).forEach(key => {
+      if (!curLtypes[key]) newItems.push({ type: 'linetype', key, data: draftLtypes[key] });
+    });
+    Object.keys(curLtypes).forEach(key => {
+      if (!draftLtypes[key]) missingItems.push({ type: 'linetype', key, data: curLtypes[key] });
+    });
+
+    // --- MLeader Styles ---
+    Object.keys(draftMLdrs).forEach(key => {
+      if (!curMLdrs[key]) newItems.push({ type: 'mleaderStyle', key, data: draftMLdrs[key] });
+    });
+    Object.keys(curMLdrs).forEach(key => {
+      if (!draftMLdrs[key]) missingItems.push({ type: 'mleaderStyle', key, data: curMLdrs[key] });
+    });
+
+    // --- Table Styles ---
+    Object.keys(draftTables).forEach(key => {
+      if (!curTables[key]) newItems.push({ type: 'tableStyle', key, data: draftTables[key] });
+    });
+    Object.keys(curTables).forEach(key => {
+      if (!draftTables[key]) missingItems.push({ type: 'tableStyle', key, data: curTables[key] });
+    });
+
     setDiff({ newItems, modifiedItems, missingItems });
     // New items: checked by default. Modified & Missing: unchecked for safety.
     setSelectedNews(new Set(newItems.map(i => `${i.type}-${i.key}`)));
@@ -133,23 +178,35 @@ export default function DiffMergePanel({ draft, currentStandard, searchFilters =
   // --- Commit ---
   const handleCommit = () => {
     const merged = {
-      layers:     { ...(currentStandard?.layers     || {}) },
-      textStyles: { ...(currentStandard?.textStyles || {}) },
-      dimStyles:  { ...(currentStandard?.dimStyles  || {}) },
+      layers:        { ...(currentStandard?.layers        || {}) },
+      textStyles:    { ...(currentStandard?.textStyles    || {}) },
+      dimStyles:     { ...(currentStandard?.dimStyles     || {}) },
+      globalVars:    { ...(currentStandard?.globalVars    || {}) },
+      linetypes:     { ...(currentStandard?.linetypes     || {}) },
+      mleaderStyles: { ...(currentStandard?.mleaderStyles || {}) },
+      tableStyles:   { ...(currentStandard?.tableStyles   || {}) },
     };
 
     const applyItems = (items, selected) => items.forEach(item => {
       if (!selected.has(`${item.type}-${item.key}`)) return;
-      if (item.type === 'layer')    merged.layers[item.key]     = item.data;
-      if (item.type === 'style')    merged.textStyles[item.key] = item.data;
-      if (item.type === 'dimStyle') merged.dimStyles[item.key]  = item.data;
+      if (item.type === 'layer')        merged.layers[item.key]        = item.data;
+      if (item.type === 'style')        merged.textStyles[item.key]    = item.data;
+      if (item.type === 'dimStyle')     merged.dimStyles[item.key]     = item.data;
+      if (item.type === 'globalVar')    merged.globalVars[item.key]    = item.data;
+      if (item.type === 'linetype')     merged.linetypes[item.key]     = item.data;
+      if (item.type === 'mleaderStyle') merged.mleaderStyles[item.key] = item.data;
+      if (item.type === 'tableStyle')   merged.tableStyles[item.key]   = item.data;
     });
 
     const removeItems = (items, selected) => items.forEach(item => {
       if (!selected.has(`${item.type}-${item.key}`)) return;
-      if (item.type === 'layer')    delete merged.layers[item.key];
-      if (item.type === 'style')    delete merged.textStyles[item.key];
-      if (item.type === 'dimStyle') delete merged.dimStyles[item.key];
+      if (item.type === 'layer')        delete merged.layers[item.key];
+      if (item.type === 'style')        delete merged.textStyles[item.key];
+      if (item.type === 'dimStyle')     delete merged.dimStyles[item.key];
+      if (item.type === 'globalVar')    delete merged.globalVars[item.key];
+      if (item.type === 'linetype')     delete merged.linetypes[item.key];
+      if (item.type === 'mleaderStyle') delete merged.mleaderStyles[item.key];
+      if (item.type === 'tableStyle')   delete merged.tableStyles[item.key];
     });
 
     applyItems(diff.newItems,      selectedNews);
