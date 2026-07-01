@@ -22,6 +22,9 @@ export default function DiffMergePanel({ draft, currentStandard, searchFilters =
   const [selectedMissing, setSelectedMissing] = useState(new Set());
   // Keys: '{section}-{type}', e.g. 'new-layer', 'mod-style'
   const [collapsedSubGroups, setCollapsedSubGroups] = useState(new Set());
+  // layerMappings: { [oldLayerName]: targetStandardLayerName }
+  const [layerMappings, setLayerMappings] = useState({});
+  const [mappingActiveFor, setMappingActiveFor] = useState(null);
 
   useEffect(() => {
     if (!draft) return;
@@ -154,12 +157,12 @@ export default function DiffMergePanel({ draft, currentStandard, searchFilters =
     removeItems(diff.missingItems, selectedMissing);
 
     const selectedActions = {
-      newItems: diff.newItems.filter(i => selectedNews.has(`${i.type}-${i.key}`)),
+      newItems: diff.newItems.filter(i => selectedNews.has(`${i.type}-${i.key}`) || (i.type === 'layer' && layerMappings[i.key])),
       modifiedItems: diff.modifiedItems.filter(i => selectedMods.has(`${i.type}-${i.key}`)),
       missingItems: diff.missingItems.filter(i => selectedMissing.has(`${i.type}-${i.key}`))
     };
 
-    onCommit({ merged, selectedActions });
+    onCommit({ merged, selectedActions, layerMappings });
   };
 
   // --- Filter ---
@@ -171,18 +174,22 @@ export default function DiffMergePanel({ draft, currentStandard, searchFilters =
   };
 
   // --- Row renderer ---
-  const renderItem = (item, i, selectedSet, toggleFn) => {
-    const isChecked = selectedSet.has(`${item.type}-${item.key}`);
+  const renderItem = (item, i, selectedSet, toggleFn, sectionKey) => {
+    // Si la capa está mapeada, se asume seleccionada/procesada (solo en modo audit y sección new)
+    const isMapped = mode === 'audit' && sectionKey === 'new' && item.type === 'layer' && layerMappings[item.key];
+    const isChecked = isMapped || selectedSet.has(`${item.type}-${item.key}`);
+    
     return (
-      <div key={`${item.type}-${item.key}-${i}`} style={{ borderBottom: '1px solid #2d3748' }}>
+      <div key={`${item.type}-${item.key}-${i}`} style={{ borderBottom: '1px solid #2d3748', position: 'relative' }}>
         <label style={{ display: 'flex', alignItems: 'center', padding: '4px 20px 4px 20px', fontSize: '0.75rem', cursor: 'pointer', margin: 0, boxSizing: 'border-box' }}>
           <input
             type="checkbox"
             style={{ margin: '0 8px 0 0', flexShrink: 0 }}
             checked={isChecked}
+            disabled={isMapped}
             onChange={() => toggleFn(`${item.type}-${item.key}`)}
           />
-          <span style={{ fontFamily: 'monospace', color: '#d1d5db', flex: 1, textOverflow: 'ellipsis', overflow: 'hidden', whiteSpace: 'nowrap' }}>
+          <span style={{ fontFamily: 'monospace', color: isMapped ? '#9ca3af' : '#d1d5db', textDecoration: isMapped ? 'line-through' : 'none', flex: 1, textOverflow: 'ellipsis', overflow: 'hidden', whiteSpace: 'nowrap' }}>
             {item.key}
           </span>
           {item.type === 'layer' && (
@@ -194,7 +201,47 @@ export default function DiffMergePanel({ draft, currentStandard, searchFilters =
           {item.type === 'dimStyle' && (
             <span style={{ color: '#6b7280', fontSize: '10px', flexShrink: 0 }}>×{item.data.dimscale}</span>
           )}
+          
+          {mode === 'audit' && sectionKey === 'new' && item.type === 'layer' && (
+            <div style={{ marginLeft: '8px', flexShrink: 0 }}>
+              {isMapped ? (
+                <span 
+                  onClick={(e) => { e.preventDefault(); setLayerMappings(prev => { const n = {...prev}; delete n[item.key]; return n; }); }}
+                  style={{ color: '#fbbf24', fontSize: '10px', cursor: 'pointer', border: '1px solid #fbbf24', padding: '2px 4px', borderRadius: '4px' }}>
+                  → {layerMappings[item.key]} ✕
+                </span>
+              ) : (
+                <span 
+                  onClick={(e) => { e.preventDefault(); setMappingActiveFor(mappingActiveFor === item.key ? null : item.key); }}
+                  style={{ color: '#60a5fa', fontSize: '10px', cursor: 'pointer', border: '1px solid #3b82f6', padding: '2px 4px', borderRadius: '4px' }}>
+                  Map to...
+                </span>
+              )}
+            </div>
+          )}
         </label>
+        {mappingActiveFor === item.key && (
+          <div style={{ position: 'absolute', top: '100%', right: '10px', width: '200px', maxHeight: '150px', overflowY: 'auto', backgroundColor: '#1f2937', border: '1px solid #4b5563', borderRadius: '4px', zIndex: 50, boxShadow: '0 4px 6px rgba(0,0,0,0.5)' }}>
+            {diff.missingItems.filter(m => m.type === 'layer').length === 0 && (
+              <div style={{ padding: '8px', fontSize: '10px', color: '#9ca3af' }}>No missing layers to map to.</div>
+            )}
+            {diff.missingItems.filter(m => m.type === 'layer').map(m => (
+              <div 
+                key={m.key} 
+                onClick={(e) => {
+                  e.preventDefault();
+                  setLayerMappings(prev => ({ ...prev, [item.key]: m.key }));
+                  setMappingActiveFor(null);
+                }}
+                style={{ padding: '6px 10px', fontSize: '10px', cursor: 'pointer', borderBottom: '1px solid #374151' }}
+                onMouseEnter={e => e.target.style.backgroundColor = '#374151'}
+                onMouseLeave={e => e.target.style.backgroundColor = 'transparent'}
+              >
+                {m.key}
+              </div>
+            ))}
+          </div>
+        )}
         {item.changes && item.changes.length > 0 && (
           <div style={{ padding: '0 20px 4px 36px', fontSize: '10px', color: '#6b7280' }}>
             {item.changes.map((c, j) => <div key={j}>{c}</div>)}
@@ -255,7 +302,7 @@ export default function DiffMergePanel({ draft, currentStandard, searchFilters =
                 </div>
               )}
               {!isCollapsed && typeItems.map((item, i) =>
-                renderItem(item, i, selectedSet, toggleFn)
+                renderItem(item, i, selectedSet, toggleFn, sectionKey)
               )}
             </div>
           );
@@ -283,9 +330,19 @@ export default function DiffMergePanel({ draft, currentStandard, searchFilters =
 
       {/* Scrollable content */}
       <div style={{ flex: 1, overflowY: 'auto' }}>
-        {renderSection(diff.newItems,      selectedNews,    (id) => toggleItem(id, selectedNews,    setSelectedNews),    'new',     mode === 'extract' ? 'New in DWG (Add to Cloud)' : 'Extra in DWG (Ignore)', '#38bdf8')}
-        {renderSection(diff.modifiedItems, selectedMods,    (id) => toggleItem(id, selectedMods,    setSelectedMods),    'mod',     mode === 'extract' ? 'Modified (Update Cloud)' : 'Deviates (Fix in DWG)', '#fbbf24')}
-        {renderSection(diff.missingItems,  selectedMissing, (id) => toggleItem(id, selectedMissing, setSelectedMissing), 'missing', mode === 'extract' ? 'Missing in DWG (Delete from Cloud)' : 'Missing (Create in DWG)', '#f87171')}
+        {mode === 'extract' ? (
+          <>
+            {renderSection(diff.newItems,      selectedNews,    (id) => toggleItem(id, selectedNews,    setSelectedNews),    'new',     'New in DWG (Add to Cloud)',             '#38bdf8')}
+            {renderSection(diff.modifiedItems, selectedMods,    (id) => toggleItem(id, selectedMods,    setSelectedMods),    'mod',     'Modified (Update Cloud)',               '#fbbf24')}
+            {renderSection(diff.missingItems,  selectedMissing, (id) => toggleItem(id, selectedMissing, setSelectedMissing), 'missing', 'Missing in DWG (Delete from Cloud)','#f87171')}
+          </>
+        ) : (
+          <>
+            {renderSection(diff.missingItems,  selectedMissing, (id) => toggleItem(id, selectedMissing, setSelectedMissing), 'missing', 'Missing (Create in DWG)', '#38bdf8')}
+            {renderSection(diff.modifiedItems, selectedMods,    (id) => toggleItem(id, selectedMods,    setSelectedMods),    'mod',     'Deviates (Fix in DWG)', '#fbbf24')}
+            {renderSection(diff.newItems,      selectedNews,    (id) => toggleItem(id, selectedNews,    setSelectedNews),    'new',     'Extra in DWG (Map/Delete)', '#f87171')}
+          </>
+        )}
 
         {totalAll === 0 && (
           <div style={{ textAlign: 'center', padding: '40px', color: '#888', fontSize: '0.75rem' }}>

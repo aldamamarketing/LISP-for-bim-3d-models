@@ -110,13 +110,26 @@ export default function StandardsList({ teamId, searchFilters = [], isExtracting
     return () => clearInterval(interval);
   }, [isExtracting, isAuditing, panelMode, teamId, onExtractComplete]);
 
-  const handleCommitMerge = ({ merged, selectedActions }) => {
+  const handleCommitMerge = ({ merged, selectedActions, layerMappings }) => {
     setShowDiff(false);
     if (onEditingStateChange) onEditingStateChange(false);
     
     if (panelMode === 'audit') {
       // FIX DWG MODE: Construct LISP to apply fixes to DWG
       const cmds = [];
+
+      // 1. Rename extra layers mapped to standard layers
+      if (layerMappings) {
+        Object.keys(layerMappings).forEach(oldLayer => {
+          const newLayer = layerMappings[oldLayer];
+          const escapedOld = oldLayer.replace(/"/g, '\\"');
+          const escapedNew = newLayer.replace(/"/g, '\\"');
+          // Rename if old exists and new does NOT exist (to prevent rename crash)
+          cmds.push(`(if (and (tblsearch "LAYER" "${escapedOld}") (not (tblsearch "LAYER" "${escapedNew}"))) (command ".-rename" "layer" "${escapedOld}" "${escapedNew}"))`);
+        });
+      }
+
+      // 2. Apply standard properties (color, linetype)
       const addCmds = (items, sourceMap) => {
         items.forEach(item => {
           if (item.type === 'layer') {
@@ -139,6 +152,22 @@ export default function StandardsList({ teamId, searchFilters = [], isExtracting
       // We apply standard values (from currentStandard) to fix the DWG
       addCmds(selectedActions.modifiedItems, standard);
       addCmds(selectedActions.missingItems, standard);
+
+      // If a layer was "mapped" (and thus not formally selected as missing), 
+      // we still need to apply its standard color/linetype because it just got renamed!
+      if (layerMappings) {
+        Object.values(layerMappings).forEach(targetLayer => {
+          // If it wasn't already in missingItems to be processed
+          if (!selectedActions.missingItems.find(i => i.key === targetLayer)) {
+            const p = standard.layers[targetLayer];
+            if (p) {
+              const escapedName = targetLayer.replace(/"/g, '\\"');
+              const escapedLtype = (p.ltype || 'Continuous').replace(/"/g, '\\"');
+              cmds.push(`(tmd:apply-layer "${escapedName}" ${p.color} "${escapedLtype}" ${p.lineweight || 25})`);
+            }
+          }
+        });
+      }
 
       if (cmds.length > 0) {
         cmds.push('(c:TMD_APPLY_COMPLETE)');
