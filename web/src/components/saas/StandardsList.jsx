@@ -146,6 +146,12 @@ export default function StandardsList({ teamId, searchFilters = [], isExtracting
               const escapedFont = (p.font || '').replace(/"/g, '\\"');
               cmds.push(`(tmd:apply-textstyle "${escapedName}" "${escapedFont}" ${p.height || 0})`);
             }
+          } else if (item.type === 'dimStyle') {
+            const p = sourceMap.dimStyles[item.key];
+            if (p) {
+              const escapedName = item.key.replace(/"/g, '\\"');
+              cmds.push(`(tmd:apply-dimstyle "${escapedName}" ${p.dimscale || 0} ${p.dimtxt || 0} ${p.dimdec || 0})`);
+            }
           }
         });
       };

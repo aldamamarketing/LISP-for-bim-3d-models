@@ -124,3 +124,23 @@ Los motores AutoLISP antiguos (ej. AutoCAD 2021) presentan fallos críticos (File
 
 ### 2. Idempotencia de la Paleta CEF (Blackboard Variables)
 Debido a que el contexto de variables LISP se reinicia por cada documento abierto, usar variables locales para rastrear si la paleta ya fue inyectada causa ventanas duplicadas. **Solución**: Utilizar las funciones de Blackboard de AutoLISP (l-bb-set, l-bb-ref) para compartir estados de la aplicación (*LC-SAAS-PALETTE-OPEN*) a través de todos los dibujos, asegurando una instancia única de la interfaz.
+
+## Roadmap a Futuro (Expansión del Estándar)
+La visión arquitectónica del SaaS es cubrir el ecosistema completo de objetos nombrados (Named Objects) y variables de entorno del DWG. 
+
+### 1. Variables Globales del Dibujo
+El estándar debe dictar y corregir:
+- **Unidades de Inserción (INSUNITS)**
+- **Escalas Globales (LTSCALE, DIMSCALE)**
+- **Variables de visualización y precisión (AUPREC, LUPREC)**
+
+### 2. Estandarización Profunda de Objetos (Purge-level)
+Inspirado en el árbol de dependencias de AutoCAD, las siguientes iteraciones del motor de extracción/auditoría incluirán:
+- Blocks (Bloques dinámicos y estáticos)
+- Multileader Styles (MLeader)
+- Table Styles
+- Materials
+- Plot Styles (CTB/STB asignations)
+- Detail & Section View Styles
+
+La arquitectura JSON actual (basada en \layers\, \	extStyles\, \dimStyles\) está diseñada para escalar horizontalmente y soportar estas nuevas ramas sin romper la compatibilidad hacia atrás.

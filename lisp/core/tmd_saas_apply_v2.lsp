@@ -94,6 +94,32 @@
   )
 )
 
+;; Creates or updates a dimension style.
+;; Called from JS: (tmd:apply-dimstyle "NAME" DIMSCALE DIMTXT DIMDEC)
+(defun tmd:apply-dimstyle (name dimscale dimtxt dimdec / doc styles style result)
+  (setq doc    (vla-get-activedocument (vlax-get-acad-object)))
+  (setq styles (vla-get-dimstyles doc))
+
+  (setq result (vl-catch-all-apply 'vla-item (list styles name)))
+  (if (vl-catch-all-error-p result)
+    (setq style (vla-add styles name))
+    (setq style result)
+  )
+
+  ;; Modify style by making it active, setting sysvars, and saving back
+  (vl-catch-all-apply 'vla-put-activedimstyle (list doc style))
+  
+  (if (and dimscale (> dimscale 0.0)) (vl-catch-all-apply 'setvar (list "DIMSCALE" (float dimscale))))
+  (if (and dimtxt (> dimtxt 0.0))     (vl-catch-all-apply 'setvar (list "DIMTXT" (float dimtxt))))
+  (if (and dimdec (>= dimdec 0))      (vl-catch-all-apply 'setvar (list "DIMDEC" dimdec)))
+  ;; Note: we use vl-catch-all-apply because some variables might be read-only in certain states
+
+  ;; Save document overrides to the active style
+  (vl-catch-all-apply 'vla-copyfrom (list style doc))
+
+  (princ (strcat "\n[TMD] DimStyle: " name))
+)
+
 ;;; --- Completion Signal ---
 
 ;; Called by JS when all apply-layer calls have finished.
