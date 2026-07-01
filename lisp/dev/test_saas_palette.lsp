@@ -13,6 +13,7 @@
 
 (defun c:TEST_SAAS_PALETTE (/ loader-js f-js palette-url)
   (vl-load-com)
+  (c:TMD_LOAD_CORE)
   (princ "\n[⚙] Cargando SaaS Palette (modo DEV)...")
 
   ;; Token y HWID: usa globals si ya existen (definidos por el Loader real)

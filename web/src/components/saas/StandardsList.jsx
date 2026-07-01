@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { db, auth } from '../../firebase';
 import { doc, getDoc, onSnapshot } from 'firebase/firestore';
-import { List } from 'react-window';
 import DiffMergePanel from './DiffMergePanel';
 
 export default function StandardsList({ teamId, searchFilters = [], isExtracting, onExtractComplete, onEditingStateChange, onStandardLoaded }) {
@@ -243,9 +242,6 @@ export default function StandardsList({ teamId, searchFilters = [], isExtracting
     );
   }
 
-  const rawLayers = Object.entries(standard.layers || {});
-  const rawTextStyles = Object.entries(standard.textStyles || {});
-
   // Apply search filters
   const passesFilter = (name) => {
     if (!searchFilters || searchFilters.length === 0) return true;
@@ -253,32 +249,71 @@ export default function StandardsList({ teamId, searchFilters = [], isExtracting
     return searchFilters.every(f => lowerName.includes(f.toLowerCase()));
   };
 
-  const layersArray = rawLayers.filter(([name]) => passesFilter(name)).sort((a, b) => a[0].localeCompare(b[0]));
-  const textStylesArray = rawTextStyles.filter(([name]) => passesFilter(name)).sort((a, b) => a[0].localeCompare(b[0]));
+  const arrays = {
+    layers: Object.entries(standard.layers || {}).filter(([name]) => passesFilter(name)).sort((a, b) => a[0].localeCompare(b[0])),
+    textStyles: Object.entries(standard.textStyles || {}).filter(([name]) => passesFilter(name)).sort((a, b) => a[0].localeCompare(b[0])),
+    dimStyles: Object.entries(standard.dimStyles || {}).filter(([name]) => passesFilter(name)).sort((a, b) => a[0].localeCompare(b[0])),
+    globalVars: Object.entries(standard.globalVars || {}).filter(([name]) => passesFilter(name)).sort((a, b) => a[0].localeCompare(b[0])),
+    linetypes: Object.entries(standard.linetypes || {}).filter(([name]) => passesFilter(name)).sort((a, b) => a[0].localeCompare(b[0])),
+    mleaderStyles: Object.entries(standard.mleaderStyles || {}).filter(([name]) => passesFilter(name)).sort((a, b) => a[0].localeCompare(b[0])),
+    tableStyles: Object.entries(standard.tableStyles || {}).filter(([name]) => passesFilter(name)).sort((a, b) => a[0].localeCompare(b[0])),
+  };
 
-  const renderLayerRow = ({ index, style }) => {
-    const [name, props] = layersArray[index];
-    const colorHex = getAutoCADColor(props.color);
-    return (
-      <div style={{ ...style, display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '4px 20px 4px 12px', boxSizing: 'border-box', borderBottom: '1px solid #333', fontSize: '0.75rem', cursor: 'default' }}>
-        <span style={{ fontFamily: 'monospace', color: '#d1d5db', textOverflow: 'ellipsis', overflow: 'hidden', whiteSpace: 'nowrap', paddingRight: '8px', width: '66.666%' }} title={name}>{name}</span>
-        <div style={{ display: 'flex', alignItems: 'center', width: '33.333%', justifyContent: 'flex-end', gap: '8px' }}>
-          <div style={{ width: '8px', height: '8px', borderRadius: '50%', flexShrink: 0, backgroundColor: colorHex }} title={`Color ACI: ${props.color}`}></div>
-          <span style={{ color: '#6b7280', textOverflow: 'ellipsis', overflow: 'hidden', whiteSpace: 'nowrap', fontSize: '10px' }} title={props.linetype}>{props.linetype}</span>
+  const renderRow = (type, name, props) => {
+    if (type === 'layers') {
+      const colorHex = getAutoCADColor(props.color);
+      return (
+        <div key={name} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '4px 20px 4px 12px', boxSizing: 'border-box', borderBottom: '1px solid #333', fontSize: '0.75rem', cursor: 'default' }}>
+          <span style={{ fontFamily: 'monospace', color: '#d1d5db', textOverflow: 'ellipsis', overflow: 'hidden', whiteSpace: 'nowrap', paddingRight: '8px', width: '66.666%' }} title={name}>{name}</span>
+          <div style={{ display: 'flex', alignItems: 'center', width: '33.333%', justifyContent: 'flex-end', gap: '8px' }}>
+            <div style={{ width: '8px', height: '8px', borderRadius: '50%', flexShrink: 0, backgroundColor: colorHex }} title={`Color ACI: ${props.color}`}></div>
+            <span style={{ color: '#6b7280', textOverflow: 'ellipsis', overflow: 'hidden', whiteSpace: 'nowrap', fontSize: '10px' }} title={props.linetype}>{props.linetype}</span>
+          </div>
         </div>
-      </div>
-    );
+      );
+    } else if (type === 'textStyles') {
+      return (
+        <div key={name} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '4px 20px 4px 12px', boxSizing: 'border-box', borderBottom: '1px solid #333', fontSize: '0.75rem', cursor: 'default' }}>
+          <span style={{ fontFamily: 'monospace', color: '#d1d5db', textOverflow: 'ellipsis', overflow: 'hidden', whiteSpace: 'nowrap', paddingRight: '8px', width: '50%' }} title={name}>{name}</span>
+          <span style={{ color: '#6b7280', textOverflow: 'ellipsis', overflow: 'hidden', whiteSpace: 'nowrap', width: '50%', textAlign: 'right' }} title={props.font}>{props.font}</span>
+        </div>
+      );
+    } else if (type === 'globalVars') {
+      return (
+        <div key={name} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '4px 20px 4px 12px', boxSizing: 'border-box', borderBottom: '1px solid #333', fontSize: '0.75rem', cursor: 'default' }}>
+          <span style={{ fontFamily: 'monospace', color: '#fbbf24', textOverflow: 'ellipsis', overflow: 'hidden', whiteSpace: 'nowrap', paddingRight: '8px', width: '50%' }} title={name}>{name}</span>
+          <span style={{ color: '#d1d5db', textOverflow: 'ellipsis', overflow: 'hidden', whiteSpace: 'nowrap', width: '50%', textAlign: 'right' }}>{props.value}</span>
+        </div>
+      );
+    } else {
+      return (
+        <div key={name} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '4px 20px 4px 12px', boxSizing: 'border-box', borderBottom: '1px solid #333', fontSize: '0.75rem', cursor: 'default' }}>
+          <span style={{ fontFamily: 'monospace', color: '#d1d5db', textOverflow: 'ellipsis', overflow: 'hidden', whiteSpace: 'nowrap', paddingRight: '8px', width: '100%' }} title={name}>{name}</span>
+        </div>
+      );
+    }
   };
 
-  const renderTextStyleRow = ({ index, style }) => {
-    const [name, props] = textStylesArray[index];
-    return (
-      <div style={{ ...style, display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '4px 20px 4px 12px', boxSizing: 'border-box', borderBottom: '1px solid #333', fontSize: '0.75rem', cursor: 'default' }}>
-        <span style={{ fontFamily: 'monospace', color: '#d1d5db', textOverflow: 'ellipsis', overflow: 'hidden', whiteSpace: 'nowrap', paddingRight: '8px', width: '50%' }} title={name}>{name}</span>
-        <span style={{ color: '#6b7280', textOverflow: 'ellipsis', overflow: 'hidden', whiteSpace: 'nowrap', width: '50%', textAlign: 'right' }} title={props.font}>{props.font}</span>
-      </div>
-    );
+  const groups = [
+    { key: 'layers', label: 'Capas' },
+    { key: 'textStyles', label: 'Estilos de Texto' },
+    { key: 'dimStyles', label: 'Estilos de Cota' },
+    { key: 'globalVars', label: 'Variables Globales' },
+    { key: 'linetypes', label: 'Tipos de Línea' },
+    { key: 'mleaderStyles', label: 'Directrices Múltiples' },
+    { key: 'tableStyles', label: 'Estilos de Tabla' },
+  ];
+
+  const toggleGroup = (key) => {
+    setActiveTab(prev => {
+      const next = new Set(prev instanceof Set ? prev : [prev]);
+      if (next.has(key)) next.delete(key);
+      else next.add(key);
+      return next;
+    });
   };
+
+  const expandedGroups = activeTab instanceof Set ? activeTab : new Set(['layers']);
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', height: '100%', backgroundColor: '#111827', color: '#ffffff', position: 'relative' }}>
@@ -295,45 +330,30 @@ export default function StandardsList({ teamId, searchFilters = [], isExtracting
           }}
         />
       )}
-      {/* Tabs */}
-      <div style={{ display: 'flex', backgroundColor: '#1f2937', borderBottom: '1px solid #374151', fontSize: '0.75rem' }}>
-        <button 
-          onClick={() => setActiveTab('layers')}
-          style={{ flex: 1, padding: '8px 0', fontWeight: 'bold', transition: 'all 0.2s', borderBottom: activeTab === 'layers' ? '2px solid #60a5fa' : 'none', color: activeTab === 'layers' ? '#60a5fa' : '#9ca3af', backgroundColor: 'transparent', cursor: 'pointer', borderTop: 'none', borderLeft: 'none', borderRight: 'none' }}
-        >
-          Capas ({layersArray.length})
-        </button>
-        <button 
-          onClick={() => setActiveTab('textstyles')}
-          style={{ flex: 1, padding: '8px 0', fontWeight: 'bold', transition: 'all 0.2s', borderBottom: activeTab === 'textstyles' ? '2px solid #818cf8' : 'none', color: activeTab === 'textstyles' ? '#818cf8' : '#9ca3af', backgroundColor: 'transparent', cursor: 'pointer', borderTop: 'none', borderLeft: 'none', borderRight: 'none' }}
-        >
-          Estilos ({textStylesArray.length})
-        </button>
-      </div>
 
-      {/* Virtualized Lists for High Performance Rendering */}
-      <div style={{ flex: 1, overflow: 'hidden', minHeight: '300px' }}>
-        {activeTab === 'layers' && (
-          <List
-            height={300} // This should dynamically size to parent in prod, fixed for MVP
-            rowCount={layersArray.length}
-            rowHeight={30}
-            width={'100%'}
-            rowComponent={renderLayerRow}
-            rowProps={{}}
-          />
-        )}
-        
-        {activeTab === 'textstyles' && (
-          <List
-            height={300}
-            rowCount={textStylesArray.length}
-            rowHeight={30}
-            width={'100%'}
-            rowComponent={renderTextStyleRow}
-            rowProps={{}}
-          />
-        )}
+      {/* Accordion Lists */}
+      <div style={{ flex: 1, overflowY: 'auto', paddingBottom: '16px' }}>
+        {groups.map(g => {
+          const arr = arrays[g.key];
+          if (!arr || arr.length === 0) return null;
+          const isExpanded = expandedGroups.has(g.key);
+          return (
+            <div key={g.key} style={{ borderBottom: '1px solid #374151' }}>
+              <button 
+                onClick={() => toggleGroup(g.key)}
+                style={{ width: '100%', display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '10px 12px', backgroundColor: isExpanded ? '#374151' : '#1f2937', color: '#e5e7eb', fontWeight: 'bold', fontSize: '0.75rem', cursor: 'pointer', border: 'none', textAlign: 'left', transition: 'background-color 0.2s' }}
+              >
+                <span>{g.label} ({arr.length})</span>
+                <svg style={{ width: '16px', height: '16px', transform: isExpanded ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform 0.2s' }} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" /></svg>
+              </button>
+              {isExpanded && (
+                <div style={{ backgroundColor: '#111827' }}>
+                  {arr.map(([name, props]) => renderRow(g.key, name, props))}
+                </div>
+              )}
+            </div>
+          );
+        })}
       </div>
       
       {/* Action Footer */}
