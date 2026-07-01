@@ -1,0 +1,3 @@
+## 2024-07-24 - Accessible ARIA patterns for toggleable dropdown menus
+**Learning:** For custom dropdown menus representing toggleable states, standard buttons or menuitems don't provide adequate screen reader context for selected/unselected items. Using `role='menuitemcheckbox'` combined with `aria-checked` on individual items, along with `aria-expanded` and `aria-haspopup='menu'` on the trigger, drastically improves understanding for assistive technologies.
+**Action:** Always adhere to accessible ARIA patterns for custom dropdowns (especially ones with toggleable/checkbox items) by adding appropriate roles (`menu`, `menuitemcheckbox`) and state attributes (`aria-expanded`, `aria-checked`).
