@@ -11,6 +11,7 @@ export default function PaletteDropdownMenu({ myId }) {
 
   const palettes = [
     { id: 'commands', label: 'Command Palette', acadName: 'Command Palette', openCmd: '(C:LC) ' },
+    { id: 'saas', label: 'LispCentral Normas', acadName: 'SaaS Palette', openCmd: '(C:TEST_SAAS_PALETTE) ' },
     { id: 'resources', label: 'LispCentral Recursos', acadName: 'LispCentral Recursos', openCmd: '(C:RECURSOS) ' },
     { id: 'properties', label: 'LispCentral Propiedades', acadName: 'LispCentral Propiedades', openCmd: '(C:LC_PROP) ' }
   ];

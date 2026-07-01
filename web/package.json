@@ -8,7 +8,7 @@
   "scripts": {
     "dev": "astro dev",
     "start": "astro dev",
-    "build": "vite build -c vite.palettes.config.mjs && vite build -c vite.resource-palette.config.mjs && astro build",
+    "build": "vite build -c vite.palettes.config.mjs && vite build -c vite.resource-palette.config.mjs && vite build -c vite.saas-palette.config.mjs && astro build",
     "preview": "astro preview",
     "astro": "astro"
   },
@@ -26,6 +26,7 @@
     "jszip": "^3.10.1",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
+    "react-window": "^2.2.7",
     "shiki": "^4.1.0",
     "tailwindcss": "^3.4.0"
   },

@@ -134,7 +134,10 @@ const t = (key) => {
           <h4 class="text-primary-container uppercase text-xs font-bold tracking-wider mb-2 px-2" data-i18n="dashboard.sidebar.sectionAccount">{t("dashboard.sidebar.sectionAccount")}</h4>
           <ul class="list-none p-0 m-0 space-y-1">
             <li><a href={localizeUrl("/dashboard#profile", lang)} class="flex items-center gap-3 py-1.5 px-3 text-on-surface-variant hover:text-white hover:bg-[#1a1c1c] rounded-md transition-colors text-sm">
-              <span class="material-symbols-outlined text-[18px]">person</span> <span data-i18n="dashboard.sidebar.profile">{t("dashboard.sidebar.profile")}</span>
+              <span class="material-symbols-outlined text-[18px]">account_circle</span> <span data-i18n="dashboard.sidebar.profile">{t("dashboard.sidebar.profile")}</span>
+            </a></li>
+            <li><a href={localizeUrl("/dashboard#saas", lang)} class="flex items-center gap-3 py-1.5 px-3 text-on-surface-variant hover:text-white hover:bg-[#1a1c1c] rounded-md transition-colors text-sm font-semibold text-primary-container">
+              <span class="material-symbols-outlined text-[18px]">business</span> <span>SaaS (Teams & Standards)</span>
             </a></li>
             <li><a href="#" id="sidebar-report-bug" class="flex items-center gap-3 py-1.5 px-3 text-on-surface-variant hover:text-white hover:bg-[#1a1c1c] rounded-md transition-colors text-sm">
               <span class="material-symbols-outlined text-[18px]">bug_report</span> <span data-i18n="dashboard.sidebar.reportBug">{t("dashboard.sidebar.reportBug")}</span>

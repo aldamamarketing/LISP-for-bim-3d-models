@@ -56,8 +56,9 @@ export const executeInAutoCAD = (cmdStr) => {
   }
 
   // Fallback: ejecución como línea de comandos (espacio final = Enter)
-  // BUGFIX: No añadir espacio ni enter al final, AutoCAD lo añade solo.
-  const formattedCmd = cmdStr.replace(/[\\n\\r\\s]+$/, '');
+  // BUGFIX: /[\n\r\s]/ buscaba literales '\n', no whitespace real.
+  // \s+ cubre spaces, tabs y newlines correctamente.
+  const formattedCmd = cmdStr.replace(/\s+$/, '');
 
   if (editorAvailable) {
     try {

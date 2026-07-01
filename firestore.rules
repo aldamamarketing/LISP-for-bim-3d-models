@@ -74,5 +74,22 @@ service cloud.firestore {
       allow create: if request.auth != null;
       allow read, update, delete: if false;
     }
+
+    // --- SAAS STANDARDIZATION ---
+    match /teams/{teamId} {
+      allow read: if request.auth != null;
+      allow create: if request.auth != null;
+      allow update, delete: if request.auth != null && request.auth.uid == resource.data.ownerId;
+    }
+
+    match /teams/{teamId}/standards/{docId} {
+      allow read: if request.auth != null;
+      allow write: if false; // Only Cloud Functions (syncStandard) can write here
+    }
+
+    match /teams/{teamId}/drafts/{userId} {
+      allow read: if request.auth != null && request.auth.uid == userId;
+      allow write: if false; // Only Cloud Functions (uploadDraft) can write here
+    }
   }
 }

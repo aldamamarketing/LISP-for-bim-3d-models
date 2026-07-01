@@ -2,7 +2,7 @@ const { onRequest, onCall, HttpsError } = require("firebase-functions/v2/https")
 const { onDocumentCreated, onDocumentWritten, onDocumentDeleted } = require("firebase-functions/v2/firestore");
 const logger = require("firebase-functions/logger");
 
-// Lazy imports de módulos nativos
+// Lazy imports de mÃ³dulos nativos
 function getOpenAI() {
   const OpenAI = require("openai");
   return new OpenAI({
@@ -31,7 +31,7 @@ function getDb() {
   return getAdmin().firestore();
 }
 
-// Función segura para minificar LISP respetando strings y DCL
+// FunciÃ³n segura para minificar LISP respetando strings y DCL
 function stripLispComments(code) {
   let result = "";
   let inString = false;
@@ -48,7 +48,7 @@ function stripLispComments(code) {
       continue;
     }
 
-    // Toggle de estado de string si no está escapado
+    // Toggle de estado de string si no estÃ¡ escapado
     if (char === '"' && prevChar !== '\\') {
       inString = !inString;
       result += char;
@@ -104,7 +104,7 @@ exports.getRoutine = onRequest({ cors: true, minInstances: 1 }, async (req, res)
       userEmail = userData.email || "Cliente Registrado";
       registeredDevice = userData.registeredDevice || null;
     }
-    // 1. Registrar el equipo en el Pool y evaluar Auto-Vinculación de Suite Global
+    // 1. Registrar el equipo en el Pool y evaluar Auto-VinculaciÃ³n de Suite Global
     let isGlobalLinked = false;
     let hasGranularLicense = false;
     const validSuiteIds = [];
@@ -128,12 +128,12 @@ exports.getRoutine = onRequest({ cors: true, minInstances: 1 }, async (req, res)
           await devRef.set({
             hwId: hwId,
             name: hwId,
-            globalLinked: false, // La vinculación real ahora es vía suscripción
+            globalLinked: false, // La vinculaciÃ³n real ahora es vÃ­a suscripciÃ³n
             lastActive: admin.firestore.FieldValue.serverTimestamp()
           });
         }
 
-        // Lógica de Suite Global mediante Subscriptions
+        // LÃ³gica de Suite Global mediante Subscriptions
         const globalSubId = `sub_global_${userDocRef.id}`;
         const globalSubRef = db.collection("subscriptions").doc(globalSubId);
         const globalSubSnap = await globalSubRef.get();
@@ -143,7 +143,7 @@ exports.getRoutine = onRequest({ cors: true, minInstances: 1 }, async (req, res)
           const assignedDevices = subData.assignedDevices || [];
           
           if (assignedDevices.includes(hwId)) {
-            // Verificar si NO está en sobregiro
+            // Verificar si NO estÃ¡ en sobregiro
             if (assignedDevices.length <= (subData.purchasedSeats || 1)) {
               isGlobalLinked = true; // El hwId ya tiene el asiento global asignado
             }
@@ -155,7 +155,7 @@ exports.getRoutine = onRequest({ cors: true, minInstances: 1 }, async (req, res)
             isGlobalLinked = true;
           }
         } else {
-          // Fallback Legacy si no existe la suscripción global (ej. usuarios no migrados)
+          // Fallback Legacy si no existe la suscripciÃ³n global (ej. usuarios no migrados)
           if (!devSnap.exists) {
             const activeDevsSnap = await db.collection("users").doc(userDocRef.id).collection("devices")
               .where("globalLinked", "==", true)
@@ -183,7 +183,7 @@ exports.getRoutine = onRequest({ cors: true, minInstances: 1 }, async (req, res)
         if (!subSnap.empty) {
           for (const doc of subSnap.docs) {
             const subData = doc.data();
-            if (subData.isGlobal) continue; // La global ya se verificó
+            if (subData.isGlobal) continue; // La global ya se verificÃ³
             
             if (subData.suiteId) {
               if ((subData.assignedDevices || []).length <= (subData.purchasedSeats || 1)) {
@@ -197,7 +197,7 @@ exports.getRoutine = onRequest({ cors: true, minInstances: 1 }, async (req, res)
         }
       } catch(e) { console.error("Error checking subscriptions:", e); }
 
-      // 3. Bloqueo si no tiene acceso por ninguna de las vías
+      // 3. Bloqueo si no tiene acceso por ninguna de las vÃ­as
       if (!isGlobalLinked && !hasGranularLicense) {
         const drmAlert = `(alert "\\n[TM Digital] PROTECAO ATIVADA:\\nLimite de assentos atingido (${maxSeats}).\\n\\nAcesse o Painel Web para desvincular um equipamento ou vincular manualmente este PC.")\n(princ)`;
         res.setHeader("Content-Type", "text/plain; charset=utf-8");
@@ -272,8 +272,8 @@ exports.getRoutine = onRequest({ cors: true, minInstances: 1 }, async (req, res)
              if (ctx) {
                allCommands.push({
                  name: cmdData.commandName,
-                 friendly: (ctx.isOverlimit ? "⚠️ " : "") + (cmdData.friendlyName || cmdData.commandName),
-                 desc: ctx.isOverlimit ? "[Límite de Asientos] " + (cmdData.description || "") : (cmdData.description || "Herramienta"),
+                 friendly: (ctx.isOverlimit ? "âš ï¸  " : "") + (cmdData.friendlyName || cmdData.commandName),
+                 desc: ctx.isOverlimit ? "[LÃ­mite de Asientos] " + (cmdData.description || "") : (cmdData.description || "Herramienta"),
                  group: ctx.group,
                  doc: "#",
                  svgIcon: cmdData.svgIcon || "",
@@ -313,8 +313,8 @@ exports.getRoutine = onRequest({ cors: true, minInstances: 1 }, async (req, res)
       const header = `;;; =====================================================================================\n` +
                      `;;; SERVIDO POR LISPCENTRAL CLOUD PLATFORM v2.0 (SaaS)\n` +
                      `;;; Pacote Consolidado de Ferramentas Carregado em RAM\n` +
-                     `;;; Licença Ativa: ${userEmail}\n` +
-                     `;;; Módulos incluídos: ${routinesLoaded.join(", ")}\n` +
+                     `;;; LicenÃ§a Ativa: ${userEmail}\n` +
+                     `;;; MÃ³dulos incluÃ­dos: ${routinesLoaded.join(", ")}\n` +
                      `;;; Timestamp: ${new Date().toISOString()}\n` +
                      `;;; =====================================================================================\n`;
       
@@ -337,7 +337,7 @@ exports.getRoutine = onRequest({ cors: true, minInstances: 1 }, async (req, res)
       let code = "";
 
       if (!fs.existsSync(filepath)) {
-        // Búsqueda Global: Permitimos Cross-Tenant (Fase 3)
+        // BÃºsqueda Global: Permitimos Cross-Tenant (Fase 3)
         if (!userDocRef) {
           return res.status(404).send(`Error: Rutina ${originalName} no encontrada.`);
         }
@@ -351,7 +351,7 @@ exports.getRoutine = onRequest({ cors: true, minInstances: 1 }, async (req, res)
         if (!lispsSnapshot.empty) {
           lispData = lispsSnapshot.docs[0].data();
         } else {
-          // Búsqueda en comandos granulares
+          // BÃºsqueda en comandos granulares
           const cmdsSnapshot = await db.collection("commands")
             .where("commandName", "==", safeRoutineId)
             .limit(1)
@@ -372,13 +372,13 @@ exports.getRoutine = onRequest({ cors: true, minInstances: 1 }, async (req, res)
 
         const creatorId = lispData.tenantId;
 
-        // Validar si tiene derecho a usar este código (Restricción Estricta B2B)
+        // Validar si tiene derecho a usar este cÃ³digo (RestricciÃ³n Estricta B2B)
         let isAuthorizedForThisFile = false;
         if (creatorId === userDocRef.id) {
-          // El propio creador. Ya pasó los checks de HWID arriba.
+          // El propio creador. Ya pasÃ³ los checks de HWID arriba.
           isAuthorizedForThisFile = true;
         } else {
-          // Cross-Tenant: Validar si la Suite está autorizada para este HWID sin sobregiro
+          // Cross-Tenant: Validar si la Suite estÃ¡ autorizada para este HWID sin sobregiro
           if (lispData.suiteIds && lispData.suiteIds.some(id => validSuiteIds.includes(id))) {
              isAuthorizedForThisFile = true;
           }
@@ -387,7 +387,7 @@ exports.getRoutine = onRequest({ cors: true, minInstances: 1 }, async (req, res)
         if (!isAuthorizedForThisFile) {
           const isOverlimit = overlimitSuiteIds.includes(lispData.suiteId);
           const reason = isOverlimit 
-             ? "Límite de asientos alcanzado para esta Suite. Libera un equipo en el Panel Web." 
+             ? "LÃ­mite de asientos alcanzado para esta Suite. Libera un equipo en el Panel Web." 
              : "No tienes una licencia asignada a este dispositivo para usar comandos de esta Suite.";
           const authAlert = `(alert "\\n[LispCentral] ACCESO DENEGADO:\\n${reason}")\n(princ)`;
           res.setHeader("Content-Type", "text/plain; charset=utf-8");
@@ -414,16 +414,16 @@ exports.getRoutine = onRequest({ cors: true, minInstances: 1 }, async (req, res)
         code = code.replace(/\(TMD_/gi, "(LC_");
       }
 
-      // Minificación LISP estricta para inyección en RAM (Zero-Disk)
+      // MinificaciÃ³n LISP estricta para inyecciÃ³n en RAM (Zero-Disk)
       code = stripLispComments(code); // Remover todos los comentarios de forma segura
-      code = code.replace(/\r\n/g, "\n"); // Normalizar saltos de línea
+      code = code.replace(/\r\n/g, "\n"); // Normalizar saltos de lÃ­nea
       // Envolvemos en progn en el backend para entregar una S-Expression perfecta
       code = `(progn\n${code}\n(princ)\n)`;
 
 
       const header = `;;; =====================================================================================\n` +
                      `;;; SERVIDO POR LISPCENTRAL CLOUD PLATFORM v2.0 (SaaS)\n` +
-                     `;;; Licença Ativa: ${userEmail}\n` +
+                     `;;; LicenÃ§a Ativa: ${userEmail}\n` +
                      `;;; Timestamp: ${new Date().toISOString()}\n` +
                      `;;; =====================================================================================\n`;
       
@@ -454,7 +454,7 @@ exports.generateLoader = onRequest({ cors: true }, async (req, res) => {
 
   let loaderCode = fs.readFileSync(templatePath, "utf8");
 
-  // Reemplazar variables dinámicas
+  // Reemplazar variables dinÃ¡micas
   loaderCode = loaderCode.replace("{{SEAT_TOKEN}}", token);
   loaderCode = loaderCode.replace("{{TENANT_NAME}}", tenantName);
 
@@ -478,26 +478,26 @@ exports.generateIcons = onRequest({ cors: true, maxInstances: 10, timeoutSeconds
   try {
     const openai = getOpenAI();
 
-    const systemPrompt = `Eres un diseñador experto de iconos SVG.
+    const systemPrompt = `Eres un diseÃ±ador experto de iconos SVG.
 Genera iconos limpios y profesionales basados en estos comandos o descripciones.
 
 Contexto / Industria: ${theme}
-El estilo visual que el usuario desea es: "${styleOption}". Usa esto como dirección de arte.
+El estilo visual que el usuario desea es: "${styleOption}". Usa esto como direcciÃ³n de arte.
 
-REGLAS DE DISEÑO ESTRICTAS (Bicolor/Tricolor):
+REGLAS DE DISEÃ‘O ESTRICTAS (Bicolor/Tricolor):
 1. Genera SIEMPRE 3 variaciones exactas para cada comando solicitado.
 2. No uses colores hex (como #000000 o #FFFFFF). 
-3. Para las líneas y trazados principales estáticos, usa EXACTAMENTE \`currentColor\`.
-4. Para elementos dinámicos, flechas de acción o partes destacadas, usa EXACTAMENTE \`var(--icon-accent)\`.
+3. Para las lÃ­neas y trazados principales estÃ¡ticos, usa EXACTAMENTE \`currentColor\`.
+4. Para elementos dinÃ¡micos, flechas de acciÃ³n o partes destacadas, usa EXACTAMENTE \`var(--icon-accent)\`.
 5. Para rellenos suaves, sombras, elementos secundarios o fondos de apoyo, usa EXACTAMENTE \`var(--icon-secondary)\`.
-6. Grosor de línea: Usa trazos finos y precisos (\`stroke-width="1.5"\` o \`1\`).
+6. Grosor de lÃ­nea: Usa trazos finos y precisos (\`stroke-width="1.5"\` o \`1\`).
 7. Bordes y uniones: Usa bordes rectos/cuadrados, NO redondeados. Usa \`stroke-linecap="square"\` y \`stroke-linejoin="miter"\`. Nada de "round".
 8. El viewBox DEBE ser "0 0 32 32".
-9. El código debe ser SVG puro. No pongas etiquetas XML extra. No pongas markdown. Solo el \`<svg>...</svg>\`.
-10. FILTRO DE SEGURIDAD (CRÍTICO): RECHAZA cualquier icono de odio, desnudos, esvásticas, símbolos religiosos o discriminación. Si lo detectas, omítelo de los resultados.
+9. El cÃ³digo debe ser SVG puro. No pongas etiquetas XML extra. No pongas markdown. Solo el \`<svg>...</svg>\`.
+10. FILTRO DE SEGURIDAD (CRÃ TICO): RECHAZA cualquier icono de odio, desnudos, esvÃ¡sticas, sÃ­mbolos religiosos o discriminaciÃ³n. Si lo detectas, omÃ­telo de los resultados.
 
 INSTRUCCIONES DE FORMATO DE RESPUESTA:
-Debes responder ÚNICAMENTE con un objeto JSON (sin markdown, sin bloques de código) con esta estructura exacta:
+Debes responder ÃšNICAMENTE con un objeto JSON (sin markdown, sin bloques de cÃ³digo) con esta estructura exacta:
 {
   "results": [
     { "id": "uuid1", "name": "Name in English", "category": "English Category", "filename": "SHORT_NAME", "description": "Short description in English", "svgCode": "<svg>...</svg>" },
@@ -533,23 +533,23 @@ exports.generateHatch = onRequest({ cors: true, maxInstances: 10, timeoutSeconds
 
   try {
     const openai = getOpenAI();
-    const systemPrompt = `Eres un experto matemático y programador en AutoLISP.
+    const systemPrompt = `Eres un experto matemÃ¡tico y programador en AutoLISP.
 Genera patrones de sombreado (Hatch) de AutoCAD (.pat) basados en estas descripciones.
 Contexto: ${theme}
 
-REGLAS DE DISEÑO:
-1. El código PAT debe ser válido matemáticamente. Formato: "ángulo, x-origen, y-origen, delta-x, delta-y, dash-1, dash-2".
-   - ATENCIÓN CRÍTICA: "delta-x" es el desplazamiento PARALELO a la línea. "delta-y" es el desplazamiento PERPENDICULAR a la línea (separación entre líneas de la familia).
-   - ERROR COMÚN A EVITAR: Para líneas verticales (ángulo 90), la separación entre columnas DEBE ir en "delta-y", NO en "delta-x". (Ej. "90, 0,0, 0,41" separa las líneas verticales 41 unidades. Si escribes "90, 0,0, 41,0", todas se dibujan en la misma columna X).
-2. Genera exactamente 1 patrón de alta calidad por cada descripción.
-3. PRECISIÓN ESTRUCTURAL Y DIMENSIONAL (CRÍTICO): 
-   - Respeta escrupulosamente la geometría solicitada (ej. "matajuntas" o "stretcher bond" NO es "herringbone" o "espina de pez").
-   - Si el usuario provee medidas (ej. 40x20cm, juntas de 1cm, ángulos), DEBES aplicar la matemática exacta para que las proporciones del Hatch reflejen esas medidas a escala 1:1.
-4. TRUCO PARA MATAJUNTAS (STRETCHER BOND): Para ladrillos intercalados, NUNCA uses una cuadrícula continua. Las líneas verticales DEBEN ser segmentadas y desfasadas usando dash y delta-x. Fórmula para bloque LxC (Largo x Alto):
+REGLAS DE DISEÃ‘O:
+1. El cÃ³digo PAT debe ser vÃ¡lido matemÃ¡ticamente. Formato: "Ã¡ngulo, x-origen, y-origen, delta-x, delta-y, dash-1, dash-2".
+   - ATENCIÃ“N CRÃ TICA: "delta-x" es el desplazamiento PARALELO a la lÃ­nea. "delta-y" es el desplazamiento PERPENDICULAR a la lÃ­nea (separaciÃ³n entre lÃ­neas de la familia).
+   - ERROR COMÃšN A EVITAR: Para lÃ­neas verticales (Ã¡ngulo 90), la separaciÃ³n entre columnas DEBE ir en "delta-y", NO en "delta-x". (Ej. "90, 0,0, 0,41" separa las lÃ­neas verticales 41 unidades. Si escribes "90, 0,0, 41,0", todas se dibujan en la misma columna X).
+2. Genera exactamente 1 patrÃ³n de alta calidad por cada descripciÃ³n.
+3. PRECISIÃ“N ESTRUCTURAL Y DIMENSIONAL (CRÃ TICO): 
+   - Respeta escrupulosamente la geometrÃ­a solicitada (ej. "matajuntas" o "stretcher bond" NO es "herringbone" o "espina de pez").
+   - Si el usuario provee medidas (ej. 40x20cm, juntas de 1cm, Ã¡ngulos), DEBES aplicar la matemÃ¡tica exacta para que las proporciones del Hatch reflejen esas medidas a escala 1:1.
+4. TRUCO PARA MATAJUNTAS (STRETCHER BOND): Para ladrillos intercalados, NUNCA uses una cuadrÃ­cula continua. Las lÃ­neas verticales DEBEN ser segmentadas y desfasadas usando dash and delta-x. FÃ³rmula para bloque LxC (Largo x Alto):
    - Horizontales: "0, 0,0, 0,C"
    - Verticales: "90, 0,0, C,L, C,-C"
-5. Formato de salida: JSON con "results" Array: { "id": "uuid", "name": "English Name", "category": "Architecture", "filename": "SHORT_NAME", "description": "Concise description (e.g. 'Stretcher bond 40x20cm blocks with 1cm joints')", "patCode": "0, 0,0..." }. Devuelve SOLO las líneas matemáticas en patCode.
-6. FILTRO DE SEGURIDAD (CRÍTICO): RECHAZA símbolos de odio, esvásticas, cruces, etc. Devuelve "results" vacío si detectas esto.`;
+5. Formato de salida: JSON con "results" Array: { "id": "uuid", "name": "English Name", "category": "Architecture", "filename": "SHORT_NAME", "description": "Concise description (e.g. 'Stretcher bond 40x20cm blocks with 1cm joints')", "patCode": "0, 0,0..." }. Devuelve SOLO las lÃ­neas matemÃ¡ticas en patCode.
+6. FILTRO DE SEGURIDAD (CRÃ TICO): RECHAZA sÃ­mbolos de odio, esvÃ¡sticas, cruces, etc. Devuelve "results" vacÃ­o si detectas esto.`;
 
     const userPrompt = `Descripciones:\n${prompts.join('\n')}`;
 
@@ -576,14 +576,14 @@ exports.generateLinetype = onRequest({ cors: true, maxInstances: 10, timeoutSeco
   try {
     const openai = getOpenAI();
     const systemPrompt = `Eres un experto en AutoCAD.
-Genera definiciones de tipos de línea complejos (.lin) basados en estas descripciones.
+Genera definiciones de tipos de lÃ­nea complejos (.lin) basados en estas descripciones.
 
-REGLAS DE DISEÑO:
-1. El código LIN define la secuencia de pluma: trazo (positivo), espacio (negativo), punto (0), y texto/formas.
-2. PRECISIÓN (CRÍTICO): Si el usuario provee medidas o textos, aplícalos de forma exacta en la definición LIN.
+REGLAS DE DISEÃ‘O:
+1. El cÃ³digo LIN define la secuencia de pluma: trazo (positivo), espacio (negativo), punto (0), y texto/formas.
+2. PRECISIÃ“N (CRÃ TICO): Si el usuario provee medidas o textos, aplÃ­calos de forma exacta en la definiciÃ³n LIN.
 3. Formato de salida: Objeto JSON con una propiedad "results" que sea un Array con objetos: { "id": "uuid", "name": "Line Name in English", "category": "Engineering", "filename": "SHORT_NAME", "description": "DETAILED description in English including specs", "linCode": "A,10,-5..." }.
-4. Devuelve SOLO la definición de la línea (empieza por A), NO incluyas el asterisco (*Nombre).
-5. FILTRO DE SEGURIDAD (CRÍTICO): RECHAZA solicitudes con símbolos de odio, contenido adulto o discriminación devolviendo un "results" vacío.`;
+4. Devuelve SOLO la definiciÃ³n de la lÃ­nea (empieza por A), NO incluyas el asterisco (*Nombre).
+5. FILTRO DE SEGURIDAD (CRÃ TICO): RECHAZA solicitudes con sÃ­mbolos de odio, contenido adulto o discriminaciÃ³n devolviendo un "results" vacÃ­o.`;
 
     const userPrompt = `Descripciones:\n${prompts.join('\n')}`;
 
@@ -602,7 +602,7 @@ REGLAS DE DISEÑO:
 });
 
 // Endpoint para que la paleta embebida en AutoCAD obtenga los favoritos del usuario
-// Autenticación por apiKey (token del Loader), sin necesidad de Firebase Auth SDK
+// AutenticaciÃ³n por apiKey (token del Loader), sin necesidad de Firebase Auth SDK
 exports.getUserResources = onRequest({ cors: true }, async (req, res) => {
   const token = req.query.token || req.query.apiKey;
   const type = req.query.type || 'hatch'; // 'hatch', 'lin', 'icon'
@@ -617,17 +617,17 @@ exports.getUserResources = onRequest({ cors: true }, async (req, res) => {
     // Buscar usuario por apiKey
     const userSnap = await db.collection("users").where("apiKey", "==", token).limit(1).get();
     if (userSnap.empty) {
-      return res.status(401).json({ error: "Token inválido." });
+      return res.status(401).json({ error: "Token invÃ¡lido." });
     }
 
     const userDoc = userSnap.docs[0];
     const userId = userDoc.id;
 
-    // Obtener los assets públicos que coincidan con el tipo
+    // Obtener los assets pÃºblicos que coincidan con el tipo
     const assetsSnap = await db.collection("publicAssets").where("type", "==", type).get();
     const results = assetsSnap.docs.map(d => ({ id: d.id, ...d.data() }));
 
-    res.setHeader("Cache-Control", "public, max-age=30"); // Cache corto para sync rápido
+    res.setHeader("Cache-Control", "public, max-age=30"); // Cache corto para sync rÃ¡pido
     return res.status(200).json(results);
   } catch (err) {
     console.error("Error en getUserResources:", err);
@@ -635,7 +635,7 @@ exports.getUserResources = onRequest({ cors: true }, async (req, res) => {
   }
 });
 
-// Trigger para crear la Suite Global Inicial automáticamente al registrar un nuevo usuario/tenant
+// Trigger para crear la Suite Global Inicial automÃ¡ticamente al registrar un nuevo usuario/tenant
 exports.onUserCreated = onDocumentCreated("users/{userId}", async (event) => {
   const snapshot = event.data;
   if (!snapshot) return;
@@ -650,7 +650,7 @@ exports.onUserCreated = onDocumentCreated("users/{userId}", async (event) => {
     await db.collection("suites").doc(globalSuiteId).set({
       ownerId: userId,
       name: "Suite Global (Herramientas Propias)",
-      description: "Agrupa todos tus comandos LISP subidos. Creada automáticamente por el sistema.",
+      description: "Agrupa todos tus comandos LISP subidos. Creada automÃ¡ticamente por el sistema.",
       type: "global",
       visibility: "private",
       isEditable: false,
@@ -658,7 +658,7 @@ exports.onUserCreated = onDocumentCreated("users/{userId}", async (event) => {
       createdAt: admin.firestore.FieldValue.serverTimestamp()
     });
 
-    // 2. Crear la Suscripción Global (Entitlement) con 1 asiento auto-asignable
+    // 2. Crear la SuscripciÃ³n Global (Entitlement) con 1 asiento auto-asignable
     const globalSubId = `sub_global_${userId}`;
     await db.collection("subscriptions").doc(globalSubId).set({
       suiteId: globalSuiteId,
@@ -685,7 +685,7 @@ exports.toggleDeviceAssignment = onCall(async (request) => {
 
   const { subId, deviceId, action } = request.data;
   if (!subId || !deviceId || !["assign", "unassign"].includes(action)) {
-    throw new HttpsError("invalid-argument", "Parámetros inválidos.");
+    throw new HttpsError("invalid-argument", "ParÃ¡metros invÃ¡lidos.");
   }
 
   const db = getDb();
@@ -695,11 +695,11 @@ exports.toggleDeviceAssignment = onCall(async (request) => {
   try {
     return await db.runTransaction(async (transaction) => {
       const subDoc = await transaction.get(subRef);
-      if (!subDoc.exists) throw new HttpsError("not-found", "Suscripción no encontrada.");
+      if (!subDoc.exists) throw new HttpsError("not-found", "SuscripciÃ³n no encontrada.");
       
       const subData = subDoc.data();
       if (subData.tenantId !== request.auth.uid) {
-        throw new HttpsError("permission-denied", "No eres el dueño de esta suscripción.");
+        throw new HttpsError("permission-denied", "No eres el dueÃ±o de esta suscripciÃ³n.");
       }
 
       const currentAssigned = subData.assignedDevices || [];
@@ -709,24 +709,24 @@ exports.toggleDeviceAssignment = onCall(async (request) => {
       if (action === "assign") {
         if (currentAssigned.includes(deviceId)) return { success: true }; // Ya asignado
         
-        // 1. Regla de Negocio: Límite de Asientos
+        // 1. Regla de Negocio: LÃ­mite de Asientos
         if (currentAssigned.length >= purchasedSeats) {
-          throw new HttpsError("resource-exhausted", `Límite de asientos alcanzado (${purchasedSeats}).`);
+          throw new HttpsError("resource-exhausted", `LÃ­mite de asientos alcanzado (${purchasedSeats}).`);
         }
 
-        // 2. Regla de Negocio: Penalty Box (7 Días Cooldown)
+        // 2. Regla de Negocio: Penalty Box (7 DÃ­as Cooldown)
         if (penaltyBox[deviceId]) {
           const unlinkedDate = penaltyBox[deviceId].toDate();
           const daysPassed = (new Date() - unlinkedDate) / (1000 * 60 * 60 * 24);
           if (daysPassed < 7) {
             const daysLeft = Math.ceil(7 - daysPassed);
-            throw new HttpsError("failed-precondition", `Anti-Abuso: Espera ${daysLeft} días para reasignar este PC.`);
+            throw new HttpsError("failed-precondition", `Anti-Abuso: Espera ${daysLeft} dÃ­as para reasignar este PC.`);
           }
         }
 
         const newAssigned = [...currentAssigned, deviceId];
         transaction.update(subRef, { assignedDevices: newAssigned });
-        return { success: true, message: "Equipo asignado con éxito." };
+        return { success: true, message: "Equipo asignado con Ã©xito." };
       } 
       else if (action === "unassign") {
         if (!currentAssigned.includes(deviceId)) return { success: true };
@@ -737,7 +737,7 @@ exports.toggleDeviceAssignment = onCall(async (request) => {
           [`penaltyBox.${deviceId}`]: admin.firestore.FieldValue.serverTimestamp()
         };
         transaction.update(subRef, updates);
-        return { success: true, message: "Equipo desvinculado. Bloqueado por 7 días." };
+        return { success: true, message: "Equipo desvinculado. Bloqueado por 7 dÃ­as." };
       }
     });
   } catch (error) {
@@ -753,7 +753,7 @@ exports.onSubscriptionCreated = onDocumentCreated("subscriptions/{subId}", async
   if (!snapshot) return;
 
   const data = snapshot.data();
-  if (data.isGlobal || !data.suiteId) return; // Ignorar la suscripción global del propio usuario
+  if (data.isGlobal || !data.suiteId) return; // Ignorar la suscripciÃ³n global del propio usuario
 
   const db = getDb();
   const { admin } = getDeps();
@@ -769,25 +769,25 @@ exports.onSubscriptionCreated = onDocumentCreated("subscriptions/{subId}", async
   }
 });
 
-// Recalcular el rating de la suite o del comando cuando hay una nueva o modificada reseña
+// Recalcular el rating de la suite o del comando cuando hay una nueva o modificada reseÃ±a
 exports.onReviewWritten = onDocumentWritten("reviews/{reviewId}", async (event) => {
   const db = getDb();
   
-  // Si se borró, el doc posterior no existe. Tomamos el previo.
+  // Si se borrÃ³, el doc posterior no existe. Tomamos el previo.
   const docData = event.data.after.exists ? event.data.after.data() : event.data.before.data();
   if (!docData) return;
 
   const suiteId = docData.suiteId;
   const commandId = docData.commandId;
 
-  // Lógica para recalcular el promedio de la Suite
+  // LÃ³gica para recalcular el promedio de la Suite
   if (suiteId && !commandId) {
     try {
-      // Nota: Si una reseña es de un comando, NO recalculamos el promedio de la suite con esa reseña,
-      // para mantener las reseñas de comandos separadas de la reseña general de la suite.
+      // Nota: Si una reseÃ±a es de un comando, NO recalculamos el promedio de la suite con esa reseÃ±a,
+      // para mantener las reseÃ±as de comandos separadas de la reseÃ±a general de la suite.
       const reviewsSnap = await db.collection("reviews")
         .where("suiteId", "==", suiteId)
-        // Solo contamos reseñas de la suite que no sean específicas de un comando
+        // Solo contamos reseÃ±as de la suite que no sean especÃ­ficas de un comando
         // Como Firestore no soporta un simple isNull nativo combinado con '==', 
         // filtramos en memoria las que tengan commandId.
         .get();
@@ -815,7 +815,7 @@ exports.onReviewWritten = onDocumentWritten("reviews/{reviewId}", async (event) 
     }
   }
 
-  // Lógica para recalcular el promedio del Comando Individual
+  // LÃ³gica para recalcular el promedio del Comando Individual
   if (commandId) {
     try {
       const reviewsSnap = await db.collection("reviews")
@@ -1076,7 +1076,7 @@ exports.onLispFileDeleted = onDocumentDeleted({ document: "lispFiles/{fileId}", 
 
 
 
-// Endpoint para generar el patrón Hatch algorítmico en la nube
+// Endpoint para generar el patrÃ³n Hatch algorÃ­tmico en la nube
 exports.buildHatchPattern = onCall(async (request) => {
   const { archetypeId, params } = request.data;
   if (!archetypeId || !params) {
@@ -1091,3 +1091,239 @@ exports.buildHatchPattern = onCall(async (request) => {
     throw new HttpsError('internal', err.message);
   }
 });
+
+exports.getTeams = onRequest({ cors: true, maxInstances: 10 }, async (req, res) => {
+  try {
+    const { token } = req.query;
+    if (!token) return res.status(400).send("Falta Token.");
+    
+    const db = getDb();
+    const userSnap = await db.collection("users").where("apiKey", "==", token).limit(1).get();
+    if (userSnap.empty) return res.status(404).send("Token invalido.");
+    
+    const userId = userSnap.docs[0].id;
+    const userData = userSnap.docs[0].data();
+    let list = [{
+      id: userId,
+      name: "Personal Standard",
+      isPublic: false,
+      role: "OWNER"
+    }];
+
+    const pubSnap = await db.collection("teams").where("isPublic", "==", true).get();
+    pubSnap.forEach(d => list.push({ id: d.id, ...d.data(), isPublic: true }));
+
+    const joined = userData.joinedTeams || [];
+    for (const jt of joined) {
+      if (!list.find(t => t.id === jt.teamId)) {
+        const tDoc = await db.collection("teams").doc(jt.teamId).get();
+        if (tDoc.exists) {
+          list.push({ id: tDoc.id, ...tDoc.data(), role: jt.role });
+        }
+      }
+    }
+    return res.status(200).json(list);
+  } catch (err) {
+    console.error("Error en getTeams:", err);
+    return res.status(500).send("Error interno.");
+  }
+});
+
+
+// ============================================================================
+// MODULO SAAS: STANDARDIZATION AS A SERVICE
+// ============================================================================
+
+// Unirse a un Equipo (Web Dashboard)
+exports.joinTeam = onCall(async (request) => {
+  if (!request.auth) {
+    throw new HttpsError("unauthenticated", "Debe estar autenticado para unirse a un equipo.");
+  }
+  
+  const { inviteCode } = request.data;
+  if (!inviteCode) {
+    throw new HttpsError("invalid-argument", "Código de invitación requerido.");
+  }
+
+  const db = getDb();
+  const { admin } = getDeps();
+  const uid = request.auth.uid;
+
+  try {
+    const teamSnap = await db.collection("teams").where("inviteCode", "==", inviteCode).limit(1).get();
+    
+    if (teamSnap.empty) {
+      throw new HttpsError("not-found", "Código de invitación inválido o caducado.");
+    }
+    
+    const teamDoc = teamSnap.docs[0];
+    const teamId = teamDoc.id;
+
+    await db.collection("users").doc(uid).update({
+      joinedTeams: admin.firestore.FieldValue.arrayUnion({
+        teamId: teamId,
+        role: "MEMBER"
+      })
+    });
+
+    return { success: true, teamId: teamId, teamName: teamDoc.data().name };
+  } catch (err) {
+    console.error("Error en joinTeam:", err);
+    if (err instanceof HttpsError) throw err;
+    throw new HttpsError("internal", "Error al unirse al equipo.");
+  }
+});
+
+// Sincronizar Norma desde AutoCAD (LISP Extractor)
+exports.syncStandard = onRequest({ cors: true, maxInstances: 10 }, async (req, res) => {
+  if (req.method !== "POST") return res.status(405).send("Method Not Allowed");
+
+  const token = req.query.token || req.body.token;
+  const teamId = req.body.teamId;
+  const standardData = req.body.standardData;
+
+  if (!token || !teamId || !standardData) {
+    return res.status(400).send("Faltan parámetros requeridos (token, teamId, standardData).");
+  }
+
+  const db = getDb();
+  const { admin } = getDeps();
+
+  try {
+    // 1. Validar el token del usuario (Loader)
+    const userSnap = await db.collection("users").where("apiKey", "==", token).limit(1).get();
+    if (userSnap.empty) {
+      return res.status(401).send("Token de usuario inválido.");
+    }
+    const userId = userSnap.docs[0].id;
+
+    // 2. Validar que el equipo exista y el usuario sea el Owner/Manager
+    // Si teamId === userId, es el Personal Standard (freemium), tiene permiso siempre
+    if (teamId !== userId) {
+      const teamDoc = await db.collection("teams").doc(teamId).get();
+      if (!teamDoc.exists) {
+        return res.status(404).send("Equipo no encontrado.");
+      }
+      
+      const teamData = teamDoc.data();
+      if (teamData.ownerId !== userId) {
+        return res.status(403).send("No tienes permisos de Administrador para actualizar esta norma.");
+      }
+    }
+
+    // 3. Guardar el payload en la colección standards
+    // Parseamos por si mandan string desde LISP
+    const payload = typeof standardData === "string" ? JSON.parse(standardData) : standardData;
+
+    await db.collection("standards").doc(teamId).set({
+      teamId: teamId,
+      updatedAt: admin.firestore.FieldValue.serverTimestamp(),
+      data: payload
+    }, { merge: true }); // Merge evita borrar bloques que el Manager haya subido por separado
+
+    return res.status(200).send("OK: Norma sincronizada con éxito.");
+  } catch (err) {
+    console.error("Error en syncStandard:", err);
+    return res.status(500).send("Error interno del servidor al sincronizar la norma.");
+  }
+});
+
+// Obtener Norma desde AutoCAD (LISP Auditor)
+exports.getStandard = onRequest({ cors: true, maxInstances: 10 }, async (req, res) => {
+  if (req.method !== "GET" && req.method !== "POST") return res.status(405).send("Method Not Allowed");
+
+  const token = req.query.token || req.body.token;
+  const teamId = req.query.teamId || req.body.teamId;
+
+  if (!token || !teamId) {
+    return res.status(400).send("Faltan parámetros requeridos (token, teamId).");
+  }
+
+  const db = getDb();
+
+  try {
+    // 1. Validar Token
+    const userSnap = await db.collection("users").where("apiKey", "==", token).limit(1).get();
+    if (userSnap.empty) return res.status(401).send("Token inválido.");
+    const userId = userSnap.docs[0].id;
+    const userData = userSnap.docs[0].data();
+
+    // 2. Validar que tiene acceso (Es Manager, o está en joinedTeams, o el equipo es público)
+    let hasAccess = false;
+    if (teamId === userId) {
+      hasAccess = true; // Es el Personal Standard
+    } else {
+      const teamDoc = await db.collection("teams").doc(teamId).get();
+      if (!teamDoc.exists) return res.status(404).send("Equipo no encontrado.");
+      const teamData = teamDoc.data();
+
+      if (teamData.isPublic || teamData.ownerId === userId) {
+        hasAccess = true;
+      } else {
+        const joined = userData.joinedTeams || [];
+        if (joined.some(jt => jt.teamId === teamId)) hasAccess = true;
+      }
+    }
+
+    if (!hasAccess) return res.status(403).send("No tienes acceso a esta norma corporativa.");
+
+    // 3. Fetch Standard
+    const standardDoc = await db.collection("standards").doc(teamId).get();
+    if (!standardDoc.exists) return res.status(404).send("{}"); // No standard yet
+
+    res.setHeader("Content-Type", "application/json");
+    return res.status(200).send(JSON.stringify(standardDoc.data().data));
+  } catch (err) {
+    console.error("Error en getStandard:", err);
+    return res.status(500).send("Error interno al obtener la norma.");
+  }
+});
+
+
+exports.uploadDraft = onRequest({ cors: true, maxInstances: 10 }, async (req, res) => {
+  if (req.method !== "POST") return res.status(405).send("Method Not Allowed");
+
+  const { token, teamId, standardData } = req.body;
+  if (!token || !teamId || !standardData) {
+    return res.status(400).send("Faltan parámetros requeridos.");
+  }
+
+  const db = getDb();
+  try {
+    const userSnap = await db.collection("users").where("apiKey", "==", token).limit(1).get();
+    if (userSnap.empty) return res.status(401).send("Token inválido.");
+    const userId = userSnap.docs[0].id;
+    
+    // We assume validation is done, save draft for this user
+    await db.collection("teams").doc(teamId).collection("drafts").doc(userId).set({
+      draftData: standardData,
+      timestamp: getAdmin().firestore.FieldValue.serverTimestamp()
+    });
+
+    return res.status(200).send("OK: Borrador guardado.");
+  } catch (err) {
+    console.error("Error en uploadDraft:", err);
+    return res.status(500).send("Error interno al guardar borrador.");
+  }
+});
+
+
+exports.getDraft = onRequest({ cors: true, maxInstances: 10 }, async (req, res) => {
+  if (req.method !== "GET" && req.method !== "POST") return res.status(405).send("Method Not Allowed");
+  const token = req.query.token || req.body.token;
+  const teamId = req.query.teamId || req.body.teamId;
+  if (!token || !teamId) return res.status(400).send("Faltan par�metros requeridos.");
+  const db = getDb();
+  try {
+    const userSnap = await db.collection("users").where("apiKey", "==", token).limit(1).get();
+    if (userSnap.empty) return res.status(401).send("Token inv�lido.");
+    const userId = userSnap.docs[0].id;
+    const draftDoc = await db.collection("teams").doc(teamId).collection("drafts").doc(userId).get();
+    if (!draftDoc.exists) return res.status(404).send("{}");
+    res.setHeader("Content-Type", "application/json");
+    return res.status(200).send(JSON.stringify(draftDoc.data()));
+  } catch (err) {
+    return res.status(500).send("Error interno.");
+  }
+});
+

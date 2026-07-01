@@ -13,6 +13,8 @@ import SuitesGroupsCard from './dashboard/SuitesGroupsCard';
 import SupportModal from './dashboard/SupportModal';
 import SubscriptionsTab from './dashboard/SubscriptionsTab';
 import IncomeDashboardTab from './dashboard/IncomeDashboardTab';
+import TeamManager from './saas/TeamManager';
+import StandardsViewer from './saas/StandardsViewer';
 
 
 function DashboardInner({ mode }) {
@@ -31,7 +33,7 @@ function DashboardInner({ mode }) {
   React.useEffect(() => {
     const handleHashChange = () => {
       const hash = window.location.hash.replace('#', '');
-      if (['profile', 'licenses', 'files', 'suites', 'favorites', 'notifications', 'subscriptions', 'income'].includes(hash)) {
+      if (['profile', 'licenses', 'files', 'suites', 'favorites', 'notifications', 'subscriptions', 'income', 'saas'].includes(hash)) {
         setActiveTab(hash);
       } else if (!hash) {
         setActiveTab('licenses');
@@ -71,6 +73,13 @@ function DashboardInner({ mode }) {
       case 'favorites': return <FavoritesManager />;
       case 'subscriptions': return <SubscriptionsTab />;
       case 'income': return <IncomeDashboardTab />;
+      case 'saas': 
+        return (
+          <div className="flex flex-col gap-6">
+            <TeamManager />
+            <StandardsViewer />
+          </div>
+        );
 
       case 'notifications': 
         return (
@@ -105,6 +114,7 @@ function DashboardInner({ mode }) {
                activeTab === 'licenses' ? t('dashboard.sidebar.licenses') : 
                activeTab === 'subscriptions' ? t('dashboard.subscriptions.title') :
                activeTab === 'income' ? t('dashboard.sidebar.income') :
+               activeTab === 'saas' ? 'SaaS' :
                t('dashboard.sidebar.notifications')}
             </span>
           </div>
