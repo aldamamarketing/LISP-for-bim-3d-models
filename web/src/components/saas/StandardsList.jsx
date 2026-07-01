@@ -108,7 +108,7 @@ export default function StandardsList({ teamId, searchFilters = [], isExtracting
     }, 2000);
 
     return () => clearInterval(interval);
-  }, [isExtracting, teamId, onExtractComplete]);
+  }, [isExtracting, isAuditing, panelMode, teamId, onExtractComplete]);
 
   const handleCommitMerge = ({ merged, selectedActions }) => {
     setShowDiff(false);
