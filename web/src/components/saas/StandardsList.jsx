@@ -259,6 +259,16 @@ export default function StandardsList({ teamId, searchFilters = [], isExtracting
     tableStyles: Object.entries(standard.tableStyles || {}).filter(([name]) => passesFilter(name)).sort((a, b) => a[0].localeCompare(b[0])),
   };
 
+  const formatGlobalVar = (name, value) => {
+    if (name === 'INSUNITS') {
+      const map = {0:'Sin unidades', 1:'Pulgadas', 2:'Pies', 4:'Milímetros', 5:'Centímetros', 6:'Metros'};
+      return map[value] || value;
+    }
+    if (name === 'MEASUREMENT') return value === 0 ? 'Inglés' : (value === 1 ? 'Métrico' : value);
+    if (name === 'DIMSCALE' && value === 0) return 'Anotativo (0)';
+    return value;
+  };
+
   const renderRow = (type, name, props) => {
     if (type === 'layers') {
       const colorHex = getAutoCADColor(props.color);
@@ -282,7 +292,7 @@ export default function StandardsList({ teamId, searchFilters = [], isExtracting
       return (
         <div key={name} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '4px 20px 4px 12px', boxSizing: 'border-box', borderBottom: '1px solid #333', fontSize: '0.75rem', cursor: 'default' }}>
           <span style={{ fontFamily: 'monospace', color: '#fbbf24', textOverflow: 'ellipsis', overflow: 'hidden', whiteSpace: 'nowrap', paddingRight: '8px', width: '50%' }} title={name}>{name}</span>
-          <span style={{ color: '#d1d5db', textOverflow: 'ellipsis', overflow: 'hidden', whiteSpace: 'nowrap', width: '50%', textAlign: 'right' }}>{props.value}</span>
+          <span style={{ color: '#d1d5db', textOverflow: 'ellipsis', overflow: 'hidden', whiteSpace: 'nowrap', width: '50%', textAlign: 'right' }}>{formatGlobalVar(name, props.value)}</span>
         </div>
       );
     } else {

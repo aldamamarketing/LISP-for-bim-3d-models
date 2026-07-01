@@ -99,10 +99,20 @@ export default function DiffMergePanel({ draft, currentStandard, searchFilters =
 
     // --- Global Vars ---
     // Global vars never "miss" or are "new", they only deviate (modify).
+    const formatGlobalVar = (name, value) => {
+      if (name === 'INSUNITS') {
+        const map = {0:'Sin unidades', 1:'Pulgadas', 2:'Pies', 4:'Milímetros', 5:'Centímetros', 6:'Metros'};
+        return map[value] || value;
+      }
+      if (name === 'MEASUREMENT') return value === 0 ? 'Inglés' : (value === 1 ? 'Métrico' : value);
+      if (name === 'DIMSCALE' && value === 0) return 'Anotativo (0)';
+      return value;
+    };
+
     Object.keys(draftGlobals).forEach(key => {
       const d = draftGlobals[key], c = curGlobals[key];
       if (c && d.value !== c.value) {
-        modifiedItems.push({ type: 'globalVar', key, data: d, changes: [`Value: ${c.value} → ${d.value}`] });
+        modifiedItems.push({ type: 'globalVar', key, data: d, changes: [`Value: ${formatGlobalVar(key, c.value)} → ${formatGlobalVar(key, d.value)}`] });
       } else if (!c) {
         // Technically standard doesn't have it, we could treat as new
         newItems.push({ type: 'globalVar', key, data: d });
@@ -132,6 +142,11 @@ export default function DiffMergePanel({ draft, currentStandard, searchFilters =
     Object.keys(curTables).forEach(key => {
       if (!draftTables[key]) missingItems.push({ type: 'tableStyle', key, data: curTables[key] });
     });
+
+    // Ordenar alfabéticamente para que en el UI salgan en orden
+    newItems.sort((a, b) => a.key.localeCompare(b.key));
+    modifiedItems.sort((a, b) => a.key.localeCompare(b.key));
+    missingItems.sort((a, b) => a.key.localeCompare(b.key));
 
     setDiff({ newItems, modifiedItems, missingItems });
     // New items: checked by default. Modified & Missing: unchecked for safety.
