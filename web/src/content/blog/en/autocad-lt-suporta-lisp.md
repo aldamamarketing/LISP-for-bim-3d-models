@@ -1,6 +1,6 @@
 ---
 title: 'AutoCAD LT Now Supports LISP: How to Prepare Your Office'
-description: 'Understand Autodesk\'s recent update that released the use of AutoLISP routines in AutoCAD LT and discover how to distribute corporate tools.'
+description: "Understand Autodesk's recent update that released the use of AutoLISP routines in AutoCAD LT and discover how to distribute corporate tools."
 pubDate: 2026-05-28
 heroImage: 'https://images.unsplash.com/photo-1581092921461-7d603a115ab3?q=80&w=1200&auto=format&fit=crop'
 author: 'Equipe LispCentral'
