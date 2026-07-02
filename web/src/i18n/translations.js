@@ -206,6 +206,8 @@ export const translations = {
     "common.loading": "Loading data...",
 
     // Landing Hero
+    "landing.meta.title": "LispCentral | Hatch Library, CAD Standards & LISP Cloud for CAD Professionals",
+    "landing.meta.desc": "Protect your intellectual property, centralize your LISPs in the cloud and standardize your AutoCAD team's production.",
     "landing.hero.tag": "FOR CAD & BIM PROFESSIONALS",
     "landing.hero.title": "Everything your CAD workflow needs, in one place.",
     "landing.hero.subtitle": "Parametric hatches. Team drawing standards. Protected LISP routines in the cloud. Compatible with leading CAD software.",
@@ -229,6 +231,7 @@ export const translations = {
 
     // Hatch Section
     "hatch.section.eyebrow": "HATCH CLOUD",
+    "hatch.section.image_alt": "LispCentral Hatch Library",
     "hatch.section.title": "300 parametric hatch patterns. Ready to use.",
     "hatch.section.subtitle": "Stop searching for .pat files on the internet.",
     "hatch.section.b1.title": "Ready-to-use library",
@@ -242,6 +245,7 @@ export const translations = {
 
     // Standards Section
     "standards.section.eyebrow": "CAD STANDARDS",
+    "standards.section.image_alt": "LispCentral CAD Standards Palette",
     "standards.section.title": "Your CAD standard. In the cloud. One click away.",
     "standards.section.subtitle": "Stop fighting with inconsistent layers and styles across your team.",
     "standards.section.b1.title": "1-click apply",
@@ -313,6 +317,7 @@ export const translations = {
 
     // Landing Palettes
     "palettes.title": "Integrated Web Palettes",
+    "palettes.image_alt": "AutoCAD with Integrated Web Palette",
     "palettes.desc": "Modernize the interface of your routines. The platform provides your tools through advanced, responsive web panels that communicate seamlessly with AutoCAD, replacing legacy LISP dialog boxes.",
     "palettes.sync.title": "Real-Time Sync",
     "palettes.sync.desc": "UI updates reflect immediately on clients without restart.",
@@ -576,6 +581,8 @@ export const translations = {
     "common.loading": "Cargando datos...",
 
     // Landing Hero
+    "landing.meta.title": "LispCentral | Biblioteca de Hatch, Normas CAD y LISP Cloud para Profesionales CAD",
+    "landing.meta.desc": "Proteja su propiedad intelectual, centralice sus LISPs en la nube y estandarice la producción de su equipo de AutoCAD.",
     "landing.hero.tag": "PARA PROFESIONALES CAD & BIM",
     "landing.hero.title": "Todo lo que tu flujo de trabajo CAD necesita, en un solo lugar.",
     "landing.hero.subtitle": "Patrones de hatch paramétricos. Normas de dibujo en equipo. Rutinas LISP protegidas en la nube. Compatible con los principales softwares CAD.",
@@ -599,6 +606,7 @@ export const translations = {
 
     // Hatch Section
     "hatch.section.eyebrow": "HATCH CLOUD",
+    "hatch.section.image_alt": "Biblioteca de Hatch LispCentral",
     "hatch.section.title": "300 patrones de hatch paramétricos. Listos para usar.",
     "hatch.section.subtitle": "Deja de buscar archivos .pat en internet.",
     "hatch.section.b1.title": "Biblioteca lista para usar",
@@ -612,6 +620,7 @@ export const translations = {
 
     // Standards Section
     "standards.section.eyebrow": "NORMAS CAD",
+    "standards.section.image_alt": "Paleta de Normas CAD LispCentral",
     "standards.section.title": "Tu norma CAD. En la nube. A un clic.",
     "standards.section.subtitle": "Deja de luchar con capas y estilos inconsistentes en tu equipo.",
     "standards.section.b1.title": "Aplicar en 1 clic",
@@ -683,6 +692,7 @@ export const translations = {
 
     // Landing Palettes
     "palettes.title": "Paletas Web Integradas",
+    "palettes.image_alt": "AutoCAD con Paleta Web Integrada",
     "palettes.desc": "Modernice la interfaz de sus rutinas. La plataforma ofrece sus herramientas a través de paneles web avanzados y responsivos que se comunican perfectamente con AutoCAD, reemplazando cuadros de diálogo LISP heredados.",
     "palettes.sync.title": "Sincronización en Tiempo Real",
     "palettes.sync.desc": "Las actualizaciones de UI se reflejan inmediatamente en los clientes sin necesidad de reiniciar.",
@@ -946,6 +956,8 @@ export const translations = {
     "common.loading": "Carregando dados...",
 
     // Landing Hero
+    "landing.meta.title": "LispCentral | Biblioteca de Hatch, Normas CAD e LISP Cloud para Profissionais CAD",
+    "landing.meta.desc": "Proteja sua propriedade intelectual, centralize seus LISPs na nuvem e padronize a produção da sua equipe de AutoCAD.",
     "landing.hero.tag": "PARA PROFISSIONAIS CAD & BIM",
     "landing.hero.title": "Tudo o que seu fluxo de trabalho CAD precisa, em um só lugar.",
     "landing.hero.subtitle": "Hachuras paramétricas. Normas de desenho em equipe. Rotinas LISP protegidas na nuvem. Compatível com os principais softwares CAD.",
@@ -969,6 +981,7 @@ export const translations = {
 
     // Hatch Section
     "hatch.section.eyebrow": "HATCH CLOUD",
+    "hatch.section.image_alt": "Biblioteca de Hatch LispCentral",
     "hatch.section.title": "300 padrões de hachura paramétricos. Prontos para usar.",
     "hatch.section.subtitle": "Pare de buscar arquivos .pat na internet.",
     "hatch.section.b1.title": "Biblioteca pronta para uso",
@@ -982,6 +995,7 @@ export const translations = {
 
     // Standards Section
     "standards.section.eyebrow": "NORMAS CAD",
+    "standards.section.image_alt": "Paleta de Normas CAD LispCentral",
     "standards.section.title": "Sua norma CAD. Na nuvem. A um clique.",
     "standards.section.subtitle": "Pare de brigar com layers e estilos inconsistentes na equipe.",
     "standards.section.b1.title": "Aplicar em 1 clique",
@@ -1053,6 +1067,7 @@ export const translations = {
 
     // Landing Palettes
     "palettes.title": "Paletas Web Integradas",
+    "palettes.image_alt": "AutoCAD com Paleta Web Integrada",
     "palettes.desc": "Modernize a interface das suas rotinas. A plataforma disponibiliza suas ferramentas através de painéis web avançados e responsivos que se comunicam perfeitamente com o AutoCAD, substituindo caixas de diálogo LISP legadas.",
     "palettes.sync.title": "Sincronização em Tempo Real",
     "palettes.sync.desc": "Atualizações de UI refletem imediatamente nos clientes sem reinicialização.",

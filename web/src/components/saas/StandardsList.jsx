@@ -308,14 +308,14 @@ export default function StandardsList({ teamId, searchFilters = [], isExtracting
   };
 
   const groups = [
-    { key: 'layers', label: 'Capas' },
-    { key: 'textStyles', label: 'Estilos de Texto' },
-    { key: 'dimStyles', label: 'Estilos de Cota' },
-    { key: 'globalVars', label: 'Variables Globales' },
-    { key: 'linetypes', label: 'Tipos de Línea' },
-    { key: 'mleaderStyles', label: 'Directrices Múltiples' },
-    { key: 'tableStyles', label: 'Estilos de Tabla' },
-    { key: 'scaleLists', label: 'Escalas Anotativas' },
+    { key: 'layers', label: 'Layers' },
+    { key: 'textStyles', label: 'Text Styles' },
+    { key: 'dimStyles', label: 'Dim Styles' },
+    { key: 'globalVars', label: 'Global Vars' },
+    { key: 'linetypes', label: 'Linetypes' },
+    { key: 'mleaderStyles', label: 'MLeader Styles' },
+    { key: 'tableStyles', label: 'Table Styles' },
+    { key: 'scaleLists', label: 'Scale Lists' }
   ];
 
   const toggleGroup = (key) => {

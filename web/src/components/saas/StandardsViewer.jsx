@@ -26,14 +26,14 @@ export default function StandardsViewer({ teamId }) {
     return () => unsubscribe();
   }, [teamId]);
 
-  if (loading) return <div className="text-gray-400 p-4 animate-pulse">Analizando base de datos de normas...</div>;
+  if (loading) return <div className="text-gray-400 p-4 animate-pulse">Analyzing standards database...</div>;
 
   if (!standard) return (
     <div className="bg-amber-900/20 text-amber-500 p-6 rounded-lg border border-amber-800/50 flex flex-col items-center">
       <svg className="w-12 h-12 mb-3 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>
-      <h3 className="font-bold text-lg mb-1">Archivo Dorado Vacío</h3>
+      <h3 className="font-bold text-lg mb-1">Empty Golden File</h3>
       <p className="text-center text-sm text-amber-600/80 max-w-md">
-        Aún no has sincronizado las normas de tu empresa. Abre tu archivo plantilla (.dwt) en AutoCAD y ejecuta el comando <strong>TMD_EXTRACT_STDS</strong>.
+        You haven't synced your company standards yet. Open your template file (.dwt) in AutoCAD and run the command <strong>LC_STANDARDS</strong>.
       </p>
     </div>
   );
@@ -44,15 +44,15 @@ export default function StandardsViewer({ teamId }) {
   return (
     <div className="bg-gray-900 rounded-lg border border-gray-700 shadow-inner overflow-hidden">
       <div className="bg-gray-800/50 p-4 border-b border-gray-700 flex justify-between items-center">
-        <h3 className="font-bold text-gray-200">Norma Configurada (Archivo Dorado)</h3>
-        <span className="bg-green-900/50 text-green-400 text-xs px-2 py-1 rounded-full border border-green-800">Sincronizado</span>
+        <h3 className="font-bold text-gray-200">Configured Standard (Golden File)</h3>
+        <span className="bg-green-900/50 text-green-400 text-xs px-2 py-1 rounded-full border border-green-800">Synced</span>
       </div>
       
       <div className="p-5 grid grid-cols-1 md:grid-cols-2 gap-6">
         {/* Layers Column */}
         <div>
           <h4 className="text-sm font-bold text-blue-400 mb-3 flex items-center justify-between border-b border-gray-700 pb-2">
-            <span>CAPAS OFICIALES</span>
+            <span>OFFICIAL LAYERS</span>
             <span className="bg-gray-800 px-2 py-0.5 rounded-full text-xs text-gray-400">{layerCount} items</span>
           </h4>
           <div className="max-h-64 overflow-y-auto pr-2 custom-scrollbar">
@@ -74,7 +74,7 @@ export default function StandardsViewer({ teamId }) {
         {/* TextStyles Column */}
         <div>
           <h4 className="text-sm font-bold text-indigo-400 mb-3 flex items-center justify-between border-b border-gray-700 pb-2">
-            <span>ESTILOS DE TEXTO</span>
+            <span>TEXT STYLES</span>
             <span className="bg-gray-800 px-2 py-0.5 rounded-full text-xs text-gray-400">{textStyleCount} items</span>
           </h4>
           <div className="max-h-64 overflow-y-auto pr-2 custom-scrollbar">

@@ -10,10 +10,10 @@ export default function PaletteDropdownMenu({ myId }) {
   const activePalettes = usePalettePresence(myId);
 
   const palettes = [
-    { id: 'commands', label: 'Command Palette', acadName: 'Command Palette', openCmd: '(C:LC) ' },
-    { id: 'saas', label: 'LispCentral Normas', acadName: 'SaaS Palette', openCmd: '(C:TEST_SAAS_PALETTE) ' },
-    { id: 'resources', label: 'LispCentral Recursos', acadName: 'LispCentral Recursos', openCmd: '(C:RECURSOS) ' },
-    { id: 'properties', label: 'LispCentral Propiedades', acadName: 'LispCentral Propiedades', openCmd: '(C:LC_PROP) ' }
+    { id: 'commands', label: 'LispCentral Commands', acadName: 'Command Palette', openCmd: '(C:LC_PALETTE) ' },
+    { id: 'saas', label: 'LispCentral Standards', acadName: 'SaaS Palette', openCmd: '(C:TEST_SAAS_PALETTE) ' },
+    { id: 'resources', label: 'LispCentral Hatches', acadName: 'Resource Palette', openCmd: '(C:LC_RESOURCES) ' },
+    { id: 'properties', label: 'LispCentral Properties', acadName: 'LispCentral Propiedades', openCmd: '(C:LC_PROP) ' }
   ];
 
   // Cerrar si se clickea fuera del menu

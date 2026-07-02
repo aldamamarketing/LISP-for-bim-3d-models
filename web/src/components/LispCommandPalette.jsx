@@ -137,7 +137,7 @@ export default function LispCommandPalette() {
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
             <PaletteDropdownMenu myId="commands" />
             <span style={{ fontSize: '0.75rem', fontWeight: 'bold', color: 'var(--tmd-orange)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
-              LispCentral Comandos
+              LispCentral Commands
             </span>
           </div>
           <button
@@ -155,7 +155,7 @@ export default function LispCommandPalette() {
         <div style={{ padding: '8px' }}>
           <MultiFilter
             storageKey="lc_active_filters_cmd"
-            placeholder="Procurar função..."
+            placeholder="Search function..."
             onFilterChange={setActiveFilters}
           />
         </div>

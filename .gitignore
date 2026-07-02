@@ -100,7 +100,7 @@ functions/lisp/
 
 # Assets and test images
 assets/
-*.png
+assets/*.png
 *.zip
 
 # Secrets

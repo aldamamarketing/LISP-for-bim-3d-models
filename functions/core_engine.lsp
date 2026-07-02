@@ -541,49 +541,43 @@
           "\"MEASUREMENT\":{\"value\":" (itoa meas) "}}")
 )
 
-(defun LC:get-mleaderstyles-json (/ doc dicts result entries name)
-  (setq doc (vla-get-activedocument (vlax-get-acad-object)))
-  (setq dicts (vla-get-dictionaries doc))
-  (setq result (vl-catch-all-apply 'vla-item (list dicts "ACAD_MLEADERSTYLE")))
-  (setq entries '())
-  (if (not (vl-catch-all-error-p result))
-    (vlax-for obj result
-      (setq name (vla-get-name obj))
-      (if (not (vl-string-search "|" name))
-        (setq entries (cons (strcat "\"" (LC:json-escape name) "\":{}") entries))
+(defun LC:get-dict-keys (dictName / dict keys)
+  (setq dict (dictsearch (namedobjdict) dictName) keys '())
+  (if dict
+    (foreach item dict
+      (if (= (car item) 3)
+        (setq keys (cons (cdr item) keys))
       )
+    )
+  )
+  (reverse keys)
+)
+
+(defun LC:get-mleaderstyles-json (/ keys entries name)
+  (setq keys (LC:get-dict-keys "ACAD_MLEADERSTYLE") entries '())
+  (foreach name keys
+    (if (not (vl-string-search "|" name))
+      (setq entries (cons (strcat "\"" (LC:json-escape name) "\":{}") entries))
     )
   )
   (LC:list->json-obj (reverse entries))
 )
 
-(defun LC:get-tablestyles-json (/ doc dicts result entries name)
-  (setq doc (vla-get-activedocument (vlax-get-acad-object)))
-  (setq dicts (vla-get-dictionaries doc))
-  (setq result (vl-catch-all-apply 'vla-item (list dicts "ACAD_TABLESTYLE")))
-  (setq entries '())
-  (if (not (vl-catch-all-error-p result))
-    (vlax-for obj result
-      (setq name (vla-get-name obj))
-      (if (not (vl-string-search "|" name))
-        (setq entries (cons (strcat "\"" (LC:json-escape name) "\":{}") entries))
-      )
+(defun LC:get-tablestyles-json (/ keys entries name)
+  (setq keys (LC:get-dict-keys "ACAD_TABLESTYLE") entries '())
+  (foreach name keys
+    (if (not (vl-string-search "|" name))
+      (setq entries (cons (strcat "\"" (LC:json-escape name) "\":{}") entries))
     )
   )
   (LC:list->json-obj (reverse entries))
 )
 
-(defun LC:get-scalelists-json (/ doc dicts result entries name)
-  (setq doc (vla-get-activedocument (vlax-get-acad-object)))
-  (setq dicts (vla-get-dictionaries doc))
-  (setq result (vl-catch-all-apply 'vla-item (list dicts "ACAD_SCALELIST")))
-  (setq entries '())
-  (if (not (vl-catch-all-error-p result))
-    (vlax-for obj result
-      (setq name (vla-get-name obj))
-      (if (not (vl-string-search "|" name))
-        (setq entries (cons (strcat "\"" (LC:json-escape name) "\":{}") entries))
-      )
+(defun LC:get-scalelists-json (/ keys entries name)
+  (setq keys (LC:get-dict-keys "ACAD_SCALELIST") entries '())
+  (foreach name keys
+    (if (not (vl-string-search "|" name))
+      (setq entries (cons (strcat "\"" (LC:json-escape name) "\":{}") entries))
     )
   )
   (LC:list->json-obj (reverse entries))
@@ -706,6 +700,10 @@
       )
     )
   )
+)
+
+(defun LC:apply-scale (name /)
+  (princ (strcat "\n[LC] Scale ensured: " name))
 )
 
 ;; Web API communication for Standards

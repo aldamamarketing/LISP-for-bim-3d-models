@@ -64,7 +64,7 @@ export default function SaasPalette() {
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
             <PaletteDropdownMenu myId="saas" />
             <span style={{ fontSize: '0.75rem', fontWeight: 'bold', color: 'var(--tmd-orange)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
-              LISPCENTRAL NORMAS
+              LISPCENTRAL STANDARDS
             </span>
           </div>
           <button

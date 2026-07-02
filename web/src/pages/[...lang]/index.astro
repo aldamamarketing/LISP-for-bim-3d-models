@@ -13,9 +13,13 @@ import Features from '../../components/landing/Features.astro';
 import WebPalettes from '../../components/landing/WebPalettes.astro';
 import FAQ from '../../components/landing/FAQ.astro';
 import CTA from '../../components/landing/CTA.astro';
+
+import { translations } from '../../i18n/translations.js';
+
+const t = (key) => translations[lang]?.[key] || translations['en'][key] || key;
 ---
 
-<Layout title="LispCentral | Hatch Library, CAD Standards & LISP Cloud for CAD Professionals">
+<Layout title={t('landing.meta.title')} description={t('landing.meta.desc')}>
     <Header />
     <main id="modules">
         <Hero />

@@ -32,7 +32,7 @@ const t = (key) => translations[lang]?.[key] || translations['en'][key];
             </div>
             <div class="relative">
                 <div class="absolute inset-0 bg-gradient-to-tr from-primary-container/20 to-transparent blur-2xl rounded-full"></div>
-                <img src="/images/autocad_palette_ui.jpg" alt="AutoCAD com Paleta Web Integrada" class="w-full h-auto rounded-lg border border-[#262626] shadow-2xl relative z-10" loading="lazy" />
+                <img src="/images/autocad_palette_ui.jpg" alt={t("palettes.image_alt")} class="w-full h-auto rounded-lg border border-[#262626] shadow-2xl relative z-10" loading="lazy" />
             </div>
         </div>
     </div>
