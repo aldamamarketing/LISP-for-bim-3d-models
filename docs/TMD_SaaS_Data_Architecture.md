@@ -32,7 +32,7 @@ Ver esquemas en sección 2.
 - **Responsabilidades del motor LISP:**
   - `tmd_utils.lsp`: HTTP (WinHttp), escape JSON, api-base
   - `tmd_saas_extract.lsp`: Extrae Layers + TextStyles + DimStyles → JSON → Cloud
-  - `tmd_saas_apply.lsp`: `tmd:apply-layer`, `tmd:apply-textstyle`, `tmd:rename-layer`
+  - `core_engine.lsp`: `LC:apply-layer`, `LC:apply-textstyle`, `tmd:rename-layer`
   - `tmd_saas_audit.lsp`: Extrae snapshot del DWG para comparación (misma lógica que extract)
 
 > [!IMPORTANT]

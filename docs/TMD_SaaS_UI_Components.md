@@ -43,8 +43,8 @@ Este módulo SaaS es un **add-on independiente** de LispCentral. Se desarrolla y
 
 **Acciones:**
 - `handleSync()` → `executeInAutoCAD('LC_SYNC')`
-- `handleUploadStandard()` → `executeInAutoCAD('(tmd:extract-stds teamId token) ')` → inicia polling
-- `handleInject()` → llama `tmd:apply-layer` por cada ítem del estándar (pendiente de implementar)
+- `handleUploadStandard()` → `executeInAutoCAD('(LC:extract-standards) ')` → inicia polling
+- `handleInject()` → llama `LC:apply-layer` por cada ítem del estándar (pendiente de implementar)
 
 ---
 
@@ -103,7 +103,7 @@ Modo pantalla completa (position: absolute, z-index: 100) dentro de `StandardsLi
 |---|---|---|
 | **DiffMergePanel — Sub-grupos colapsables** | Agrupa ítems por tipo (Layers/TextStyles/DimStyles) dentro de cada sección | Alta |
 | **DimStyles en StandardsList** | Tab adicional para DimStyles, igual que Capas y Estilos | Media |
-| **Apply Standard (handleInject)** | Conectar botón naranja: JS itera estándar y llama `tmd:apply-layer` por ítem | Alta |
+| **Apply Standard (handleInject)** | Conectar botón naranja: JS itera estándar y llama `LC:apply-layer` por ítem | Alta |
 | **Audit Panel** | Vista similar a DiffMergePanel pero en dirección inversa (Cloud es fuente de verdad) | Media |
 | **Layer Rename UI** | En Audit: dropdown para mapear capa no-estándar a capa del estándar | Baja (Fase 2) |
 
@@ -130,4 +130,4 @@ Modo pantalla completa (position: absolute, z-index: 100) dentro de `StandardsLi
 ### Modo Auditor�a (Audit Mode)
 - **DiffMergePanel adaptado**: El mismo panel de Diff ahora soporta dos modos (mode='extract' y mode='audit').
 - En modo Audit, la interfaz muestra las desviaciones del DWG respecto a la Nube bajo las categor�as: Extra in DWG (Ignore), Deviates (Fix in DWG), y Missing (Create in DWG).
-- **Inyecci�n din�mica de LISP**: Al confirmar los cambios en modo Audit, el componente StandardsList genera din�micamente comandos (tmd:apply-layer ...) y (tmd:apply-textstyle ...) inyect�ndolos directo a AutoCAD mediante el bridge, corrigiendo el dibujo activo sin modificar el Standard en la Nube.
+- **Inyecci�n din�mica de LISP**: Al confirmar los cambios en modo Audit, el componente StandardsList genera din�micamente comandos (LC:apply-layer ...) y (LC:apply-textstyle ...) inyect�ndolos directo a AutoCAD mediante el bridge, corrigiendo el dibujo activo sin modificar el Standard en la Nube.

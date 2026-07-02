@@ -20,7 +20,7 @@ El Manager trabaja directamente en AutoCAD — cero fricción.
 
 1. Configura capas, estilos de texto y cotas en un `.dwg`.
 2. En la paleta, selecciona su equipo y hace clic en el botón de subir (ícono nube verde).
-3. La paleta llama `(tmd:extract-stds teamId token)` vía JS.
+3. La paleta llama `(LC:extract-standards)` vía JS.
 4. El LISP extrae **Layers + TextStyles + DimStyles** y hace POST a `/uploadDraft`.
 5. La paleta hace polling a `/getDraft` cada 2s.
 6. Al detectar el draft, abre el **DiffMergePanel** con 3 categorías:
@@ -43,9 +43,9 @@ Actualmente el COMMIT hace `delete` real del campo en Firestore. La arquitectura
 ### 3.1 Apply Standard to DWG (Cloud → DWG, ciego)
 Acción directa. Sin revisión previa.
 1. El Manager/Dibujante hace clic en **"Apply Standard to DWG"** (botón naranja en footer).
-2. La paleta JS llama `tmd:apply-layer(name, color, ltype, lw)` para cada capa del estándar.
-3. La paleta JS llama `tmd:apply-textstyle(name, font, height)` para cada estilo.
-4. Al terminar, llama `c:TMD_APPLY_COMPLETE` para regen de vistas.
+2. La paleta JS llama `LC:apply-layer(name, color, ltype, lw)` para cada capa del estándar.
+3. La paleta JS llama `LC:apply-textstyle(name, font, height)` para cada estilo.
+4. Al terminar, llama `c:LC_APPLY_COMPLETE` para regen de vistas.
 
 > [!NOTE]
 > El JS parsea el JSON del estándar y llama la función LISP individualmente por ítem. Esto evita tener que parsear JSON dentro de LISP (sin soporte nativo). Las capas faltantes se crean, las existentes se corrigen.
@@ -55,15 +55,15 @@ Comparación inversa al Update Standard. La **nube es la fuente de verdad**.
 
 **Proceso:**
 1. Usuario hace clic en **"Auditar Dibujo Actual"**.
-2. La paleta llama `(tmd:run-audit teamId token)`.
+2. La paleta llama `(LC:run-audit)`.
 3. El LISP extrae el DWG (mismo mecanismo que extract) y sube a `/uploadDraft`.
 4. La paleta recibe el snapshot y abre el **panel de auditoría** mostrando:
 
 | Tipo de Violación | Descripción | Fix disponible |
 |---|---|---|
-| **Property Violation** | Capa existe en ambos, pero con color/ltype/lineweight incorrecto | ✅ `tmd:apply-layer` corrige propiedades |
-| **Missing Layer** | Capa en la norma Cloud que no existe en el DWG | ✅ `tmd:apply-layer` la crea |
-| **Non-Standard Layer** | Capa en DWG que no existe en la norma | ⚠️ Ofrecer renombrar a capa estándar vía `tmd:rename-layer` |
+| **Property Violation** | Capa existe en ambos, pero con color/ltype/lineweight incorrecto | ✅ `LC:apply-layer` corrige propiedades |
+| **Missing Layer** | Capa en la norma Cloud que no existe en el DWG | ✅ `LC:apply-layer` la crea |
+| **Non-Standard Layer** | Capa en DWG que no existe en la norma | ⚠️ Ofrecer renombrar a capa estándar vía `LC:rename-layer` |
 
 > [!IMPORTANT]
 > **Renombrar es la operación correcta para capas no-estándar.** `vla-put-name` renombra la capa y todos los objetos la siguen automáticamente — es O(1). Mover objetos entre capas requiere iterar entidades (O(n), complejo). Moverse al estándar de la industria: Layer Translator (`LAYTRANS`) de AutoCAD hace exactamente esto.
@@ -106,7 +106,7 @@ Para testing local: `c:TMD_LOAD_CORE` carga los módulos desde el path del proye
 
 ### 🔧 En Progreso
 - Sub-grupos colapsables en DiffMergePanel (por tipo: Layers / TextStyles / DimStyles)
-- "Apply Standard to DWG" — botón conectado, falta lógica en el frontend para llamar tmd:apply-layer por ítem
+- "Apply Standard to DWG" — botón conectado, falta lógica en el frontend para llamar LC:apply-layer por ítem
 
 ### ❌ Fuera de Scope MVP
 - Soft Delete (marcar `_deprecated: true` en lugar de borrar)
