@@ -37,111 +37,95 @@ export default function SvgPreviewEngine({ archetype, params, gridRows = 3, grid
 
   if (!archetype) return null;
 
-  // 1. Patrones sin motor matemático: escalar imagen SVG original de forma pareja
+  // 1. Patrones sin motor matemático: escalar imagen SVG original de forma pareja usando CSS
   if (!archetype.generateSvgRenderer) {
-    // URL absoluta para evitar file:// en AutoCAD embebido
-    const absIconUrl = archetype.iconUrl?.startsWith('/')
-      ? ASSETS_BASE_URL + archetype.iconUrl
-      : archetype.iconUrl;
-
-    if (gridCols === 1 && gridRows === 1) {
-      // Modo Aislado: sin repetición, centrado y con espacio vacío alrededor
-      return (
-        <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', backgroundColor: '#0b0f19', padding: '40px' }}>
-          <div style={{
-            width: '100%',
-            height: '100%',
-            backgroundImage: `url(${absIconUrl})`,
-            backgroundSize: 'contain',
-            backgroundPosition: 'center',
-            backgroundRepeat: 'no-repeat',
-            filter: 'invert(1) hue-rotate(180deg)',
-          }}></div>
-        </div>
-      );
+    if (!svgContent) {
+      return <div style={{ width: '100%', height: '100%', backgroundColor: '#0b0f19' }} />;
     }
 
-    const w = params?.width || archetype.defaults.width;
-    const h = params?.height || archetype.defaults.height;
+    const w = params?.width || archetype.defaults.width || 346;
+    const h = params?.height || archetype.defaults.height || 600;
+    const origW = archetype.defaults.width || 346;
+    const origH = archetype.defaults.height || 600;
 
-    const gridW = w * gridCols;
-    const gridH = h * gridRows;
-    const viewBoxSize = Math.max(gridW, gridH) + (1.5 * Math.max(w, h));
+    // Calculamos el grosor dinámico
+    const maxGrid = Math.max(gridCols, gridRows);
+    const strokeWidth = 1.5 * maxGrid;
+
+    // Construimos el SVG como string
+    const svgString = `
+      <svg xmlns="http://www.w3.org/2000/svg" width="${w}" height="${h}" viewBox="0 0 ${w} ${h}">
+        <style>
+          path, line, polyline, polygon, rect, circle {
+            stroke: #e2e8f0 !important;
+            fill: none !important;
+            stroke-width: ${strokeWidth}px !important;
+          }
+        </style>
+        <g transform="scale(${w / origW}, ${h / origH})">
+          ${svgContent}
+        </g>
+      </svg>
+    `;
+
+    // Usar codificación segura para Chromium antiguos (sin ;utf8)
+    const dataUri = `data:image/svg+xml,${encodeURIComponent(svgString.trim())}`;
+    
+    // Zoom Infinito: la dimensión predominante dicta el porcentaje
+    const bgSize = gridRows >= gridCols 
+      ? `auto ${100 / gridRows}%` 
+      : `${100 / gridCols}% auto`;
 
     return (
-      <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', backgroundColor: '#0b0f19' }}>
-        <svg 
-          viewBox={`0 0 ${viewBoxSize} ${viewBoxSize}`} 
-          style={{ width: '100%', height: '100%', maxWidth: '100%', maxHeight: '100%', aspectRatio: '1 / 1', border: '1px solid #1e293b' }}
-        >
-          <defs>
-            <pattern 
-              id={`hatchFallback-${archetype.id}`} 
-              patternUnits="userSpaceOnUse" 
-              width={w} 
-              height={h}
-            >
-              {svgContent ? (
-                <g 
-                   className="hatch-preview-layer"
-                   transform={`scale(${w / (archetype.defaults.width || 346)}, ${h / (archetype.defaults.height || 600)})`}
-                   dangerouslySetInnerHTML={{ __html: svgContent }} 
-                />
-              ) : (
-                <image 
-                  href={absIconUrl} 
-                  width={w} 
-                  height={h} 
-                  preserveAspectRatio="none"
-                  style={{ filter: 'invert(1) hue-rotate(180deg)' }}
-                />
-              )}
-            </pattern>
-          </defs>
-          <rect width={viewBoxSize} height={viewBoxSize} fill={`url(#hatchFallback-${archetype.id})`} />
-        </svg>
-      </div>
+      <div style={{ 
+        width: '100%', 
+        height: '100%', 
+        backgroundColor: '#0b0f19',
+        overflow: 'hidden',
+        backgroundImage: `url("${dataUri}")`,
+        backgroundSize: bgSize,
+        backgroundPosition: 'top left',
+        backgroundRepeat: 'repeat'
+      }} />
     );
   }
 
-  // 2. Patrones con motor matemático geométrico: dibujar SVG dinámicamente
+  // 2. Patrones con motor matemático geométrico: dibujar SVG dinámicamente y usar mismo paradigma
   try {
-    const { w, h, paths, baseUnit } = archetype.generateSvgRenderer(params);
+    const { w, h, paths } = archetype.generateSvgRenderer(params);
     
-    // 1. Calculamos el tamaño de la cuadrícula base solicitada
-    const gridW = w * gridCols;
-    const gridH = h * gridRows;
-    
-    // 2. Tomamos el lado mayor para mantener un viewBox cuadrado
-    const maxGridSide = Math.max(gridW, gridH);
-    
-    // 3. Añadimos un desbordamiento de 1.5 patrones por lado (1.5 en total extra para encuadrar mejor)
-    const maxPatternSide = baseUnit || Math.max(w, h);
-    const viewBoxSize = maxGridSide + (1.5 * maxPatternSide);
+    const maxGrid = Math.max(gridCols, gridRows);
+    // Para matemáticos, el trazo base suele ser más fino, compensamos igual.
+    const dynamicStrokeWidth = Math.max(1, 1.5 * maxGrid);
 
-    // 4. Calcular el stroke-width dinámico.
-    // Si asumiéramos que el previsualizador mide unos 500px en pantalla,
-    // queremos que el stroke se vea como de ~1px físico en todo momento.
-    // Esto evita que 'non-scaling-stroke' destruya las proporciones de los 'dashes' al hacer zoom.
-    const dynamicStrokeWidth = Math.max(0.1, viewBoxSize / 500);
+    const svgString = `
+      <svg xmlns="http://www.w3.org/2000/svg" width="${w}" height="${h}" viewBox="0 0 ${w} ${h}">
+        <g stroke-width="${dynamicStrokeWidth}" stroke="#e2e8f0" fill="none">
+          ${paths}
+        </g>
+      </svg>
+    `;
+
+    const dataUri = `data:image/svg+xml,${encodeURIComponent(svgString.trim())}`;
+    
+    const bgSize = gridRows >= gridCols 
+      ? `auto ${100 / gridRows}%` 
+      : `${100 / gridCols}% auto`;
 
     return (
-      <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', backgroundColor: '#0b0f19' }}>
-        <svg 
-          viewBox={`0 0 ${viewBoxSize} ${viewBoxSize}`} 
-          style={{ width: '100%', height: '100%', maxWidth: '100%', maxHeight: '100%', aspectRatio: '1 / 1', border: '1px solid #1e293b' }}
-        >
-          <defs>
-            <pattern id={`hatchPattern-${archetype.id}`} patternUnits="userSpaceOnUse" width={w} height={h} patternTransform={archetype.patternTransform || ''}>
-              <g className="hatch-preview-layer" strokeWidth={dynamicStrokeWidth} dangerouslySetInnerHTML={{ __html: paths }} />
-            </pattern>
-          </defs>
-          <rect width={viewBoxSize} height={viewBoxSize} fill={`url(#hatchPattern-${archetype.id})`} />
-        </svg>
-      </div>
+      <div style={{ 
+        width: '100%', 
+        height: '100%', 
+        backgroundColor: '#0b0f19',
+        overflow: 'hidden',
+        backgroundImage: `url("${dataUri}")`,
+        backgroundSize: bgSize,
+        backgroundPosition: 'top left',
+        backgroundRepeat: 'repeat'
+      }} />
     );
   } catch (err) {
     console.error("Error generating dynamic SVG:", err);
-    return <div style={{ color: 'red' }}>Error rendering geometry</div>;
+    return <div style={{ color: 'red', padding: '20px' }}>Error rendering geometry</div>;
   }
 }

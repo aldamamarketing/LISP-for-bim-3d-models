@@ -30,7 +30,7 @@ export default function StandardsList({ teamId, searchFilters = [], isExtracting
       const API_BASE = window.location.hostname === "localhost"
         ? "http://127.0.0.1:5001/lispcentral/us-central1"
         : "https://us-central1-lispcentral.cloudfunctions.net";
-      
+
       const fetchStandard = () => {
         fetch(`${API_BASE}/getStandard?token=${encodeURIComponent(token)}&teamId=${encodeURIComponent(teamId)}`)
           .then(res => {
@@ -112,7 +112,7 @@ export default function StandardsList({ teamId, searchFilters = [], isExtracting
   const handleCommitMerge = ({ merged, selectedActions, layerMappings }) => {
     setShowDiff(false);
     if (onEditingStateChange) onEditingStateChange(false);
-    
+
     if (panelMode === 'audit') {
       // FIX DWG MODE: Construct LISP to apply fixes to DWG
       const cmds = [];
@@ -199,18 +199,18 @@ export default function StandardsList({ teamId, searchFilters = [], isExtracting
     // EXTRACT MODE: Sync merged standard to Cloud
     const urlParams = new URLSearchParams(typeof window !== 'undefined' ? window.location.search : '');
     const token = urlParams.get('token');
-    
+
     if (!auth.currentUser && token) {
       const API_BASE = window.location.hostname === "localhost"
         ? "http://127.0.0.1:5001/lispcentral/us-central1"
         : "https://us-central1-lispcentral.cloudfunctions.net";
-        
+
       fetch(`${API_BASE}/syncStandard`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ token, teamId, standardData: merged })
       }).then(res => {
-        if(res.ok) {
+        if (res.ok) {
           // Force reload
           if (window.Acad) window.Acad.Editor.executeCommandAsync('(setvar "USERS1" "LC_SAAS_FORCE_RELOAD") ');
         }
@@ -264,7 +264,7 @@ export default function StandardsList({ teamId, searchFilters = [], isExtracting
 
   const formatGlobalVar = (name, value) => {
     if (name === 'INSUNITS') {
-      const map = {0:'Sin unidades', 1:'Pulgadas', 2:'Pies', 4:'Milímetros', 5:'Centímetros', 6:'Metros'};
+      const map = { 0: 'Sin unidades', 1: 'Pulgadas', 2: 'Pies', 4: 'Milímetros', 5: 'Centímetros', 6: 'Metros' };
       return map[value] || value;
     }
     if (name === 'MEASUREMENT') return value === 0 ? 'Inglés' : (value === 1 ? 'Métrico' : value);
@@ -353,7 +353,7 @@ export default function StandardsList({ teamId, searchFilters = [], isExtracting
           const isExpanded = expandedGroups.has(g.key);
           return (
             <div key={g.key} style={{ borderBottom: '1px solid #374151' }}>
-              <button 
+              <button
                 onClick={() => toggleGroup(g.key)}
                 style={{ width: '100%', display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '10px 12px', backgroundColor: isExpanded ? '#374151' : '#1f2937', color: '#e5e7eb', fontWeight: 'bold', fontSize: '0.75rem', cursor: 'pointer', border: 'none', textAlign: 'left', transition: 'background-color 0.2s' }}
               >
@@ -369,10 +369,10 @@ export default function StandardsList({ teamId, searchFilters = [], isExtracting
           );
         })}
       </div>
-      
+
       {/* Action Footer */}
       <div style={{ padding: '12px', borderTop: '1px solid #374151', backgroundColor: '#111827' }}>
-        <button 
+        <button
           onClick={() => {
             const urlParams = new URLSearchParams(typeof window !== 'undefined' ? window.location.search : '');
             const token = urlParams.get('token') || '';
@@ -402,13 +402,13 @@ export default function StandardsList({ teamId, searchFilters = [], isExtracting
 // Full ACI mapping to keep main list colors accurate
 function getAutoCADColor(aci) {
   const colors = {
-    1:'#FF0000',2:'#FFFF00',3:'#00FF00',4:'#00FFFF',5:'#0000FF',6:'#FF00FF',
-    7:'#FFFFFF',8:'#808080',9:'#C0C0C0',10:'#FF4040',20:'#FF9B00',30:'#FF7800',
-    40:'#FFBE00',50:'#FFE600',60:'#BEFF00',70:'#7FFF00',80:'#3FFF00',90:'#00FF40',
-    100:'#00FF9B',110:'#00FFD5',120:'#00D5FF',130:'#009BFF',140:'#0040FF',
-    150:'#4000FF',160:'#7800FF',170:'#BE00FF',180:'#FF00D5',190:'#FF009B',
-    200:'#FF0040',250:'#AAAAAA',251:'#808080',252:'#555555',253:'#333333',
-    254:'#1A1A1A',255:'#000000'
+    1: '#FF0000', 2: '#FFFF00', 3: '#00FF00', 4: '#00FFFF', 5: '#0000FF', 6: '#FF00FF',
+    7: '#FFFFFF', 8: '#808080', 9: '#C0C0C0', 10: '#FF4040', 20: '#FF9B00', 30: '#FF7800',
+    40: '#FFBE00', 50: '#FFE600', 60: '#BEFF00', 70: '#7FFF00', 80: '#3FFF00', 90: '#00FF40',
+    100: '#00FF9B', 110: '#00FFD5', 120: '#00D5FF', 130: '#009BFF', 140: '#0040FF',
+    150: '#4000FF', 160: '#7800FF', 170: '#BE00FF', 180: '#FF00D5', 190: '#FF009B',
+    200: '#FF0040', 250: '#AAAAAA', 251: '#808080', 252: '#555555', 253: '#333333',
+    254: '#1A1A1A', 255: '#000000'
   };
   return colors[aci] || '#AAAAAA';
 }

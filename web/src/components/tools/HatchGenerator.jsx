@@ -445,11 +445,11 @@ export default function HatchGenerator({ lang = 'en', isEmbedded = false, onClos
         )}
 
         {activeTab === 'generator' && generatorView === 'builder' && (
-          <div style={{ display: 'flex', width: '100%', height: '100%', gap: '0', flexDirection: 'column', overflow: 'hidden' }}>
+          <div style={{ display: 'flex', width: '100%', height: '100%', gap: '0', flexDirection: 'row', overflow: 'hidden' }}>
             
-            {/* Arriba: Preview Canvas */}
-            <div style={{ flex: 'none', minHeight: '220px', maxHeight: '45vh', backgroundColor: '#0b0f19', borderBottom: '1px solid #333', padding: '15px', display: 'flex', flexDirection: 'column' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'nowrap', marginBottom: '10px', overflowX: 'auto', WebkitMaskImage: 'linear-gradient(to right, black 85%, transparent 100%)', maskImage: 'linear-gradient(to right, black 85%, transparent 100%)', scrollbarWidth: 'none', paddingRight: '20px' }}>
+            {/* Izquierda: Preview Canvas */}
+            <div style={{ flex: 1, backgroundColor: '#0b0f19', borderRight: '1px solid #333', padding: '15px', display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'nowrap', marginBottom: '10px', overflowX: 'auto', WebkitMaskImage: 'linear-gradient(to right, black 85%, transparent 100%)', maskImage: 'linear-gradient(to right, black 85%, transparent 100%)', scrollbarWidth: 'none', paddingRight: '20px', flex: 'none' }}>
                 {onClose && (
                   <button onClick={onClose} style={{ background: 'none', border: 'none', color: 'var(--text-muted)', cursor: 'pointer', fontSize: '0.9rem', fontWeight: 'bold', padding: 0, whiteSpace: 'nowrap' }}>← Library</button>
                 )}
@@ -477,10 +477,10 @@ export default function HatchGenerator({ lang = 'en', isEmbedded = false, onClos
               </div>
             </div>
 
-            {/* Abajo: Parámetros */}
-            <div className="panel col-settings" style={{ flex: 1, display: 'flex', flexDirection: 'column', width: '100%', overflow: 'hidden' }}>
-              <div style={{ flex: 1, overflowY: 'auto', padding: '20px', display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
-                <div style={{ width: '100%', maxWidth: '350px', display: 'flex', flexDirection: 'column', gap: '20px', position: 'relative' }}>
+            {/* Derecha: Parámetros */}
+            <div className="panel col-settings" style={{ width: '400px', minWidth: '400px', flexShrink: 0, display: 'flex', flexDirection: 'column', height: '100%', overflow: 'hidden', backgroundColor: '#0f172a' }}>
+              <div style={{ flex: 1, overflowY: 'auto', padding: '20px', display: 'flex', flexDirection: 'column', alignItems: 'stretch' }}>
+                <div style={{ width: '100%', display: 'flex', flexDirection: 'column', gap: '20px', position: 'relative' }}>
                   {!currentArchetype.hasBackendEngine && (
                     <div style={{ padding: '10px', backgroundColor: 'rgba(242, 109, 33, 0.1)', borderLeft: '3px solid var(--tmd-orange)', borderRadius: '4px' }}>
                       <div style={{ fontWeight: 'bold', color: 'var(--tmd-orange)', fontSize: '0.85rem' }}>BETA / In Development</div>

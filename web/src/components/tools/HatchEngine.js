@@ -301,7 +301,7 @@ import { arch_kultura } from './patterns/kultura';
 
 // URL base del hosting — necesaria para construir URLs absolutas de SVG en el
 // contexto de AutoCAD (HTML embebido sin servidor, rutas relativas fallan con file://).
-export const ASSETS_BASE_URL = 'https://lispcentral.web.app';
+export const ASSETS_BASE_URL = typeof window !== 'undefined' && window.location.hostname === 'localhost' ? 'http://localhost:4321' : 'https://lispcentral.web.app';
 
 export const ARCHETYPES = [
     arch_stack,
