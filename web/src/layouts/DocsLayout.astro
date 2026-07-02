@@ -4,6 +4,7 @@ import '../styles/styles.css';
 import Header from '../components/layout/Header.astro';
 import { getLangFromUrl, localizeUrl } from '../i18n/utils';
 import { translations } from '../i18n/translations.js';
+import CookieBanner from '../components/layout/CookieBanner.astro';
 
 const { 
   title = "LispCentral Docs — Superpoderes para seu AutoCAD",
@@ -176,7 +177,21 @@ const t = (key) => {
 
   <script>
     import { initPageTracking, trackDocView, trackCtaClick } from '../utils/analytics.js';
-    initPageTracking();
+
+    // Guard: solo inicializa analytics si hay consentimiento 'all'
+    const CONSENT_KEY = 'lc-cookie-consent';
+    function tryInitAnalytics() {
+        if (localStorage.getItem(CONSENT_KEY) === 'all') {
+            initPageTracking();
+        }
+    }
+    tryInitAnalytics();
+    
+    // Si el usuario acaba de aceptar en este page load
+    window.addEventListener('lc:consent', (e) => {
+        if ((e as CustomEvent).detail?.level === 'all') initPageTracking();
+    });
+
     const path = window.location.pathname;
     if (path.includes('/docs/')) {
       const slug = path.split('/docs/').pop()?.replace(/\/$/, '');
@@ -266,5 +281,7 @@ const t = (key) => {
       });
     }
   </script>
+
+  <CookieBanner />
 </body>
 </html>
