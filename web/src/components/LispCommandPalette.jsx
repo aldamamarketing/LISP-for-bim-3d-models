@@ -58,7 +58,7 @@ const SvgIcon = ({ svgString, fallback }) => {
 };
 
 export default function LispCommandPalette() {
-  const buildHash = Date.now();
+  const buildHash = "1782961442";
   console.log("[LispCommandPalette] Inicializando componente...");
   const [commands, setCommands] = useState([]);
   const [loading, setLoading] = useState(true);
