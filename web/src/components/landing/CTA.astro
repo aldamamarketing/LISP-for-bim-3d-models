@@ -4,18 +4,50 @@ import { getLangFromUrl } from '../../i18n/utils';
 
 const lang = getLangFromUrl(Astro.url);
 const t = (key) => translations[lang]?.[key] || translations['en'][key];
+
+const getPath = (path) => {
+    const noI18nPages = ['/login', '/dashboard', '/favorites', '/store'];
+    if (noI18nPages.includes(path)) return path;
+    return lang === 'en' ? path : `/${lang}${path}`;
+};
 ---
-<section class="py-24 bg-primary-container/5 border-t border-surface-variant reveal" id="falar-especialista">
-    <div class="max-w-3xl mx-auto px-gutter text-center">
-        <h2 class="font-headline-lg text-headline-lg text-white mb-6">{t("cta.title")}</h2>
-        <p class="font-body-md text-body-md text-on-surface-variant mb-10">
-            {t("cta.desc")}
-        </p>
-        <div class="flex justify-center mt-8">
-            <a href="/login" class="bg-primary-container text-white font-label-md text-[18px] font-bold px-10 py-4 rounded hover:bg-[#e66000] transition-colors whitespace-nowrap shadow-[0_0_20px_rgba(255,107,0,0.3)] hover:-translate-y-1">
-                {t("cta.button")}
-            </a>
+<section class="py-24 bg-primary-container/5 border-t border-surface-variant reveal" id="get-started">
+    <div class="max-w-4xl mx-auto px-gutter">
+        <h2 class="font-headline-lg text-headline-lg text-white text-center mb-12">{t("cta.title")}</h2>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <!-- Hatch — Zero friction -->
+            <div class="bg-surface border border-surface-variant rounded-xl p-6 hover:border-primary-container/50 hover:-translate-y-1 transition-all flex flex-col">
+                <div class="w-10 h-10 rounded-lg bg-primary-container/10 flex items-center justify-center mb-4">
+                    <span class="material-symbols-outlined text-primary-container text-xl">grid_view</span>
+                </div>
+                <h3 class="text-white font-label-md text-label-md font-bold mb-2">{t("cta.hatch.title")}</h3>
+                <p class="text-on-surface-variant font-body-md text-body-md mb-6 flex-1">{t("cta.hatch.desc")}</p>
+                <a href={getPath('/tools/hatch-generator')} id="cta-hatch-btn" class="w-full text-center bg-primary-container text-white font-label-md text-label-md font-bold py-3 rounded hover:bg-[#e66000] transition-colors shadow-[0_0_16px_rgba(255,107,0,0.2)]">
+                    {t("cta.hatch.btn")}
+                </a>
+            </div>
+            <!-- Standards -->
+            <div class="bg-surface border border-surface-variant rounded-xl p-6 hover:border-primary-container/50 hover:-translate-y-1 transition-all flex flex-col">
+                <div class="w-10 h-10 rounded-lg bg-primary-container/10 flex items-center justify-center mb-4">
+                    <span class="material-symbols-outlined text-primary-container text-xl">layers</span>
+                </div>
+                <h3 class="text-white font-label-md text-label-md font-bold mb-2">{t("cta.standards.title")}</h3>
+                <p class="text-on-surface-variant font-body-md text-body-md mb-6 flex-1">{t("cta.standards.desc")}</p>
+                <a href={getPath('/login')} id="cta-standards-btn" class="w-full text-center border border-primary-container text-primary-container font-label-md text-label-md font-bold py-3 rounded hover:bg-primary-container hover:text-white transition-colors">
+                    {t("cta.standards.btn")}
+                </a>
+            </div>
+            <!-- LISP Cloud -->
+            <div class="bg-surface border border-surface-variant rounded-xl p-6 hover:border-primary-container/50 hover:-translate-y-1 transition-all flex flex-col">
+                <div class="w-10 h-10 rounded-lg bg-primary-container/10 flex items-center justify-center mb-4">
+                    <span class="material-symbols-outlined text-primary-container text-xl">code</span>
+                </div>
+                <h3 class="text-white font-label-md text-label-md font-bold mb-2">{t("cta.lisp.title")}</h3>
+                <p class="text-on-surface-variant font-body-md text-body-md mb-6 flex-1">{t("cta.lisp.desc")}</p>
+                <a href={getPath('/login')} id="cta-lisp-btn" class="w-full text-center border border-surface-variant text-white font-label-md text-label-md font-bold py-3 rounded hover:border-primary-container hover:text-primary-container transition-colors">
+                    {t("cta.lisp.btn")}
+                </a>
+            </div>
         </div>
-        <p class="mt-4 font-code-sm text-code-sm text-on-surface-variant">{t("cta.disclaimer")}</p>
     </div>
 </section>

@@ -1,0 +1,41 @@
+---
+import { getLangFromUrl } from '../../i18n/utils';
+import { translations } from '../../i18n/translations.js';
+
+const lang = getLangFromUrl(Astro.url);
+const t = (key) => translations[lang]?.[key] || translations['en'][key] || key;
+
+const steps = [
+  { num: t('workflow.step1.num'), title: t('workflow.step1.title'), desc: t('workflow.step1.desc'), icon: 'category' },
+  { num: t('workflow.step2.num'), title: t('workflow.step2.title'), desc: t('workflow.step2.desc'), icon: 'person_add' },
+  { num: t('workflow.step3.num'), title: t('workflow.step3.title'), desc: t('workflow.step3.desc'), icon: 'download' },
+  { num: t('workflow.step4.num'), title: t('workflow.step4.title'), desc: t('workflow.step4.desc'), icon: 'dashboard' },
+];
+---
+<section id="how-it-works" class="py-section-padding bg-surface-container-lowest border-y border-surface-variant reveal">
+  <div class="max-w-container-max-width mx-auto px-gutter">
+    <div class="text-center mb-16">
+      <h2 class="font-headline-lg text-headline-lg text-white mb-4">{t('workflow.title')}</h2>
+      <p class="font-body-lg text-body-lg text-on-surface-variant max-w-xl mx-auto">{t('workflow.subtitle')}</p>
+    </div>
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+      {steps.map((step, i) => (
+        <div class="relative bg-surface border border-surface-variant rounded-xl p-6 hover:border-primary-container/40 transition-colors group">
+          {i < 3 && (
+            <div class="hidden lg:block absolute top-10 -right-3 z-10 text-surface-variant">
+              <span class="material-symbols-outlined text-2xl">arrow_forward_ios</span>
+            </div>
+          )}
+          <div class="flex items-center gap-3 mb-4">
+            <span class="font-code-sm text-code-sm text-primary-container/60">{step.num}</span>
+            <div class="w-9 h-9 rounded-lg bg-surface-container-highest flex items-center justify-center group-hover:bg-primary-container/20 transition-colors">
+              <span class="material-symbols-outlined text-primary-container text-lg">{step.icon}</span>
+            </div>
+          </div>
+          <h3 class="text-white font-label-md text-label-md font-semibold mb-2">{step.title}</h3>
+          <p class="text-on-surface-variant font-body-md text-body-md">{step.desc}</p>
+        </div>
+      ))}
+    </div>
+  </div>
+</section>

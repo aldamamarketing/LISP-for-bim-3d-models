@@ -3,25 +3,26 @@ import Layout from '../layouts/Layout.astro';
 import Header from '../components/layout/Header.astro';
 import Footer from '../components/layout/Footer.astro';
 import Hero from '../components/landing/Hero.astro';
+import HatchSection from '../components/landing/HatchSection.astro';
+import StandardsSection from '../components/landing/StandardsSection.astro';
+import LispSection from '../components/landing/LispSection.astro';
+import WorkflowSection from '../components/landing/WorkflowSection.astro';
 import Features from '../components/landing/Features.astro';
-import Libraries from '../components/landing/Libraries.astro';
 import WebPalettes from '../components/landing/WebPalettes.astro';
 import FAQ from '../components/landing/FAQ.astro';
 import CTA from '../components/landing/CTA.astro';
 ---
 
-<Layout title="LispCentral | A Plataforma Definitiva para BIM Managers e Engenheiros">
+<Layout title="LispCentral | Hatch Library, CAD Standards & LISP Cloud for CAD Professionals">
     <script is:inline>
       (function() {
         if (window.location.pathname !== '/') return;
-        
         const savedLang = localStorage.getItem('lc-lang');
         if (savedLang) {
           if (savedLang === 'es') window.location.replace('/es/');
           if (savedLang === 'pt') window.location.replace('/pt/');
           return;
         }
-        
         const browserLang = navigator.language || navigator.userLanguage;
         if (browserLang) {
           const lowerLang = browserLang.toLowerCase();
@@ -36,15 +37,17 @@ import CTA from '../components/landing/CTA.astro';
       })();
     </script>
     <Header />
-    
-    <main>
+    <main id="modules">
         <Hero />
+        <HatchSection />
+        <StandardsSection />
+        <LispSection />
+        <WorkflowSection />
         <Features />
-        <Libraries />
         <WebPalettes />
         <FAQ />
         <CTA />
     </main>
-
     <Footer />
 </Layout>
+

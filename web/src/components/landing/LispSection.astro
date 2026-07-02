@@ -1,0 +1,86 @@
+---
+import { getLangFromUrl } from '../../i18n/utils';
+import { translations } from '../../i18n/translations.js';
+
+const lang = getLangFromUrl(Astro.url);
+const t = (key) => translations[lang]?.[key] || translations['en'][key] || key;
+
+const getPath = (path) => {
+    const noI18nPages = ['/login', '/dashboard', '/favorites', '/store'];
+    if (noI18nPages.includes(path)) return path;
+    return lang === 'en' ? path : `/${lang}${path}`;
+};
+---
+<section id="lisp" class="py-section-padding relative overflow-hidden reveal">
+    <div class="absolute left-1/2 bottom-0 -translate-x-1/2 w-[600px] h-[300px] bg-primary-container/5 blur-[100px] rounded-full pointer-events-none"></div>
+    <div class="max-w-container-max-width mx-auto px-gutter">
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+            <!-- Copy -->
+            <div>
+                <span class="inline-block text-primary-container font-code-sm text-code-sm tracking-widest mb-4">
+                    {t('lisp.section.eyebrow')}
+                </span>
+                <h2 class="font-headline-lg text-headline-lg text-white mb-4 leading-tight">
+                    {t('lisp.section.title')}
+                </h2>
+                <p class="font-body-lg text-body-lg text-on-surface-variant mb-10">
+                    {t('lisp.section.subtitle')}
+                </p>
+                <ul class="space-y-6 mb-10">
+                    <li class="flex items-start gap-4">
+                        <div class="w-9 h-9 rounded-lg bg-surface-container-highest flex items-center justify-center shrink-0 mt-0.5">
+                            <span class="material-symbols-outlined text-primary-container text-lg">memory</span>
+                        </div>
+                        <div>
+                            <strong class="text-white font-label-md text-label-md block mb-1">{t('lisp.section.b1.title')}</strong>
+                            <span class="text-on-surface-variant font-body-md text-body-md">{t('lisp.section.b1.desc')}</span>
+                        </div>
+                    </li>
+                    <li class="flex items-start gap-4">
+                        <div class="w-9 h-9 rounded-lg bg-surface-container-highest flex items-center justify-center shrink-0 mt-0.5">
+                            <span class="material-symbols-outlined text-primary-container text-lg">bolt</span>
+                        </div>
+                        <div>
+                            <strong class="text-white font-label-md text-label-md block mb-1">{t('lisp.section.b2.title')}</strong>
+                            <span class="text-on-surface-variant font-body-md text-body-md">{t('lisp.section.b2.desc')}</span>
+                        </div>
+                    </li>
+                    <li class="flex items-start gap-4">
+                        <div class="w-9 h-9 rounded-lg bg-surface-container-highest flex items-center justify-center shrink-0 mt-0.5">
+                            <span class="material-symbols-outlined text-primary-container text-lg">storefront</span>
+                        </div>
+                        <div>
+                            <strong class="text-white font-label-md text-label-md block mb-1">{t('lisp.section.b3.title')}</strong>
+                            <span class="text-on-surface-variant font-body-md text-body-md">{t('lisp.section.b3.desc')}</span>
+                        </div>
+                    </li>
+                </ul>
+                <!-- Tier progression -->
+                <div class="grid grid-cols-3 gap-3 mb-8">
+                    <div class="bg-surface border border-surface-variant rounded-lg p-3 text-center">
+                        <div class="text-primary-container font-label-md text-label-md font-bold">{t('lisp.section.tier.free')}</div>
+                        <div class="text-on-surface-variant font-code-sm text-[11px] mt-1">{t('lisp.section.tier.free.desc')}</div>
+                    </div>
+                    <div class="bg-surface border border-primary-container/30 rounded-lg p-3 text-center">
+                        <div class="text-primary-container font-label-md text-label-md font-bold">{t('lisp.section.tier.team')}</div>
+                        <div class="text-on-surface-variant font-code-sm text-[11px] mt-1">{t('lisp.section.tier.team.desc')}</div>
+                    </div>
+                    <div class="bg-surface border border-surface-variant rounded-lg p-3 text-center">
+                        <div class="text-white font-label-md text-label-md font-bold">{t('lisp.section.tier.market')}</div>
+                        <div class="text-on-surface-variant font-code-sm text-[11px] mt-1">{t('lisp.section.tier.market.desc')}</div>
+                    </div>
+                </div>
+                <a href={getPath('/login')} id="lisp-section-cta" class="inline-flex items-center gap-2 bg-primary-container text-white font-label-md text-label-md font-bold px-6 py-3 rounded hover:bg-[#e66000] transition-all shadow-[0_0_16px_rgba(255,107,0,0.25)] hover:-translate-y-0.5">
+                    {t('lisp.section.cta')}
+                </a>
+            </div>
+            <!-- Visual -->
+            <div class="relative">
+                <div class="absolute inset-0 bg-gradient-to-tr from-primary-container/15 to-transparent blur-2xl rounded-full pointer-events-none"></div>
+                <div class="bg-surface border border-surface-variant rounded-xl overflow-hidden shadow-2xl relative z-10">
+                    <img src="/images/lisp_palette_mockup.png" alt="LispCentral LISP Cloud — Command palette in CAD" class="w-full h-auto" loading="lazy" />
+                </div>
+            </div>
+        </div>
+    </div>
+</section>

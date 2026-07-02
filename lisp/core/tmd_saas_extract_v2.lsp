@@ -152,6 +152,23 @@
   (tmd:list->json-object (reverse entries))
 )
 
+;; ScaleLists (Annotation Scales)
+(defun tmd:get-scalelists-json (/ doc dicts entries name result)
+  (setq doc (vla-get-activedocument (vlax-get-acad-object)))
+  (setq dicts (vla-get-dictionaries doc))
+  (setq result (vl-catch-all-apply 'vla-item (list dicts "ACAD_SCALELIST")))
+  (setq entries '())
+  (if (not (vl-catch-all-error-p result))
+    (vlax-for obj result
+      (setq name (vla-get-name obj))
+      (if (not (vl-string-search "|" name))
+        (setq entries (cons (strcat "\"" (tmd:escape-json-string name) "\":{}") entries))
+      )
+    )
+  )
+  (tmd:list->json-object (reverse entries))
+)
+
 ;;; --- Main command ---
 
 (defun tmd:extract-stds (teamId token / payload url res)
@@ -166,7 +183,8 @@
       "\"linetypes\":"      (tmd:get-linetypes-json)      ","
       "\"globalVars\":"     (tmd:get-globalvars-json)     ","
       "\"mleaderStyles\":"  (tmd:get-mleaderstyles-json)  ","
-      "\"tableStyles\":"    (tmd:get-tablestyles-json)
+      "\"tableStyles\":"    (tmd:get-tablestyles-json)    ","
+      "\"scaleLists\":"     (tmd:get-scalelists-json)
     "}}"
   ))
   (setq url (strcat (tmd:api-base) "/uploadDraft"))

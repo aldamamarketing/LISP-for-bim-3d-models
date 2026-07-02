@@ -1,18 +1,13 @@
----
+﻿---
 title: 'AutoCAD LT Now Supports LISP: How to Prepare Your Office'
-description: 'Understand Autodesk\'s recent update that released the use of AutoLISP routines in AutoCAD LT and discover how to distribute corporate tools.'
+description: "Understand Autodesk's recent update that released the use of AutoLISP routines in AutoCAD LT and discover how to distribute corporate tools."
 pubDate: 2026-05-28
 heroImage: 'https://images.unsplash.com/photo-1581092921461-7d603a115ab3?q=80&w=1200&auto=format&fit=crop'
 author: 'Equipe LispCentral'
 tags: ["autocad lt lisp", "autocad 2023 lisp", "autolisp autocad"]
----**TL;DR:** For nearly three decades, **AutoCAD LT** ("Lite") was strictly limited and locked to automation via AutoLISP, forcing companies to purchase "Full" licenses just to run productivity macros. Starting with the 2024 update, Autodesk surprised the market by activating native LISP support in AutoCAD LT.
+---
 
-The search for *"autocad lt lisp"* took off on the CAD and Google forums. This happens because a huge portion of the market uses the LT version for cost reasons. The release of automation in AutoCAD LT drastically changes the enterprise game.
-
-## The History: The Cost Barrier
-
-Until recently, the primary selling point for the Full version of AutoCAD was not necessarily 3D modeling capability, but rather **API Support and Extensibility** (AutoLISP, .NET, ObjectARX).
-
+**TL;DR:** For nearly three decades, **AutoCAD LT** ("Lite") was strictly limited and locked to automation via AutoLISP, forcing companies to purchase "Full" licenses just to run productivity macros. Starting with the 2024 update, Autodesk surprised the market by activating native LISP support in AutoCAD LT.
 If an engineering office had 15 designers who needed to run a simple "Block Quantitative" routine developed in-house, the BIM Manager was forced to approve the purchase of 15 expensive AutoCAD Full subscriptions, justifying the monstrous difference in price annually.
 
 ## What changes with AutoLISP in AutoCAD LT?

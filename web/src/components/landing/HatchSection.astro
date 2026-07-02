@@ -1,0 +1,75 @@
+---
+import { getLangFromUrl } from '../../i18n/utils';
+import { translations } from '../../i18n/translations.js';
+
+const lang = getLangFromUrl(Astro.url);
+const t = (key) => translations[lang]?.[key] || translations['en'][key] || key;
+
+const getPath = (path) => {
+    const noI18nPages = ['/login', '/dashboard', '/favorites', '/store'];
+    if (noI18nPages.includes(path)) return path;
+    return lang === 'en' ? path : `/${lang}${path}`;
+};
+---
+<section id="hatch" class="py-section-padding relative overflow-hidden reveal">
+    <div class="absolute right-0 top-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-primary-container/5 blur-[120px] rounded-full pointer-events-none"></div>
+    <div class="max-w-container-max-width mx-auto px-gutter">
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+            <div>
+                <span class="inline-block text-primary-container font-code-sm text-code-sm tracking-widest mb-4">
+                    {t('hatch.section.eyebrow')}
+                </span>
+                <h2 class="font-headline-lg text-headline-lg text-white mb-4 leading-tight">
+                    {t('hatch.section.title')}
+                </h2>
+                <p class="font-body-lg text-body-lg text-on-surface-variant mb-10">
+                    {t('hatch.section.subtitle')}
+                </p>
+                <ul class="space-y-6 mb-10">
+                    <li class="flex items-start gap-4">
+                        <div class="w-9 h-9 rounded-lg bg-surface-container-highest flex items-center justify-center shrink-0 mt-0.5">
+                            <span class="material-symbols-outlined text-primary-container text-lg">library_books</span>
+                        </div>
+                        <div>
+                            <strong class="text-white font-label-md text-label-md block mb-1">{t('hatch.section.b1.title')}</strong>
+                            <span class="text-on-surface-variant font-body-md text-body-md">{t('hatch.section.b1.desc')}</span>
+                        </div>
+                    </li>
+                    <li class="flex items-start gap-4">
+                        <div class="w-9 h-9 rounded-lg bg-surface-container-highest flex items-center justify-center shrink-0 mt-0.5">
+                            <span class="material-symbols-outlined text-primary-container text-lg">tune</span>
+                        </div>
+                        <div>
+                            <strong class="text-white font-label-md text-label-md block mb-1">{t('hatch.section.b2.title')}</strong>
+                            <span class="text-on-surface-variant font-body-md text-body-md">{t('hatch.section.b2.desc')}</span>
+                        </div>
+                    </li>
+                    <li class="flex items-start gap-4">
+                        <div class="w-9 h-9 rounded-lg bg-surface-container-highest flex items-center justify-center shrink-0 mt-0.5">
+                            <span class="material-symbols-outlined text-primary-container text-lg">devices</span>
+                        </div>
+                        <div>
+                            <strong class="text-white font-label-md text-label-md block mb-1">{t('hatch.section.b3.title')}</strong>
+                            <span class="text-on-surface-variant font-body-md text-body-md">{t('hatch.section.b3.desc')}</span>
+                        </div>
+                    </li>
+                </ul>
+                <div class="flex flex-col sm:flex-row items-start sm:items-center gap-4">
+                    <a href={getPath('/tools/hatch-generator')} id="hatch-section-cta" class="inline-flex items-center gap-2 bg-primary-container text-white font-label-md text-label-md font-bold px-6 py-3 rounded hover:bg-[#e66000] transition-all shadow-[0_0_16px_rgba(255,107,0,0.25)] hover:-translate-y-0.5">
+                        {t('hatch.section.cta')}
+                    </a>
+                    <span class="text-on-surface-variant font-code-sm text-code-sm flex items-center gap-1.5">
+                        <span class="material-symbols-outlined text-[14px] text-primary-container">verified</span>
+                        {t('hatch.section.free_badge')}
+                    </span>
+                </div>
+            </div>
+            <div class="relative">
+                <div class="absolute inset-0 bg-gradient-to-tr from-primary-container/15 to-transparent blur-2xl rounded-full pointer-events-none"></div>
+                <div class="bg-surface border border-surface-variant rounded-xl overflow-hidden shadow-2xl relative z-10">
+                    <img src="/images/hatch_palette_mockup.png" alt="LispCentral Hatch Library" class="w-full h-auto" loading="lazy" />
+                </div>
+            </div>
+        </div>
+    </div>
+</section>

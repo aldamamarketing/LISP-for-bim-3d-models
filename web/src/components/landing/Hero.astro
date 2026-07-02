@@ -16,34 +16,61 @@ const getPath = (path) => {
 ---
 <section class="relative pt-section-padding pb-section-padding overflow-hidden">
     <div class="absolute inset-0 bg-grid-pattern pointer-events-none"></div>
-    <div class="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[600px] bg-primary-container/10 blur-[120px] rounded-full pointer-events-none"></div>
+    <div class="absolute top-0 left-1/2 -translate-x-1/2 w-[900px] h-[600px] bg-primary-container/10 blur-[140px] rounded-full pointer-events-none"></div>
     <div class="max-w-container-max-width mx-auto px-gutter relative z-10">
         <div class="text-center max-w-3xl mx-auto mb-16">
             <span class="inline-block py-1 px-3 rounded-full bg-surface-container border border-surface-variant text-primary font-code-sm text-code-sm mb-6">
-                <span class="material-symbols-outlined text-[14px] align-middle mr-1">code</span>
+                <span class="material-symbols-outlined text-[14px] align-middle mr-1">workspaces</span>
                 {t('landing.hero.tag')}
             </span>
-            <h1 class="font-headline-xl text-headline-xl mb-6 text-white">
-                {t('landing.hero.title1')} <span class="text-primary-container">{t('landing.hero.title2')}</span>
+            <h1 class="font-headline-xl text-headline-xl mb-6 text-white leading-tight">
+                {t('landing.hero.title')}
             </h1>
-            <p class="font-body-lg text-body-lg text-on-surface-variant mb-10">
-                {t('landing.hero.desc')}
+            <p class="font-body-lg text-body-lg text-on-surface-variant mb-4">
+                {t('landing.hero.subtitle')}
+            </p>
+            <p class="font-code-sm text-code-sm text-on-surface-variant/60 mb-10">
+                {t('landing.hero.note')}
             </p>
             <div class="flex flex-col sm:flex-row justify-center items-center gap-4">
-                <a href={getPath('/login')} class="w-full sm:w-auto bg-primary-container text-white font-label-md text-label-md font-bold px-8 py-4 rounded hover:bg-[#e66000] transition-all shadow-[0_0_20px_rgba(255,107,0,0.3)] text-center">
+                <a href={getPath('/tools/hatch-generator')} id="hero-cta-hatch" class="w-full sm:w-auto bg-primary-container text-white font-label-md text-label-md font-bold px-8 py-4 rounded hover:bg-[#e66000] transition-all shadow-[0_0_24px_rgba(255,107,0,0.35)] hover:-translate-y-0.5 text-center">
                     {t('landing.hero.cta1')}
                 </a>
-                <a href={getPath('/help')} class="w-full sm:w-auto border border-surface-variant text-white font-label-md text-label-md font-bold px-8 py-4 rounded hover:border-primary-container hover:text-primary-container transition-all flex items-center justify-center gap-2">
-                    <span class="material-symbols-outlined">help</span>
+                <a href="#modules" id="hero-cta-modules" class="w-full sm:w-auto border border-surface-variant text-white font-label-md text-label-md font-bold px-8 py-4 rounded hover:border-primary-container hover:text-primary-container transition-all flex items-center justify-center gap-2">
                     {t('landing.hero.cta2')}
                 </a>
             </div>
         </div>
-        
-        <!-- Tablet Image Showcase -->
-        <div class="relative max-w-4xl mx-auto mt-20">
-            <div class="absolute -inset-4 bg-gradient-to-b from-surface-container-high to-transparent opacity-50 rounded-xl blur-lg"></div>
-            <img alt="LispCentral Cloud Computing" class="w-full h-auto rounded-xl border border-surface-variant shadow-2xl relative z-10" src="/images/cloud_lisp_concept.jpg" loading="lazy" />
+
+        <!-- Three-module visual teaser -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 max-w-4xl mx-auto mt-16">
+            <div class="bg-surface border border-surface-variant rounded-xl p-5 flex items-center gap-4 hover:border-primary-container/50 transition-colors">
+                <div class="w-10 h-10 rounded-lg bg-primary-container/10 flex items-center justify-center shrink-0">
+                    <span class="material-symbols-outlined text-primary-container text-xl">grid_view</span>
+                </div>
+                <div>
+                    <div class="text-white font-label-md text-label-md font-semibold">{t('modules.hatch.title')}</div>
+                    <div class="text-on-surface-variant font-code-sm text-code-sm mt-0.5">{t('modules.hatch.desc')}</div>
+                </div>
+            </div>
+            <div class="bg-surface border border-surface-variant rounded-xl p-5 flex items-center gap-4 hover:border-primary-container/50 transition-colors">
+                <div class="w-10 h-10 rounded-lg bg-primary-container/10 flex items-center justify-center shrink-0">
+                    <span class="material-symbols-outlined text-primary-container text-xl">layers</span>
+                </div>
+                <div>
+                    <div class="text-white font-label-md text-label-md font-semibold">{t('modules.standards.title')}</div>
+                    <div class="text-on-surface-variant font-code-sm text-code-sm mt-0.5">{t('modules.standards.desc')}</div>
+                </div>
+            </div>
+            <div class="bg-surface border border-surface-variant rounded-xl p-5 flex items-center gap-4 hover:border-primary-container/50 transition-colors">
+                <div class="w-10 h-10 rounded-lg bg-primary-container/10 flex items-center justify-center shrink-0">
+                    <span class="material-symbols-outlined text-primary-container text-xl">code</span>
+                </div>
+                <div>
+                    <div class="text-white font-label-md text-label-md font-semibold">{t('modules.lisp.title')}</div>
+                    <div class="text-on-surface-variant font-code-sm text-code-sm mt-0.5">{t('modules.lisp.desc')}</div>
+                </div>
+            </div>
         </div>
     </div>
 </section>
