@@ -75,6 +75,14 @@ const lang = getLangFromUrl(Astro.url);
         <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet" />
 	</head>
 	<body class="bg-background text-on-surface font-body-md antialiased selection:bg-primary-container selection:text-white flex flex-col min-h-screen">
+        <!-- Beta Banner -->
+        <div id="beta-banner" class="w-full bg-[#1a1200] border-b border-amber-500/30 text-amber-300 text-center py-2 px-4 text-sm font-medium flex items-center justify-center gap-2 relative">
+            <span class="text-base leading-none">🧪</span>
+            {lang === 'pt' && <span>Beta Público — Plataforma totalmente funcional. Algumas funcionalidades ainda em aprimoramento.</span>}
+            {lang === 'es' && <span>Beta Pública — Plataforma totalmente funcional. Algunas funcionalidades aún en refinamiento.</span>}
+            {(lang !== 'pt' && lang !== 'es') && <span>Public Beta — Platform is fully functional. Some features are still being refined.</span>}
+            <button onclick="document.getElementById('beta-banner').remove()" aria-label="Close" class="absolute right-4 top-1/2 -translate-y-1/2 text-amber-400/60 hover:text-amber-300 transition-colors text-xl leading-none">&times;</button>
+        </div>
 		<slot />
 
         <!-- Firebase Analytics -->
