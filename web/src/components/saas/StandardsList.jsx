@@ -136,20 +136,20 @@ export default function StandardsList({ teamId, searchFilters = [], isExtracting
             if (p) {
               const escapedName = item.key.replace(/"/g, '\\"');
               const escapedLtype = (p.ltype || 'Continuous').replace(/"/g, '\\"');
-              cmds.push(`(tmd:apply-layer "${escapedName}" ${p.color} "${escapedLtype}" ${p.lineweight || 25})`);
+              cmds.push(`(LC:apply-layer "${escapedName}" ${p.color} "${escapedLtype}" ${p.lineweight || 25})`);
             }
           } else if (item.type === 'style') {
             const p = sourceMap.textStyles[item.key];
             if (p) {
               const escapedName = item.key.replace(/"/g, '\\"');
               const escapedFont = (p.font || '').replace(/"/g, '\\"');
-              cmds.push(`(tmd:apply-textstyle "${escapedName}" "${escapedFont}" ${p.height || 0})`);
+              cmds.push(`(LC:apply-textstyle "${escapedName}" "${escapedFont}" ${p.height || 0})`);
             }
           } else if (item.type === 'dimStyle') {
             const p = sourceMap.dimStyles[item.key];
             if (p) {
               const escapedName = item.key.replace(/"/g, '\\"');
-              cmds.push(`(tmd:apply-dimstyle "${escapedName}" ${p.dimscale || 0} ${p.dimtxt || 0} ${p.dimdec || 0})`);
+              cmds.push(`(LC:apply-dimstyle "${escapedName}" ${p.dimscale || 0} ${p.dimtxt || 0} ${p.dimdec || 0})`);
             }
           } else if (item.type === 'globalVar') {
             const p = sourceMap.globalVars[item.key];
@@ -157,13 +157,13 @@ export default function StandardsList({ teamId, searchFilters = [], isExtracting
               cmds.push(`(setvar "${item.key}" ${p.value})`);
             }
           } else if (item.type === 'linetype') {
-            cmds.push(`(tmd:apply-linetype "${item.key.replace(/"/g, '\\"')}")`);
+            cmds.push(`(LC:apply-linetype "${item.key.replace(/"/g, '\\"')}")`);
           } else if (item.type === 'mleaderStyle') {
-            cmds.push(`(tmd:apply-mleaderstyle "${item.key.replace(/"/g, '\\"')}")`);
+            cmds.push(`(LC:apply-mleaderstyle "${item.key.replace(/"/g, '\\"')}")`);
           } else if (item.type === 'tableStyle') {
-            cmds.push(`(tmd:apply-tablestyle "${item.key.replace(/"/g, '\\"')}")`);
+            cmds.push(`(LC:apply-tablestyle "${item.key.replace(/"/g, '\\"')}")`);
           } else if (item.type === 'scaleList') {
-            cmds.push(`(tmd:apply-scale "${item.key.replace(/"/g, '\\"')}")`);
+            cmds.push(`(LC:apply-scale "${item.key.replace(/"/g, '\\"')}")`);
           }
         });
       };
@@ -181,14 +181,14 @@ export default function StandardsList({ teamId, searchFilters = [], isExtracting
             if (p) {
               const escapedName = targetLayer.replace(/"/g, '\\"');
               const escapedLtype = (p.ltype || 'Continuous').replace(/"/g, '\\"');
-              cmds.push(`(tmd:apply-layer "${escapedName}" ${p.color} "${escapedLtype}" ${p.lineweight || 25})`);
+              cmds.push(`(LC:apply-layer "${escapedName}" ${p.color} "${escapedLtype}" ${p.lineweight || 25})`);
             }
           }
         });
       }
 
       if (cmds.length > 0) {
-        cmds.push('(c:TMD_APPLY_COMPLETE)');
+        cmds.push('(c:LC_APPLY_COMPLETE)');
         import('../../utils/autocadBridge').then(m => {
           m.executeInAutoCAD(`(progn ${cmds.join(' ')})`);
         });
@@ -382,7 +382,7 @@ export default function StandardsList({ teamId, searchFilters = [], isExtracting
             setTimeout(() => setIsAuditing(false), 30000); // 30s timeout
             // Importar dinámicamente o usar executeInAutoCAD global si existe
             import('../../utils/autocadBridge').then(m => {
-              m.executeInAutoCAD(`(tmd:run-audit "${targetTeamId}" "${token}")`);
+              m.executeInAutoCAD(`(LC:run-audit "${targetTeamId}" "${token}")`);
             }).catch(() => {
               console.log('TMD_AUDIT triggered locally. AutoCAD bridge fallback.');
             });

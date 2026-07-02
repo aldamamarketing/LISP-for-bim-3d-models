@@ -35,22 +35,22 @@ export default function SaasPalette() {
     Object.entries(currentStandard.layers || {}).forEach(([name, p]) => {
       const escapedName = name.replace(/"/g, '\\"');
       const escapedLtype = (p.ltype || 'Continuous').replace(/"/g, '\\"');
-      cmds.push(`(tmd:apply-layer "${escapedName}" ${p.color} "${escapedLtype}" ${p.lineweight || 25})`);
+      cmds.push(`(LC:apply-layer "${escapedName}" ${p.color} "${escapedLtype}" ${p.lineweight || 25})`);
     });
     Object.entries(currentStandard.textStyles || {}).forEach(([name, p]) => {
       const escapedName = name.replace(/"/g, '\\"');
       const escapedFont = (p.font || '').replace(/"/g, '\\"');
-      cmds.push(`(tmd:apply-textstyle "${escapedName}" "${escapedFont}" ${p.height || 0})`);
+      cmds.push(`(LC:apply-textstyle "${escapedName}" "${escapedFont}" ${p.height || 0})`);
     });
     if (cmds.length === 0) return;
-    cmds.push('(c:TMD_APPLY_COMPLETE)');
+    cmds.push('(c:LC_APPLY_COMPLETE)');
     executeInAutoCAD(`(progn ${cmds.join(' ')})`);
   };
 
   const handleUploadStandard = () => {
     setIsExtracting(true);
     // Sin espacio final — AutoCAD interpreta espacio como "repetir último comando"
-    executeInAutoCAD(`(tmd:extract-stds "${activeTeamId}" "${token}")`);    
+    executeInAutoCAD(`(LC:extract-standards)`);    
     setTimeout(() => setIsExtracting(false), 30000);
   };
 

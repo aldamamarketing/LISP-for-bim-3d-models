@@ -8,8 +8,8 @@ const t = (key) => {
     return dict[key] || key;
 };
 ---
-
-<nav class="fixed w-full top-0 z-50 transition-all duration-300" style="background: rgba(18,20,20,0.85); backdrop-filter: blur(12px); border-bottom: 1px solid var(--surface-variant, #343535);">
+<header class="fixed w-full top-0 z-50 flex flex-col shadow-xl">
+    <nav class="w-full transition-all duration-300" style="background: rgba(18,20,20,0.85); backdrop-filter: blur(12px); border-bottom: 1px solid var(--surface-variant, #343535);">
     <div class="flex justify-between items-center px-6 py-3 max-w-[1400px] mx-auto">
         
         <!-- Logo -->
@@ -41,6 +41,34 @@ const t = (key) => {
         </button>
     </div>
 </nav>
+
+<!-- Beta Banner (Under Header) -->
+<div id="beta-banner" style="display: none;" class="w-full bg-[#1a1200] border-b border-amber-500/30 text-amber-300 text-center py-1.5 px-4 text-xs md:text-sm font-medium items-center justify-center gap-2 relative transition-all duration-300 shadow-[inset_0_-1px_10px_rgba(245,158,11,0.05)]">
+    <span class="text-base leading-none">🧪</span>
+    {currentLocale === 'pt' && <span>Beta Público — Plataforma funcional. Algumas ferramentas ainda em aprimoramento.</span>}
+    {currentLocale === 'es' && <span>Beta Pública — Plataforma funcional. Algunas herramientas aún en refinamiento.</span>}
+    {(currentLocale !== 'pt' && currentLocale !== 'es') && <span>Public Beta — Platform functional. Some tools still being refined.</span>}
+    <button id="close-beta-banner" aria-label="Close" class="absolute right-4 top-1/2 -translate-y-1/2 text-amber-400/60 hover:text-amber-300 transition-colors text-xl leading-none">&times;</button>
+</div>
+
+<script is:inline>
+    (function() {
+        if (!localStorage.getItem('lc-beta-read')) {
+            const b = document.getElementById('beta-banner');
+            if (b) b.style.display = 'flex';
+        }
+        const btn = document.getElementById('close-beta-banner');
+        if (btn) {
+            btn.addEventListener('click', () => {
+                localStorage.setItem('lc-beta-read', '1');
+                const b = document.getElementById('beta-banner');
+                if (b) b.remove();
+            });
+        }
+    })();
+</script>
+
+</header>
 
 <!-- Mobile Navigation Panel -->
 <div id="mobile-overlay" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-[90] opacity-0 pointer-events-none transition-opacity duration-300 md:hidden"></div>

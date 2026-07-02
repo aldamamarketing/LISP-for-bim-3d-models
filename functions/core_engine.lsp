@@ -3,8 +3,28 @@
 ;;; This file is served dynamically to RAM and never saved to disk.
 ;;; ==========================================================================
 
-;; Utility function to URL-encode spaces and special characters for HTTP requests.
-(defun LC:url-encode (str / res i len char) 
+;;; ==========================================================================
+;;; SECCIÓN 0: VARIABLES GLOBALES (inyectadas por servidor en BOOT)
+;;; ==========================================================================
+;; The server injects:
+;; *LC-SEAT-TOKEN*
+;; *LC-HWID*
+;; *LC-API-ENDPOINT*
+;; (and in the future *LC-PLATFORM-ID* and *LC-PLATFORM-MAP*)
+
+;; Global tracking list for JIT-loaded routines
+(if (not *LC-LOADED-ROUTINES*) (setq *LC-LOADED-ROUTINES* nil))
+
+;; Global tracking list for Ghost Commands (Stubs) to allow live purging
+(if (not *LC-GHOST-ROUTINES*) (setq *LC-GHOST-ROUTINES* nil))
+
+;; Cache de sesión para assets descargados
+(if (not *LC-ASSET-CACHE*) (setq *LC-ASSET-CACHE* nil))
+
+;;; ==========================================================================
+;;; SECCIÓN 1: HTTP LAYER
+;;; ==========================================================================
+(defun LC:url-encode (str / res i len char)
   (setq res "")
   (setq i 1)
   (setq len (strlen str))
@@ -19,75 +39,79 @@
   res
 )
 
-;; Fetches and evaluates code directly in AutoCAD's RAM
-(defun LC:load-remote-routine (lisp_id / xmlhttp url status response) 
-  (princ (strcat "\n[LispCentral] Fetching remote package '" lisp_id "'..."))
+;; Obtiene la ruta base removiendo "/getRoutine" (ej: http://.../us-central1)
+(defun LC:get-api-base ()
+  (vl-string-subst "" "/getRoutine" *LC-API-ENDPOINT*)
+)
 
-  (setq url (strcat *LC-API-ENDPOINT* 
-                    "?token="
-                    *LC-SEAT-TOKEN*
-                    "&hwId="
-                    (LC:url-encode *LC-HWID*)
-                    "&lispId="
-                    lisp_id
-            )
+;; GET unificado (MSXML2)
+(defun LC:http-get (url / obj response status)
+  (setq obj (vl-catch-all-apply 'vlax-create-object '("MSXML2.XMLHTTP.6.0")))
+  (if (vl-catch-all-error-p obj)
+    (setq obj (vl-catch-all-apply 'vlax-create-object '("MSXML2.XMLHTTP")))
   )
-
-  (setq xmlhttp (vlax-create-object "MSXML2.XMLHTTP.6.0"))
-  (if xmlhttp 
-    (progn 
-      (vl-catch-all-apply 
-        '(lambda () 
-           (vlax-invoke-method xmlhttp 'open "GET" url :vlax-false)
-           (vlax-invoke-method xmlhttp 'send)
-         )
+  (if (and obj (not (vl-catch-all-error-p obj)))
+    (progn
+      (vl-catch-all-apply 'vlax-invoke-method (list obj 'open "GET" url :vlax-false))
+      (vl-catch-all-apply 'vlax-invoke-method (list obj 'send))
+      (setq status (vl-catch-all-apply 'vlax-get-property (list obj 'status)))
+      (if (and (not (vl-catch-all-error-p status)) (= status 200))
+        (setq response (vl-catch-all-apply 'vlax-get-property (list obj 'responseText)))
       )
-      (setq status (vl-catch-all-apply 'vlax-get-property (list xmlhttp 'status)))
+      (vl-catch-all-apply 'vlax-release-object (list obj))
+      (if (vl-catch-all-error-p response) nil response)
+    )
+  )
+)
 
-      (if (= status 200) 
-        (progn 
-          (setq response (vlax-get-property xmlhttp 'responseText))
-          (if 
-            (vl-catch-all-error-p (vl-catch-all-apply 'eval (list (read response))))
-            (progn 
-              (princ (strcat "\n[ERROR] Syntax error evaluating routine: " lisp_id))
-              (setvar "USERS1" (strcat lisp_id ":error"))
-              nil
-            )
-            (progn 
-              (setvar "USERS1" (strcat lisp_id ":success"))
-              (princ (strcat "\n[SUCCESS] Package '" lisp_id "' loaded successfully into RAM."))
-              t
-            )
-          )
-        )
-        (progn 
-          (princ (strcat "\n[ERROR] Failed to fetch '" lisp_id "' (HTTP Status: " (vl-princ-to-string status) ")."))
-          (setvar "USERS1" (strcat lisp_id ":error"))
-          nil
-        )
+;; POST unificado con JSON payload (WinHttp)
+(defun LC:http-post (url payload / obj response)
+  (setq obj (vl-catch-all-apply 'vlax-create-object '("WinHttp.WinHttpRequest.5.1")))
+  (if (and obj (not (vl-catch-all-error-p obj)))
+    (progn
+      (vl-catch-all-apply 'vlax-invoke-method (list obj 'Open "POST" url :vlax-false))
+      (vl-catch-all-apply 'vlax-invoke-method (list obj 'SetRequestHeader "Content-Type" "application/json"))
+      (vl-catch-all-apply 'vlax-invoke-method (list obj 'Send payload))
+      (setq response (vl-catch-all-apply 'vlax-get-property (list obj 'ResponseText)))
+      (vl-catch-all-apply 'vlax-release-object (list obj))
+      (if (vl-catch-all-error-p response) nil response)
+    )
+  )
+)
+
+;;; ==========================================================================
+;;; SECCIÓN 2: JIT ENGINE
+;;; ==========================================================================
+(defun LC:load-remote-routine (lisp_id / url response) 
+  (princ (strcat "\n[LispCentral] Fetching remote package '" lisp_id "'..."))
+  (setq url (strcat *LC-API-ENDPOINT* 
+                    "?token=" *LC-SEAT-TOKEN*
+                    "&hwId=" (LC:url-encode *LC-HWID*)
+                    "&lispId=" lisp_id))
+  (setq response (LC:http-get url))
+  (if response
+    (if (vl-catch-all-error-p (vl-catch-all-apply 'eval (list (read response))))
+      (progn 
+        (princ (strcat "\n[ERROR] Syntax error evaluating routine: " lisp_id))
+        (setvar "USERS1" (strcat lisp_id ":error"))
+        nil
       )
-      (vlax-release-object xmlhttp)
+      (progn 
+        (setvar "USERS1" (strcat lisp_id ":success"))
+        (princ (strcat "\n[SUCCESS] Package '" lisp_id "' loaded successfully into RAM."))
+        t
+      )
     )
     (progn 
-      (princ "\n[CRITICAL ERROR] Failed to instantiate MSXML2.XMLHTTP object. Ensure Windows components are updated.")
+      (princ (strcat "\n[ERROR] Failed to fetch '" lisp_id "'."))
       (setvar "USERS1" (strcat lisp_id ":error"))
       nil
     )
   )
-  (princ)
 )
 
-;; Global tracking list for JIT-loaded routines
-(if (not *LC-LOADED-ROUTINES*) (setq *LC-LOADED-ROUTINES* nil))
-
-;; Global tracking list for Ghost Commands (Stubs) to allow live purging
-(if (not *LC-GHOST-ROUTINES*) (setq *LC-GHOST-ROUTINES* nil))
-
-;; Core wrapper to run a command
 (defun LC:run-or-load (lisp_id / cmd-sym) 
   (setq cmd-sym (read (strcat "c:" lisp_id)))
-
   (if (not (member lisp_id *LC-LOADED-ROUTINES*)) 
     (progn 
       (princ (strcat "\n[LispCentral] Command '" lisp_id "' not found in RAM. Initiating Just-In-Time Load..."))
@@ -95,17 +119,13 @@
       (setq *LC-LOADED-ROUTINES* (cons lisp_id *LC-LOADED-ROUTINES*))
     )
   )
-
   (if (member lisp_id *LC-LOADED-ROUTINES*) 
-    (progn 
-      (eval (list cmd-sym))
-    )
+    (eval (list cmd-sym))
     (alert (strcat "\n[FATAL ERROR] Could not resolve and load JIT command: " lisp_id))
   )
   (princ)
 )
 
-;; Directive for dependency injection. 
 (defun LC:Require (lisp_id) 
   (if (not (member lisp_id *LC-LOADED-ROUTINES*)) 
     (progn 
@@ -117,10 +137,11 @@
   (princ)
 )
 
-;; Parses 'name' values from JSON response string
+;;; ==========================================================================
+;;; SECCIÓN 3: INDEX & GHOST REGISTRATION
+;;; ==========================================================================
 (defun LC:parse-json-names (jsonStr / pos start end cmd-list name) 
-  (setq cmd-list nil)
-  (setq pos 0)
+  (setq cmd-list nil pos 0)
   (while (setq start (vl-string-search "\"name\":\"" jsonStr pos)) 
     (setq start (+ start 8))
     (setq end (vl-string-search "\"" jsonStr start))
@@ -136,163 +157,60 @@
   cmd-list
 )
 
-;; Cloud Handshake: Fetches the command index upon launch
-(defun LC:register-ghosts (/ xmlhttp index-url status response cmds item) 
+(defun LC:register-ghosts (/ index-url response cmds item) 
   (princ "\n[LispCentral] Authenticating and syncing your cloud commands...")
-
   (setq index-url (strcat *LC-API-ENDPOINT* 
                           "?token=" *LC-SEAT-TOKEN*
                           "&hwId=" (LC:url-encode *LC-HWID*)
-                          "&routine=INDEX"
-                  )
-  )
-
-  (setq xmlhttp (vlax-create-object "MSXML2.XMLHTTP.6.0"))
-  (if xmlhttp 
+                          "&routine=INDEX"))
+  (setq response (LC:http-get index-url))
+  (if response
     (progn 
-      (vl-catch-all-apply 
-        '(lambda () 
-           (vlax-invoke-method xmlhttp 'open "GET" index-url :vlax-false)
-           (vlax-invoke-method xmlhttp 'send)
-         )
-      )
-      (setq status (vl-catch-all-apply 'vlax-get-property (list xmlhttp 'status)))
-      (if (= status 200) 
+      (setq cmds (LC:parse-json-names response))
+      (if cmds 
         (progn 
-          (setq response (vlax-get-property xmlhttp 'responseText))
-          (setq cmds (LC:parse-json-names response))
-          (if cmds 
-            (progn 
-              (foreach item cmds 
-                (if (not (member (cadr item) *LC-LOADED-ROUTINES*)) 
-                  (progn
-                    (eval 
-                      (list 'defun 
-                            (read (strcat "c:" (car item)))
-                            '()
-                            (list 'LC:run-or-load (cadr item))
-                      )
-                    )
-                    ;; Track the ghost command for future garbage collection
-                    (if (not (member (car item) *LC-GHOST-ROUTINES*))
-                      (setq *LC-GHOST-ROUTINES* (cons (car item) *LC-GHOST-ROUTINES*))
-                    )
-                  )
+          (foreach item cmds 
+            (if (not (member (cadr item) *LC-LOADED-ROUTINES*)) 
+              (progn
+                (eval (list 'defun (read (strcat "c:" (car item))) '() (list 'LC:run-or-load (cadr item))))
+                (if (not (member (car item) *LC-GHOST-ROUTINES*))
+                  (setq *LC-GHOST-ROUTINES* (cons (car item) *LC-GHOST-ROUTINES*))
                 )
               )
-              (princ (strcat " OK. (" (itoa (length cmds)) " ghost commands now active in RAM)"))
             )
-            (princ " ERROR: No commands received from the cloud INDEX. Check your suite permissions.")
           )
+          (princ (strcat " OK. (" (itoa (length cmds)) " ghost commands now active in RAM)"))
         )
-        (princ (strcat " ERROR: HTTP Authentication failed. Status " (vl-princ-to-string status)))
+        (princ " ERROR: No commands received from the cloud INDEX. Check your suite permissions.")
       )
-      (vlax-release-object xmlhttp)
     )
-    (princ " ERROR: Failed to instantiate MSXML2.XMLHTTP. Check Windows COM permissions.")
+    (princ " ERROR: HTTP Authentication failed.")
   )
   (princ)
 )
 
-(LC:register-ghosts)
-
-;; Live Sync: Safely resets RAM permissions and regenerates ghosts
-(defun c:LC_SYNC ()
-  (princ "\n[LispCentral] Iniciando Live Sync (Garbage Collection)...")
-  
-  ;; 1. Destroy existing ghost commands from RAM
-  (if *LC-GHOST-ROUTINES*
-    (progn
-      (foreach cmd *LC-GHOST-ROUTINES*
-        (eval (list 'setq (read (strcat "c:" cmd)) nil))
-      )
-      (setq *LC-GHOST-ROUTINES* nil)
-      (princ "\n[LispCentral] Fantasmas anteriores destruidos.")
-    )
-  )
-
-  ;; 2. Clear JIT cache to force fresh permission validation on next use
-  (setq *LC-LOADED-ROUTINES* nil)
-  (princ "\n[LispCentral] Cache JIT limpiada.")
-
-  ;; 3. Fetch fresh INDEX and re-register allowed ghosts
-  (LC:register-ghosts)
-  (princ)
-)
-
-;; Simple Base64 decoder
-(defun LC:b64-decode (b64str / idx ch val buf result pad charset) 
-  (setq charset "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/")
-  (setq result "" buf 0 idx 1 pad 0)
-  (while (<= idx (strlen b64str)) 
-    (setq ch (substr b64str idx 1))
-    (if (= ch "=") 
-      (progn (setq pad (1+ pad)) (setq idx (1+ idx)))
-      (progn 
-        (setq val (1- (vl-string-search ch charset)))
-        (if (and val (>= val 0)) 
-          (progn 
-            (setq buf (logior (lsh buf 6) val))
-            (if (= 0 (rem idx 4)) 
-              (progn 
-                (setq result (strcat result 
-                                     (chr (logand (lsh buf -16) 255))
-                                     (chr (logand (lsh buf -8) 255))
-                                     (chr (logand buf 255))
-                             )
-                )
-                (setq buf 0)
-              )
-            )
-          )
-        )
-        (setq idx (1+ idx))
-      )
-    )
-  )
-  result
-)
-
-;; Cache de sesión para assets descargados (evita re-descarga en la misma sesión)
-(if (not *LC-ASSET-CACHE*) (setq *LC-ASSET-CACHE* nil))
-
-;; Ghost Command: LC_APPLY_ASSET
-;; Disparado por el ResourcePalette via executeCommandAsync.
-;; Los datos (*LC-ASSET-TYPE*, *LC-ASSET-NAME*, *LC-ASSET-CODE*) son
-;; inyectados previamente via evaluateLisp de forma silenciosa.
-;;
-;; Flujo JIT de 3 niveles:
-;;  Nivel 2 — cache de sesión RAM (*LC-ASSET-CACHE*)
-;;  Nivel 3 — código inyectado por JS (*LC-ASSET-CODE*)
+;;; ==========================================================================
+;;; SECCIÓN 4: ASSET ENGINE (Hatches & Linetypes)
+;;; ==========================================================================
 (defun c:LC_APPLY_ASSET (/ assetType assetName codeB64 cachedCode tmpDir tmpFile f decoded)
   (setq assetType *LC-ASSET-TYPE*)
   (setq assetName *LC-ASSET-NAME*)
   (setq codeB64   *LC-ASSET-CODE*)
 
-  ;; Limpiar variables globales inmediatamente
   (setq *LC-ASSET-TYPE* nil *LC-ASSET-NAME* nil *LC-ASSET-CODE* nil)
 
   (if (not (and assetType assetName))
+    (princ "\n[LC] Selecione um padrão na paleta primeiro.")
     (progn
-      (princ "\n[LC] Selecione um padrão na paleta primeiro.")
-      (princ)
-    )
-    (progn
-      ;; Nivel 2: buscar en cache de sesión
       (setq cachedCode (cdr (assoc assetName *LC-ASSET-CACHE*)))
-
-      ;; Nivel 3: usar el código inyectado por JS si no está en cache
       (if (not cachedCode)
-        (progn
-          (if codeB64
-            (progn
-              (setq decoded codeB64)
-              ;; Guardar en cache de sesión RAM (sin disco)
-              (setq *LC-ASSET-CACHE* (cons (cons assetName decoded) *LC-ASSET-CACHE*))
-              (setq cachedCode decoded)
-            )
-            (princ (strcat "\n[LC] Código do padrão '" assetName "' não encontrado."))
+        (if codeB64
+          (progn
+            (setq decoded codeB64)
+            (setq *LC-ASSET-CACHE* (cons (cons assetName decoded) *LC-ASSET-CACHE*))
+            (setq cachedCode decoded)
           )
+          (princ (strcat "\n[LC] Código do padrão '" assetName "' não encontrado."))
         )
       )
 
@@ -303,10 +221,6 @@
 
           (if (= assetType "hatch")
             (progn
-              ;; Determinar el nombre real del patrón dentro del archivo .pat.
-              ;; Si el código empieza con "*", el nombre real está entre "*" y ","
-              ;; y puede diferir de assetName (Generator genera nombres con dimensiones).
-              ;; Library no empieza con "*", así que assetName ya es correcto.
               (if (= (substr cachedCode 1 1) "*")
                 (progn
                   (setq comma-pos (vl-string-search "," cachedCode))
@@ -317,7 +231,6 @@
                 )
                 (setq hpname-to-use assetName)
               )
-              ;; Escrever .pat temporário (usando o nome real hpname-to-use)
               (setq tmpFile (strcat tmpDir "\\" hpname-to-use ".pat"))
               (setq f (open tmpFile "w"))
               (if f
@@ -327,8 +240,6 @@
                   )
                   (write-line cachedCode f)
                   (close f)
-                  ;; Registrar el directório temporário no SupportPath activo del AutoCAD.
-                  ;; NOTA: vl-catch-all-apply requiere segundo argumento '() aunque no haya args.
                   (vl-catch-all-apply
                     '(lambda (/ acadObj prefObj curPaths)
                        (setq acadObj (vlax-get-acad-object))
@@ -341,7 +252,6 @@
                      )
                     '()
                   )
-                  ;; Usar el nombre real extraído del header del .pat
                   (setvar "HPNAME" hpname-to-use)
                   (princ (strcat "\n[LC] Hachura '" hpname-to-use "' disponivel. Selecione a area interna..."))
                   (vla-sendcommand (vla-get-ActiveDocument (vlax-get-acad-object)) "._BHATCH ")
@@ -349,7 +259,6 @@
                 (princ "\n[LC][ERRO] Falha ao criar arquivo temporário. Verifique permissões do %TEMP%.")
               )
             )
-            ;; else: linetype
             (progn
               (setq tmpFile (strcat tmpDir "\\" assetName ".lin"))
               (setq f (open tmpFile "w"))
@@ -369,28 +278,492 @@
           )
         )
       )
-      (princ)
     )
   )
+  (princ)
 )
 
-;; Aliases legacy (mantidos para compatibilidade com código antigo)
 (defun LC_ApplyHatch (patName codeB64)
-  (setq *LC-ASSET-TYPE* "hatch")
-  (setq *LC-ASSET-NAME* patName)
-  (setq *LC-ASSET-CODE* codeB64)
+  (setq *LC-ASSET-TYPE* "hatch" *LC-ASSET-NAME* patName *LC-ASSET-CODE* codeB64)
   (c:LC_APPLY_ASSET)
 )
 
 (defun LC_ApplyLinetype (linName codeB64)
-  (setq *LC-ASSET-TYPE* "lin")
-  (setq *LC-ASSET-NAME* linName)
-  (setq *LC-ASSET-CODE* codeB64)
+  (setq *LC-ASSET-TYPE* "lin" *LC-ASSET-NAME* linName *LC-ASSET-CODE* codeB64)
   (c:LC_APPLY_ASSET)
 )
 
-;; Reactor Callback
-(defun LC:DocChanged-Callback (reactorObj eventList / activeDoc f-js event-js) 
+;;; ==========================================================================
+;;; SECCIÓN 5: PALETTE ENGINE
+;;; ==========================================================================
+
+(defun LC:get-palette-url (key / base)
+  (setq base "https://lispcentral.web.app")
+  (if (and (boundp '*LC-PLATFORM-MAP*) *LC-PLATFORM-MAP*)
+    (cdr (assoc key *LC-PLATFORM-MAP*))
+    (cond
+      ((= key "palette")   (strcat base "/palette"))
+      ((= key "resources") (strcat base "/resource-palette"))
+      ((= key "properties")(strcat base "/properties-palette"))
+      ((= key "standards") (strcat base "/standards-palette"))
+      (T base)
+    )
+  )
+)
+
+(defun LC:open-palette (id name active-var guard-var dummy-html / doc loader-js f-js local-html source-url temp-html f-html html-content)
+  (if (and (vl-bb-ref active-var) (not *LC-FORCE-RELOAD*))
+    (princ (strcat "\n[LispCentral] " name " already active in this session."))
+    (progn
+      (vl-load-com)
+      (setq doc (vla-get-ActiveDocument (vlax-get-acad-object)))
+      (vla-StartUndoMark doc)
+      (princ (strcat "\n[⚙] Initializing " name "..."))
+
+      (if (not (vl-bb-ref '*LC-SESSION-VERSION*))
+        (vl-bb-set '*LC-SESSION-VERSION* (rtos (getvar "MILLISECS") 2 0))
+      )
+      
+      (setq source-url (strcat (LC:get-palette-url id) "?v=" (rtos (getvar "MILLISECS") 2 0)))
+      (setq temp-html (strcat (getenv "TEMP") "\\LC_" id ".html"))
+      
+      (if dummy-html
+        (progn
+          (setq f-html (open temp-html "w"))
+          (if f-html
+            (progn
+              (write-line dummy-html f-html)
+              (close f-html)
+            )
+          )
+        )
+        (progn
+          (princ (strcat "\n[LispCentral] Syncing " name " UI from cloud..."))
+          (setq html-content (LC:http-get source-url))
+          (if html-content
+            (progn
+              (setq f-html (open temp-html "w"))
+              (if f-html
+                (progn
+                  (princ html-content f-html)
+                  (close f-html)
+                )
+              )
+            )
+          )
+        )
+      )
+
+      (setq local-html (strcat "file:///" (vl-string-translate "\\" "/" temp-html)
+                               "?token=" *LC-SEAT-TOKEN*
+                               "&hwId="  (LC:url-encode *LC-HWID*)
+                               "&v="     (vl-bb-ref '*LC-SESSION-VERSION*)))
+
+      (setq loader-js (strcat (getenv "TEMP") "\\LC_" id "_Loader.js"))
+      (setq f-js (open loader-js "w"))
+      (if f-js
+        (progn
+          (write-line "if (typeof Acad !== 'undefined') {" f-js)
+          (write-line (strcat "  if (!window." guard-var ") {") f-js)
+          (write-line "    try {" f-js)
+          (write-line (strcat "      try { Acad.Application.removePalette('" name "'); } catch(x) {}") f-js)
+          (write-line (strcat "      Acad.Application.addPalette('" name "', '" local-html "');") f-js)
+          (write-line (strcat "      window." guard-var " = true;") f-js)
+          (write-line (strcat "      Acad.Editor.writeMessage('\\n[SUCCESS] " name " is ready.\\n');") f-js)
+          (write-line "    } catch(e) {" f-js)
+          (write-line "      Acad.Editor.writeMessage('\\n[LC ERROR] ' + e.message + '\\n');" f-js)
+          (write-line "    }" f-js)
+          (write-line "  } else {" f-js)
+          (write-line (strcat "    Acad.Editor.writeMessage('\\n[LispCentral] " name " already active.\\n');") f-js)
+          (write-line "  }" f-js)
+          (write-line "} else {" f-js)
+          (write-line "  console.error('[ERROR] AutoCAD JavaScript API not detected.');" f-js)
+          (write-line "}" f-js)
+          (close f-js)
+          
+          (vl-cmdf "_.WEBLOAD" "_L" (strcat "\"" loader-js "\""))
+          (vl-bb-set active-var T)
+
+          ;; Init EventHub once
+          (if (not (vl-bb-ref 'LC_PALETTE_LOADED))
+            (progn
+              (LC:Init-EventHub)
+              (vl-bb-set 'LC_PALETTE_LOADED T)
+            )
+          )
+        )
+        (princ (strcat "\n[ERROR] Could not create " name " JS injector file."))
+      )
+      (vla-EndUndoMark doc)
+    )
+  )
+  (princ)
+)
+
+(defun c:LC_PALETTE ()   (LC:open-palette "palette"   "Command Palette"       '*LC-PALETTE-ACTIVE*    "_lcCmdPaletteActive" nil))
+(defun c:LC_RESOURCES () (LC:open-palette "resources" "LispCentral Resources" '*LC-RESOURCE-ACTIVE*   "_lcResourceActive" nil))
+(defun c:LC_STANDARDS () (LC:open-palette "standards" "LispCentral Standards" '*LC-STANDARDS-ACTIVE*  "_lcStandardsActive" nil))
+
+;; Dummy fallback for properties
+(defun c:LC_PROPERTIES () 
+  (LC:open-palette "properties" "LispCentral Properties" '*LC-PROPERTIES-ACTIVE* "_lcPropertiesActive"
+    "<!DOCTYPE html><html><head><style>body{background:#222;color:#fff;font-family:sans-serif;display:flex;align-items:center;justify-content:center;height:100vh;margin:0;}</style></head><body><h3>Próximamente...</h3></body></html>"
+  )
+)
+
+;;; ==========================================================================
+;;; SECCIÓN 6: STANDARDS ENGINE
+;;; ==========================================================================
+
+;; JSON Escaping
+(defun LC:json-escape (str / i char result)
+  (if (not str) ""
+    (progn
+      (setq result "" i 1)
+      (while (<= i (strlen str))
+        (setq char (substr str i 1))
+        (cond
+          ((= char "\\") (setq result (strcat result "\\\\")))
+          ((= char "\"") (setq result (strcat result "\\\"")))
+          ((= char "\n") (setq result (strcat result "\\n")))
+          ((= char "\r") (setq result (strcat result "\\r")))
+          ((= char "\t") (setq result (strcat result "\\t")))
+          (T             (setq result (strcat result char)))
+        )
+        (setq i (1+ i))
+      )
+      result
+    )
+  )
+)
+
+(defun LC:list->json-obj (entries / result i)
+  (if (not entries) "{}"
+    (progn
+      (setq result "{" i 0)
+      (foreach entry entries
+        (if (> i 0) (setq result (strcat result ",")))
+        (setq result (strcat result entry))
+        (setq i (1+ i))
+      )
+      (strcat result "}")
+    )
+  )
+)
+
+;; Extractors
+(defun LC:get-layers-json (/ doc layers entries name color ltype lw plottable desc)
+  (setq doc (vla-get-activedocument (vlax-get-acad-object)))
+  (setq layers (vla-get-layers doc) entries '())
+  (vlax-for layer layers
+    (setq name (vla-get-name layer))
+    (if (not (vl-string-search "|" name))
+      (progn
+        (setq color     (vla-get-color layer))
+        (setq ltype     (vla-get-linetype layer))
+        (setq lw        (vla-get-lineweight layer))
+        (setq plottable (if (= (vla-get-plottable layer) :vlax-true) "true" "false"))
+        (setq desc      (vl-catch-all-apply 'vla-get-description (list layer)))
+        (if (vl-catch-all-error-p desc) (setq desc ""))
+        (setq entries (cons
+          (strcat "\"" (LC:json-escape name) "\":"
+                  "{\"color\":"       (itoa color)
+                  ",\"ltype\":\""     (LC:json-escape ltype) "\""
+                  ",\"lineweight\":"  (itoa lw)
+                  ",\"plottable\":"   plottable
+                  ",\"description\":\"" (LC:json-escape desc) "\"}") entries))
+      )
+    )
+  )
+  (LC:list->json-obj (reverse entries))
+)
+
+(defun LC:get-textstyles-json (/ tbl entries name font bigfont height)
+  (setq tbl (tblnext "STYLE" T) entries '())
+  (while tbl
+    (setq name    (cdr (assoc 2  tbl)))
+    (setq font    (cdr (assoc 3  tbl)))
+    (setq bigfont (cdr (assoc 4  tbl)))
+    (setq height  (cdr (assoc 40 tbl)))
+    (if (not (vl-string-search "|" name))
+      (setq entries (cons
+        (strcat "\"" (LC:json-escape name) "\":"
+                "{\"font\":\""    (LC:json-escape (if font font "")) "\""
+                ",\"bigfont\":\"" (LC:json-escape (if bigfont bigfont "")) "\""
+                ",\"height\":"    (rtos (if height height 0.0) 2 4) "}") entries))
+    )
+    (setq tbl (tblnext "STYLE"))
+  )
+  (LC:list->json-obj (reverse entries))
+)
+
+(defun LC:get-dimstyles-json (/ tbl entries name scale txth arrowsz dimdec dimgap)
+  (setq tbl (tblnext "DIMSTYLE" T) entries '())
+  (while tbl
+    (setq name    (cdr (assoc 2   tbl)))
+    (setq scale   (cdr (assoc 40  tbl)))
+    (setq txth    (cdr (assoc 140 tbl)))
+    (setq arrowsz (cdr (assoc 41  tbl)))
+    (setq dimdec  (cdr (assoc 271 tbl)))
+    (setq dimgap  (cdr (assoc 147 tbl)))
+    (if (not (vl-string-search "|" name))
+      (setq entries (cons
+        (strcat "\"" (LC:json-escape name) "\":"
+                "{\"dimscale\":" (rtos (if scale scale 1.0) 2 4)
+                ",\"dimtxt\":"   (rtos (if txth txth 2.5) 2 4)
+                ",\"dimasz\":"   (rtos (if arrowsz arrowsz 2.5) 2 4)
+                ",\"dimdec\":"   (itoa (if dimdec dimdec 4))
+                ",\"dimgap\":"   (rtos (if dimgap dimgap 0.625) 2 4) "}") entries))
+    )
+    (setq tbl (tblnext "DIMSTYLE"))
+  )
+  (LC:list->json-obj (reverse entries))
+)
+
+(defun LC:get-linetypes-json (/ tbl entries name desc)
+  (setq tbl (tblnext "LTYPE" T) entries '())
+  (while tbl
+    (setq name (cdr (assoc 2 tbl)))
+    (setq desc (cdr (assoc 3 tbl)))
+    (if (not (vl-string-search "|" name))
+      (setq entries (cons (strcat "\"" (LC:json-escape name) "\":{\"desc\":\"" (LC:json-escape (if desc desc "")) "\"}") entries))
+    )
+    (setq tbl (tblnext "LTYPE"))
+  )
+  (LC:list->json-obj (reverse entries))
+)
+
+(defun LC:get-globalvars-json (/ ins lt ds meas)
+  (setq ins (getvar "INSUNITS") lt (getvar "LTSCALE") ds (getvar "DIMSCALE") meas (getvar "MEASUREMENT"))
+  (strcat "{\"INSUNITS\":{\"value\":" (itoa ins) "},"
+          "\"LTSCALE\":{\"value\":" (rtos lt 2 4) "},"
+          "\"DIMSCALE\":{\"value\":" (rtos ds 2 4) "},"
+          "\"MEASUREMENT\":{\"value\":" (itoa meas) "}}")
+)
+
+(defun LC:get-mleaderstyles-json (/ doc dicts result entries name)
+  (setq doc (vla-get-activedocument (vlax-get-acad-object)))
+  (setq dicts (vla-get-dictionaries doc))
+  (setq result (vl-catch-all-apply 'vla-item (list dicts "ACAD_MLEADERSTYLE")))
+  (setq entries '())
+  (if (not (vl-catch-all-error-p result))
+    (vlax-for obj result
+      (setq name (vla-get-name obj))
+      (if (not (vl-string-search "|" name))
+        (setq entries (cons (strcat "\"" (LC:json-escape name) "\":{}") entries))
+      )
+    )
+  )
+  (LC:list->json-obj (reverse entries))
+)
+
+(defun LC:get-tablestyles-json (/ doc dicts result entries name)
+  (setq doc (vla-get-activedocument (vlax-get-acad-object)))
+  (setq dicts (vla-get-dictionaries doc))
+  (setq result (vl-catch-all-apply 'vla-item (list dicts "ACAD_TABLESTYLE")))
+  (setq entries '())
+  (if (not (vl-catch-all-error-p result))
+    (vlax-for obj result
+      (setq name (vla-get-name obj))
+      (if (not (vl-string-search "|" name))
+        (setq entries (cons (strcat "\"" (LC:json-escape name) "\":{}") entries))
+      )
+    )
+  )
+  (LC:list->json-obj (reverse entries))
+)
+
+(defun LC:get-scalelists-json (/ doc dicts result entries name)
+  (setq doc (vla-get-activedocument (vlax-get-acad-object)))
+  (setq dicts (vla-get-dictionaries doc))
+  (setq result (vl-catch-all-apply 'vla-item (list dicts "ACAD_SCALELIST")))
+  (setq entries '())
+  (if (not (vl-catch-all-error-p result))
+    (vlax-for obj result
+      (setq name (vla-get-name obj))
+      (if (not (vl-string-search "|" name))
+        (setq entries (cons (strcat "\"" (LC:json-escape name) "\":{}") entries))
+      )
+    )
+  )
+  (LC:list->json-obj (reverse entries))
+)
+
+;; Appliers
+(defun LC:ensure-linetype (ltype-name doc / ltypes result)
+  (if (or (= (strcase ltype-name) "CONTINUOUS") (= ltype-name "")) T
+    (progn
+      (setq ltypes (vla-get-linetypes doc))
+      (setq result (vl-catch-all-apply 'vla-item (list ltypes ltype-name)))
+      (if (vl-catch-all-error-p result)
+        (vl-catch-all-apply 'vla-load (list ltypes ltype-name "acad.lin")) T
+      )
+    )
+  )
+)
+
+(defun LC:apply-layer (name color ltype lineweight / doc layers layer result)
+  (setq doc (vla-get-activedocument (vlax-get-acad-object)))
+  (setq layers (vla-get-layers doc))
+  (LC:ensure-linetype ltype doc)
+  (setq result (vl-catch-all-apply 'vla-item (list layers name)))
+  (if (vl-catch-all-error-p result)
+    (setq layer (vla-add layers name))
+    (setq layer result)
+  )
+  (vl-catch-all-apply 'vla-put-color      (list layer color))
+  (vl-catch-all-apply 'vla-put-linetype   (list layer ltype))
+  (vl-catch-all-apply 'vla-put-lineweight (list layer lineweight))
+  (princ (strcat "\n[LC] Layer: " name))
+)
+
+(defun LC:apply-textstyle (name font height / doc styles style result)
+  (setq doc (vla-get-activedocument (vlax-get-acad-object)))
+  (setq styles (vla-get-textstyles doc))
+  (setq result (vl-catch-all-apply 'vla-item (list styles name)))
+  (if (vl-catch-all-error-p result)
+    (setq style (vla-add styles name))
+    (setq style result)
+  )
+  (if (and font (> (strlen font) 0)) (vl-catch-all-apply 'vla-put-fontfile (list style font)))
+  (if (and height (> height 0.0))    (vl-catch-all-apply 'vla-put-height (list style (float height))))
+  (princ (strcat "\n[LC] TextStyle: " name))
+)
+
+(defun LC:rename-layer (old-name new-name / doc layers result layer)
+  (setq doc (vla-get-activedocument (vlax-get-acad-object)))
+  (setq layers (vla-get-layers doc))
+  (setq result (vl-catch-all-apply 'vla-item (list layers old-name)))
+  (if (vl-catch-all-error-p result)
+    (progn (princ (strcat "\n[LC ERROR] Layer not found: " old-name)) nil)
+    (progn
+      (setq layer result)
+      (vl-catch-all-apply 'vla-put-name (list layer new-name))
+      (princ (strcat "\n[LC] Renamed: " old-name " -> " new-name))
+      T
+    )
+  )
+)
+
+(defun LC:apply-dimstyle (name dimscale dimtxt dimdec / doc styles style result)
+  (setq doc (vla-get-activedocument (vlax-get-acad-object)))
+  (setq styles (vla-get-dimstyles doc))
+  (setq result (vl-catch-all-apply 'vla-item (list styles name)))
+  (if (vl-catch-all-error-p result)
+    (setq style (vla-add styles name))
+    (setq style result)
+  )
+  (vl-catch-all-apply 'vla-put-activedimstyle (list doc style))
+  (if (and dimscale (> dimscale 0.0)) (vl-catch-all-apply 'setvar (list "DIMSCALE" (float dimscale))))
+  (if (and dimtxt (> dimtxt 0.0))     (vl-catch-all-apply 'setvar (list "DIMTXT" (float dimtxt))))
+  (if (and dimdec (>= dimdec 0))      (vl-catch-all-apply 'setvar (list "DIMDEC" dimdec)))
+  (vl-catch-all-apply 'vla-copyfrom (list style doc))
+  (princ (strcat "\n[LC] DimStyle: " name))
+)
+
+(defun c:LC_APPLY_COMPLETE ( / doc)
+  (setq doc (vla-get-activedocument (vlax-get-acad-object)))
+  (vl-catch-all-apply 'vla-regen (list doc 1))
+  (princ "\n[LC] Standard applied to drawing.")
+  (princ)
+)
+
+(defun LC:apply-linetype (name / doc)
+  (setq doc (vla-get-activedocument (vlax-get-acad-object)))
+  (LC:ensure-linetype name doc)
+  (princ (strcat "\n[LC] Linetype ensured: " name))
+)
+
+(defun LC:apply-mleaderstyle (name / doc dicts mlDict result)
+  (setq doc (vla-get-activedocument (vlax-get-acad-object)))
+  (setq dicts (vla-get-dictionaries doc))
+  (setq mlDict (vl-catch-all-apply 'vla-item (list dicts "ACAD_MLEADERSTYLE")))
+  (if (not (vl-catch-all-error-p mlDict))
+    (progn
+      (setq result (vl-catch-all-apply 'vla-item (list mlDict name)))
+      (if (vl-catch-all-error-p result)
+        (progn
+          (vl-catch-all-apply 'vla-addobject (list mlDict name "AcDbMLeaderStyle"))
+          (princ (strcat "\n[LC] MLeaderStyle created: " name))
+        )
+      )
+    )
+  )
+)
+
+(defun LC:apply-tablestyle (name / doc dicts tblDict result)
+  (setq doc (vla-get-activedocument (vlax-get-acad-object)))
+  (setq dicts (vla-get-dictionaries doc))
+  (setq tblDict (vl-catch-all-apply 'vla-item (list dicts "ACAD_TABLESTYLE")))
+  (if (not (vl-catch-all-error-p tblDict))
+    (progn
+      (setq result (vl-catch-all-apply 'vla-item (list tblDict name)))
+      (if (vl-catch-all-error-p result)
+        (progn
+          (vl-catch-all-apply 'vla-addobject (list tblDict name "AcDbTableStyle"))
+          (princ (strcat "\n[LC] TableStyle created: " name))
+        )
+      )
+    )
+  )
+)
+
+;; Web API communication for Standards
+(defun LC:extract-standards (/ payload url res)
+  (princ "\n[LispCentral] Extracting standard for team...")
+  (setq payload (strcat "{"
+    "\"token\":\""     (LC:json-escape *LC-SEAT-TOKEN*)  "\","
+    "\"teamId\":\""    (LC:json-escape *LC-HWID*) "\","
+    "\"standardData\":{"
+      "\"layers\":"         (LC:get-layers-json)         ","
+      "\"textStyles\":"     (LC:get-textstyles-json)     ","
+      "\"dimStyles\":"      (LC:get-dimstyles-json)      ","
+      "\"linetypes\":"      (LC:get-linetypes-json)      ","
+      "\"globalVars\":"     (LC:get-globalvars-json)     ","
+      "\"mleaderStyles\":"  (LC:get-mleaderstyles-json)  ","
+      "\"tableStyles\":"    (LC:get-tablestyles-json)    ","
+      "\"scaleLists\":"     (LC:get-scalelists-json)
+    "}}"
+  ))
+  (setq url (strcat (LC:get-api-base) "/uploadDraft"))
+  (setq res (LC:http-post url payload))
+  (if res
+    (progn
+      (princ (strcat "\n[LispCentral] Server responded: " res))
+      (setvar "USERS1" "LC_SAAS_DRAFT_READY")
+    )
+    (princ "\n[LispCentral] Error contacting server.")
+  )
+  (princ)
+)
+
+(defun LC:run-audit (/ payload url res)
+  (princ "\n[LispCentral] Starting audit for team...")
+  (setq payload (strcat "{"
+    "\"token\":\"" (LC:json-escape *LC-SEAT-TOKEN*) "\","
+    "\"teamId\":\"" (LC:json-escape *LC-HWID*) "\","
+    "\"standardData\":{"
+      "\"layers\":"     (LC:get-layers-json)     ","
+      "\"textStyles\":" (LC:get-textstyles-json) ","
+      "\"dimStyles\":"  (LC:get-dimstyles-json)
+    "}}"
+  ))
+  (setq url (strcat (LC:get-api-base) "/uploadDraft"))
+  (setq res (LC:http-post url payload))
+  (if res
+    (progn
+      (princ (strcat "\n[LispCentral] Audit sent: " res))
+      (setvar "USERS1" "LC_SAAS_DRAFT_READY")
+    )
+    (princ "\n[LispCentral] Error sending audit.")
+  )
+  (princ)
+)
+
+;;; ==========================================================================
+;;; SECCIÓN 7: EVENT HUB & REACTOR
+;;; ==========================================================================
+(defun LC:DocChanged-Callback (reactorObj eventList / f-js event-js) 
   (vl-catch-all-apply 
     '(lambda () 
        (setq event-js (strcat (getenv "TEMP") "\\LC_DocEvent.js"))
@@ -420,221 +793,38 @@
   (princ "\n[LispCentral Hub] Global Session Reactor initialized.")
 )
 
-
-
-(defun LC:Download-Asset (url dest / xmlhttp f result) 
-  (setq result nil)
-  (setq xmlhttp (vlax-create-object "MSXML2.XMLHTTP.6.0"))
-  (if (not xmlhttp) (setq xmlhttp (vlax-create-object "MSXML2.XMLHTTP")))
-  (if xmlhttp 
-    (progn 
-      (vl-catch-all-apply 'vlax-invoke-method (list xmlhttp 'open "GET" url :vlax-false))
-      (vl-catch-all-apply 'vlax-invoke-method (list xmlhttp 'send))
-      (if (= (vlax-get-property xmlhttp 'status) 200) 
-        (progn 
-          (setq f (open dest "w"))
-          (if f 
-            (progn 
-              (princ (vlax-get-property xmlhttp 'responseText) f)
-              (close f)
-              (setq result t)
-            )
-          )
-        )
-      )
-      (vlax-release-object xmlhttp)
-    )
-  )
-  result
-)
-
-(defun c:LC_PALETTE (/ doc loader-js f-js local-html source-url temp-html)
-  ;; Guard: evita duplicar a paleta ao trocar de desenho na mesma sessão.
-  ;; O Blackboard persiste entre documentos; variáveis locais não.
-  (if (and (vl-bb-ref '*LC-PALETTE-ACTIVE*) (not *LC-FORCE-RELOAD*))
-    (princ "\n[LispCentral] Command Palette already active in this session.")
+;;; ==========================================================================
+;;; SECCIÓN 8: COMANDOS DE SISTEMA
+;;; ==========================================================================
+(defun c:LC_SYNC ()
+  (princ "\n[LispCentral] Iniciando Live Sync (Garbage Collection)...")
+  (if *LC-GHOST-ROUTINES*
     (progn
-      (vl-load-com)
-      (setq doc (vla-get-ActiveDocument (vlax-get-acad-object)))
-      (vla-StartUndoMark doc)
-      (princ "\n[⚙] Initializing LispCentral Main Palette...")
-
-      (if (not (vl-bb-ref '*LC-SESSION-VERSION*))
-        (vl-bb-set '*LC-SESSION-VERSION* (rtos (getvar "MILLISECS") 2 0))
+      (foreach cmd *LC-GHOST-ROUTINES*
+        (eval (list 'setq (read (strcat "c:" cmd)) nil))
       )
-
-      (setq source-url (strcat "https://lispcentral.web.app/palette?v=" (rtos (getvar "MILLISECS") 2 0)))
-      (setq temp-html (strcat (getenv "TEMP") "\\LC_Palette.html"))
-      (princ "\n[LispCentral] Syncing latest UI from cloud...")
-      (LC:Download-Asset source-url temp-html)
-      (setq local-html (strcat "file:///" (vl-string-translate "\\" "/" temp-html)
-                               "?token=" *LC-SEAT-TOKEN*
-                               "&hwId="  (LC:url-encode *LC-HWID*)
-                               "&v="     (vl-bb-ref '*LC-SESSION-VERSION*)))
-
-      (setq loader-js (strcat (getenv "TEMP") "\\LC_Palette_Loader.js"))
-      (setq f-js (open loader-js "w"))
-      (if f-js
-        (progn
-          (write-line "if (typeof Acad !== 'undefined') {" f-js)
-          ;; Guard JS: window._lcCmdPaletteActive persiste na sessão CEF do AutoCAD.
-          ;; Evita chamar addPalette duas vezes mesmo se LISP for re-executado.
-          (write-line "  if (!window._lcCmdPaletteActive) {" f-js)
-          (write-line "    try {" f-js)
-          (write-line "      try { Acad.Application.removePalette('Command Palette'); } catch(x) {}" f-js)
-          (write-line (strcat "      Acad.Application.addPalette('Command Palette', '" local-html "');") f-js)
-          (write-line "      window._lcCmdPaletteActive = true;" f-js)
-          (write-line "      Acad.Editor.writeMessage('\\n[SUCCESS] LispCentral Palette is ready.\\n');" f-js)
-          (write-line "    } catch(e) {" f-js)
-          (write-line "      Acad.Editor.writeMessage('\\n[LC ERROR] ' + e.message + '\\n');" f-js)
-          (write-line "    }" f-js)
-          (write-line "  } else {" f-js)
-          (write-line "    Acad.Editor.writeMessage('\\n[LispCentral] Command Palette already active.\\n');" f-js)
-          (write-line "  }" f-js)
-          (write-line "} else {" f-js)
-          (write-line "  console.error('[ERROR] AutoCAD JavaScript API not detected.');" f-js)
-          (write-line "}" f-js)
-          (close f-js)
-          (vl-cmdf "_.WEBLOAD" "_L" (strcat "\"" loader-js "\""))
-          ;; Marcar no Blackboard: paleta ativa nesta sessão
-          (vl-bb-set '*LC-PALETTE-ACTIVE* T)
-
-          (if (not (vl-bb-ref 'LC_PALETTE_LOADED))
-            (progn
-              (LC:Init-EventHub)
-              (vl-bb-set 'LC_PALETTE_LOADED T)
-            )
-          )
-        )
-        (princ "\n[ERROR] Could not create Palette JS injector file.")
-      )
-      (vla-EndUndoMark doc)
+      (setq *LC-GHOST-ROUTINES* nil)
+      (princ "\n[LispCentral] Fantasmas anteriores destruidos.")
     )
   )
-  (princ)
-)
-
-(defun c:LC_RESOURCES (/ doc loader-js f-js local-html source-url temp-html)
-  ;; Guard: evita duplicar a paleta ao trocar de desenho na mesma sessão.
-  (if (and (vl-bb-ref '*LC-RESOURCE-ACTIVE*) (not *LC-FORCE-RELOAD*))
-    (princ "\n[LispCentral] Resource Palette already active in this session.")
-    (progn
-      (vl-load-com)
-      (setq doc (vla-get-ActiveDocument (vlax-get-acad-object)))
-      (vla-StartUndoMark doc)
-      (princ "\n[⚙] Initializing Resource Palette...")
-
-      (if (not (vl-bb-ref '*LC-SESSION-VERSION*))
-        (vl-bb-set '*LC-SESSION-VERSION* (rtos (getvar "MILLISECS") 2 0))
-      )
-
-      (setq source-url (strcat "https://lispcentral.web.app/resource-palette?v=" (rtos (getvar "MILLISECS") 2 0)))
-      (setq temp-html (strcat (getenv "TEMP") "\\LC_Resource.html"))
-      (princ "\n[LispCentral] Syncing Resource UI from cloud...")
-      (LC:Download-Asset source-url temp-html)
-      (setq local-html (strcat "file:///" (vl-string-translate "\\" "/" temp-html)
-                               "?token=" *LC-SEAT-TOKEN*
-                               "&hwId="  (LC:url-encode *LC-HWID*)
-                               "&v="     (vl-bb-ref '*LC-SESSION-VERSION*)))
-
-      (setq loader-js (strcat (getenv "TEMP") "\\LC_Resource_Loader.js"))
-      (setq f-js (open loader-js "w"))
-      (if f-js
-        (progn
-          (write-line "if (typeof Acad !== 'undefined') {" f-js)
-          ;; Guard JS: window._lcResourceActive persiste na sessão CEF do AutoCAD.
-          (write-line "  if (!window._lcResourceActive) {" f-js)
-          (write-line "    try {" f-js)
-          (write-line "      try { Acad.Application.removePalette('LispCentral Resources'); } catch(x) {}" f-js)
-          (write-line (strcat "      Acad.Application.addPalette('LispCentral Resources', '" local-html "');") f-js)
-          (write-line "      window._lcResourceActive = true;" f-js)
-          (write-line "      Acad.Editor.writeMessage('\\n[SUCCESS] Resource Palette is ready.\\n');" f-js)
-          (write-line "    } catch(e) {" f-js)
-          (write-line "      Acad.Editor.writeMessage('\\n[LC ERROR] ' + e.message + '\\n');" f-js)
-          (write-line "    }" f-js)
-          (write-line "  } else {" f-js)
-          (write-line "    Acad.Editor.writeMessage('\\n[LispCentral] Resource Palette already active.\\n');" f-js)
-          (write-line "  }" f-js)
-          (write-line "} else {" f-js)
-          (write-line "  console.error('[ERROR] AutoCAD JavaScript API not detected.');" f-js)
-          (write-line "}" f-js)
-          (close f-js)
-          (vl-cmdf "_.WEBLOAD" "_L" (strcat "\"" loader-js "\""))
-          ;; Marcar no Blackboard: paleta ativa nesta sessão
-          (vl-bb-set '*LC-RESOURCE-ACTIVE* T)
-        )
-        (princ "\n[ERROR] Could not create Resource Palette JS injector file.")
-      )
-      (vla-EndUndoMark doc)
-    )
-  )
-  (princ)
-)
-
-(defun c:LC_PROPERTIES (/ doc loader-js f-js local-html temp-html f-html)
-  ;; Guard: evita duplicar a paleta ao trocar de desenho na mesma sessão.
-  (if (and (vl-bb-ref '*LC-PROPERTIES-ACTIVE*) (not *LC-FORCE-RELOAD*))
-    (princ "\n[LispCentral] Properties Palette already active in this session.")
-    (progn
-      (vl-load-com)
-      (setq doc (vla-get-activedocument (vlax-get-acad-object)))
-      (princ "\n[⚙] Initializing Properties Palette...")
-
-      ;; HTML Dummy temporário (ainda sem build na nuvem)
-      (setq temp-html (strcat (getenv "TEMP") "\\LC_Prop_Dummy.html"))
-      (setq f-html (open temp-html "w"))
-      (if f-html
-        (progn
-          (write-line "<!DOCTYPE html><html><head><style>body{background:#222;color:#fff;font-family:sans-serif;display:flex;align-items:center;justify-content:center;height:100vh;margin:0;}</style></head><body><h3>Próximamente...</h3></body></html>" f-html)
-          (close f-html)
-        )
-      )
-      (setq local-html (strcat "file:///" (vl-string-translate "\\" "/" temp-html)))
-
-      (setq loader-js (strcat (getenv "TEMP") "\\LC_Prop_Loader.js"))
-      (if (setq f-js (open loader-js "w"))
-        (progn
-          (write-line "if (typeof Acad !== 'undefined') {" f-js)
-          ;; Guard JS: window._lcPropertiesActive persiste na sessão CEF do AutoCAD.
-          (write-line "  if (!window._lcPropertiesActive) {" f-js)
-          (write-line "    try {" f-js)
-          (write-line "      try { Acad.Application.removePalette('LispCentral Properties'); } catch(x) {}" f-js)
-          (write-line (strcat "      Acad.Application.addPalette('LispCentral Properties', '" local-html "');") f-js)
-          (write-line "      window._lcPropertiesActive = true;" f-js)
-          (write-line "      Acad.Editor.writeMessage('\\n[SUCCESS] Properties Palette is ready.\\n');" f-js)
-          (write-line "    } catch(e) {" f-js)
-          (write-line "      Acad.Editor.writeMessage('\\n[LC ERROR] ' + e.message + '\\n');" f-js)
-          (write-line "    }" f-js)
-          (write-line "  } else {" f-js)
-          (write-line "    Acad.Editor.writeMessage('\\n[LispCentral] Properties Palette already active.\\n');" f-js)
-          (write-line "  }" f-js)
-          (write-line "} else {" f-js)
-          (write-line "  console.error('[ERROR] AutoCAD JavaScript API not detected.');" f-js)
-          (write-line "}" f-js)
-          (close f-js)
-          (vl-cmdf "_.WEBLOAD" "_L" (strcat "\"" loader-js "\""))
-          ;; Marcar no Blackboard: paleta ativa nesta sessão
-          (vl-bb-set '*LC-PROPERTIES-ACTIVE* T)
-        )
-        (princ "\n[ERROR] Could not create Properties Palette JS injector file.")
-      )
-    )
-  )
+  (setq *LC-LOADED-ROUTINES* nil)
+  (princ "\n[LispCentral] Cache JIT limpiada.")
+  (LC:register-ghosts)
   (princ)
 )
 
 (defun c:LC_RESET ()
-  ;; Limpa flags do Blackboard para permitir recriação forçada
   (vl-bb-set '*LC-PALETTE-ACTIVE*    nil)
   (vl-bb-set '*LC-RESOURCE-ACTIVE*   nil)
   (vl-bb-set '*LC-PROPERTIES-ACTIVE* nil)
+  (vl-bb-set '*LC-STANDARDS-ACTIVE*  nil)
   (vl-bb-set '*LC-SESSION-VERSION* (rtos (getvar "MILLISECS") 2 0))
-  ;; *LC-FORCE-RELOAD* sinaliza às paletas que devem ignorar os guards
   (setq *LC-FORCE-RELOAD* T)
   (princ "\n[LispCentral] Palette state reset. Reloading all palettes...")
   (c:LC_PALETTE)
   (c:LC_RESOURCES)
   (c:LC_PROPERTIES)
+  (c:LC_STANDARDS)
   (setq *LC-FORCE-RELOAD* nil)
 )
 
@@ -645,6 +835,8 @@
 (defun c:RECURSOS () (c:LC_RESOURCES))
 (defun c:HATCHES () (c:LC_RESOURCES))
 (defun c:LINHAS () (c:LC_RESOURCES))
+(defun c:PADROES () (c:LC_STANDARDS))
+(defun c:STANDARDS () (c:LC_STANDARDS))
 
 (defun c:LC_HELP () 
   (princ "\n")
@@ -655,15 +847,20 @@
   (princ "\n  • LC / PALETA / LC_PALETTE .... Open Main Command Palette     ")
   (princ "\n  • LC_RES / RECURSOS ........... Open Resource Palette         ")
   (princ "\n  • LC_PROP / LC_PROPERTIES ..... Open Properties Palette       ")
+  (princ "\n  • LC_STANDARDS / PADROES ...... Open Standards Palette        ")
   (princ "\n  • LC_RESET .................... Force reload all UI elements  ")
   (princ "\n  • LC_HELP ..................... Show this help menu           ")
   (princ "\n                                                                  ")
   (princ "\n  Tip: If you close a palette, type its command again to reopen.  ")
-  (princ "\n                                                                  ")
   (princ "\n  ================================================================")
   (princ "\n")
   (princ)
 )
 
-(c:LC_PALETTE)
+;;; ==========================================================================
+;;; SECCIÓN 9: INICIALIZACIÓN
+;;; ==========================================================================
+(vl-load-com)
+(LC:register-ghosts)
 (princ "\n[LispCentral] Core Engine loaded. Type 'LC' to open the palette.")
+(princ)

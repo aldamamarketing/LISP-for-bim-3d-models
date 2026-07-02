@@ -19,6 +19,10 @@
       {
         "source": "/properties-palette",
         "destination": "/palette-builds/properties-palette.html"
+      },
+      {
+        "source": "/standards-palette",
+        "destination": "/palette-builds/saas-palette.html"
       }
     ],
     "headers": [
