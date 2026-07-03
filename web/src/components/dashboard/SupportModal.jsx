@@ -42,7 +42,8 @@ export default function SupportModal() {
       <div className="bg-surface-container border border-surface-variant rounded-xl w-full max-w-md p-6 relative">
         <button 
           onClick={() => setShowSupportModal(false)} 
-          className="absolute top-4 right-4 text-on-surface-variant hover:text-white transition-colors"
+          className="absolute top-4 right-4 text-on-surface-variant hover:text-white transition-colors focus-visible:ring-2 focus-visible:outline-none"
+          aria-label="Fechar"
         >
           <span className="material-symbols-outlined">close</span>
         </button>
