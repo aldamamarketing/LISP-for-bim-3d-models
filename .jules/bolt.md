@@ -1,0 +1,3 @@
+## 2024-10-27 - Memoize and extract derived string allocations in AutoCAD embedded palettes
+**Learning:** React components rendered within AutoCAD's embedded HTML5 browser execute JavaScript slower than modern desktop browsers. O(N*M) closure evaluations involving string allocations (like `.toLowerCase()`) directly within `.filter()` can severely impact UI responsiveness during rapid re-renders.
+**Action:** Extract expensive string transformations outside of closures and strictly wrap derived lists (like command grouping and sorting) in `React.useMemo()` hook to ensure recalculations only happen when specific dependency arrays change.
