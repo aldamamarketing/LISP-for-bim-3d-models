@@ -1,0 +1,3 @@
+## 2024-07-06 - [Array Filter Performance in React]
+**Learning:** Extracting expensive string allocations/regex initializations (like `.split()` and `toLowerCase()`) OUTSIDE of high-frequency list mapping/filtering array closures prevents O(N*M) performance degradation, particularly vital for environments like AutoCAD's embedded browser that may lack V8's advanced JIT optimizations.
+**Action:** When filtering lists using user input strings in React, always sanitize the input into primitive parts BEFORE the array iterator, and memoize the resulting mapped data structure utilizing `React.useMemo()`.

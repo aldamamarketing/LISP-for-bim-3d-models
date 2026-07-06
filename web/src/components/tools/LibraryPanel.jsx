@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { getPublicAssets, addToFavorites } from '../../utils/library';
 import { auth } from '../../firebase';
 import { onAuthStateChanged } from 'firebase/auth';
@@ -120,22 +120,28 @@ export default function LibraryPanel({ currentType, searchQuery = '', selectedIt
     setAssets(assets.map(a => a.id === updatedHatch.id ? updatedHatch : a));
   };
 
-  const categories = ['Todas', ...new Set(assets.map(a => a.category || 'General'))];
+  const categories = useMemo(() => {
+    return ['Todas', ...new Set(assets.map(a => a.category || 'General'))];
+  }, [assets]);
 
-  const filtered = assets.filter(a => {
-    if (activeCategory !== 'Todas' && a.category !== activeCategory) return false;
-    if (searchQuery && searchQuery.trim().length > 2) {
-      const lowerQ = searchQuery.toLowerCase();
-      // Verificamos si alguna de las palabras clave del usuario está en el título o descripción
-      const keywords = lowerQ.split(/[\n, ]+/).filter(k => k.length >= 2);
+  const filtered = useMemo(() => {
+    // ⚡ Bolt: Extract expensive string parsing outside the filter loop (O(N) to O(1) allocation)
+    const normalizedQuery = searchQuery ? searchQuery.trim().toLowerCase() : '';
+    const keywords = normalizedQuery.length > 2
+      ? normalizedQuery.split(/[\n, ]+/).filter(k => k.length >= 2)
+      : [];
+
+    return assets.filter(a => {
+      if (activeCategory !== 'Todas' && a.category !== activeCategory) return false;
+
       if (keywords.length > 0) {
         const textToSearch = `${a.name || ''} ${a.description || ''}`.toLowerCase();
         const matches = keywords.some(k => textToSearch.includes(k));
         if (!matches) return false;
       }
-    }
-    return true;
-  });
+      return true;
+    });
+  }, [assets, activeCategory, searchQuery]);
 
   return (
     <div style={{ flex: 1, backgroundColor: '#222', borderRadius: '8px', padding: '15px', display: 'flex', flexDirection: 'column', height: '100%', overflow: 'hidden' }}>
