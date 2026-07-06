@@ -625,7 +625,12 @@ exports.getUserResources = onRequest({ cors: true }, async (req, res) => {
 
     // Obtener los assets pÃºblicos que coincidan con el tipo
     const assetsSnap = await db.collection("publicAssets").where("type", "==", type).get();
-    const results = assetsSnap.docs.map(d => ({ id: d.id, ...d.data() }));
+    const results = assetsSnap.docs.map(d => {
+      const data = d.data();
+      // Remove code to save bandwidth and prevent client localStorage Quota Exceeded error
+      delete data.code;
+      return { id: d.id, ...data };
+    });
 
     res.setHeader("Cache-Control", "public, max-age=30"); // Cache corto para sync rÃ¡pido
     return res.status(200).json(results);
@@ -1326,4 +1331,7 @@ exports.getDraft = onRequest({ cors: true, maxInstances: 10 }, async (req, res) 
     return res.status(500).send("Error interno.");
   }
 });
+
+
+exports.generateMVPs = require('./generateMVPs').generateMVPs;
 

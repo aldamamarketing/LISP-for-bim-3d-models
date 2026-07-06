@@ -2,16 +2,34 @@ export const arch_circular = {
   id: 'circular',
   name: 'Circular',
   categories: ["Paving","Organic"],
-  controlsType: 'lines',
+  controlsType: 'circular',
   iconUrl: '/patterns/circular.svg',
-  controls: ['width', 'height'],
+  controls: ['radius', 'spacing'],
   defaults: {
-    width: 114,
-    height: 200,
+    radius: 50,
+    spacing: 120,
     joint: 0,
     rows: 2,
     columns: 2
   },
+  generateSvgRenderer: (params) => {
+    const r = params.radius || 50;
+    const s = params.spacing || 120;
+    
+    // El patrón base es un cuadrado de lado = spacing
+    // Dibujamos el círculo en el centro
+    const paths = `<circle cx="${s/2}" cy="${s/2}" r="${r}" />`;
+    
+    return {
+      w: s,
+      h: s,
+      logicalCols: 1,
+      logicalRows: 1,
+      paths: paths,
+      baseUnit: s
+    };
+  },
+  hasBackendEngine: true,
   i18n: {
     es: {
       name: 'Circular',

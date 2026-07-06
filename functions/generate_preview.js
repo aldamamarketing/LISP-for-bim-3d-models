@@ -1,4 +1,8 @@
-export function parsePatLine(line) {
+const fs = require('fs');
+
+const TOKEN = process.env.GCP_TOKEN || 'YOUR_TOKEN_HERE';
+
+function parsePatLine(line) {
   const parts = line.split(',').map(s => parseFloat(s.trim()));
   if (parts.length < 5) return null;
   return {
@@ -11,7 +15,7 @@ export function parsePatLine(line) {
   };
 }
 
-export function generateSvgPathsFromPat(patCode) {
+function generateSvgPathsFromPat(patCode) {
   const lines = patCode.split('\n')
     .map(l => l.trim())
     .filter(l => l && !l.startsWith('*') && !l.startsWith(';'));
@@ -102,3 +106,72 @@ export function generateSvgPathsFromPat(patCode) {
     strokeWidth: strokeW
   };
 }
+
+async function run() {
+  console.log("Fetching documents from publicAssets via REST...");
+  const url = 'https://firestore.googleapis.com/v1/projects/lispcentral/databases/(default)/documents/publicAssets?pageSize=300';
+  const res = await fetch(url, { headers: { Authorization: `Bearer ${TOKEN}` } });
+  const data = await res.json();
+  
+  if (!data.documents) {
+    console.log("No documents found or error", data);
+    return;
+  }
+  
+  let html = `
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>PAT Preview</title>
+  <style>
+    body { font-family: sans-serif; background: #1a1a1a; color: #fff; padding: 20px; }
+    .grid { display: flex; flex-wrap: wrap; gap: 20px; }
+    .card { background: #333; padding: 15px; border-radius: 8px; width: 250px; text-align: center; }
+    .card h3 { font-size: 14px; margin: 0 0 10px 0; word-wrap: break-word; }
+    .card svg { background: #222; border-radius: 4px; margin-bottom: 10px; border: 1px solid #555; }
+    .btn-delete { background: #ff4444; color: white; border: none; padding: 5px 10px; cursor: pointer; border-radius: 4px; width: 100%; }
+    .btn-delete:hover { background: #cc0000; }
+  </style>
+</head>
+<body>
+  <h1>Hatch Patterns Preview (${data.documents.length} items)</h1>
+  <div class="grid">
+  `;
+
+  data.documents.forEach(doc => {
+    const id = doc.name.split('/').pop();
+    const fields = doc.fields || {};
+    const code = fields.code?.stringValue || "";
+    const name = fields.name?.stringValue || id;
+    
+    // We only care about PAT files
+    if (!code) return;
+    
+    const svgData = generateSvgPathsFromPat(code);
+    if (!svgData) return;
+
+    html += `
+    <div class="card" id="${id}">
+      <h3>${name}</h3>
+      <svg width="100%" height="200" viewBox="${svgData.viewBox}" xmlns="http://www.w3.org/2000/svg">
+        <g stroke="#ff8c00" stroke-width="${svgData.strokeWidth}" fill="none">
+          ${svgData.svgLines}
+        </g>
+      </svg>
+      <p style="font-size: 10px; color: #aaa;">ID: ${id}</p>
+    </div>
+    `;
+  });
+
+  html += `
+  </div>
+</body>
+</html>
+  `;
+  
+  fs.writeFileSync('preview.html', html);
+  console.log("preview.html generado con exito en C:/Users/TM PROJETOS/3D Objects/Projetos/LispCentral/functions/preview.html");
+}
+
+run().catch(console.error);

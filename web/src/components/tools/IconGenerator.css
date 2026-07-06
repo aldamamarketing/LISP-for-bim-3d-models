@@ -245,3 +245,72 @@ textarea.form-control {
 @keyframes spin {
   to { transform: rotate(360deg); }
 }
+
+/* Layout responsivo del Builder */
+.builder-layout {
+  display: flex;
+  width: 100%;
+  height: 100%;
+  gap: 0;
+  flex-direction: row;
+  overflow: hidden;
+}
+
+.builder-preview {
+  flex: 1;
+  background-color: #0b0f19;
+  border-right: 1px solid #333;
+  padding: 15px;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.builder-settings {
+  width: 400px;
+  min-width: 400px;
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  overflow: hidden;
+  background-color: #0f172a;
+}
+
+/* Modo móvil o paneles estrechos */
+@media (max-width: 768px) {
+  .builder-layout {
+    flex-direction: column;
+    overflow: hidden; /* Global scrolling is off */
+  }
+  
+  .builder-preview {
+    flex: none;
+    height: 40%; /* Menos alto para dar más espacio a los controles en 245px */
+    border-right: none;
+    border-bottom: 1px solid #333;
+    padding: 8px; /* Menos padding */
+  }
+  
+  .builder-settings {
+    width: 100%;
+    min-width: 100%;
+    height: auto;
+    flex: 1; /* Toma el espacio restante */
+    overflow: hidden; /* Evita que crezca infinitamente, el scroll lo hace el div interno */
+  }
+  
+  .archetypes-header {
+    flex-direction: column !important;
+    align-items: stretch !important;
+  }
+  
+  .archetypes-search-bar {
+    width: 100% !important;
+    flex-direction: column !important;
+  }
+  
+  .stack-mobile {
+    flex-direction: column !important;
+  }
+}

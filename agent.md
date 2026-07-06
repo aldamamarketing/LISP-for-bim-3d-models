@@ -359,3 +359,32 @@ El código óptimo a implementar en el Loader y en `core_engine.lsp` a futuro es
 (vlax-invoke-method winhttp 'Send)
 ```
 *Recomendación:* Migrar todos los HTTP Getters nativos en LISP al objeto `WinHttpRequest.5.1` con timeouts acelerados para proteger la experiencia del usuario SaaS (B2B) en redes corporativas defectuosas.
+
+---
+
+## Arquitectura del Motor Paramétrico de Hatchs (HatchGenerator)
+
+El sistema de Hatchs Paramétricos está diseñado para ofrecer patrones matemáticos calculados al vuelo, permitiendo a los usuarios ajustar espaciados, juntas y dimensiones sin depender de un catálogo rígido de archivos .PAT.
+
+### Jerarquía de Fallback (Niveles de Seguridad)
+Para garantizar que el usuario en AutoCAD siempre reciba una respuesta rápida al hacer clic en "Insertar" desde el Generador de Arquetipos, se diseñó un flujo con una triple red de seguridad:
+
+1. **Nivel 1: Motor Matemático (Cloud Function / Ideal)**
+   - El front-end invoca la Cloud Function `buildHatchPattern`, enviando los parámetros seleccionados por el usuario (ej: Row Spacing, Brick Width).
+   - El backend evalúa la matemática de ese arquetipo específico (si ya ha sido desarrollado) y devuelve un código PAT preciso.
+   - *Estado actual:* Implementado para los arquetipos base (stack, stretcher, flemish, etc.).
+
+2. **Nivel 2: Archivo Estático de Respaldo (privateAssets)**
+   - Si la invocación al backend falla (ya sea porque el motor para ese arquetipo aún está en desarrollo o por fallo de red), el sistema cae a este nivel silenciosamente.
+   - Intenta leer un patrón base (MVP) pre-calculado desde la colección `privateAssets` en Firestore (ej: `hatch_mvp_hexagonal`).
+   - Las reglas de seguridad de Firebase permiten lectura pública (`allow read: if true`) a `privateAssets` para que esta descarga funcione instantáneamente sin requerir autenticación en la Paleta.
+
+3. **Nivel 3: Motor JIT de Conversión SVG (SvgToPatEngine)**
+   - Si el archivo MVP en `privateAssets` no existiese (fue borrado o no se pre-calculó), el último nivel de respaldo es el conversor en tiempo de ejecución.
+   - El sistema descarga el icono vectorial (.SVG) que representa al arquetipo, y utilizando `SvgToPatEngine.js`, traza y calcula las matemáticas del patrón directamente en la memoria del navegador.
+
+### Experiencia de Usuario (UI) en Estado de Fallback
+Cuando un arquetipo todavía no cuenta con la implementación de su motor matemático en el backend, se le marca con la propiedad `status: 'coming_soon'` en el archivo local de la paleta (`HatchEngine.js`). Esto provoca que:
+- Los deslizadores paramétricos (Width, Height, Joints) queden ocultos bajo una capa translúcida con la leyenda "Beta / En Desarrollo".
+- Se evitan frustraciones al usuario, impidiendo que mueva parámetros que no alterarán el patrón resultante.
+- El botón de "Aplicar" sigue 100% activo, entregando siempre el patrón base del Nivel 2.

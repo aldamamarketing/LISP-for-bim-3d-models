@@ -14,7 +14,7 @@ import { arch_diamond } from './patterns/diamond';
 import { arch_circular } from './patterns/circular';
 import { arch_fishscale } from './patterns/fishscale';
 import { arch_french } from './patterns/french';
-import { arch_none } from './patterns/none';
+
 import { arch_rubble } from './patterns/rubble';
 import { arch_drystone } from './patterns/drystone';
 import { arch_coursed_ashlar } from './patterns/coursed_ashlar';
@@ -320,7 +320,7 @@ export const ARCHETYPES = [
     arch_circular,
     arch_fishscale,
     arch_french,
-    arch_none,
+
     arch_rubble,
     arch_drystone,
     arch_coursed_ashlar,

@@ -44,6 +44,8 @@ export const arch_chevron = {
     return {
       w: tw * 2,
       h: th,
+      logicalCols: 2,
+      logicalRows: 1,
       paths: paths,
       baseUnit: Math.max(tw, th)
     };

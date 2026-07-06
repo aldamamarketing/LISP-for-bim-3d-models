@@ -92,11 +92,12 @@ export default function SvgPreviewEngine({ archetype, params, gridRows = 3, grid
 
   // 2. Patrones con motor matemático geométrico: dibujar SVG dinámicamente y usar mismo paradigma
   try {
-    const { w, h, paths } = archetype.generateSvgRenderer(params);
+    const { w, h, paths, logicalCols = 1, logicalRows = 1 } = archetype.generateSvgRenderer(params);
     
     const maxGrid = Math.max(gridCols, gridRows);
-    // Para matemáticos, el trazo base suele ser más fino, compensamos igual.
-    const dynamicStrokeWidth = Math.max(1, 1.5 * maxGrid);
+    const baseDim = Math.max(w, h);
+    // Para matemáticos, el trazo escala proporcional a su viewBox respecto a un tamaño típico de 400
+    const dynamicStrokeWidth = (baseDim / 400) * 1.5 * maxGrid;
 
     const svgString = `
       <svg xmlns="http://www.w3.org/2000/svg" width="${w}" height="${h}" viewBox="0 0 ${w} ${h}">
@@ -108,9 +109,11 @@ export default function SvgPreviewEngine({ archetype, params, gridRows = 3, grid
 
     const dataUri = `data:image/svg+xml,${encodeURIComponent(svgString.trim())}`;
     
+    const pctH = (100 / gridRows) * logicalRows;
+    const pctW = (100 / gridCols) * logicalCols;
     const bgSize = gridRows >= gridCols 
-      ? `auto ${100 / gridRows}%` 
-      : `${100 / gridCols}% auto`;
+      ? `auto ${pctH}%` 
+      : `${pctW}% auto`;
 
     return (
       <div style={{ 

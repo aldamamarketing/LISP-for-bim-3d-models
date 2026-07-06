@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import './IconGenerator.css'; 
 import { saveToGlobalLibrary, addToFavorites } from '../../utils/library';
-import { auth, functions } from '../../firebase';
+import { auth, functions, db } from '../../firebase';
 import { onAuthStateChanged } from 'firebase/auth';
 import { httpsCallable } from 'firebase/functions';
+import { doc, getDoc, setDoc } from 'firebase/firestore';
 import { executeInAutoCAD } from '../../utils/autocadBridge';
 import LibraryPanel from './LibraryPanel';
 import ToastContainer, { showToast } from '../Toast';
@@ -12,7 +13,7 @@ import { ARCHETYPES, generatePatternName, ARCHETYPE_DESCRIPTIONS, CATEGORIES, AS
 import SvgPreviewEngine from './SvgPreviewEngine';
 import ThumbnailPreview from './ThumbnailPreview';
 import MultiFilter from '../MultiFilter';
-import { SvgToPatEngine } from '../../utils/SvgToPatEngine';
+
 
 
 const isInsideAutoCAD = typeof window !== 'undefined' && (
@@ -40,9 +41,22 @@ export default function HatchGenerator({ lang = 'en', isEmbedded = false, onClos
   const [width, setWidth] = useState(200);
   const [height, setHeight] = useState(100);
   const [spacing, setSpacing] = useState(200);
+  const [radius, setRadius] = useState(50);
   const [joint, setJoint] = useState(5);
   const [rows, setRows] = useState(1);
   const [columns, setColumns] = useState(1);
+  const [units, setUnits] = useState('cm');
+  
+  const getUnitProps = () => {
+    switch(units) {
+      case 'm': return { max: 10, step: 0.01 };
+      case 'mm': return { max: 10000, step: 10 };
+      case 'in': return { max: 400, step: 1 };
+      case 'ft': return { max: 40, step: 0.1 };
+      default: return { max: 1000, step: 1 }; // cm and unitless
+    }
+  };
+  const unitProps = getUnitProps();
   
 
   
@@ -62,6 +76,7 @@ export default function HatchGenerator({ lang = 'en', isEmbedded = false, onClos
     setHeight(currentArchetype.defaults.height || 100);
     setJoint(currentArchetype.defaults.joint || 0);
     setSpacing(currentArchetype.defaults.spacing || 50);
+    setRadius(currentArchetype.defaults.radius || 50);
     setRows(currentArchetype.defaults.rows || 1);
     setColumns(currentArchetype.defaults.columns || 1);
   }, [currentArchetype]);
@@ -74,8 +89,12 @@ export default function HatchGenerator({ lang = 'en', isEmbedded = false, onClos
       if (width < height) {
         setWidth(height);
       }
+    } else if (currentArchetype.controlsType === 'circular') {
+      if (spacing < 2 * radius) {
+        setSpacing(2 * radius);
+      }
     }
-  }, [width, height, currentArchetype]);
+  }, [width, height, radius, spacing, currentArchetype]);
 
   const handleArchetypeChange = (id) => {
     setSelectedArchetypeId(id);
@@ -91,6 +110,14 @@ export default function HatchGenerator({ lang = 'en', isEmbedded = false, onClos
   }, [searchTerm, selectedCategory]);
 
 
+  const getParamValues = () => {
+    let p1 = width;
+    let p2 = height;
+    if (currentArchetype.controlsType === 'lines') { p1 = spacing; p2 = height; }
+    else if (currentArchetype.controlsType === 'circular') { p1 = radius; p2 = spacing; }
+    return { p1, p2, j: joint, scale: 1 }; // Scaling is handled natively by the UI values
+  };
+
   const handleSaveToFavorites = async () => {
     if (!user) {
       showToast('Crie uma conta gratuita para salvar nos favoritos.', 'warning', 6000);
@@ -98,11 +125,11 @@ export default function HatchGenerator({ lang = 'en', isEmbedded = false, onClos
     }
     setSaving(true);
     try {
-      const p1 = currentArchetype.controlsType === 'lines' ? spacing : width;
+      const { p1, p2, j, scale } = getParamValues();
       const buildHatchPattern = httpsCallable(functions, 'buildHatchPattern');
-      const { data } = await buildHatchPattern({ archetypeId: currentArchetype.id, params: [p1, height, joint] });
+      const { data } = await buildHatchPattern({ archetypeId: currentArchetype.id, params: [p1, p2, j], scaleFactor: scale });
       const patCode = data.patCode;
-      const generatedName = generatePatternName(currentArchetype, p1, height, joint);
+      const generatedName = generatePatternName(currentArchetype, p1, p2, j);
       const hatchId = "hatch_" + generatedName.replace(/[^a-zA-Z0-9]/g, "_").toLowerCase();
 
       const assetData = {
@@ -126,11 +153,11 @@ export default function HatchGenerator({ lang = 'en', isEmbedded = false, onClos
   const handleSaveToPublicLibrary = async () => {
     setSaving(true);
     try {
-      const p1 = currentArchetype.controlsType === 'lines' ? spacing : width;
+      const { p1, p2, j, scale } = getParamValues();
       const buildHatchPattern = httpsCallable(functions, 'buildHatchPattern');
-      const { data } = await buildHatchPattern({ archetypeId: currentArchetype.id, params: [p1, height, joint] });
+      const { data } = await buildHatchPattern({ archetypeId: currentArchetype.id, params: [p1, p2, j], scaleFactor: scale });
       const patCode = data.patCode;
-      const generatedName = generatePatternName(currentArchetype, p1, height, joint);
+      const generatedName = generatePatternName(currentArchetype, p1, p2, j);
       const hatchId = "hatch_" + generatedName.replace(/[^a-zA-Z0-9]/g, "_").toLowerCase();
 
       const assetData = {
@@ -155,20 +182,20 @@ export default function HatchGenerator({ lang = 'en', isEmbedded = false, onClos
   const handleApplyToAutoCAD = async () => {
     setSaving(true);
     try {
-      const p1 = currentArchetype.controlsType === 'lines' ? spacing : width;
+      const { p1, p2, j, scale } = getParamValues();
       let patCode;
       try {
         const buildHatchPattern = httpsCallable(functions, 'buildHatchPattern');
-        const { data } = await buildHatchPattern({ archetypeId: currentArchetype.id, params: [p1, height, joint] });
+        const { data } = await buildHatchPattern({ archetypeId: currentArchetype.id, params: [p1, p2, j], scaleFactor: scale });
         patCode = data.patCode;
       } catch (backendError) {
-        // Fallback al Motor Universal — construir URL absoluta para evitar file:// en AutoCAD
-        const absoluteIconUrl = currentArchetype.iconUrl?.startsWith('/')
-          ? ASSETS_BASE_URL + currentArchetype.iconUrl
-          : currentArchetype.iconUrl;
-        patCode = await SvgToPatEngine.fetchAndConvert(absoluteIconUrl, currentArchetype.name);
+        console.warn("Backend falló, usando MVP de Firestore...", backendError);
+        const mvpId = `hatch_mvp_${currentArchetype.id}`;
+        const snap = await getDoc(doc(db, 'privateAssets', mvpId));
+        if (!snap.exists()) throw new Error('MVP no encontrado en la base de datos');
+        patCode = snap.data().code;
       }
-      const generatedName = generatePatternName(currentArchetype, p1, height, joint);
+      const generatedName = generatePatternName(currentArchetype, p1, p2, j);
       const safeName = generatedName.replace(/[^a-zA-Z0-9_]/g, '_').toUpperCase();
 
       executeInAutoCAD(`(setq *LC-ASSET-TYPE* "hatch")`);
@@ -202,11 +229,12 @@ export default function HatchGenerator({ lang = 'en', isEmbedded = false, onClos
     e.stopPropagation();
     setSaving(true);
     try {
-      // Construir URL absoluta para evitar el bug de file:// en AutoCAD embebido.
-      const absoluteIconUrl = arch.iconUrl?.startsWith('/')
-        ? ASSETS_BASE_URL + arch.iconUrl
-        : arch.iconUrl;
-      let patCode = await SvgToPatEngine.fetchAndConvert(absoluteIconUrl, arch.name);
+      let patCode;
+      const mvpId = `hatch_mvp_${arch.id}`;
+      const snap = await getDoc(doc(db, 'privateAssets', mvpId));
+      if (!snap.exists()) throw new Error('MVP no encontrado');
+      patCode = snap.data().code;
+      
       const safeName = arch.name.replace(/[^a-zA-Z0-9_]/g, '_').toUpperCase();
       
       if (isInsideAutoCAD) {
@@ -309,7 +337,7 @@ export default function HatchGenerator({ lang = 'en', isEmbedded = false, onClos
         {activeTab === 'generator' && generatorView === 'archetypes' && (
           <div style={{ display: 'flex', flexDirection: 'column', width: '100%', height: '100%', backgroundColor: '#0f172a', borderRadius: '8px', border: '1px solid #334155', overflow: 'hidden' }}>
             {/* Header de Arquetipos con Breadcrumb y Buscador */}
-            <div style={{ padding: '10px 15px', borderBottom: '1px solid #334155', display: 'flex', flexDirection: 'column', gap: '10px', backgroundColor: '#181818' }}>
+            <div className="archetypes-header" style={{ padding: '10px 15px', borderBottom: '1px solid #334155', display: 'flex', gap: '10px', justifyContent: 'space-between', backgroundColor: '#181818' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                 {onClose && (
                   <button onClick={onClose} style={{ background: 'none', border: 'none', color: 'var(--text-muted)', cursor: 'pointer', fontSize: '0.9rem', fontWeight: 'bold', padding: 0 }}>← Library</button>
@@ -319,7 +347,7 @@ export default function HatchGenerator({ lang = 'en', isEmbedded = false, onClos
                 <span style={{ color: '#555' }}>/</span>
                 <span style={{ color: '#fff', fontSize: '0.9rem', fontWeight: 'bold' }}>Templates</span>
               </div>
-              <div style={{ display: 'flex', gap: '10px' }}>
+              <div className="archetypes-search-bar" style={{ display: 'flex', gap: '10px' }}>
                 <input 
                   type="text" 
                   placeholder="Search archetype..." 
@@ -445,10 +473,10 @@ export default function HatchGenerator({ lang = 'en', isEmbedded = false, onClos
         )}
 
         {activeTab === 'generator' && generatorView === 'builder' && (
-          <div style={{ display: 'flex', width: '100%', height: '100%', gap: '0', flexDirection: 'row', overflow: 'hidden' }}>
+          <div className="builder-layout">
             
             {/* Izquierda: Preview Canvas */}
-            <div style={{ flex: 1, backgroundColor: '#0b0f19', borderRight: '1px solid #333', padding: '15px', display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
+            <div className="builder-preview">
               <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'nowrap', marginBottom: '10px', overflowX: 'auto', WebkitMaskImage: 'linear-gradient(to right, black 85%, transparent 100%)', maskImage: 'linear-gradient(to right, black 85%, transparent 100%)', scrollbarWidth: 'none', paddingRight: '20px', flex: 'none' }}>
                 {onClose && (
                   <button onClick={onClose} style={{ background: 'none', border: 'none', color: 'var(--text-muted)', cursor: 'pointer', fontSize: '0.9rem', fontWeight: 'bold', padding: 0, whiteSpace: 'nowrap' }}>← Library</button>
@@ -478,7 +506,7 @@ export default function HatchGenerator({ lang = 'en', isEmbedded = false, onClos
             </div>
 
             {/* Derecha: Parámetros */}
-            <div className="panel col-settings" style={{ width: '400px', minWidth: '400px', flexShrink: 0, display: 'flex', flexDirection: 'column', height: '100%', overflow: 'hidden', backgroundColor: '#0f172a' }}>
+            <div className="panel col-settings builder-settings">
               <div style={{ flex: 1, overflowY: 'auto', padding: '20px', display: 'flex', flexDirection: 'column', alignItems: 'stretch' }}>
                 <div style={{ width: '100%', display: 'flex', flexDirection: 'column', gap: '20px', position: 'relative' }}>
                   {!currentArchetype.hasBackendEngine && (
@@ -524,7 +552,7 @@ export default function HatchGenerator({ lang = 'en', isEmbedded = false, onClos
                   {/* Grid Setup */}
                   <div className="form-group" style={{ borderTop: '1px solid #444', paddingTop: '15px' }}>
                     <label style={{ fontWeight: 'bold', color: '#ccc' }}>{t('hatch.gridLayout')}</label>
-                    <div style={{ display: 'flex', gap: '15px', marginTop: '10px' }}>
+                    <div className="stack-mobile" style={{ display: 'flex', gap: '15px', marginTop: '10px' }}>
                       <div style={{ flex: 1 }}>
                         <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '4px' }}>
                           <span style={{ fontSize: '0.75rem', color: '#aaa' }}>{t('hatch.gridRows')}</span>
@@ -537,14 +565,34 @@ export default function HatchGenerator({ lang = 'en', isEmbedded = false, onClos
                           <span style={{ fontSize: '0.75rem', color: '#aaa' }}>{t('hatch.gridCols')}</span>
                           <span style={{ fontSize: '0.75rem', color: 'var(--tmd-orange)', fontWeight: 'bold' }}>{columns}</span>
                         </div>
+}}
                         <input type="range" min="1" max="10" value={columns} onChange={e => setColumns(Number(e.target.value))} style={{ width: '100%', cursor: 'pointer', accentColor: 'var(--tmd-orange)' }} />
                       </div>
                     </div>
                   </div>
 
+                  {/* Unit Scale Setup */}
+                  <div className="form-group" style={{ borderTop: '1px solid #444', paddingTop: '15px' }}>
+                    <label style={{ fontWeight: 'bold', color: '#ccc' }}>Scale & Units</label>
+                    <div style={{ marginTop: '10px' }}>
+                      <select 
+                        value={units}
+                        onChange={e => setUnits(e.target.value)}
+                        style={{ width: '100%', padding: '8px', borderRadius: '4px', border: '1px solid #444', backgroundColor: '#222', color: '#fff', outline: 'none' }}
+                      >
+                        <option value="unitless">Unitless</option>
+                        <option value="mm">Milimeters (mm)</option>
+                        <option value="cm">Centimeters (cm)</option>
+                        <option value="m">Meters (m)</option>
+                        <option value="in">Inches (in)</option>
+                        <option value="ft">Feet (ft)</option>
+                      </select>
+                    </div>
+                  </div>
+
                   {/* Control Dinámico por Tipo */}
                   <div className="form-group" style={{ borderTop: '1px solid #444', paddingTop: '15px' }}>
-                    <label style={{ fontWeight: 'bold', color: '#ccc' }}>Dimensions (mm)</label>
+                    <label style={{ fontWeight: 'bold', color: '#ccc' }}>Dimensions</label>
                     <div style={{ display: 'flex', gap: '15px', marginTop: '10px', flexWrap: 'wrap' }}>
                       
                       {currentArchetype.controlsType === 'rectangular' && currentArchetype.controls.includes('width') && (
@@ -582,6 +630,32 @@ export default function HatchGenerator({ lang = 'en', isEmbedded = false, onClos
                         </div>
                       )}
 
+                      {currentArchetype.controlsType === 'circular' && currentArchetype.controls.includes('radius') && (
+                        <div style={{ flex: '1 1 100%' }}>
+                          <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '4px' }}>
+                            <span style={{ fontSize: '0.75rem', color: '#aaa' }}>Radius</span>
+                            <span style={{ fontSize: '0.75rem', color: 'var(--tmd-orange)', fontWeight: 'bold' }}>{radius}</span>
+                          </div>
+                          <div style={{ display: 'flex', gap: '10px' }}>
+                            <input type="range" min={unitProps.step} max={unitProps.max / 2} step={unitProps.step} value={radius} onChange={e => setRadius(Number(e.target.value))} style={{ flex: 1, cursor: 'pointer', accentColor: 'var(--tmd-orange)' }} />
+                            <input type="number" min={unitProps.step} max={unitProps.max / 2} step={unitProps.step} value={radius} onChange={e => setRadius(Number(e.target.value))} style={{ width: '80px', padding: '4px', borderRadius: '4px', border: '1px solid #444', backgroundColor: '#222', color: '#fff' }} />
+                          </div>
+                        </div>
+                      )}
+
+                      {currentArchetype.controlsType === 'circular' && currentArchetype.controls.includes('spacing') && (
+                        <div style={{ flex: '1 1 100%' }}>
+                          <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '4px' }}>
+                            <span style={{ fontSize: '0.75rem', color: '#aaa' }}>Spacing (Center to Center)</span>
+                            <span style={{ fontSize: '0.75rem', color: 'var(--tmd-orange)', fontWeight: 'bold' }}>{spacing}</span>
+                          </div>
+                          <div style={{ display: 'flex', gap: '10px' }}>
+                            <input type="range" min={unitProps.step} max={unitProps.max} step={unitProps.step} value={spacing} onChange={e => setSpacing(Number(e.target.value))} style={{ flex: 1, cursor: 'pointer', accentColor: 'var(--tmd-orange)' }} />
+                            <input type="number" min={unitProps.step} max={unitProps.max} step={unitProps.step} value={spacing} onChange={e => setSpacing(Number(e.target.value))} style={{ width: '80px', padding: '4px', borderRadius: '4px', border: '1px solid #444', backgroundColor: '#222', color: '#fff' }} />
+                          </div>
+                        </div>
+                      )}
+
                       {(currentArchetype.controlsType === 'cubic' || currentArchetype.controlsType === 'cubic3d') && currentArchetype.controls.includes('size') && (
                         <div style={{ flex: '1 1 45%' }}>
                           <span style={{ fontSize: '0.75rem', color: '#aaa', display: 'block', marginBottom: '4px' }}>Size (Side)</span>
@@ -607,7 +681,7 @@ export default function HatchGenerator({ lang = 'en', isEmbedded = false, onClos
               
               {/* Action Buttons fijos en la base */}
               <div style={{ padding: '15px 20px', backgroundColor: '#181818', borderTop: '1px solid #333', display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                <div style={{ width: '100%', maxWidth: '350px', display: 'flex', gap: '10px' }}>
+                <div className="stack-mobile" style={{ width: '100%', maxWidth: '350px', display: 'flex', gap: '10px' }}>
                   {isInsideAutoCAD && (
                     <button 
                       style={{ flex: 2, padding: '10px 15px', fontSize: '0.9rem', backgroundColor: 'var(--tmd-orange)', color: '#fff', borderRadius: '6px', border: 'none', cursor: 'pointer', fontWeight: 'bold' }}
@@ -625,21 +699,23 @@ export default function HatchGenerator({ lang = 'en', isEmbedded = false, onClos
                   >
                     <span>⭐</span> Add
                   </button>
-                  {isAdmin && (
-                    <button 
-                      style={{ padding: '10px 15px', fontSize: '0.9rem', backgroundColor: '#e65c00', color: '#fff', borderRadius: '6px', border: 'none', cursor: 'pointer' }}
-                      onClick={handleSaveToPublicLibrary}
-                      disabled={saving}
-                      title="Publish to Global Library"
-                    >
-                      🌍
-                    </button>
-                  )}
+                    {isAdmin && (
+                      <>
+                        <button 
+                          style={{ padding: '10px 15px', fontSize: '0.9rem', backgroundColor: '#e65c00', color: '#fff', borderRadius: '6px', border: 'none', cursor: 'pointer' }}
+                          onClick={handleSaveToPublicLibrary}
+                          disabled={saving}
+                          title="Publish to Global Library"
+                        >
+                          🌐
+                        </button>
+                      </>
+                    )}
                 </div>
                 {/* Footer Link */}
                 <div style={{ width: '100%', maxWidth: '350px', textAlign: 'center', marginTop: '2px' }}>
-                  <a href="https://lispcentral.com" target="_blank" rel="noreferrer" style={{ fontSize: '0.7rem', color: '#666', textDecoration: 'none', letterSpacing: '0.5px' }}>
-                    lispcentral.com
+                  <a href="https://lispcentral.web.app" target="_blank" rel="noreferrer" style={{ fontSize: '0.7rem', color: '#666', textDecoration: 'none', letterSpacing: '0.5px' }}>
+                    lispcentral.web.app
                   </a>
                 </div>
               </div>

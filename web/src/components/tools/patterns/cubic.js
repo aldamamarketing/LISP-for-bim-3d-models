@@ -12,6 +12,7 @@ export const arch_cubic = {
     rows: 2,
     columns: 2
   },
+  hasBackendEngine: true,
   i18n: {
     es: {
       name: 'Cubic',

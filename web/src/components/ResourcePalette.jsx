@@ -313,13 +313,24 @@ export default function ResourcePalette() {
       executeInAutoCAD(`(setq *LC-ASSET-TYPE* "${activeTab}")`);
       executeInAutoCAD(`(setq *LC-ASSET-NAME* "${safeName}")`);
       
+      // PRESERVE ORIGINAL HEADER AND COMMENTS: 
+      // core_engine.lsp injects ", LispCentral" if the very first char isn't '*'.
+      // If the pattern has comments before the '*', we move the '*' line to the very top.
+      const lines = patCode.split('\n');
+      const starIndex = lines.findIndex(l => l.trim().startsWith('*'));
+      if (starIndex > 0) {
+        const starLine = lines.splice(starIndex, 1)[0];
+        lines.unshift(starLine);
+      }
+      const finalPatCode = lines.join('\n');
+
       // FIX: Chunk string to avoid Access Violation y Syntax Errors.
       // 1. Tamaño seguro (100) para evitar buffer overflow en línea de comandos.
       // 2. Trocear el texto PRIMERO y escapar DESPUÉS, para no romper secuencias de escape.
       executeInAutoCAD(`(setq *LC-ASSET-CODE* "")`);
       const chunkSize = 100;
-      for (let i = 0; i < patCode.length; i += chunkSize) {
-        const rawChunk = patCode.substring(i, i + chunkSize);
+      for (let i = 0; i < finalPatCode.length; i += chunkSize) {
+        const rawChunk = finalPatCode.substring(i, i + chunkSize);
         const escapedChunk = rawChunk
           .replace(/\\/g, '\\\\')
           .replace(/"/g, '\\"')
@@ -365,10 +376,21 @@ export default function ResourcePalette() {
 
   const triggerDownload = (item, patCode) => {
     const ext      = activeTab === 'hatch' ? 'pat' : 'lin';
-    const header   = activeTab === 'hatch'
-      ? `*${item.name}, ${item.desc || ''}\n`
-      : `*${item.name}, ${item.desc || ''}\n`;
-    const content  = header + patCode + '\n';
+    
+    // PRESERVE ORIGINAL HEADER AND COMMENTS
+    let content = '';
+    const lines = patCode.split('\n');
+    const starIndex = lines.findIndex(l => l.trim().startsWith('*'));
+    if (starIndex !== -1) {
+      const starLine = lines.splice(starIndex, 1)[0];
+      lines.unshift(starLine);
+      content = lines.join('\n') + '\n';
+    } else {
+      const header = activeTab === 'hatch'
+        ? `*${item.name}, ${item.desc || ''}\n`
+        : `*${item.name}, ${item.desc || ''}\n`;
+      content = header + patCode + '\n';
+    }
     const blob     = new Blob([content], { type: 'text/plain;charset=utf-8' });
     const url      = URL.createObjectURL(blob);
     const a        = document.createElement('a');

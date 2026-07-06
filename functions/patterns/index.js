@@ -43,10 +43,6 @@ const PATTERN_GENERATORS = {
   return pat;
 },
   "cubic": (s, unused, j) => {
-  const ts = s + j;
-  return `*Cubic_${s}x${s}_J${j}, LispCentral Parametric Hatch\n` + `; Generado por LispCentral Hatch Builder\n` + `0, 0,0, 0,${ts}\n` + `90, 0,0, 0,${ts}\n`;
-},
-  "cubic3d": (s, unused, j) => {
   const w = s * Math.sqrt(3);
   const h = s * 3;
   const offset = s * Math.sqrt(3) / 2;
@@ -54,7 +50,7 @@ const PATTERN_GENERATORS = {
   const vSpace = -(2 * s + j);
   const dStroke = s - j;
   const dSpace = -(2 * s + j);
-  return `*Cubic3D_${s}_J${j}, LispCentral 3D Cubic Hatch\n` + `; Generado por LispCentral Hatch Builder\n` + `90, 0,0, ${offset},${s * 1.5}, ${vStroke},${vSpace}\n` + `90, ${offset},${s * 0.5}, ${offset},${s * 1.5}, ${vStroke},${vSpace}\n` + `30, 0,0, 0,${s * 1.5}, ${dStroke},${dSpace}\n` + `30, 0,${s}, 0,${s * 1.5}, ${dStroke},${dSpace}\n` + `150, 0,0, 0,${s * 1.5}, ${dStroke},${dSpace}\n` + `150, 0,${s}, 0,${s * 1.5}, ${dStroke},${dSpace}\n`;
+  return `*Cubic_${s}_J${j}, LispCentral 3D Cubic Hatch\n` + `; Generado por LispCentral Hatch Builder\n` + `90, 0,0, ${offset},${s * 1.5}, ${vStroke},${vSpace}\n` + `90, ${offset},${s * 0.5}, ${offset},${s * 1.5}, ${vStroke},${vSpace}\n` + `30, 0,0, 0,${s * 1.5}, ${dStroke},${dSpace}\n` + `30, 0,${s}, 0,${s * 1.5}, ${dStroke},${dSpace}\n` + `150, 0,0, 0,${s * 1.5}, ${dStroke},${dSpace}\n` + `150, 0,${s}, 0,${s * 1.5}, ${dStroke},${dSpace}\n`;
 },
   "flemish": (w, h, j) => {
   const tw = w + j;
@@ -241,7 +237,84 @@ const PATTERN_GENERATORS = {
   const W = tw + th;
   return `*Hopscotch_${w}x${h}_J${j}, Rayuela\n` + `; Generado por LispCentral Hatch Builder\n` + `0, 0,0, 0,${W}, ${w},${-th}\n` + `0, 0,${w}, 0,${W}, ${w},${-th}\n` + `0, ${tw},${tw}, 0,${W}, ${h},${-tw}\n` + `0, ${tw},${tw + h}, 0,${W}, ${h},${-tw}\n` + `90, 0,0, 0,${W}, ${w},${-th}\n` + `90, ${w},0, 0,${W}, ${w},${-th}\n` + `90, ${tw},${tw}, 0,${W}, ${h},${-tw}\n` + `90, ${tw + h},${tw}, 0,${W}, ${h},${-tw}\n`;
 },
+  "circular": (r, spacing, j) => {
+    let patLines = [`*Circular_R${r}_S${spacing}_J${j}, LispCentral Parametric Hatch`, `; Generado por LispCentral Hatch Builder`];
+    const radius = r - (j || 0) * 0.5;
+    const S = spacing;
+    
+    function round(val) { return Math.round(val * 100000) / 100000; }
+    
+    function getAB(p, q) {
+      for (let a = -10; a <= 10; a++) {
+        for (let b = -10; b <= 10; b++) {
+          if (a * p - b * q === -1) {
+            return { a, b };
+          }
+        }
+      }
+      return { a: 0, b: 0 };
+    }
+
+    const vectors = [
+      { dx: -1, dy: 5 }, { dx: -2, dy: 3 }, { dx: -3, dy: 2 }, { dx: -5, dy: 1 },
+      { dx: -5, dy: -1 }, { dx: -3, dy: -2 }, { dx: -2, dy: -3 }, { dx: -1, dy: -5 },
+      { dx: 1, dy: -5 }, { dx: 2, dy: -3 }, { dx: 3, dy: -2 }, { dx: 5, dy: -1 },
+      { dx: 5, dy: 1 }, { dx: 3, dy: 2 }, { dx: 2, dy: 3 }, { dx: 1, dy: 5 }
+    ];
+    
+    const centers = [
+      { cx: 0, cy: 0 },
+      { cx: S / 2, cy: S / 2 }
+    ];
+    
+    centers.forEach(center => {
+      let currX = center.cx + radius;
+      let currY = center.cy;
+      
+      vectors.forEach(v => {
+        let p = Math.abs(v.dy);
+        let q = Math.abs(v.dx);
+        let { a, b } = getAB(p, q); 
+        
+        let shiftX_world = a * S;
+        let shiftY_world = b * S;
+        
+        if (v.dx < 0) shiftX_world = -shiftX_world;
+        if (v.dy < 0) shiftY_world = -shiftY_world;
+        
+        let length_unscaled = Math.sqrt(p*p + q*q);
+        let U_x = v.dx / length_unscaled;
+        let U_y = v.dy / length_unscaled;
+        let V_x = -U_y;
+        let V_y = U_x;
+        
+        let dx_shift = shiftX_world * U_x + shiftY_world * U_y;
+        let dy_shift = shiftX_world * V_x + shiftY_world * V_y;
+        
+        if (dy_shift < 0) {
+          dx_shift = -dx_shift;
+          dy_shift = -dy_shift;
+        }
+        
+        let L = S * length_unscaled;
+        let actual_dx = v.dx * (radius / 11);
+        let actual_dy = v.dy * (radius / 11);
+        let drawn_length = Math.sqrt(actual_dx*actual_dx + actual_dy*actual_dy);
+        
+        let angle = Math.atan2(v.dy, v.dx) * 180 / Math.PI;
+        if (angle < 0) angle += 360;
+        
+        patLines.push(`${round(angle)}, ${round(currX)},${round(currY)}, ${round(dx_shift)},${round(dy_shift)}, ${round(drawn_length)}, -${round(L - drawn_length)}`);
+        
+        currX += actual_dx;
+        currY += actual_dy;
+      });
+    });
+    return patLines.join('\n');
+  },
 };
+
+exports.PATTERN_GENERATORS = PATTERN_GENERATORS;
 
 exports.generatePatternString = function(archetypeId, params) {
   const generator = PATTERN_GENERATORS[archetypeId];

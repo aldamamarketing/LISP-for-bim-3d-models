@@ -1,17 +1,21 @@
 ---
 import DocsLayout from '../../layouts/DocsLayout.astro';
 import HatchGenerator from '../../components/tools/HatchGenerator.jsx';
+import { getLangFromUrl, useTranslations } from '../../i18n/utils';
+
+const lang = getLangFromUrl(Astro.url);
+const t = useTranslations(lang);
 ---
 
 <DocsLayout 
-  title="Gerador de Hatch AutoCAD — Criar Padrões .PAT | LispCentral" 
-  description="Crie padrões de hachura complexos (.pat) para AutoCAD usando IA. Insira descrições e gere hachuras personalizadas instantaneamente."
-  keywords="autocad hatch generator, criar hatch autocad, pat generator, lisp hatch, autocad patterns, gerador de hachura IA"
+  title={t("hatch.pageTitle")} 
+  description={t("hatch.pageDesc")}
+  keywords={t("hatch.pageKeywords")}
 >
   <div class="tool-container">
     <div class="tool-header">
-      <h1>Gerador de Hachuras (Hatch) <span class="badge">BETA</span></h1>
-      <p>Desenhe e compile padrões complexos (.pat) para AutoCAD usando comandos textuais y Inteligência Artificial.</p>
+      <h1>{t("hatch.title")} <span class="badge">BETA</span></h1>
+      <p>{t("hatch.desc")}</p>
     </div>
 
     <!-- Carga del componente React en el cliente -->
