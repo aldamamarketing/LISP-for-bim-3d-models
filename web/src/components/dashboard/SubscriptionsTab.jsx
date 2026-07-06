@@ -114,34 +114,42 @@ const SubscribedSuiteRow = ({ suite, subObj, devices, handleToggleDevice, handle
 
   return (
     <div className={`bg-surface-container-low border ${expanded ? 'border-primary-container/50' : 'border-outline-variant'} rounded-md overflow-hidden transition-all duration-300 hover:border-outline mb-2`}>
-      <div className="flex items-center p-3 cursor-pointer group" onClick={handleToggle}>
-        <div className="w-8 h-8 rounded bg-surface-container-highest flex items-center justify-center shrink-0 border border-outline-variant shadow-sm">
-          <span className="material-symbols-outlined text-[18px] text-primary-container">extension</span>
-        </div>
-        
-        <div className="ml-4 flex-1 min-w-0 flex items-center gap-4">
-          <div className="flex flex-col min-w-0 shrink-0 w-64">
-            <span className="font-bold text-on-surface text-sm truncate">{suite.name}</span>
-            <span className="text-xs text-on-surface-variant flex items-center gap-1">
-              <span className="material-symbols-outlined text-[12px]">person</span> {suite.authorName || 'Anônimo'}
-            </span>
+      <div className="flex items-center p-3 group">
+        <button
+          type="button"
+          onClick={handleToggle}
+          aria-expanded={expanded}
+          aria-label={`Toggle details for ${suite.name}`}
+          className="flex-1 flex items-center min-w-0 text-left bg-transparent border-none p-0 cursor-pointer outline-none focus-visible:ring-2 focus-visible:ring-primary-container rounded"
+        >
+          <div className="w-8 h-8 rounded bg-surface-container-highest flex items-center justify-center shrink-0 border border-outline-variant shadow-sm">
+            <span className="material-symbols-outlined text-[18px] text-primary-container">extension</span>
           </div>
           
-          <div className="flex-1 hidden md:block">
-            {subObj && (
-              <div className="flex flex-col items-start">
-                <span className={`text-xs font-bold ${subObj.assignedDevices?.length > (subObj.purchasedSeats || 1) ? 'text-error' : 'text-primary-container'}`}>
-                  {subObj.assignedDevices?.length || 0} / {subObj.purchasedSeats || 1} Asientos
-                </span>
-                {subObj.assignedDevices?.length > (subObj.purchasedSeats || 1) && (
-                  <div className="text-error text-[10px] mt-0.5 bg-error/10 px-1 rounded inline-block">
-                    Sobregiro. Desvincule equipos.
-                  </div>
-                )}
-              </div>
-            )}
+          <div className="ml-4 flex-1 min-w-0 flex items-center gap-4">
+            <div className="flex flex-col min-w-0 shrink-0 w-64">
+              <span className="font-bold text-on-surface text-sm truncate">{suite.name}</span>
+              <span className="text-xs text-on-surface-variant flex items-center gap-1">
+                <span className="material-symbols-outlined text-[12px]">person</span> {suite.authorName || 'Anônimo'}
+              </span>
+            </div>
+
+            <div className="flex-1 hidden md:block">
+              {subObj && (
+                <div className="flex flex-col items-start">
+                  <span className={`text-xs font-bold ${subObj.assignedDevices?.length > (subObj.purchasedSeats || 1) ? 'text-error' : 'text-primary-container'}`}>
+                    {subObj.assignedDevices?.length || 0} / {subObj.purchasedSeats || 1} Asientos
+                  </span>
+                  {subObj.assignedDevices?.length > (subObj.purchasedSeats || 1) && (
+                    <div className="text-error text-[10px] mt-0.5 bg-error/10 px-1 rounded inline-block">
+                      Sobregiro. Desvincule equipos.
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
           </div>
-        </div>
+        </button>
 
         <div className="ml-4 flex items-center gap-3 shrink-0">
           {!suite.isGlobal && (
@@ -155,7 +163,13 @@ const SubscribedSuiteRow = ({ suite, subObj, devices, handleToggleDevice, handle
             </button>
           )}
           
-          <button className="text-on-surface-variant hover:text-on-surface w-6 flex justify-center transition-transform">
+          <button
+            type="button"
+            onClick={handleToggle}
+            aria-expanded={expanded}
+            aria-label="Toggle details"
+            className="text-on-surface-variant hover:text-on-surface w-6 flex justify-center transition-transform outline-none focus-visible:ring-2 focus-visible:ring-primary-container rounded"
+          >
             <span className={`material-symbols-outlined text-[20px] transform transition-transform duration-300 ${expanded ? 'rotate-180 text-primary-container' : ''}`}>
               expand_more
             </span>
