@@ -1,0 +1,3 @@
+## 2024-05-24 - [Optimize search filter string allocations and memoize derived state]
+**Learning:** In React components rendered within AutoCAD's embedded browser control, which executes JavaScript slower than modern desktop browsers, redundant string allocations (like `.toLowerCase()` inside tight loop iterations like `.filter()`) can cause noticeable performance degradation and O(N*M) time complexity.
+**Action:** Extract expensive string transformations outside closures and wrap derived arrays/objects in `useMemo` hooks to prevent recalculations on every render update, thereby keeping the UI responsive in embedded environments.
