@@ -1,0 +1,3 @@
+## 2024-05-18 - Expensive String Processing in Render Loops
+**Learning:** Found a common anti-pattern in the codebase where expensive string operations (like `.toLowerCase().split().filter()`) are performed repeatedly inside array `.filter()` or `.some()` closures during component rendering (e.g., in `LibraryPanel.jsx` when filtering items). This results in O(N*M) performance degradation where N is the number of items and M is the search query complexity.
+**Action:** When optimizing React lists, always extract static search query transformations OUTSIDE of the `.filter()` closures so they are evaluated only once per render (or memoized). Additionally, wrap the resulting derived lists in `useMemo` hooks.
