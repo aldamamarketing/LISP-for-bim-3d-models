@@ -71,6 +71,9 @@ export default function PaletteDropdownMenu({ myId }) {
           justifyContent: 'center'
         }}
         title="Opciones de Paleta"
+        aria-label="Opciones de Paleta"
+        aria-haspopup="menu"
+        aria-expanded={isOpen}
       >
         <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round">
           <line x1="3" y1="12" x2="21" y2="12"></line>
@@ -81,26 +84,30 @@ export default function PaletteDropdownMenu({ myId }) {
 
       {/* Menú Desplegable */}
       {isOpen && (
-        <div style={{
-          position: 'absolute',
-          top: '100%',
-          left: 0,
-          marginTop: '4px',
-          backgroundColor: '#222',
-          border: '1px solid #333',
-          borderRadius: '4px',
-          boxShadow: '0 4px 12px rgba(0,0,0,0.5)',
-          minWidth: '200px',
-          zIndex: 1000,
-          display: 'flex',
-          flexDirection: 'column',
-          padding: '4px 0'
-        }}>
+        <div
+          role="menu"
+          style={{
+            position: 'absolute',
+            top: '100%',
+            left: 0,
+            marginTop: '4px',
+            backgroundColor: '#222',
+            border: '1px solid #333',
+            borderRadius: '4px',
+            boxShadow: '0 4px 12px rgba(0,0,0,0.5)',
+            minWidth: '200px',
+            zIndex: 1000,
+            display: 'flex',
+            flexDirection: 'column',
+            padding: '4px 0'
+          }}>
           {palettes.map((p) => {
             const isActive = activePalettes.includes(p.id);
             return (
               <button
                 key={p.id}
+                role="menuitemcheckbox"
+                aria-checked={isActive}
                 onClick={() => handleToggle(p)}
                 style={{
                   background: 'transparent',
