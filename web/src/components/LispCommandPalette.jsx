@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import PaletteDropdownMenu from './PaletteDropdownMenu';
 import MultiFilter from './MultiFilter';
 import { executeInAutoCAD } from '../utils/autocadBridge';
@@ -105,28 +105,34 @@ export default function LispCommandPalette() {
     executeInAutoCAD(cmdName);
   };
 
-  // Filter and group
-  const filteredCmds = commands.filter(cmd => {
-    if (activeFilters.length === 0) return true;
-    const searchableText = `${cmd.name || ''} ${cmd.friendly || ''} ${cmd.desc || ''} ${cmd.group || ''}`.toLowerCase();
-    // Must match at least ONE tag (OR logic)
-    return activeFilters.some(tag => searchableText.includes(tag.toLowerCase()));
-  });
+  // ⚡ Bolt: Memoize derived lists and hoist toLowerCase() outside the loop to avoid O(N*M) string allocations in the embedded browser.
+  const { filteredCmds, grouped, sortedGroups } = useMemo(() => {
+    const lowerFilters = activeFilters.map(f => f.toLowerCase());
 
-  const grouped = {};
-  filteredCmds.forEach(cmd => {
-    const g = cmd.group || 'Outros';
-    if (!grouped[g]) grouped[g] = [];
-    grouped[g].push(cmd);
-  });
+    const filtered = commands.filter(cmd => {
+      if (lowerFilters.length === 0) return true;
+      const searchableText = `${cmd.name || ''} ${cmd.friendly || ''} ${cmd.desc || ''} ${cmd.group || ''}`.toLowerCase();
+      // Must match at least ONE tag (OR logic)
+      return lowerFilters.some(tag => searchableText.includes(tag));
+    });
 
-  const sortedGroups = Object.keys(grouped).sort((a, b) => {
-    let iA = GROUP_ORDER.indexOf(a);
-    let iB = GROUP_ORDER.indexOf(b);
-    if (iA === -1) iA = 99;
-    if (iB === -1) iB = 99;
-    return iA - iB;
-  });
+    const grp = {};
+    filtered.forEach(cmd => {
+      const g = cmd.group || 'Outros';
+      if (!grp[g]) grp[g] = [];
+      grp[g].push(cmd);
+    });
+
+    const sorted = Object.keys(grp).sort((a, b) => {
+      let iA = GROUP_ORDER.indexOf(a);
+      let iB = GROUP_ORDER.indexOf(b);
+      if (iA === -1) iA = 99;
+      if (iB === -1) iB = 99;
+      return iA - iB;
+    });
+
+    return { filteredCmds: filtered, grouped: grp, sortedGroups: sorted };
+  }, [commands, activeFilters]);
 
   return (
     <div style={{ backgroundColor: '#181818', color: '#fff', height: '100vh', overflow: 'hidden', fontFamily: "'Inter', sans-serif", display: 'flex', flexDirection: 'column' }}>
