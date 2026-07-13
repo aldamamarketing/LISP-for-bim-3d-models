@@ -148,13 +148,13 @@
     (if end 
       (progn 
         (setq name (substr jsonStr (1+ start) (- end start)))
-        (setq cmd-list (append cmd-list (list (list name name))))
+        (setq cmd-list (cons (list name name) cmd-list)) ; ⚡ Bolt: Use cons for O(1) list building instead of O(N^2) append
         (setq pos end)
       )
       (setq pos (strlen jsonStr))
     )
   )
-  cmd-list
+  (reverse cmd-list)
 )
 
 (defun LC:register-ghosts (/ index-url response cmds item) 
