@@ -1,13 +1,7 @@
-import React, { useState, useEffect, useCallback, useRef, Suspense, lazy } from 'react';
-import PaletteDropdownMenu from './PaletteDropdownMenu';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import MultiFilter from './MultiFilter';
 import { executeInAutoCAD } from '../utils/autocadBridge';
-import { db } from '../firebase';
-import { doc, getDoc } from 'firebase/firestore';
-import { ARCHETYPES } from './tools/HatchEngine';
-import ThumbnailPreview from './tools/ThumbnailPreview';
-
-const HatchGenerator = lazy(() => import('./tools/HatchGenerator'));
+import GlobalHeader from './layout/GlobalHeader';
 
 /**
  * ResourcePalette
@@ -157,7 +151,7 @@ function ContextMenu({ item, position, onClose, onInsert, onPin, onDownload, isP
 // ─────────────────────────────────────────────
 // ResourceItem
 // ─────────────────────────────────────────────
-function ResourceItem({ item, isPinned, activeTab, onContextMenu, onInsert }) {
+function ResourceItem({ item, isPinned, onContextMenu, onInsert }) {
   return (
     <div
       className="res-item"
@@ -179,23 +173,11 @@ function ResourceItem({ item, isPinned, activeTab, onContextMenu, onInsert }) {
       }}
     >
       <div style={{ position: 'relative', width: '100%', height: '100%', backgroundColor: '#1a1a1a' }}>
-        {(() => {
-          const arch = ARCHETYPES.find(a => 
-            a.name.toLowerCase() === (item.name || '').toLowerCase() || 
-            (a.iconUrl && a.iconUrl === (item.iconUrl || item.icon))
-          ) || { 
-            id: item.id || 'f', 
-            iconUrl: item.iconUrl || item.icon || '/patterns/stack.svg', 
-            defaults: { width: 346, height: 600 } 
-          };
-          return (
-            <ThumbnailPreview 
-              archetype={arch} 
-              containerWidth={180} 
-              containerHeight={100} 
-            />
-          );
-        })()}
+        <img 
+          src={item.image_url || '/patterns/stack.svg'} 
+          alt={item.name} 
+          style={{ width: '100%', height: '100%', objectFit: 'cover', opacity: 0.8 }} 
+        />
       </div>
 
       <button
@@ -238,49 +220,30 @@ function ResourceItem({ item, isPinned, activeTab, onContextMenu, onInsert }) {
 // ─────────────────────────────────────────────
 // Componente principal
 // ─────────────────────────────────────────────
-export default function ResourcePalette() {
-  const [activeTab, setActiveTab]       = useState('hatch');
+export default function ResourcePalette({ isUnified = false }) {
   const [catalog, setCatalog]           = useState([]);
   const [loading, setLoading]           = useState(true);
   const [error, setError]               = useState(null);
   const [activeFilters, setActiveFilters] = useState([]);
   const [pinnedIds, setPinnedIds]       = useState([]);
-  const [contextMenu, setContextMenu]   = useState(null); // { item, position, pinTrigger }
-  const [applying, setApplying]         = useState(null); // id del item en proceso
-  const [showGenerator, setShowGenerator] = useState(false);
+  const [contextMenu, setContextMenu]   = useState(null);
+  const [applying, setApplying]         = useState(null);
 
-  // Credenciales del Loader (igual que LispCommandPalette)
-  const urlParams = new URLSearchParams(typeof window !== 'undefined' ? window.location.search : '');
-  const token     = urlParams.get('token') || '';
-
-  // ── Cargar catálogo ligero (JIT Nivel 1: localStorage → JSON estático) ──
-  const fetchCatalog = useCallback(async (forceRefresh = false) => {
+  // ── Cargar catálogo local (Local JSON) ──
+  const fetchCatalog = useCallback(async () => {
     setLoading(true);
     setError(null);
     try {
-      const cacheKey = `lc_catalog_${activeTab}`;
-      const tsKey    = `lc_catalog_${activeTab}_ts`;
-      const cached   = localStorage.getItem(cacheKey);
-      const ts       = parseInt(localStorage.getItem(tsKey) || '0', 10);
-      const expired  = Date.now() - ts > 3600000; // 1 hora TTL
-
-      if (cached && !expired && !forceRefresh) {
-        setCatalog(JSON.parse(cached));
-      } else {
-        const url = `https://us-central1-lispcentral.cloudfunctions.net/getUserResources?token=${encodeURIComponent(token)}&type=${encodeURIComponent(activeTab)}&_t=${Date.now()}`;
-        const res  = await fetch(url, { cache: 'no-store' });
-        if (!res.ok) throw new Error(`HTTP ${res.status}`);
-        const data = await res.json();
-        localStorage.setItem(cacheKey, JSON.stringify(data));
-        localStorage.setItem(tsKey, String(Date.now()));
-        setCatalog(data);
-      }
+      const res = await fetch('/hatches/catalog.json');
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const data = await res.json();
+      setCatalog(data);
     } catch (err) {
       console.error('[ResourcePalette] fetchCatalog error:', err);
-      setError('Failed to load catalog.');
+      setError('Failed to load local catalog.');
     }
     setLoading(false);
-  }, [activeTab, token]);
+  }, []);
 
   useEffect(() => {
     fetchCatalog();
@@ -296,12 +259,11 @@ export default function ResourcePalette() {
     try {
       let patCode = sessionPatCache[item.id];
 
-      // Nivel 3: no está en cache de sesión, bajar desde Firestore
+      // Nivel 3: no está en cache de sesión, bajar de forma local
       if (!patCode) {
-        const snap = await getDoc(doc(db, 'publicAssets', item.id));
-        if (!snap.exists()) throw new Error('Asset not found on server.');
-        patCode = snap.data().code;
-        // Guardar en cache de sesión RAM (no en disco)
+        const res = await fetch(item.pat_url);
+        if (!res.ok) throw new Error('Asset file not found.');
+        patCode = await res.text();
         sessionPatCache[item.id] = patCode;
       }
 
@@ -310,7 +272,7 @@ export default function ResourcePalette() {
       // ── Bridge seguro: inyectar datos silenciosamente via evaluateLisp ──
       // Luego disparar el Ghost Command limpio via executeCommandAsync
       // NUNCA enviar expresiones LISP completas via executeCommandAsync (bug de repetición)
-      executeInAutoCAD(`(setq *LC-ASSET-TYPE* "${activeTab}")`);
+      executeInAutoCAD(`(setq *LC-ASSET-TYPE* "hatch")`);
       executeInAutoCAD(`(setq *LC-ASSET-NAME* "${safeName}")`);
       
       // PRESERVE ORIGINAL HEADER AND COMMENTS: 
@@ -364,9 +326,9 @@ export default function ResourcePalette() {
 
   const handleInsertThenDownload = async (item) => {
     try {
-      const snap = await getDoc(doc(db, 'publicAssets', item.id));
-      if (!snap.exists()) return;
-      const patCode = snap.data().code;
+      const res = await fetch(item.pat_url);
+      if (!res.ok) return;
+      const patCode = await res.text();
       sessionPatCache[item.id] = patCode;
       triggerDownload(item, patCode);
     } catch (err) {
@@ -375,20 +337,20 @@ export default function ResourcePalette() {
   };
 
   const triggerDownload = (item, patCode) => {
-    const ext      = activeTab === 'hatch' ? 'pat' : 'lin';
+    const ext = 'pat';
+    const safeName = (item.name || `LC_Hatch_${item.id}`).replace(/[^a-zA-Z0-9_-]/g, '_');
     
     // PRESERVE ORIGINAL HEADER AND COMMENTS
     let content = '';
     const lines = patCode.split('\n');
     const starIndex = lines.findIndex(l => l.trim().startsWith('*'));
-    if (starIndex !== -1) {
-      const starLine = lines.splice(starIndex, 1)[0];
-      lines.unshift(starLine);
+    
+    if (starIndex >= 0) {
+      const parts = lines[starIndex].split(',');
+      lines[starIndex] = `*${safeName}, ${parts.slice(1).join(',')}`;
       content = lines.join('\n') + '\n';
     } else {
-      const header = activeTab === 'hatch'
-        ? `*${item.name}, ${item.desc || ''}\n`
-        : `*${item.name}, ${item.desc || ''}\n`;
+      const header = `*${safeName}, ${item.desc || ''}\n`;
       content = header + patCode + '\n';
     }
     const blob     = new Blob([content], { type: 'text/plain;charset=utf-8' });
@@ -437,107 +399,55 @@ export default function ResourcePalette() {
   });
   const sortedCategories = Object.keys(grouped).sort();
 
-  const tabBtn = (id, label) => ({
-    flex: 1,
-    padding: '8px 6px',
-    backgroundColor: activeTab === id ? 'var(--tmd-orange)' : '#1e1e1e',
-    color: '#fff',
-    border: 'none',
-    borderRadius: '3px',
-    cursor: 'pointer',
-    fontSize: '0.75rem',
-    fontWeight: activeTab === id ? 'bold' : 'normal',
-    transition: 'background 0.15s',
-  });
 
   return (
     <div style={{ backgroundColor: '#181818', color: '#fff', height: '100vh', overflow: 'hidden', fontFamily: "'Inter', sans-serif", display: 'flex', flexDirection: 'column', position: 'relative' }}>
       
 
-        {/* Header (idéntico a LispCommandPalette) */}
+        {/* Header */}
         <div style={{ margin: '0 auto', width: '100%', maxWidth: '600px' }}>
-        <div style={{ padding: '8px 10px', backgroundColor: '#111', display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '2px solid var(--tmd-orange)' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-            <PaletteDropdownMenu myId="resources" />
-            
-            {!showGenerator ? (
-              <select 
-                value={activeTab} 
-                onChange={(e) => setActiveTab(e.target.value)}
-                style={{ 
-                  background: 'transparent', 
-                  color: 'var(--tmd-orange)', 
-                  border: 'none', 
-                  fontSize: '0.75rem', 
-                  fontWeight: 'bold', 
-                  textTransform: 'uppercase', 
-                  letterSpacing: '0.5px',
-                  outline: 'none',
-                  cursor: 'pointer'
-                }}
-              >
-                <option value="hatch">Hatches</option>
-                <option value="lin">Lines</option>
-              </select>
-            ) : (
+        {!isUnified ? (
+          <div style={{ padding: '8px 10px', backgroundColor: '#111', display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '2px solid var(--tmd-orange)' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
               <span style={{ fontSize: '0.75rem', fontWeight: 'bold', color: 'var(--tmd-orange)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
                 LispCentral Hatches
               </span>
-            )}
-            
+            </div>
+            <button
+              onClick={() => fetchCatalog()}
+              style={{ background: 'transparent', border: '1px solid #444', color: '#aaa', borderRadius: '4px', cursor: 'pointer', padding: '3px 8px', fontSize: '0.7rem' }}
+              title="Update catalog"
+            >
+              Sync
+            </button>
           </div>
-          <button
-            onClick={() => fetchCatalog(true)}
-            style={{ background: 'transparent', border: '1px solid #444', color: '#aaa', borderRadius: '4px', cursor: 'pointer', padding: '3px 8px', fontSize: '0.7rem' }}
-            title="Update catalog"
-          >
-            Sync
-          </button>
-        </div>
+        ) : (
+          <GlobalHeader title="LispCentral Hatches">
+            <button
+              onClick={() => fetchCatalog()}
+              style={{ background: 'transparent', border: '1px solid #444', color: '#aaa', borderRadius: '4px', cursor: 'pointer', padding: '3px 8px', fontSize: '0.7rem' }}
+              title="Update catalog"
+            >
+              Sync
+            </button>
+          </GlobalHeader>
+        )}
 
-        {/* Búsqueda y Botón Gerador */}
+        {/* Búsqueda */}
         <div style={{ padding: '8px', display: 'flex', gap: '8px', alignItems: 'center' }}>
-          {!showGenerator && (
-            <>
-              <div style={{ flex: 1 }}>
-                <MultiFilter
-                  storageKey={`lc_filters_res_${activeTab}`}
-                  placeholder="Search pattern..."
-                  onFilterChange={setActiveFilters}
-                />
-              </div>
-              {activeTab === 'hatch' && !showGenerator && (
-                <button
-                  onClick={() => setShowGenerator(true)}
-                  style={{
-                    backgroundColor: 'var(--tmd-orange)',
-                    color: '#fff',
-                    border: 'none',
-                    borderRadius: '6px',
-                    padding: '8px 12px',
-                    cursor: 'pointer',
-                    fontWeight: 'bold',
-                    fontSize: '0.8rem',
-                    whiteSpace: 'nowrap'
-                  }}
-                >
-                  + Generator
-                </button>
-              )}
-            </>
-          )}
+          <div style={{ flex: 1 }}>
+            <MultiFilter
+              storageKey="lc_filters_res_hatch"
+              placeholder="Search pattern..."
+              onFilterChange={setActiveFilters}
+            />
+          </div>
         </div>
       </div>
 
       {/* Content */}
       <div style={{ flex: 1, display: 'flex', flexDirection: 'column', height: '100%', minHeight: 0 }}>
-        {showGenerator ? (
-          <div style={{ flex: 1, overflow: 'hidden' }}>
-            <Suspense fallback={<div style={{ padding: '20px', color: '#888', textAlign: 'center' }}>Loading generator...</div>}>
-              <HatchGenerator lang="en" isEmbedded={true} onClose={() => setShowGenerator(false)} />
-            </Suspense>
-          </div>
-        ) : loading ? (
+        {loading ? (
           <div style={{ textAlign: 'center', padding: '30px', color: '#666' }}>
             <div style={{ width: '24px', height: '24px', border: '2px solid rgba(242,109,33,0.3)', borderTop: '2px solid var(--tmd-orange)', borderRadius: '50%', animation: 'spin 1s linear infinite', margin: '0 auto 10px' }}></div>
             Loading Catalog...
@@ -561,7 +471,6 @@ export default function ResourcePalette() {
                       key={`pin-${item.id}`}
                       item={item}
                       isPinned={true}
-                      activeTab={activeTab}
                       onContextMenu={handleContextMenu}
                       onInsert={handleInsert}
                     />
@@ -583,7 +492,6 @@ export default function ResourcePalette() {
                       key={item.id}
                       item={item}
                       isPinned={pinnedIds.includes(item.id)}
-                      activeTab={activeTab}
                       onContextMenu={handleContextMenu}
                       onInsert={handleInsert}
                     />

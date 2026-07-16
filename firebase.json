@@ -9,20 +9,24 @@
     "cleanUrls": false,
     "rewrites": [
       {
+        "source": "/main-palette",
+        "destination": "/palette-builds/main-palette.html"
+      },
+      {
         "source": "/palette",
-        "destination": "/palette-builds/palette.html"
+        "destination": "/palette-builds/main-palette.html"
       },
       {
         "source": "/resource-palette",
-        "destination": "/palette-builds/resource-palette.html"
+        "destination": "/palette-builds/main-palette.html"
       },
       {
         "source": "/properties-palette",
-        "destination": "/palette-builds/properties-palette.html"
+        "destination": "/palette-builds/main-palette.html"
       },
       {
         "source": "/standards-palette",
-        "destination": "/palette-builds/saas-palette.html"
+        "destination": "/palette-builds/main-palette.html"
       }
     ],
     "headers": [
