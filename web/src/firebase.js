@@ -33,10 +33,14 @@ if (typeof window !== "undefined" && window.location.hostname === "localhost") {
 const isInsideAutoCAD = typeof window !== "undefined" && window.location.search.includes('token=');
 
 if (typeof window !== "undefined" && window.location.hostname !== "localhost" && !isInsideAutoCAD) {
+  // Temporarily disabling AppCheck due to ReCAPTCHA Enterprise 400 Bad Request error.
+  // Re-enable once the key '6Lcw9wkqAAAAAIL9Z_M_p_7rW-bJmG4D2M-N43Qh' is properly configured in Google Cloud.
+  /*
   initializeAppCheck(app, {
     provider: new ReCaptchaEnterpriseProvider('6Lcw9wkqAAAAAIL9Z_M_p_7rW-bJmG4D2M-N43Qh'),
     isTokenAutoRefreshEnabled: true
   });
+  */
 }
 
 // Analytics — inicialización lazy (solo en browser, nunca en SSR)

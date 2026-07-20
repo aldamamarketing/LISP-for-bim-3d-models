@@ -303,9 +303,6 @@
     (cdr (assoc key *LC-PLATFORM-MAP*))
     (cond
       ((= key "palette")   (strcat base "/palette"))
-      ((= key "resources") (strcat base "/resource-palette"))
-      ((= key "properties")(strcat base "/properties-palette"))
-      ((= key "standards") (strcat base "/standards-palette"))
       (T base)
     )
   )
@@ -401,15 +398,6 @@
 )
 
 (defun c:LC_PALETTE ()   (LC:open-palette "palette"   "Command Palette"       '*LC-PALETTE-ACTIVE*    "_lcCmdPaletteActive" nil))
-(defun c:LC_RESOURCES () (LC:open-palette "resources" "LispCentral Resources" '*LC-RESOURCE-ACTIVE*   "_lcResourceActive" nil))
-(defun c:LC_STANDARDS () (LC:open-palette "standards" "LispCentral Standards" '*LC-STANDARDS-ACTIVE*  "_lcStandardsActive" nil))
-
-;; Dummy fallback for properties
-(defun c:LC_PROPERTIES () 
-  (LC:open-palette "properties" "LispCentral Properties" '*LC-PROPERTIES-ACTIVE* "_lcPropertiesActive"
-    "<!DOCTYPE html><html><head><style>body{background:#222;color:#fff;font-family:sans-serif;display:flex;align-items:center;justify-content:center;height:100vh;margin:0;}</style></head><body><h3>Próximamente...</h3></body></html>"
-  )
-)
 
 ;;; ==========================================================================
 ;;; SECCIÓN 6: STANDARDS ENGINE
@@ -813,16 +801,10 @@
 
 (defun c:LC_RESET ()
   (vl-bb-set '*LC-PALETTE-ACTIVE*    nil)
-  (vl-bb-set '*LC-RESOURCE-ACTIVE*   nil)
-  (vl-bb-set '*LC-PROPERTIES-ACTIVE* nil)
-  (vl-bb-set '*LC-STANDARDS-ACTIVE*  nil)
   (vl-bb-set '*LC-SESSION-VERSION* (rtos (getvar "MILLISECS") 2 0))
   (setq *LC-FORCE-RELOAD* T)
-  (princ "\n[LispCentral] Palette state reset. Reloading all palettes...")
+  (princ "\n[LispCentral] Palette state reset. Reloading palette...")
   (c:LC_PALETTE)
-  (c:LC_RESOURCES)
-  (c:LC_PROPERTIES)
-  (c:LC_STANDARDS)
   (setq *LC-FORCE-RELOAD* nil)
 )
 
@@ -830,11 +812,11 @@
 (defun c:LC () (c:LC_PALETTE))
 (defun c:PALETA () (c:LC_PALETTE))
 (defun c:PALETTE () (c:LC_PALETTE))
-(defun c:RECURSOS () (c:LC_RESOURCES))
-(defun c:HATCHES () (c:LC_RESOURCES))
-(defun c:LINHAS () (c:LC_RESOURCES))
-(defun c:PADROES () (c:LC_STANDARDS))
-(defun c:STANDARDS () (c:LC_STANDARDS))
+(defun c:RECURSOS () (c:LC_PALETTE))
+(defun c:HATCHES () (c:LC_PALETTE))
+(defun c:LINHAS () (c:LC_PALETTE))
+(defun c:PADROES () (c:LC_PALETTE))
+(defun c:STANDARDS () (c:LC_PALETTE))
 
 (defun c:LC_HELP () 
   (princ "\n")
@@ -843,10 +825,9 @@
   (princ "\n  ================================================================")
   (princ "\n                                                                  ")
   (princ "\n  • LC / PALETA / LC_PALETTE .... Open Main Command Palette     ")
-  (princ "\n  • LC_RES / RECURSOS ........... Open Resource Palette         ")
-  (princ "\n  • LC_PROP / LC_PROPERTIES ..... Open Properties Palette       ")
-  (princ "\n  • LC_STANDARDS / PADROES ...... Open Standards Palette        ")
-  (princ "\n  • LC_RESET .................... Force reload all UI elements  ")
+  (princ "\n  • HATCHES / RECURSOS .......... Open Main Command Palette     ")
+  (princ "\n  • STANDARDS / PADROES ......... Open Main Command Palette     ")
+  (princ "\n  • LC_RESET .................... Force reload UI elements      ")
   (princ "\n  • LC_HELP ..................... Show this help menu           ")
   (princ "\n                                                                  ")
   (princ "\n  Tip: If you close a palette, type its command again to reopen.  ")

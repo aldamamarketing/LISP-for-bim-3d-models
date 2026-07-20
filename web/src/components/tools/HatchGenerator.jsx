@@ -565,7 +565,6 @@ export default function HatchGenerator({ lang = 'en', isEmbedded = false, onClos
                           <span style={{ fontSize: '0.75rem', color: '#aaa' }}>{t('hatch.gridCols')}</span>
                           <span style={{ fontSize: '0.75rem', color: 'var(--tmd-orange)', fontWeight: 'bold' }}>{columns}</span>
                         </div>
-}}
                         <input type="range" min="1" max="10" value={columns} onChange={e => setColumns(Number(e.target.value))} style={{ width: '100%', cursor: 'pointer', accentColor: 'var(--tmd-orange)' }} />
                       </div>
                     </div>

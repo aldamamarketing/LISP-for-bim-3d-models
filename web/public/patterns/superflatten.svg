@@ -1,0 +1,24 @@
+<svg version="1.2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="200" height="200">
+	<style type="text/css">
+		.shape {
+			stroke-width: 4; 
+			vector-effect: non-scaling-stroke; 
+			fill: none; 
+			stroke: #000000; 
+			stroke-linecap: round; 
+			stroke-linejoin: round;
+		}
+		.dashed {
+			stroke-dasharray: 6 6;
+		}
+	</style>
+	
+	<!-- Plano Flotante en Z (Geometría con error de elevación) -->
+	<polygon points="30,60 100,90 170,60 100,30" class="shape dashed" />
+	
+	<!-- Plano Base en Z=0 (Geometría Aplanada) -->
+	<polygon points="30,160 100,190 170,160 100,130" class="shape" />
+	
+	<!-- Flecha Central indicando la acción de aplastar hacia abajo -->
+	<path d="M 100,75 L 100,160 M 85,145 L 100,160 L 115,145" class="shape" />
+</svg>

@@ -1,0 +1,1167 @@
+{
+  "HATCH_0001": {
+    "id": "local_validated_HATCH_0001",
+    "name": "Validated Match",
+    "img_url": "/hatches-cadauth/generated/HATCH_0001.svg"
+  },
+  "HATCH_0002": {
+    "id": "octagon_square",
+    "name": "Octagon Square",
+    "description": "Local SVG icon (No pattern file yet)",
+    "type": "local_svg",
+    "pat_file": null,
+    "pat_url": null,
+    "img_url": "/hatches-cadauth/assets/octagon_square.svg",
+    "svg_file": "octagon_square.svg"
+  },
+  "HATCH_0004": {
+    "id": "local_validated_HATCH_0004",
+    "name": "Validated Match",
+    "img_url": "/hatches-cadauth/generated/HATCH_0004.svg"
+  },
+  "HATCH_0006": {
+    "id": "local_validated_HATCH_0006",
+    "name": "Validated Match",
+    "img_url": "/hatches-cadauth/generated/HATCH_0006.svg"
+  },
+  "HATCH_0007": {
+    "id": "windmill",
+    "name": "Windmill",
+    "description": "Local SVG icon (No pattern file yet)",
+    "type": "local_svg",
+    "pat_file": null,
+    "pat_url": null,
+    "img_url": "/hatches-cadauth/assets/windmill.svg",
+    "svg_file": "windmill.svg"
+  },
+  "HATCH_0008": {
+    "id": "local_validated_HATCH_0008",
+    "name": "Validated Match",
+    "img_url": "/hatches-cadauth/generated/HATCH_0008.svg"
+  },
+  "HATCH_0009": {
+    "id": "local_validated_HATCH_0009",
+    "name": "Validated Match",
+    "img_url": "/hatches-cadauth/generated/HATCH_0009.svg"
+  },
+  "HATCH_0010": {
+    "id": "local_validated_HATCH_0010",
+    "name": "Validated Match",
+    "img_url": "/hatches-cadauth/generated/HATCH_0010.svg"
+  },
+  "HATCH_0011": {
+    "id": "local_validated_HATCH_0011",
+    "name": "Validated Match",
+    "img_url": "/hatches-cadauth/generated/HATCH_0011.svg"
+  },
+  "HATCH_0012": {
+    "id": "local_validated_HATCH_0012",
+    "name": "Validated Match",
+    "img_url": "/hatches-cadauth/generated/HATCH_0012.svg"
+  },
+  "HATCH_0013": {
+    "id": "local_validated_HATCH_0013",
+    "name": "Validated Match",
+    "img_url": "/hatches-cadauth/generated/HATCH_0013.svg"
+  },
+  "HATCH_0017": {
+    "id": "local_validated_HATCH_0017",
+    "name": "Validated Match",
+    "img_url": "/hatches-cadauth/generated/HATCH_0017.svg"
+  },
+  "HATCH_0030": {
+    "id": "local_validated_HATCH_0030",
+    "name": "Validated Match",
+    "img_url": "/hatches-cadauth/generated/HATCH_0030.svg"
+  },
+  "Running_Bond_Brick": {
+    "id": "1_3_running_bond",
+    "name": "1 3 Running Bond",
+    "description": "Local SVG icon (No pattern file yet)",
+    "type": "local_svg",
+    "pat_file": null,
+    "pat_url": null,
+    "img_url": "/hatches-cadauth/assets/1_3_running_bond.svg",
+    "svg_file": "1_3_running_bond.svg"
+  },
+  "Herringbone_Brick_45": {
+    "id": "45_chevron",
+    "name": "45 Chevron",
+    "description": "Local SVG icon (No pattern file yet)",
+    "type": "local_svg",
+    "pat_file": null,
+    "pat_url": null,
+    "img_url": "/hatches-cadauth/assets/45_chevron.svg",
+    "svg_file": "45_chevron.svg"
+  },
+  "Subway_Tile_3x6": {
+    "id": "alternating_striped_and_diagonal_tile_pattern",
+    "name": "Alternating Striped And Diagonal Tile Pattern",
+    "description": "Local SVG icon (No pattern file yet)",
+    "type": "local_svg",
+    "pat_file": null,
+    "pat_url": null,
+    "img_url": "/hatches-cadauth/assets/alternating_striped_and_diagonal_tile_pattern.svg",
+    "svg_file": "alternating_striped_and_diagonal_tile_pattern.svg"
+  },
+  "Stacked_Bond_Tile": {
+    "id": "alternating_tile_size_grid",
+    "name": "Alternating Tile Size Grid",
+    "description": "Local SVG icon (No pattern file yet)",
+    "type": "local_svg",
+    "pat_file": null,
+    "pat_url": null,
+    "img_url": "/hatches-cadauth/assets/alternating_tile_size_grid.svg",
+    "svg_file": "alternating_tile_size_grid.svg"
+  },
+  "Hexagon_Honeycomb": {
+    "id": "long_fish_scale_pattern",
+    "name": "Long Fish Scale Pattern",
+    "description": "Local SVG icon (No pattern file yet)",
+    "type": "local_svg",
+    "pat_file": null,
+    "pat_url": null,
+    "img_url": "/hatches-cadauth/assets/long_fish_scale_pattern.svg",
+    "svg_file": "long_fish_scale_pattern.svg"
+  },
+  "Parquet_Wood_Floor": {
+    "id": "wood_planks",
+    "name": "Wood Planks",
+    "description": "Local SVG icon (No pattern file yet)",
+    "type": "local_svg",
+    "pat_file": null,
+    "pat_url": null,
+    "img_url": "/hatches-cadauth/assets/wood_planks.svg",
+    "svg_file": "wood_planks.svg"
+  },
+  "Linear_Wood_Plank": {
+    "id": "wood_planks",
+    "name": "Wood Planks",
+    "description": "Local SVG icon (No pattern file yet)",
+    "type": "local_svg",
+    "pat_file": null,
+    "pat_url": null,
+    "img_url": "/hatches-cadauth/assets/wood_planks.svg",
+    "svg_file": "wood_planks.svg"
+  },
+  "Wood_Grain_Texture": {
+    "id": "wood_planks",
+    "name": "Wood Planks",
+    "description": "Local SVG icon (No pattern file yet)",
+    "type": "local_svg",
+    "pat_file": null,
+    "pat_url": null,
+    "img_url": "/hatches-cadauth/assets/wood_planks.svg",
+    "svg_file": "wood_planks.svg"
+  },
+  "Spanish_Roof_Tile": {
+    "id": "fishtail_roof_tile",
+    "name": "Fishtail Roof Tile",
+    "description": "Local SVG icon (No pattern file yet)",
+    "type": "local_svg",
+    "pat_file": null,
+    "pat_url": null,
+    "img_url": "/hatches-cadauth/assets/fishtail_roof_tile.svg",
+    "svg_file": "fishtail_roof_tile.svg"
+  },
+  "Diamond_Pattern_Tile": {
+    "id": "square_and_metro_tile_pattern",
+    "name": "Square And Metro Tile Pattern",
+    "description": "Local SVG icon (No pattern file yet)",
+    "type": "local_svg",
+    "pat_file": null,
+    "pat_url": null,
+    "img_url": "/hatches-cadauth/assets/square_and_metro_tile_pattern.svg",
+    "svg_file": "square_and_metro_tile_pattern.svg"
+  },
+  "Board_Formed_Concrete": {
+    "id": "checkerboard_split_pattern",
+    "name": "Checkerboard Split Pattern",
+    "description": "Local SVG icon (No pattern file yet)",
+    "type": "local_svg",
+    "pat_file": null,
+    "pat_url": null,
+    "img_url": "/hatches-cadauth/assets/checkerboard_split_pattern.svg",
+    "svg_file": "checkerboard_split_pattern.svg"
+  },
+  "Flagstone_Irregular": {
+    "id": "polygonal_interlocking_pattern",
+    "name": "Polygonal Interlocking Pattern",
+    "description": "Local SVG icon (No pattern file yet)",
+    "type": "local_svg",
+    "pat_file": null,
+    "pat_url": null,
+    "img_url": "/hatches-cadauth/assets/polygonal_interlocking_pattern.svg",
+    "svg_file": "polygonal_interlocking_pattern.svg"
+  },
+  "River_Stone_Smooth": {
+    "id": "alternating_rounded_tiles",
+    "name": "Alternating Rounded Tiles",
+    "description": "Local SVG icon (No pattern file yet)",
+    "type": "local_svg",
+    "pat_file": null,
+    "pat_url": null,
+    "img_url": "/hatches-cadauth/assets/alternating_rounded_tiles.svg",
+    "svg_file": "alternating_rounded_tiles.svg"
+  },
+  "Stacked_Ledgestone": {
+    "id": "drystone",
+    "name": "Drystone",
+    "description": "Local SVG icon (No pattern file yet)",
+    "type": "local_svg",
+    "pat_file": null,
+    "pat_url": null,
+    "img_url": "/hatches-cadauth/assets/drystone.svg",
+    "svg_file": "drystone.svg"
+  },
+  "Cobblestone_Old_World": {
+    "id": "crazy_paving",
+    "name": "Crazy Paving",
+    "description": "Local SVG icon (No pattern file yet)",
+    "type": "local_svg",
+    "pat_file": null,
+    "pat_url": null,
+    "img_url": "/hatches-cadauth/assets/crazy_paving.svg",
+    "svg_file": "crazy_paving.svg"
+  },
+  "Crushed_Gravel": {
+    "id": "long_fish_scale_pattern",
+    "name": "Long Fish Scale Pattern",
+    "description": "Local SVG icon (No pattern file yet)",
+    "type": "local_svg",
+    "pat_file": null,
+    "pat_url": null,
+    "img_url": "/hatches-cadauth/assets/long_fish_scale_pattern.svg",
+    "svg_file": "long_fish_scale_pattern.svg"
+  },
+  "Compacted_Fill_Earth": {
+    "id": "alternating_striped_and_diagonal_tile_pattern",
+    "name": "Alternating Striped And Diagonal Tile Pattern",
+    "description": "Local SVG icon (No pattern file yet)",
+    "type": "local_svg",
+    "pat_file": null,
+    "pat_url": null,
+    "img_url": "/hatches-cadauth/assets/alternating_striped_and_diagonal_tile_pattern.svg",
+    "svg_file": "alternating_striped_and_diagonal_tile_pattern.svg"
+  },
+  "Sand_Fine_Grain": {
+    "id": "long_fish_scale_pattern",
+    "name": "Long Fish Scale Pattern",
+    "description": "Local SVG icon (No pattern file yet)",
+    "type": "local_svg",
+    "pat_file": null,
+    "pat_url": null,
+    "img_url": "/hatches-cadauth/assets/long_fish_scale_pattern.svg",
+    "svg_file": "long_fish_scale_pattern.svg"
+  },
+  "Gabion_Wall_Mesh": {
+    "id": "alternating_round_and_oval_tiles",
+    "name": "Alternating Round And Oval Tiles",
+    "description": "Local SVG icon (No pattern file yet)",
+    "type": "local_svg",
+    "pat_file": null,
+    "pat_url": null,
+    "img_url": "/hatches-cadauth/assets/alternating_round_and_oval_tiles.svg",
+    "svg_file": "alternating_round_and_oval_tiles.svg"
+  },
+  "Wild_Grass_Tufts": {
+    "id": "abstract_checkered_pattern",
+    "name": "Abstract Checkered Pattern",
+    "description": "Local SVG icon (No pattern file yet)",
+    "type": "local_svg",
+    "pat_file": null,
+    "pat_url": null,
+    "img_url": "/hatches-cadauth/assets/abstract_checkered_pattern.svg",
+    "svg_file": "abstract_checkered_pattern.svg"
+  },
+  "Slate_Tile_Natural": {
+    "id": "alternating_cross_weave_tile_pattern",
+    "name": "Alternating Cross Weave Tile Pattern",
+    "description": "Local SVG icon (No pattern file yet)",
+    "type": "local_svg",
+    "pat_file": null,
+    "pat_url": null,
+    "img_url": "/hatches-cadauth/assets/alternating_cross_weave_tile_pattern.svg",
+    "svg_file": "alternating_cross_weave_tile_pattern.svg"
+  },
+  "Diamond_Plate_Steel": {
+    "id": "abstract_checkered_pattern",
+    "name": "Abstract Checkered Pattern",
+    "description": "Local SVG icon (No pattern file yet)",
+    "type": "local_svg",
+    "pat_file": null,
+    "pat_url": null,
+    "img_url": "/hatches-cadauth/assets/abstract_checkered_pattern.svg",
+    "svg_file": "abstract_checkered_pattern.svg"
+  },
+  "Corrugated_Metal_Siding": {
+    "id": "wave_pattern_tiles",
+    "name": "Wave Pattern Tiles",
+    "description": "Local SVG icon (No pattern file yet)",
+    "type": "local_svg",
+    "pat_file": null,
+    "pat_url": null,
+    "img_url": "/hatches-cadauth/assets/wave_pattern_tiles.svg",
+    "svg_file": "wave_pattern_tiles.svg"
+  },
+  "Wire_Mesh_Expanded": {
+    "id": "abstract_checkered_pattern",
+    "name": "Abstract Checkered Pattern",
+    "description": "Local SVG icon (No pattern file yet)",
+    "type": "local_svg",
+    "pat_file": null,
+    "pat_url": null,
+    "img_url": "/hatches-cadauth/assets/abstract_checkered_pattern.svg",
+    "svg_file": "abstract_checkered_pattern.svg"
+  },
+  "Rigid_Insulation_X": {
+    "id": "abstract_checkered_pattern",
+    "name": "Abstract Checkered Pattern",
+    "description": "Local SVG icon (No pattern file yet)",
+    "type": "local_svg",
+    "pat_file": null,
+    "pat_url": null,
+    "img_url": "/hatches-cadauth/assets/abstract_checkered_pattern.svg",
+    "svg_file": "abstract_checkered_pattern.svg"
+  },
+  "Batt_Insulation_Fill": {
+    "id": "playful_curved_tile_pattern",
+    "name": "Playful Curved Tile Pattern",
+    "description": "Local SVG icon (No pattern file yet)",
+    "type": "local_svg",
+    "pat_file": null,
+    "pat_url": null,
+    "img_url": "/hatches-cadauth/assets/playful_curved_tile_pattern.svg",
+    "svg_file": "playful_curved_tile_pattern.svg"
+  },
+  "Chain_Link_Fence_Fill": {
+    "id": "alternating_striped_and_diagonal_tile_pattern",
+    "name": "Alternating Striped And Diagonal Tile Pattern",
+    "description": "Local SVG icon (No pattern file yet)",
+    "type": "local_svg",
+    "pat_file": null,
+    "pat_url": null,
+    "img_url": "/hatches-cadauth/assets/alternating_striped_and_diagonal_tile_pattern.svg",
+    "svg_file": "alternating_striped_and_diagonal_tile_pattern.svg"
+  },
+  "Perforated_Metal_Sheet": {
+    "id": "abstract_checkered_pattern",
+    "name": "Abstract Checkered Pattern",
+    "description": "Local SVG icon (No pattern file yet)",
+    "type": "local_svg",
+    "pat_file": null,
+    "pat_url": null,
+    "img_url": "/hatches-cadauth/assets/abstract_checkered_pattern.svg",
+    "svg_file": "abstract_checkered_pattern.svg"
+  },
+  "Firebrick_Refractory": {
+    "id": "abstract_checkered_pattern",
+    "name": "Abstract Checkered Pattern",
+    "description": "Local SVG icon (No pattern file yet)",
+    "type": "local_svg",
+    "pat_file": null,
+    "pat_url": null,
+    "img_url": "/hatches-cadauth/assets/abstract_checkered_pattern.svg",
+    "svg_file": "abstract_checkered_pattern.svg"
+  },
+  "Acoustic_Ceiling_Tile": {
+    "id": "square_tile_with_triangle_corner_pattern",
+    "name": "Square Tile With Triangle Corner Pattern",
+    "description": "Local SVG icon (No pattern file yet)",
+    "type": "local_svg",
+    "pat_file": null,
+    "pat_url": null,
+    "img_url": "/hatches-cadauth/assets/square_tile_with_triangle_corner_pattern.svg",
+    "svg_file": "square_tile_with_triangle_corner_pattern.svg"
+  },
+  "Terrazzo_Speckle": {
+    "id": "abstract_checkered_pattern",
+    "name": "Abstract Checkered Pattern",
+    "description": "Local SVG icon (No pattern file yet)",
+    "type": "local_svg",
+    "pat_file": null,
+    "pat_url": null,
+    "img_url": "/hatches-cadauth/assets/abstract_checkered_pattern.svg",
+    "svg_file": "abstract_checkered_pattern.svg"
+  },
+  "Glass_Block_Grid": {
+    "id": "alternating_tile_size_grid",
+    "name": "Alternating Tile Size Grid",
+    "description": "Local SVG icon (No pattern file yet)",
+    "type": "local_svg",
+    "pat_file": null,
+    "pat_url": null,
+    "img_url": "/hatches-cadauth/assets/alternating_tile_size_grid.svg",
+    "svg_file": "alternating_tile_size_grid.svg"
+  },
+  "Cross_Hatch_Fine": {
+    "id": "diagonal_cross_pattern",
+    "name": "Diagonal Cross Pattern",
+    "description": "Local SVG icon (No pattern file yet)",
+    "type": "local_svg",
+    "pat_file": null,
+    "pat_url": null,
+    "img_url": "/hatches-cadauth/assets/diagonal_cross_pattern.svg",
+    "svg_file": "diagonal_cross_pattern.svg"
+  },
+  "Stipple_Gradient": {
+    "id": "alternating_round_and_oval_tiles",
+    "name": "Alternating Round And Oval Tiles",
+    "description": "Local SVG icon (No pattern file yet)",
+    "type": "local_svg",
+    "pat_file": null,
+    "pat_url": null,
+    "img_url": "/hatches-cadauth/assets/alternating_round_and_oval_tiles.svg",
+    "svg_file": "alternating_round_and_oval_tiles.svg"
+  },
+  "Plywood_End_Grain": {
+    "id": "wood_planks",
+    "name": "Wood Planks",
+    "description": "Local SVG icon (No pattern file yet)",
+    "type": "local_svg",
+    "pat_file": null,
+    "pat_url": null,
+    "img_url": "/hatches-cadauth/assets/wood_planks.svg",
+    "svg_file": "wood_planks.svg"
+  },
+  "HSBDR2E0": {
+    "id": "abstract_checkered_pattern",
+    "name": "Abstract Checkered Pattern",
+    "description": "Local SVG icon (No pattern file yet)",
+    "type": "local_svg",
+    "pat_file": null,
+    "pat_url": null,
+    "img_url": "/hatches-cadauth/assets/abstract_checkered_pattern.svg",
+    "svg_file": "abstract_checkered_pattern.svg"
+  },
+  "HSBDR3E0": {
+    "id": "abstract_checkered_pattern",
+    "name": "Abstract Checkered Pattern",
+    "description": "Local SVG icon (No pattern file yet)",
+    "type": "local_svg",
+    "pat_file": null,
+    "pat_url": null,
+    "img_url": "/hatches-cadauth/assets/abstract_checkered_pattern.svg",
+    "svg_file": "abstract_checkered_pattern.svg"
+  },
+  "HSBDR4E0": {
+    "id": "abstract_checkered_pattern",
+    "name": "Abstract Checkered Pattern",
+    "description": "Local SVG icon (No pattern file yet)",
+    "type": "local_svg",
+    "pat_file": null,
+    "pat_url": null,
+    "img_url": "/hatches-cadauth/assets/abstract_checkered_pattern.svg",
+    "svg_file": "abstract_checkered_pattern.svg"
+  },
+  "HSHP11E0": {
+    "id": "abstract_checkered_pattern",
+    "name": "Abstract Checkered Pattern",
+    "description": "Local SVG icon (No pattern file yet)",
+    "type": "local_svg",
+    "pat_file": null,
+    "pat_url": null,
+    "img_url": "/hatches-cadauth/assets/abstract_checkered_pattern.svg",
+    "svg_file": "abstract_checkered_pattern.svg"
+  },
+  "HSHP21E0": {
+    "id": "abstract_checkered_pattern",
+    "name": "Abstract Checkered Pattern",
+    "description": "Local SVG icon (No pattern file yet)",
+    "type": "local_svg",
+    "pat_file": null,
+    "pat_url": null,
+    "img_url": "/hatches-cadauth/assets/abstract_checkered_pattern.svg",
+    "svg_file": "abstract_checkered_pattern.svg"
+  },
+  "HSHP31E0": {
+    "id": "abstract_checkered_pattern",
+    "name": "Abstract Checkered Pattern",
+    "description": "Local SVG icon (No pattern file yet)",
+    "type": "local_svg",
+    "pat_file": null,
+    "pat_url": null,
+    "img_url": "/hatches-cadauth/assets/abstract_checkered_pattern.svg",
+    "svg_file": "abstract_checkered_pattern.svg"
+  },
+  "HSHP41E0": {
+    "id": "abstract_checkered_pattern",
+    "name": "Abstract Checkered Pattern",
+    "description": "Local SVG icon (No pattern file yet)",
+    "type": "local_svg",
+    "pat_file": null,
+    "pat_url": null,
+    "img_url": "/hatches-cadauth/assets/abstract_checkered_pattern.svg",
+    "svg_file": "abstract_checkered_pattern.svg"
+  },
+  "HSTON1E0": {
+    "id": "abstract_checkered_pattern",
+    "name": "Abstract Checkered Pattern",
+    "description": "Local SVG icon (No pattern file yet)",
+    "type": "local_svg",
+    "pat_file": null,
+    "pat_url": null,
+    "img_url": "/hatches-cadauth/assets/abstract_checkered_pattern.svg",
+    "svg_file": "abstract_checkered_pattern.svg"
+  },
+  "HSTON2E0": {
+    "id": "abstract_checkered_pattern",
+    "name": "Abstract Checkered Pattern",
+    "description": "Local SVG icon (No pattern file yet)",
+    "type": "local_svg",
+    "pat_file": null,
+    "pat_url": null,
+    "img_url": "/hatches-cadauth/assets/abstract_checkered_pattern.svg",
+    "svg_file": "abstract_checkered_pattern.svg"
+  },
+  "HSTON3E0": {
+    "id": "abstract_checkered_pattern",
+    "name": "Abstract Checkered Pattern",
+    "description": "Local SVG icon (No pattern file yet)",
+    "type": "local_svg",
+    "pat_file": null,
+    "pat_url": null,
+    "img_url": "/hatches-cadauth/assets/abstract_checkered_pattern.svg",
+    "svg_file": "abstract_checkered_pattern.svg"
+  },
+  "HWEND1N0": {
+    "id": "abstract_checkered_pattern",
+    "name": "Abstract Checkered Pattern",
+    "description": "Local SVG icon (No pattern file yet)",
+    "type": "local_svg",
+    "pat_file": null,
+    "pat_url": null,
+    "img_url": "/hatches-cadauth/assets/abstract_checkered_pattern.svg",
+    "svg_file": "abstract_checkered_pattern.svg"
+  },
+  "HWEND2N0": {
+    "id": "abstract_checkered_pattern",
+    "name": "Abstract Checkered Pattern",
+    "description": "Local SVG icon (No pattern file yet)",
+    "type": "local_svg",
+    "pat_file": null,
+    "pat_url": null,
+    "img_url": "/hatches-cadauth/assets/abstract_checkered_pattern.svg",
+    "svg_file": "abstract_checkered_pattern.svg"
+  },
+  "HWEND3N0": {
+    "id": "abstract_checkered_pattern",
+    "name": "Abstract Checkered Pattern",
+    "description": "Local SVG icon (No pattern file yet)",
+    "type": "local_svg",
+    "pat_file": null,
+    "pat_url": null,
+    "img_url": "/hatches-cadauth/assets/abstract_checkered_pattern.svg",
+    "svg_file": "abstract_checkered_pattern.svg"
+  },
+  "HWOOD2E1": {
+    "id": "wood_planks",
+    "name": "Wood Planks",
+    "description": "Local SVG icon (No pattern file yet)",
+    "type": "local_svg",
+    "pat_file": null,
+    "pat_url": null,
+    "img_url": "/hatches-cadauth/assets/wood_planks.svg",
+    "svg_file": "wood_planks.svg"
+  },
+  "HWOOD3E1": {
+    "id": "wood_planks",
+    "name": "Wood Planks",
+    "description": "Local SVG icon (No pattern file yet)",
+    "type": "local_svg",
+    "pat_file": null,
+    "pat_url": null,
+    "img_url": "/hatches-cadauth/assets/wood_planks.svg",
+    "svg_file": "wood_planks.svg"
+  },
+  "HWOOD4E1": {
+    "id": "wood_planks",
+    "name": "Wood Planks",
+    "description": "Local SVG icon (No pattern file yet)",
+    "type": "local_svg",
+    "pat_file": null,
+    "pat_url": null,
+    "img_url": "/hatches-cadauth/assets/wood_planks.svg",
+    "svg_file": "wood_planks.svg"
+  },
+  "HWOOD5E1": {
+    "id": "wood_planks",
+    "name": "Wood Planks",
+    "description": "Local SVG icon (No pattern file yet)",
+    "type": "local_svg",
+    "pat_file": null,
+    "pat_url": null,
+    "img_url": "/hatches-cadauth/assets/wood_planks.svg",
+    "svg_file": "wood_planks.svg"
+  },
+  "HWOOD6E1": {
+    "id": "wood_planks",
+    "name": "Wood Planks",
+    "description": "Local SVG icon (No pattern file yet)",
+    "type": "local_svg",
+    "pat_file": null,
+    "pat_url": null,
+    "img_url": "/hatches-cadauth/assets/wood_planks.svg",
+    "svg_file": "wood_planks.svg"
+  },
+  "HWOOD7E1": {
+    "id": "wood_planks",
+    "name": "Wood Planks",
+    "description": "Local SVG icon (No pattern file yet)",
+    "type": "local_svg",
+    "pat_file": null,
+    "pat_url": null,
+    "img_url": "/hatches-cadauth/assets/wood_planks.svg",
+    "svg_file": "wood_planks.svg"
+  },
+  "HWOOD8E1": {
+    "id": "wood_planks",
+    "name": "Wood Planks",
+    "description": "Local SVG icon (No pattern file yet)",
+    "type": "local_svg",
+    "pat_file": null,
+    "pat_url": null,
+    "img_url": "/hatches-cadauth/assets/wood_planks.svg",
+    "svg_file": "wood_planks.svg"
+  },
+  "HWOOD9E1": {
+    "id": "wood_planks",
+    "name": "Wood Planks",
+    "description": "Local SVG icon (No pattern file yet)",
+    "type": "local_svg",
+    "pat_file": null,
+    "pat_url": null,
+    "img_url": "/hatches-cadauth/assets/wood_planks.svg",
+    "svg_file": "wood_planks.svg"
+  },
+  "HWPLY3E1": {
+    "id": "abstract_checkered_pattern",
+    "name": "Abstract Checkered Pattern",
+    "description": "Local SVG icon (No pattern file yet)",
+    "type": "local_svg",
+    "pat_file": null,
+    "pat_url": null,
+    "img_url": "/hatches-cadauth/assets/abstract_checkered_pattern.svg",
+    "svg_file": "abstract_checkered_pattern.svg"
+  },
+  "HRCD35OS": {
+    "id": "abstract_checkered_pattern",
+    "name": "Abstract Checkered Pattern",
+    "description": "Local SVG icon (No pattern file yet)",
+    "type": "local_svg",
+    "pat_file": null,
+    "pat_url": null,
+    "img_url": "/hatches-cadauth/assets/abstract_checkered_pattern.svg",
+    "svg_file": "abstract_checkered_pattern.svg"
+  },
+  "HRDD35OS": {
+    "id": "abstract_checkered_pattern",
+    "name": "Abstract Checkered Pattern",
+    "description": "Local SVG icon (No pattern file yet)",
+    "type": "local_svg",
+    "pat_file": null,
+    "pat_url": null,
+    "img_url": "/hatches-cadauth/assets/abstract_checkered_pattern.svg",
+    "svg_file": "abstract_checkered_pattern.svg"
+  },
+  "HRPA55O1": {
+    "id": "abstract_checkered_pattern",
+    "name": "Abstract Checkered Pattern",
+    "description": "Local SVG icon (No pattern file yet)",
+    "type": "local_svg",
+    "pat_file": null,
+    "pat_url": null,
+    "img_url": "/hatches-cadauth/assets/abstract_checkered_pattern.svg",
+    "svg_file": "abstract_checkered_pattern.svg"
+  },
+  "HRPA55O2": {
+    "id": "abstract_checkered_pattern",
+    "name": "Abstract Checkered Pattern",
+    "description": "Local SVG icon (No pattern file yet)",
+    "type": "local_svg",
+    "pat_file": null,
+    "pat_url": null,
+    "img_url": "/hatches-cadauth/assets/abstract_checkered_pattern.svg",
+    "svg_file": "abstract_checkered_pattern.svg"
+  },
+  "HT1001ET": {
+    "id": "abstract_checkered_pattern",
+    "name": "Abstract Checkered Pattern",
+    "description": "Local SVG icon (No pattern file yet)",
+    "type": "local_svg",
+    "pat_file": null,
+    "pat_url": null,
+    "img_url": "/hatches-cadauth/assets/abstract_checkered_pattern.svg",
+    "svg_file": "abstract_checkered_pattern.svg"
+  },
+  "HT1002ET": {
+    "id": "abstract_checkered_pattern",
+    "name": "Abstract Checkered Pattern",
+    "description": "Local SVG icon (No pattern file yet)",
+    "type": "local_svg",
+    "pat_file": null,
+    "pat_url": null,
+    "img_url": "/hatches-cadauth/assets/abstract_checkered_pattern.svg",
+    "svg_file": "abstract_checkered_pattern.svg"
+  },
+  "HT1003ET": {
+    "id": "abstract_checkered_pattern",
+    "name": "Abstract Checkered Pattern",
+    "description": "Local SVG icon (No pattern file yet)",
+    "type": "local_svg",
+    "pat_file": null,
+    "pat_url": null,
+    "img_url": "/hatches-cadauth/assets/abstract_checkered_pattern.svg",
+    "svg_file": "abstract_checkered_pattern.svg"
+  },
+  "HT1009ET": {
+    "id": "abstract_checkered_pattern",
+    "name": "Abstract Checkered Pattern",
+    "description": "Local SVG icon (No pattern file yet)",
+    "type": "local_svg",
+    "pat_file": null,
+    "pat_url": null,
+    "img_url": "/hatches-cadauth/assets/abstract_checkered_pattern.svg",
+    "svg_file": "abstract_checkered_pattern.svg"
+  },
+  "HT1081ET": {
+    "id": "abstract_checkered_pattern",
+    "name": "Abstract Checkered Pattern",
+    "description": "Local SVG icon (No pattern file yet)",
+    "type": "local_svg",
+    "pat_file": null,
+    "pat_url": null,
+    "img_url": "/hatches-cadauth/assets/abstract_checkered_pattern.svg",
+    "svg_file": "abstract_checkered_pattern.svg"
+  },
+  "HT1082ET": {
+    "id": "abstract_checkered_pattern",
+    "name": "Abstract Checkered Pattern",
+    "description": "Local SVG icon (No pattern file yet)",
+    "type": "local_svg",
+    "pat_file": null,
+    "pat_url": null,
+    "img_url": "/hatches-cadauth/assets/abstract_checkered_pattern.svg",
+    "svg_file": "abstract_checkered_pattern.svg"
+  },
+  "HT1083ET": {
+    "id": "abstract_checkered_pattern",
+    "name": "Abstract Checkered Pattern",
+    "description": "Local SVG icon (No pattern file yet)",
+    "type": "local_svg",
+    "pat_file": null,
+    "pat_url": null,
+    "img_url": "/hatches-cadauth/assets/abstract_checkered_pattern.svg",
+    "svg_file": "abstract_checkered_pattern.svg"
+  },
+  "HT1084ET": {
+    "id": "abstract_checkered_pattern",
+    "name": "Abstract Checkered Pattern",
+    "description": "Local SVG icon (No pattern file yet)",
+    "type": "local_svg",
+    "pat_file": null,
+    "pat_url": null,
+    "img_url": "/hatches-cadauth/assets/abstract_checkered_pattern.svg",
+    "svg_file": "abstract_checkered_pattern.svg"
+  },
+  "HT1085ET": {
+    "id": "abstract_checkered_pattern",
+    "name": "Abstract Checkered Pattern",
+    "description": "Local SVG icon (No pattern file yet)",
+    "type": "local_svg",
+    "pat_file": null,
+    "pat_url": null,
+    "img_url": "/hatches-cadauth/assets/abstract_checkered_pattern.svg",
+    "svg_file": "abstract_checkered_pattern.svg"
+  },
+  "HT1251ET": {
+    "id": "abstract_checkered_pattern",
+    "name": "Abstract Checkered Pattern",
+    "description": "Local SVG icon (No pattern file yet)",
+    "type": "local_svg",
+    "pat_file": null,
+    "pat_url": null,
+    "img_url": "/hatches-cadauth/assets/abstract_checkered_pattern.svg",
+    "svg_file": "abstract_checkered_pattern.svg"
+  },
+  "HT1252ET": {
+    "id": "abstract_checkered_pattern",
+    "name": "Abstract Checkered Pattern",
+    "description": "Local SVG icon (No pattern file yet)",
+    "type": "local_svg",
+    "pat_file": null,
+    "pat_url": null,
+    "img_url": "/hatches-cadauth/assets/abstract_checkered_pattern.svg",
+    "svg_file": "abstract_checkered_pattern.svg"
+  },
+  "HT1253ET": {
+    "id": "abstract_checkered_pattern",
+    "name": "Abstract Checkered Pattern",
+    "description": "Local SVG icon (No pattern file yet)",
+    "type": "local_svg",
+    "pat_file": null,
+    "pat_url": null,
+    "img_url": "/hatches-cadauth/assets/abstract_checkered_pattern.svg",
+    "svg_file": "abstract_checkered_pattern.svg"
+  },
+  "HT1254ET": {
+    "id": "abstract_checkered_pattern",
+    "name": "Abstract Checkered Pattern",
+    "description": "Local SVG icon (No pattern file yet)",
+    "type": "local_svg",
+    "pat_file": null,
+    "pat_url": null,
+    "img_url": "/hatches-cadauth/assets/abstract_checkered_pattern.svg",
+    "svg_file": "abstract_checkered_pattern.svg"
+  },
+  "HT1259ET": {
+    "id": "abstract_checkered_pattern",
+    "name": "Abstract Checkered Pattern",
+    "description": "Local SVG icon (No pattern file yet)",
+    "type": "local_svg",
+    "pat_file": null,
+    "pat_url": null,
+    "img_url": "/hatches-cadauth/assets/abstract_checkered_pattern.svg",
+    "svg_file": "abstract_checkered_pattern.svg"
+  },
+  "HT1501ET": {
+    "id": "abstract_checkered_pattern",
+    "name": "Abstract Checkered Pattern",
+    "description": "Local SVG icon (No pattern file yet)",
+    "type": "local_svg",
+    "pat_file": null,
+    "pat_url": null,
+    "img_url": "/hatches-cadauth/assets/abstract_checkered_pattern.svg",
+    "svg_file": "abstract_checkered_pattern.svg"
+  },
+  "HT1502ET": {
+    "id": "abstract_checkered_pattern",
+    "name": "Abstract Checkered Pattern",
+    "description": "Local SVG icon (No pattern file yet)",
+    "type": "local_svg",
+    "pat_file": null,
+    "pat_url": null,
+    "img_url": "/hatches-cadauth/assets/abstract_checkered_pattern.svg",
+    "svg_file": "abstract_checkered_pattern.svg"
+  },
+  "HT1503ET": {
+    "id": "abstract_checkered_pattern",
+    "name": "Abstract Checkered Pattern",
+    "description": "Local SVG icon (No pattern file yet)",
+    "type": "local_svg",
+    "pat_file": null,
+    "pat_url": null,
+    "img_url": "/hatches-cadauth/assets/abstract_checkered_pattern.svg",
+    "svg_file": "abstract_checkered_pattern.svg"
+  },
+  "HT1504ET": {
+    "id": "abstract_checkered_pattern",
+    "name": "Abstract Checkered Pattern",
+    "description": "Local SVG icon (No pattern file yet)",
+    "type": "local_svg",
+    "pat_file": null,
+    "pat_url": null,
+    "img_url": "/hatches-cadauth/assets/abstract_checkered_pattern.svg",
+    "svg_file": "abstract_checkered_pattern.svg"
+  },
+  "HT1509ET": {
+    "id": "abstract_checkered_pattern",
+    "name": "Abstract Checkered Pattern",
+    "description": "Local SVG icon (No pattern file yet)",
+    "type": "local_svg",
+    "pat_file": null,
+    "pat_url": null,
+    "img_url": "/hatches-cadauth/assets/abstract_checkered_pattern.svg",
+    "svg_file": "abstract_checkered_pattern.svg"
+  },
+  "HT2000ET": {
+    "id": "abstract_checkered_pattern",
+    "name": "Abstract Checkered Pattern",
+    "description": "Local SVG icon (No pattern file yet)",
+    "type": "local_svg",
+    "pat_file": null,
+    "pat_url": null,
+    "img_url": "/hatches-cadauth/assets/abstract_checkered_pattern.svg",
+    "svg_file": "abstract_checkered_pattern.svg"
+  },
+  "HT2001ET": {
+    "id": "abstract_checkered_pattern",
+    "name": "Abstract Checkered Pattern",
+    "description": "Local SVG icon (No pattern file yet)",
+    "type": "local_svg",
+    "pat_file": null,
+    "pat_url": null,
+    "img_url": "/hatches-cadauth/assets/abstract_checkered_pattern.svg",
+    "svg_file": "abstract_checkered_pattern.svg"
+  },
+  "HT2002ET": {
+    "id": "abstract_checkered_pattern",
+    "name": "Abstract Checkered Pattern",
+    "description": "Local SVG icon (No pattern file yet)",
+    "type": "local_svg",
+    "pat_file": null,
+    "pat_url": null,
+    "img_url": "/hatches-cadauth/assets/abstract_checkered_pattern.svg",
+    "svg_file": "abstract_checkered_pattern.svg"
+  },
+  "HT2003ET": {
+    "id": "abstract_checkered_pattern",
+    "name": "Abstract Checkered Pattern",
+    "description": "Local SVG icon (No pattern file yet)",
+    "type": "local_svg",
+    "pat_file": null,
+    "pat_url": null,
+    "img_url": "/hatches-cadauth/assets/abstract_checkered_pattern.svg",
+    "svg_file": "abstract_checkered_pattern.svg"
+  },
+  "HT2004ET": {
+    "id": "abstract_checkered_pattern",
+    "name": "Abstract Checkered Pattern",
+    "description": "Local SVG icon (No pattern file yet)",
+    "type": "local_svg",
+    "pat_file": null,
+    "pat_url": null,
+    "img_url": "/hatches-cadauth/assets/abstract_checkered_pattern.svg",
+    "svg_file": "abstract_checkered_pattern.svg"
+  },
+  "HT4x80ET": {
+    "id": "abstract_checkered_pattern",
+    "name": "Abstract Checkered Pattern",
+    "description": "Local SVG icon (No pattern file yet)",
+    "type": "local_svg",
+    "pat_file": null,
+    "pat_url": null,
+    "img_url": "/hatches-cadauth/assets/abstract_checkered_pattern.svg",
+    "svg_file": "abstract_checkered_pattern.svg"
+  },
+  "HT4x81ET": {
+    "id": "abstract_checkered_pattern",
+    "name": "Abstract Checkered Pattern",
+    "description": "Local SVG icon (No pattern file yet)",
+    "type": "local_svg",
+    "pat_file": null,
+    "pat_url": null,
+    "img_url": "/hatches-cadauth/assets/abstract_checkered_pattern.svg",
+    "svg_file": "abstract_checkered_pattern.svg"
+  },
+  "HT4x82ET": {
+    "id": "abstract_checkered_pattern",
+    "name": "Abstract Checkered Pattern",
+    "description": "Local SVG icon (No pattern file yet)",
+    "type": "local_svg",
+    "pat_file": null,
+    "pat_url": null,
+    "img_url": "/hatches-cadauth/assets/abstract_checkered_pattern.svg",
+    "svg_file": "abstract_checkered_pattern.svg"
+  },
+  "HT4x83ET": {
+    "id": "abstract_checkered_pattern",
+    "name": "Abstract Checkered Pattern",
+    "description": "Local SVG icon (No pattern file yet)",
+    "type": "local_svg",
+    "pat_file": null,
+    "pat_url": null,
+    "img_url": "/hatches-cadauth/assets/abstract_checkered_pattern.svg",
+    "svg_file": "abstract_checkered_pattern.svg"
+  },
+  "HT4x84ET": {
+    "id": "abstract_checkered_pattern",
+    "name": "Abstract Checkered Pattern",
+    "description": "Local SVG icon (No pattern file yet)",
+    "type": "local_svg",
+    "pat_file": null,
+    "pat_url": null,
+    "img_url": "/hatches-cadauth/assets/abstract_checkered_pattern.svg",
+    "svg_file": "abstract_checkered_pattern.svg"
+  },
+  "HT600x3001ET": {
+    "id": "abstract_checkered_pattern",
+    "name": "Abstract Checkered Pattern",
+    "description": "Local SVG icon (No pattern file yet)",
+    "type": "local_svg",
+    "pat_file": null,
+    "pat_url": null,
+    "img_url": "/hatches-cadauth/assets/abstract_checkered_pattern.svg",
+    "svg_file": "abstract_checkered_pattern.svg"
+  },
+  "HT600x3002ET": {
+    "id": "abstract_checkered_pattern",
+    "name": "Abstract Checkered Pattern",
+    "description": "Local SVG icon (No pattern file yet)",
+    "type": "local_svg",
+    "pat_file": null,
+    "pat_url": null,
+    "img_url": "/hatches-cadauth/assets/abstract_checkered_pattern.svg",
+    "svg_file": "abstract_checkered_pattern.svg"
+  },
+  "HT600x3003ET": {
+    "id": "abstract_checkered_pattern",
+    "name": "Abstract Checkered Pattern",
+    "description": "Local SVG icon (No pattern file yet)",
+    "type": "local_svg",
+    "pat_file": null,
+    "pat_url": null,
+    "img_url": "/hatches-cadauth/assets/abstract_checkered_pattern.svg",
+    "svg_file": "abstract_checkered_pattern.svg"
+  },
+  "HT600x3004ET": {
+    "id": "abstract_checkered_pattern",
+    "name": "Abstract Checkered Pattern",
+    "description": "Local SVG icon (No pattern file yet)",
+    "type": "local_svg",
+    "pat_file": null,
+    "pat_url": null,
+    "img_url": "/hatches-cadauth/assets/abstract_checkered_pattern.svg",
+    "svg_file": "abstract_checkered_pattern.svg"
+  },
+  "HT600x3005ET": {
+    "id": "abstract_checkered_pattern",
+    "name": "Abstract Checkered Pattern",
+    "description": "Local SVG icon (No pattern file yet)",
+    "type": "local_svg",
+    "pat_file": null,
+    "pat_url": null,
+    "img_url": "/hatches-cadauth/assets/abstract_checkered_pattern.svg",
+    "svg_file": "abstract_checkered_pattern.svg"
+  },
+  "HT600x3006ET": {
+    "id": "abstract_checkered_pattern",
+    "name": "Abstract Checkered Pattern",
+    "description": "Local SVG icon (No pattern file yet)",
+    "type": "local_svg",
+    "pat_file": null,
+    "pat_url": null,
+    "img_url": "/hatches-cadauth/assets/abstract_checkered_pattern.svg",
+    "svg_file": "abstract_checkered_pattern.svg"
+  },
+  "HT8121ET": {
+    "id": "abstract_checkered_pattern",
+    "name": "Abstract Checkered Pattern",
+    "description": "Local SVG icon (No pattern file yet)",
+    "type": "local_svg",
+    "pat_file": null,
+    "pat_url": null,
+    "img_url": "/hatches-cadauth/assets/abstract_checkered_pattern.svg",
+    "svg_file": "abstract_checkered_pattern.svg"
+  },
+  "HT8122ET": {
+    "id": "abstract_checkered_pattern",
+    "name": "Abstract Checkered Pattern",
+    "description": "Local SVG icon (No pattern file yet)",
+    "type": "local_svg",
+    "pat_file": null,
+    "pat_url": null,
+    "img_url": "/hatches-cadauth/assets/abstract_checkered_pattern.svg",
+    "svg_file": "abstract_checkered_pattern.svg"
+  },
+  "HT8123ET": {
+    "id": "abstract_checkered_pattern",
+    "name": "Abstract Checkered Pattern",
+    "description": "Local SVG icon (No pattern file yet)",
+    "type": "local_svg",
+    "pat_file": null,
+    "pat_url": null,
+    "img_url": "/hatches-cadauth/assets/abstract_checkered_pattern.svg",
+    "svg_file": "abstract_checkered_pattern.svg"
+  },
+  "HT8124ET": {
+    "id": "abstract_checkered_pattern",
+    "name": "Abstract Checkered Pattern",
+    "description": "Local SVG icon (No pattern file yet)",
+    "type": "local_svg",
+    "pat_file": null,
+    "pat_url": null,
+    "img_url": "/hatches-cadauth/assets/abstract_checkered_pattern.svg",
+    "svg_file": "abstract_checkered_pattern.svg"
+  },
+  "HT8125ET": {
+    "id": "abstract_checkered_pattern",
+    "name": "Abstract Checkered Pattern",
+    "description": "Local SVG icon (No pattern file yet)",
+    "type": "local_svg",
+    "pat_file": null,
+    "pat_url": null,
+    "img_url": "/hatches-cadauth/assets/abstract_checkered_pattern.svg",
+    "svg_file": "abstract_checkered_pattern.svg"
+  },
+  "HVSPR1E0": {
+    "id": "abstract_checkered_pattern",
+    "name": "Abstract Checkered Pattern",
+    "description": "Local SVG icon (No pattern file yet)",
+    "type": "local_svg",
+    "pat_file": null,
+    "pat_url": null,
+    "img_url": "/hatches-cadauth/assets/abstract_checkered_pattern.svg",
+    "svg_file": "abstract_checkered_pattern.svg"
+  },
+  "HVSPR1E1": {
+    "id": "abstract_checkered_pattern",
+    "name": "Abstract Checkered Pattern",
+    "description": "Local SVG icon (No pattern file yet)",
+    "type": "local_svg",
+    "pat_file": null,
+    "pat_url": null,
+    "img_url": "/hatches-cadauth/assets/abstract_checkered_pattern.svg",
+    "svg_file": "abstract_checkered_pattern.svg"
+  },
+  "HVSPR1E2": {
+    "id": "abstract_checkered_pattern",
+    "name": "Abstract Checkered Pattern",
+    "description": "Local SVG icon (No pattern file yet)",
+    "type": "local_svg",
+    "pat_file": null,
+    "pat_url": null,
+    "img_url": "/hatches-cadauth/assets/abstract_checkered_pattern.svg",
+    "svg_file": "abstract_checkered_pattern.svg"
+  },
+  "HVSPR1E3": {
+    "id": "abstract_checkered_pattern",
+    "name": "Abstract Checkered Pattern",
+    "description": "Local SVG icon (No pattern file yet)",
+    "type": "local_svg",
+    "pat_file": null,
+    "pat_url": null,
+    "img_url": "/hatches-cadauth/assets/abstract_checkered_pattern.svg",
+    "svg_file": "abstract_checkered_pattern.svg"
+  },
+  "HVSPR1E4": {
+    "id": "abstract_checkered_pattern",
+    "name": "Abstract Checkered Pattern",
+    "description": "Local SVG icon (No pattern file yet)",
+    "type": "local_svg",
+    "pat_file": null,
+    "pat_url": null,
+    "img_url": "/hatches-cadauth/assets/abstract_checkered_pattern.svg",
+    "svg_file": "abstract_checkered_pattern.svg"
+  },
+  "HVSPR1E5": {
+    "id": "abstract_checkered_pattern",
+    "name": "Abstract Checkered Pattern",
+    "description": "Local SVG icon (No pattern file yet)",
+    "type": "local_svg",
+    "pat_file": null,
+    "pat_url": null,
+    "img_url": "/hatches-cadauth/assets/abstract_checkered_pattern.svg",
+    "svg_file": "abstract_checkered_pattern.svg"
+  },
+  "HVSPR1E6": {
+    "id": "abstract_checkered_pattern",
+    "name": "Abstract Checkered Pattern",
+    "description": "Local SVG icon (No pattern file yet)",
+    "type": "local_svg",
+    "pat_file": null,
+    "pat_url": null,
+    "img_url": "/hatches-cadauth/assets/abstract_checkered_pattern.svg",
+    "svg_file": "abstract_checkered_pattern.svg"
+  },
+  "HVSPR1E7": {
+    "id": "abstract_checkered_pattern",
+    "name": "Abstract Checkered Pattern",
+    "description": "Local SVG icon (No pattern file yet)",
+    "type": "local_svg",
+    "pat_file": null,
+    "pat_url": null,
+    "img_url": "/hatches-cadauth/assets/abstract_checkered_pattern.svg",
+    "svg_file": "abstract_checkered_pattern.svg"
+  }
+}

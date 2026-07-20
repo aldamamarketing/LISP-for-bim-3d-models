@@ -1,5 +1,9 @@
 {
   "dependencies": {
+    "express": "^5.2.1",
     "firebase": "^12.14.0"
+  },
+  "devDependencies": {
+    "playwright": "^1.61.1"
   }
 }

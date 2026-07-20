@@ -1,0 +1,685 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Motor de Autoría PAT -> SVG</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .selected { border-color: #3b82f6; background-color: #eff6ff; }
+        .matched { border-left: 4px solid #10b981; }
+        .checkbox-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0.5rem; }
+    </style>
+</head>
+<body class="bg-gray-100 h-screen flex flex-col overflow-hidden">
+    <header class="bg-slate-800 text-white p-4 flex justify-between items-center shadow-md z-10">
+        <h1 class="text-xl font-bold">LispCentral - Motor de Autoría de Patrones</h1>
+        <div>
+            <span id="statsCounter" class="mr-4 text-sm font-semibold bg-slate-700 px-3 py-1 rounded">Cargando...</span>
+        </div>
+    </header>
+
+    <div class="flex flex-1 overflow-hidden">
+        
+        <!-- COL IZQ: PATs -->
+        <div class="w-1/4 bg-white border-r flex flex-col h-full">
+            <div class="p-3 bg-gray-50 border-b font-bold text-gray-700 shadow-sm z-10">Catálogo de Patrones</div>
+            <div id="patList" class="flex-1 overflow-y-auto p-2 space-y-2"></div>
+        </div>
+
+        <!-- COL CENTRO: VISOR Y EDICIÓN -->
+        <div class="w-2/4 bg-gray-50 p-6 flex flex-col overflow-y-auto">
+            <div id="activeArea" class="hidden flex-col gap-6">
+                
+                <div class="bg-white p-6 rounded-lg shadow-md border border-gray-200">
+                    <div class="flex justify-between items-start mb-4">
+                        <h2 class="text-2xl font-bold text-gray-800">Visualizador SVG</h2>
+                        <span id="activeSource" class="text-xs font-bold uppercase tracking-wider py-1 px-2 rounded bg-indigo-100 text-indigo-800"></span>
+                    </div>
+
+                    <!-- Visualización del SVG -->
+                    <div class="grid grid-cols-2 gap-4 mb-4">
+                        <!-- Visor de Tiling -->
+                        <div class="flex flex-col bg-gray-100 rounded-lg p-2 border border-gray-300 h-80">
+                            <h3 class="text-xs font-bold text-gray-600 mb-2 text-center uppercase">Patrón Repetido (CSS Tiling)</h3>
+                            <div class="flex-1 w-full relative overflow-hidden rounded" style="background-image: linear-gradient(45deg, #ccc 25%, transparent 25%), linear-gradient(-45deg, #ccc 25%, transparent 25%), linear-gradient(45deg, transparent 75%, #ccc 75%), linear-gradient(-45deg, transparent 75%, #ccc 75%); background-size: 20px 20px; background-position: 0 0, 0 10px, 10px -10px, -10px 0px;">
+                                <div id="tiledBackground" class="absolute inset-0 hidden" style="background-repeat: repeat;"></div>
+                            </div>
+                        </div>
+                        
+                        <!-- Visor de Baldosa Individual -->
+                        <div class="flex flex-col bg-gray-100 rounded-lg p-2 border border-blue-300 h-80">
+                            <h3 class="text-xs font-bold text-blue-600 mb-2 text-center uppercase">Baldosa Única (SVG Base Exportable)</h3>
+                            <div class="flex-1 w-full relative bg-black rounded overflow-hidden" id="singleTileContainer">
+                                <div id="singleTileBox" class="absolute inset-2 flex items-center justify-center"></div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Controles de Encuadre y Visuales -->
+                    <div id="frameControls" class="hidden bg-slate-50 p-4 rounded-lg border border-slate-200 mb-6">
+                        <div class="flex justify-between items-center mb-3">
+                            <h3 class="text-sm font-bold text-slate-700 uppercase">Definición de la Baldosa (ViewBox)</h3>
+                            <label class="flex items-center space-x-2 cursor-pointer bg-blue-100 px-2 py-1 rounded">
+                                <input type="checkbox" id="keepParams" checked class="form-checkbox text-blue-600 rounded">
+                                <span class="text-xs font-bold text-blue-800">Mantener Grosor y Escala Visual</span>
+                            </label>
+                        </div>
+                        <div class="grid grid-cols-2 gap-4 mb-4">
+                            <div>
+                                <label class="text-xs font-semibold text-gray-600">Origen X (Encuadre)</label>
+                                <div class="flex items-center space-x-2 mt-1">
+                                    <input type="number" id="vbX_num" value="0" step="0.1" class="w-16 border rounded p-1 text-xs" oninput="document.getElementById('vbX_range').value=this.value; updateSvgFrame()">
+                                    <input type="range" id="vbX_range" min="-50" max="50" step="0.1" value="0" class="flex-1" oninput="document.getElementById('vbX_num').value=this.value; updateSvgFrame()">
+                                </div>
+                            </div>
+                            <div>
+                                <label class="text-xs font-semibold text-gray-600">Origen Y (Encuadre)</label>
+                                <div class="flex items-center space-x-2 mt-1">
+                                    <input type="number" id="vbY_num" value="0" step="0.1" class="w-16 border rounded p-1 text-xs" oninput="document.getElementById('vbY_range').value=this.value; updateSvgFrame()">
+                                    <input type="range" id="vbY_range" min="-50" max="50" step="0.1" value="0" class="flex-1" oninput="document.getElementById('vbY_num').value=this.value; updateSvgFrame()">
+                                </div>
+                            </div>
+                            <div>
+                                <label class="text-xs font-semibold text-gray-600">Ancho (W)</label>
+                                <div class="flex items-center space-x-2 mt-1">
+                                    <input type="number" id="vbW_num" value="10" step="0.1" class="w-16 border rounded p-1 text-xs" oninput="document.getElementById('vbW_range').value=this.value; updateSvgFrame()">
+                                    <input type="range" id="vbW_range" min="0.1" max="50" step="0.1" value="10" class="flex-1" oninput="document.getElementById('vbW_num').value=this.value; updateSvgFrame()">
+                                </div>
+                            </div>
+                            <div>
+                                <label class="text-xs font-semibold text-gray-600">Alto (H)</label>
+                                <div class="flex items-center space-x-2 mt-1">
+                                    <input type="number" id="vbH_num" value="10" step="0.1" class="w-16 border rounded p-1 text-xs" oninput="document.getElementById('vbH_range').value=this.value; updateSvgFrame()">
+                                    <input type="range" id="vbH_range" min="0.1" max="50" step="0.1" value="10" class="flex-1" oninput="document.getElementById('vbH_num').value=this.value; updateSvgFrame()">
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <label class="text-xs text-gray-500 uppercase tracking-wide font-bold mb-2 block">Grosor (Stroke) <span id="strokeval" class="float-right text-gray-400">0.01</span></label>
+                                <input type="range" id="strokeW" min="0.01" max="5" step="0.01" value="0.01" class="w-full" oninput="updateSvgFrame()">
+                            </div>
+                            <div>
+                                <label class="text-xs font-semibold text-gray-600">Escala Visual Tiling: <span id="densval">100</span>px</label>
+                                <input type="range" id="density" min="20" max="400" step="5" value="100" class="w-full" oninput="updateSvgFrame()">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Editor de Metadatos -->
+                    <div class="bg-blue-50 border border-blue-100 p-4 rounded-lg">
+                        <h3 class="text-md font-bold text-blue-900 mb-4">Información del Patrón</h3>
+                        
+                        <div class="space-y-4">
+                            <div>
+                                <label class="block text-xs font-bold text-gray-700 mb-1">Nombre</label>
+                                <input type="text" id="editName" class="w-full border rounded px-3 py-2 text-sm">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-gray-700 mb-1">Descripción</label>
+                                <textarea id="editDesc" rows="2" class="w-full border rounded px-3 py-2 text-sm"></textarea>
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-gray-700 mb-2">Categorías</label>
+                                <div id="catCheckboxes" class="checkbox-grid text-sm mb-2"></div>
+                                <input type="text" id="editCustomCats" placeholder="Otras categorías (separadas por coma)..." class="w-full border rounded px-3 py-2 text-sm text-gray-600">
+                            </div>
+                            <div class="pt-2">
+                                <button id="saveBtn" onclick="saveGeneratedSvg()" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded shadow-md transition">
+                                    💾 Generar SVG y Guardar en Proyecto
+                                </button>
+                                <p id="saveMsg" class="text-xs text-center mt-2 text-green-600 font-bold hidden"></p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Referencia de Imagen Original y Código PAT -->
+                    <div class="grid grid-cols-2 gap-4">
+                        <div class="bg-gray-100 border p-4 rounded-lg">
+                            <h3 class="text-sm font-bold text-gray-700 mb-2">Imagen de Referencia</h3>
+                            <div id="refImgContainer" class="flex justify-center bg-white p-2 border rounded" style="min-height: 150px;">
+                                <img id="refImg" src="" class="max-h-40 object-contain hidden" />
+                                <span id="refImgEmpty" class="text-xs text-gray-400 italic flex items-center">Sin imagen de referencia</span>
+                            </div>
+                        </div>
+                        <div class="bg-gray-800 border p-4 rounded-lg flex flex-col">
+                            <h3 class="text-sm font-bold text-gray-200 mb-2">Código Original (.pat)</h3>
+                            <pre id="patCodeView" class="text-xs text-green-400 bg-black p-2 rounded flex-1 overflow-y-auto" style="max-h: 150px;"></pre>
+                        </div>
+                    </div>
+
+                </div>
+
+            </div>
+            
+            <div id="emptyState" class="flex-1 flex items-center justify-center text-gray-400">
+                <p class="text-lg">Selecciona un patrón de la izquierda para comenzar.</p>
+            </div>
+        </div>
+
+        <!-- COL DER: SVGs LOCALES PARA ASOCIACIÓN MANUAL -->
+        <div class="w-1/4 bg-white border-l overflow-y-auto flex flex-col h-full">
+            <div class="p-3 bg-gray-50 border-b font-bold text-gray-700 sticky top-0 shadow-sm z-10">
+                Vincular SVG Existente
+                <input type="text" id="svgSearch" placeholder="Buscar SVG manual..." class="mt-2 w-full border rounded p-2 text-sm font-normal focus:outline-none focus:ring-2 focus:ring-blue-400" onkeyup="filterSvgs()">
+            </div>
+            <div id="svgList" class="flex-1 overflow-y-auto p-2 grid grid-cols-2 gap-2"></div>
+        </div>
+    </div>
+
+    <script>
+        const PREDEFINED_CATEGORIES = [
+            'Architecture', 'Masonry', 'Brickwork', 'Flooring', 'Woodwork', 'Stone', 
+            'Roofing', 'Geometric', 'Exterior', 'Interior', 'Tile', 
+            'Metal', 'Landscaping', 'Decorative', 'Textile', 'Paving', 'Mosaic'
+        ];
+
+        let PAtData = [];
+        let SVGData = [];
+        let activePat = null;
+        let baseViewBox = { x: 0, y: 0, w: 100, h: 100 };
+        let rawSvgLines = '';
+        
+        let selectedManualSvg = null;
+        
+        async function loadData() {
+            try {
+                const res = await fetch('/api/data');
+                const data = await res.json();
+                PAtData = data.pats.map(p => {
+                    p.img_url = p.img_url || p.image_url;
+                    return p;
+                });
+                SVGData = data.svgs;
+                
+                renderCategoryCheckboxes();
+                renderPatList();
+                renderSvgList(SVGData);
+                updateStats();
+            } catch (e) {
+                console.error("Error al cargar datos", e);
+                alert("Error al conectar con el servidor local.");
+            }
+        }
+
+        function renderCategoryCheckboxes() {
+            const container = document.getElementById('catCheckboxes');
+            container.innerHTML = '';
+            PREDEFINED_CATEGORIES.forEach(cat => {
+                const id = 'cat_' + cat.toLowerCase().replace(/[^a-z0-9]/g, '');
+                container.innerHTML += `
+                    <label class="flex items-center space-x-2 text-gray-700 cursor-pointer">
+                        <input type="checkbox" value="${cat}" class="cat-cb form-checkbox h-4 w-4 text-blue-600">
+                        <span>${cat}</span>
+                    </label>
+                `;
+            });
+        }
+
+        function getSelectedCategories() {
+            const predefined = Array.from(document.querySelectorAll('.cat-cb:checked')).map(cb => cb.value);
+            const customInput = document.getElementById('editCustomCats').value;
+            const custom = customInput ? customInput.split(',').map(s => s.trim()).filter(s => s) : [];
+            return Array.from(new Set([...predefined, ...custom]));
+        }
+
+        function setSelectedCategories(cats) {
+            if (!cats) cats = "";
+            const catArray = typeof cats === 'string' ? cats.split(',').map(s => s.trim()) : cats;
+            
+            let customCats = [];
+            
+            document.querySelectorAll('.cat-cb').forEach(cb => {
+                cb.checked = catArray.includes(cb.value);
+            });
+            
+            catArray.forEach(c => {
+                if (c && !PREDEFINED_CATEGORIES.includes(c)) {
+                    customCats.push(c);
+                }
+            });
+            
+            document.getElementById('editCustomCats').value = customCats.join(', ');
+        }
+
+        function parsePatLine(line) {
+            const parts = line.split(',').map(s => parseFloat(s.trim()));
+            if (parts.length < 5) return null;
+            return {
+                ang: parts[0],
+                ox: parts[1],
+                oy: parts[2],
+                dx: parts[3],
+                dy: parts[4],
+                dashes: parts.slice(5).filter(n => !isNaN(n))
+            };
+        }
+
+        function generateBaseSvgFromPat(patCode, densityMultiplier) {
+            const lines = patCode.split(/\r?\n/)
+                .map(l => l.trim())
+                .filter(l => l && !l.startsWith('*') && !l.startsWith(';'));
+
+            const defs = lines.map(parsePatLine).filter(d => d !== null);
+            if (defs.length === 0) return null;
+
+            let maxStep = 1;
+            for (const def of defs) {
+                if (Math.abs(def.dx) > maxStep) maxStep = Math.abs(def.dx);
+                if (Math.abs(def.dy) > maxStep) maxStep = Math.abs(def.dy);
+            }
+
+            let minX = 0, minY = 0, maxX = maxStep, maxY = maxStep;
+            for (const def of defs) {
+                if (def.ox < minX) minX = def.ox;
+                if (def.ox > maxX) maxX = def.ox;
+                if (def.oy < minY) minY = def.oy;
+                if (def.oy > maxY) maxY = def.oy;
+            }
+
+            const w = Math.max(maxX - minX + maxStep * 2, maxStep * 4, 10);
+            const h = Math.max(maxY - minY + maxStep * 2, maxStep * 4, 10);
+            const viewportSize = Math.max(w, h);
+
+            let svgLines = '';
+            let lineCount = 0;
+            const MAX_LINES = 10000; // Alto para permitir mucha repetición
+
+            for (const def of defs) {
+                if (lineCount >= MAX_LINES) break;
+
+                const rad = def.ang * Math.PI / 180;
+                const cosA = Math.cos(rad);
+                const sinA = Math.sin(rad);
+
+                let dashStr = '';
+                if (def.dashes.length > 0) {
+                    const validDashes = def.dashes.map(v => Math.max(0.0001, Math.abs(v)));
+                    dashStr = ' stroke-dasharray="' + validDashes.join(',') + '"';
+                }
+
+                const perpX = -sinA * def.dy;
+                const perpY =  cosA * def.dy;
+                const shiftX = cosA * def.dx;
+                const shiftY = sinA * def.dx;
+
+                let stepSize = Math.max(Math.abs(def.dy), Math.abs(def.dx), 0.1);
+                
+                let reps = Math.ceil(((viewportSize * 10) / stepSize) * densityMultiplier);
+                reps = Math.min(reps, 300); 
+
+                for (let i = -reps; i <= reps; i++) {
+                    if (lineCount >= MAX_LINES) break;
+
+                    const cx = def.ox + (i * perpX) + (i * shiftX);
+                    const cy = def.oy + (i * perpY) + (i * shiftY);
+
+                    const len = viewportSize * 10 * densityMultiplier;
+                    const x1 = Math.round((cx - len * cosA) * 1000) / 1000;
+                    const y1 = Math.round((cy - len * sinA) * 1000) / 1000;
+                    const x2 = Math.round((cx + len * cosA) * 1000) / 1000;
+                    const y2 = Math.round((cy + len * sinA) * 1000) / 1000;
+
+                    const boundsSize = viewportSize * 5 * densityMultiplier;
+                    if (
+                        (x1 > minX + boundsSize && x2 > minX + boundsSize) || (x1 < minX - boundsSize && x2 < minX - boundsSize) ||
+                        (y1 > minY + boundsSize && y2 > minY + boundsSize) || (y1 < minY - boundsSize && y2 < minY - boundsSize)
+                    ) {
+                        continue;
+                    }
+
+                    svgLines += '<line x1="' + x1 + '" y1="' + y1 + '" x2="' + x2 + '" y2="' + y2 + '" stroke-dashoffset="' + (-len) + '"' + dashStr + ' />\\n';
+                    lineCount++;
+                }
+            }
+
+            return {
+                svgLines,
+                viewBoxObj: { x: minX, y: minY, w: w, h: h },
+                maxStep: maxStep
+            };
+        }
+
+        function renderPatList() {
+            const container = document.getElementById('patList');
+            container.innerHTML = '';
+            PAtData.forEach(pat => {
+                const el = document.createElement('div');
+                const isMatched = pat.matched === true || (pat.img_url && pat.img_url.includes('/generated/'));
+                const activeId = activePat ? activePat.id : '';
+                el.className = 'p-3 border rounded cursor-pointer hover:bg-gray-50 transition flex items-center gap-3 ' + (activeId === pat.id ? 'selected ' : '') + (isMatched ? 'matched' : '');
+                
+                let matchText = '';
+                if(isMatched) {
+                    matchText = '<div class="text-xs text-emerald-600 mt-1 font-semibold">✓ Generado / Vinculado</div>';
+                }
+                
+                let thumbHtml = '';
+                if (pat.img_url && !pat.img_url.includes('.pat')) {
+                    thumbHtml = '<img src="/public' + pat.img_url + '" class="w-16 h-16 object-cover bg-gray-100 rounded" />';
+                } else {
+                    thumbHtml = '<div class="w-16 h-16 bg-gray-100 rounded flex items-center justify-center text-gray-300 text-xs text-center border border-dashed border-gray-300">PAT</div>';
+                }
+                
+                el.innerHTML = thumbHtml + ' <div class="flex-1 overflow-hidden"><div class="text-xs text-gray-400 mb-1">' + pat.source + '</div><div class="font-semibold text-gray-800 truncate" title="' + pat.name + '">' + pat.name + '</div>' + matchText + '</div>';
+                el.onclick = () => selectPat(pat);
+                container.appendChild(el);
+            });
+        }
+
+        function filterSvgs() {
+            const term = document.getElementById('svgSearch').value.toLowerCase();
+            const filtered = SVGData.filter(svg => svg.name.toLowerCase().includes(term) || svg.id.toLowerCase().includes(term));
+            renderSvgList(filtered);
+        }
+
+        function renderSvgList(list) {
+            const container = document.getElementById('svgList');
+            container.innerHTML = '';
+            list.forEach(svg => {
+                const el = document.createElement('div');
+                
+                // Determinar si tiene metadatos enriquecidos (por el script o por el usuario)
+                const isMatchedUser = svg.matched === true;
+                const isEnrichedAI = svg.categories && svg.categories.length > 1 && !isMatchedUser;
+                
+                let borderClass = 'border-gray-200';
+                let bgClass = 'bg-white';
+                let badge = '';
+                
+                if (isMatchedUser) {
+                    borderClass = 'border-emerald-400';
+                    bgClass = 'bg-emerald-50';
+                    badge = '<span class="absolute -top-1 -right-1 text-[9px] bg-emerald-500 text-white px-1 rounded-full font-bold shadow-sm">✓ Guardado</span>';
+                } else if (isEnrichedAI) {
+                    borderClass = 'border-amber-400';
+                    bgClass = 'bg-amber-50';
+                    badge = '<span class="absolute -top-1 -right-1 text-[9px] bg-amber-400 text-amber-900 px-1 rounded-full font-bold shadow-sm">✨ Auto</span>';
+                }
+                
+                el.className = `manual-svg-card border-2 ${borderClass} ${bgClass} rounded p-2 flex flex-col items-center justify-center cursor-pointer hover:border-blue-500 hover:shadow text-center relative`;
+                
+                const imgSrc = '/public' + svg.img_url;
+                el.innerHTML = `${badge}<img src="${imgSrc}" class="w-12 h-12 object-contain mb-2 opacity-80" onerror="this.remove()" /><span class="text-xs font-semibold text-gray-700 w-full truncate" title="${svg.name}">${svg.name}</span>`;
+                el.onclick = function() { manualLinkSvg(svg, this); };
+                container.appendChild(el);
+            });
+        }
+
+        function extractHeaderData(patCode, patName) {
+            let name = patName;
+            let desc = '';
+            const lines = patCode.split('\\n');
+            if (lines.length > 0 && lines[0].startsWith('*')) {
+                const parts = lines[0].substring(1).split(',');
+                if (parts[0]) name = parts[0].trim();
+                if (parts[1]) desc = parts[1].trim();
+            }
+            return { name, desc };
+        }
+
+        function regenerateRawSvg() {
+            // Ya no es necesario regenerar el SVG con la densidad. 
+            // Densidad ahora controla el escalado del background en updateSvgFrame.
+            updateSvgFrame();
+        }
+
+        function selectPat(pat) {
+            selectedManualSvg = null;
+            document.querySelectorAll('.manual-svg-card').forEach(el => el.classList.remove('ring-4', 'ring-blue-500', 'bg-blue-50'));
+            document.getElementById('saveBtn').innerHTML = '💾 Generar SVG y Guardar en Proyecto';
+            
+            activePat = pat;
+            document.getElementById('emptyState').classList.add('hidden');
+            document.getElementById('activeArea').classList.remove('hidden');
+            document.getElementById('saveMsg').classList.add('hidden');
+            
+            document.getElementById('activeSource').innerText = pat.source;
+            
+            let defaultName = pat.name;
+            let defaultDesc = pat.description || '';
+            if (pat.patCode) {
+                const headerData = extractHeaderData(pat.patCode, pat.name);
+                defaultName = headerData.name;
+                defaultDesc = defaultDesc || headerData.desc;
+            }
+
+            document.getElementById('editName').value = defaultName;
+            document.getElementById('editDesc').value = defaultDesc;
+            setSelectedCategories(pat.categories);
+            
+            const tiledBg = document.getElementById('tiledBackground');
+            const controls = document.getElementById('frameControls');
+            
+            if (pat.patCode) {
+                // Generate huge infinite lines canvas once
+                const svgData = generateBaseSvgFromPat(pat.patCode, 3.0);
+                if (svgData) {
+                    rawSvgLines = svgData.svgLines;
+                    baseViewBox = svgData.viewBoxObj;
+                    
+                    // Inicializar X, Y, W, H siempre desde el PAT
+                    let baseUnit = svgData.maxStep;
+                    if(baseUnit < 0.1) baseUnit = 1.0;
+                    
+                    document.getElementById('vbX_num').value = baseViewBox.x.toFixed(2);
+                    document.getElementById('vbX_range').value = baseViewBox.x.toFixed(2);
+                    
+                    document.getElementById('vbY_num').value = baseViewBox.y.toFixed(2);
+                    document.getElementById('vbY_range').value = baseViewBox.y.toFixed(2);
+                    
+                    document.getElementById('vbW_num').value = baseUnit.toFixed(2);
+                    document.getElementById('vbW_range').value = baseUnit.toFixed(2);
+                    
+                    document.getElementById('vbH_num').value = baseUnit.toFixed(2);
+                    document.getElementById('vbH_range').value = baseUnit.toFixed(2);
+                    
+                    // Inicializar Grosor y Escala solo si no están bloqueados
+                    if (!document.getElementById('keepParams').checked) {
+                        document.getElementById('strokeW').value = 0.5;
+                        document.getElementById('density').value = 100; // 100px base size
+                    }
+                }
+            }
+            
+            // Referencia de Imagen
+            const refImg = document.getElementById('refImg');
+            const refImgEmpty = document.getElementById('refImgEmpty');
+            if (pat.img_url && !pat.img_url.includes('.pat')) {
+                refImg.src = '/public' + pat.img_url;
+                refImg.classList.remove('hidden');
+                refImgEmpty.classList.add('hidden');
+            } else {
+                refImg.classList.add('hidden');
+                refImgEmpty.classList.remove('hidden');
+            }
+
+            // Código PAT
+            const patCodeView = document.getElementById('patCodeView');
+            if (pat.patCode) {
+                patCodeView.innerText = pat.patCode;
+            } else {
+                patCodeView.innerText = "No se pudo cargar el código .pat";
+            }
+            
+            if (pat.img_url && !pat.patCode) {
+                // Mostrar solo la imagen original si no hay PAT
+                tiledBg.style.backgroundImage = "url('/public" + pat.img_url + "')";
+                tiledBg.style.backgroundSize = "contain";
+                tiledBg.classList.remove('hidden');
+                document.getElementById('singleTileContainer').innerHTML = "<p class='text-white'>Solo imagen JPG</p>";
+                controls.classList.add('hidden');
+            } else if (pat.patCode) {
+                if (rawSvgLines) {
+                    controls.classList.remove('hidden');
+                    updateSvgFrame(); 
+                } else {
+                    tiledBg.classList.add('hidden');
+                    document.getElementById('singleTileContainer').innerHTML = "<p class='text-white'>Error generando PAT</p>";
+                    controls.classList.add('hidden');
+                }
+            } else {
+                tiledBg.classList.add('hidden');
+                document.getElementById('singleTileContainer').innerHTML = "<p class='text-gray-400'>Sin datos</p>";
+                controls.classList.add('hidden');
+            }
+            
+            renderPatList(); // to update active styling
+        }
+
+        let finalSvgCodeCache = '';
+
+        function updateSvgFrame() {
+            const vbX = parseFloat(document.getElementById('vbX_num').value) || 0;
+            const vbY = parseFloat(document.getElementById('vbY_num').value) || 0;
+            const vbW = parseFloat(document.getElementById('vbW_num').value) || 1;
+            const vbH = parseFloat(document.getElementById('vbH_num').value) || 1;
+            const strokeW = parseFloat(document.getElementById('strokeW').value) || 1;
+            const density = parseFloat(document.getElementById('density').value) || 100;
+            
+            document.getElementById('strokeval').innerText = strokeW.toFixed(2);
+            document.getElementById('densval').innerText = density.toFixed(0);
+            
+            const viewBoxStr = vbX + ' ' + vbY + ' ' + vbW + ' ' + vbH;
+            
+            // Generate the standalone SVG string for the single tile
+            // It uses width/height 100% and preserveAspectRatio meet to fill the UI box
+            const svgContent = '<svg xmlns="http://www.w3.org/2000/svg" width="100%" height="100%" viewBox="' + viewBoxStr + '" preserveAspectRatio="xMidYMid meet">' +
+                               '<g stroke="#fff" stroke-width="' + strokeW + '" vector-effect="non-scaling-stroke" stroke-linecap="square" fill="none">' +
+                               rawSvgLines +
+                               '</g></svg>';
+            
+            finalSvgCodeCache = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="' + viewBoxStr + '" style="background:#000;">' +
+                               '<g stroke="#fff" stroke-width="' + strokeW + '" vector-effect="non-scaling-stroke" stroke-linecap="square" fill="none">' +
+                               rawSvgLines +
+                               '</g></svg>';
+
+            // Renderizar en el DIV de Baldosa Única
+            const singleTileBox = document.getElementById('singleTileBox');
+            singleTileBox.innerHTML = svgContent;
+            
+            // Convert to Data URI for CSS background tiling
+            const encodedSvg = 'data:image/svg+xml;utf8,' + encodeURIComponent(finalSvgCodeCache);
+            
+            const tiledBg = document.getElementById('tiledBackground');
+            
+            tiledBg.style.backgroundImage = 'url("' + encodedSvg + '")';
+            // Background size respects the aspect ratio perfectly and matches the pixel size slider
+            const aspect = vbW / vbH;
+            let cssW, cssH;
+            if (aspect >= 1) {
+                cssW = density;
+                cssH = density / aspect;
+            } else {
+                cssH = density;
+                cssW = density * aspect;
+            }
+            tiledBg.style.backgroundSize = cssW + 'px ' + cssH + 'px';
+            tiledBg.classList.remove('hidden');
+        }
+
+        async function saveGeneratedSvg() {
+            if (!activePat) return;
+            
+            const name = document.getElementById('editName').value;
+            const description = document.getElementById('editDesc').value;
+            const categories = getSelectedCategories().join(', ');
+            
+            let finalSvgCode = null;
+            let manualImgUrl = null;
+
+            if (selectedManualSvg) {
+                manualImgUrl = selectedManualSvg.img_url;
+            } else {
+                if (finalSvgCodeCache) {
+                    finalSvgCode = finalSvgCodeCache;
+                }
+            }
+            
+            try {
+                const res = await fetch('/api/save-svg', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        patId: activePat.id,
+                        svgContent: finalSvgCode,
+                        manualImgUrl: manualImgUrl,
+                        name: name,
+                        description: description,
+                        categories: categories
+                    })
+                });
+                
+                const data = await res.json();
+                if (data.success) {
+                    const msg = document.getElementById('saveMsg');
+                    msg.innerText = "¡Guardado con éxito! " + data.img_url;
+                    msg.classList.remove('hidden');
+                    
+                    activePat.name = name;
+                    activePat.description = description;
+                    if(data.img_url) activePat.img_url = data.img_url;
+                    activePat.matched = true;
+                    
+                    updateStats();
+                    renderPatList();
+                } else {
+                    alert("Error: " + data.error);
+                }
+            } catch (e) {
+                console.error(e);
+                alert("Error de conexión al guardar.");
+            }
+        }
+
+        function manualLinkSvg(svg, element) {
+            if (!activePat) {
+                alert("Primero selecciona un Patrón de la izquierda.");
+                return;
+            }
+            
+            if (selectedManualSvg && selectedManualSvg.id === svg.id) {
+                // Deseleccionar (Toggle)
+                selectedManualSvg = null;
+                document.getElementById('saveBtn').innerHTML = '💾 Generar SVG y Guardar en Proyecto';
+                if (element) element.classList.remove('ring-4', 'ring-blue-500', 'bg-blue-50');
+                
+                // Restaurar datos por defecto del PAT activo
+                let defaultName = activePat.name;
+                let defaultDesc = activePat.description || '';
+                if (activePat.patCode) {
+                    const headerData = extractHeaderData(activePat.patCode, activePat.name);
+                    defaultName = headerData.name;
+                    defaultDesc = activePat.description || headerData.desc;
+                }
+                document.getElementById('editName').value = defaultName;
+                document.getElementById('editDesc').value = defaultDesc;
+                setSelectedCategories(activePat.categories);
+                
+                return;
+            }
+            
+            selectedManualSvg = svg;
+            document.getElementById('saveBtn').innerHTML = '🔗 Asociar con SVG: ' + svg.name;
+            
+            // AUTO-FILL METADATA INYECTADA VISUALMENTE
+            document.getElementById('editName').value = svg.name || '';
+            document.getElementById('editDesc').value = svg.description || '';
+            setSelectedCategories(svg.categories || []);
+            
+            document.querySelectorAll('.manual-svg-card').forEach(el => el.classList.remove('ring-4', 'ring-blue-500', 'bg-blue-50'));
+            if (element) {
+                element.classList.add('ring-4', 'ring-blue-500', 'bg-blue-50');
+            }
+        }
+
+        function updateStats() {
+            const count = PAtData.filter(p => p.matched === true || (p.img_url && p.img_url.includes('/generated/'))).length;
+            document.getElementById('statsCounter').innerText = count + ' / ' + PAtData.length + ' configurados';
+        }
+
+        window.onload = loadData;
+    </script>
+</body>
+</html>

@@ -1,11 +1,11 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import PaletteDropdownMenu from './PaletteDropdownMenu';
 import MultiFilter from './MultiFilter';
 import StandardsList from './saas/StandardsList';
 import ContextSwitcher from './saas/ContextSwitcher';
 import { executeInAutoCAD } from '../utils/autocadBridge';
+import GlobalHeader from './layout/GlobalHeader';
 
-export default function SaasPalette() {
+export default function SaasPalette({ isUnified = false }) {
   console.log('[SaasPalette] Inicializando componente...');
   const [activeFilters, setActiveFilters] = useState([]);
   const [activeTeamId, setActiveTeamId] = useState(''); // Empty means 'None'
@@ -60,21 +60,32 @@ export default function SaasPalette() {
       {/* Header & Search Container */}
       <div style={{ margin: '0 auto', width: '100%', maxWidth: '600px', flexShrink: 0 }}>
         {/* TOP BAR */}
-        <div style={{ padding: '8px 10px', backgroundColor: '#111', display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '2px solid var(--tmd-orange)' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-            <PaletteDropdownMenu myId="saas" />
-            <span style={{ fontSize: '0.75rem', fontWeight: 'bold', color: 'var(--tmd-orange)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
-              LISPCENTRAL STANDARDS
-            </span>
+        {!isUnified ? (
+          <div style={{ padding: '8px 10px', backgroundColor: '#111', display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '2px solid var(--tmd-orange)' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <span style={{ fontSize: '0.75rem', fontWeight: 'bold', color: 'var(--tmd-orange)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+                LISPCENTRAL STANDARDS
+              </span>
+            </div>
+            <button
+              onClick={handleSync}
+              style={{ background: 'transparent', border: '1px solid #444', color: '#aaa', borderRadius: '4px', cursor: 'pointer', padding: '3px 8px', fontSize: '0.7rem' }}
+              title="Sync Commands"
+            >
+              Sync
+            </button>
           </div>
-          <button
-            onClick={handleSync}
-            style={{ background: 'transparent', border: '1px solid #444', color: '#aaa', borderRadius: '4px', cursor: 'pointer', padding: '3px 8px', fontSize: '0.7rem' }}
-            title="Sync Commands"
-          >
-            Sync
-          </button>
-        </div>
+        ) : (
+          <GlobalHeader title="LispCentral Standards">
+            <button
+              onClick={handleSync}
+              style={{ background: 'transparent', border: '1px solid #444', color: '#aaa', borderRadius: '4px', cursor: 'pointer', padding: '3px 8px', fontSize: '0.7rem' }}
+              title="Sync Commands"
+            >
+              Sync
+            </button>
+          </GlobalHeader>
+        )}
 
         {/* SEARCH BAR */}
         <div style={{ padding: '8px 8px 4px 8px' }}>

@@ -2,9 +2,9 @@ import React, { useState, useEffect, useCallback, useRef } from 'react';
 import MultiFilter from './MultiFilter';
 import { executeInAutoCAD } from '../utils/autocadBridge';
 import GlobalHeader from './layout/GlobalHeader';
+import { getPublicAssets } from '../utils/library';
 
 /**
- * ResourcePalette
  * 
  * Biblioteca curada de Hachuras e Tipos de Linha para uso direto no AutoCAD.
  * 
@@ -29,6 +29,12 @@ const isInsideAutoCAD = typeof window !== 'undefined' && (
   window.location.search.includes('token=')
 );
 
+// Cuando el HTML vive en %TEMP% (file://), los fetch relativos fallan.
+// HOSTING_BASE asegura que todos los recursos estáticos usen la URL de Firebase.
+const HOSTING_BASE = (typeof window !== 'undefined' && window.location.protocol === 'file:')
+  ? 'https://lispcentral.web.app'
+  : '';
+
 const CATEGORY_ICONS = {
   'Architecture': `<svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 28V14L16 4L28 14V28H4Z"/><path d="M12 28V20H20V28"/></svg>`,
   'Topography':   `<svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 24L10 12L16 20L22 8L28 20"/><line x1="4" y1="28" x2="28" y2="28"/></svg>`,
@@ -48,6 +54,8 @@ function SvgIcon({ svgString, category }) {
   const icon = svgString || CATEGORY_ICONS[category] || CATEGORY_ICONS['General'];
 
   if (isUrl) {
+    // Prefijamos HOSTING_BASE si la URL es relativa
+    const resolvedSrc = svgString.startsWith('http') ? svgString : `${HOSTING_BASE}${svgString}`;
     return (
       <div style={{
         position: 'absolute',
@@ -61,7 +69,7 @@ function SvgIcon({ svgString, category }) {
         zIndex: 0,
         opacity: 0.8,
       }}>
-        <img src={svgString} alt={category} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+        <img src={resolvedSrc} alt={category} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
       </div>
     );
   }
@@ -172,30 +180,50 @@ function ResourceItem({ item, isPinned, onContextMenu, onInsert }) {
         cursor: 'pointer',
       }}
     >
-      <div style={{ position: 'relative', width: '100%', height: '100%', backgroundColor: '#1a1a1a' }}>
-        <img 
-          src={item.image_url || '/patterns/stack.svg'} 
-          alt={item.name} 
-          style={{ width: '100%', height: '100%', objectFit: 'cover', opacity: 0.8 }} 
-        />
+      <div style={{ position: 'relative', width: '100%', height: '100%', backgroundColor: '#1a1a1a', overflow: 'hidden' }}>
+        {(() => {
+          const src = item.iconUrl || item.image_url || '/patterns/stack.svg';
+          const isSvg = src.endsWith('.svg') || src.startsWith('data:image/svg');
+          
+          if (!isSvg) {
+            return <img src={src} alt={item.name} style={{ width: '100%', height: '100%', objectFit: 'cover', opacity: 0.8 }} />;
+          }
+
+          // Para lograr la cuadrícula 2x2 que cubra sin deformar:
+          // Creamos un contenedor interno del 200% del tamaño, centrado.
+          // Con background-size: 25% (que equivale al 50% de la tarjeta real),
+          // logramos que el tile no se deforme (mantiene su aspect-ratio original),
+          // se repita de forma perfecta y cubra el visor con desbordamiento oculto.
+          return (
+            <div style={{
+              position: 'absolute', top: '-50%', left: '-50%',
+              width: '200%', height: '200%',
+              backgroundImage: `url(${src})`,
+              backgroundSize: '25%', // El ancho del SVG será el 50% del visor real (2 columnas)
+              backgroundRepeat: 'repeat',
+              backgroundPosition: 'center',
+              opacity: 0.8,
+              filter: 'invert(1) hue-rotate(180deg)'
+            }} />
+          );
+        })()}
       </div>
 
       <button
         onClick={(e) => { e.stopPropagation(); onContextMenu(e, item, true); }}
         style={{
           position: 'absolute', top: '4px', right: '4px',
-          background: 'rgba(255,255,255,0.8)', border: 'none', cursor: 'pointer',
-          borderRadius: '50%', width: '24px', height: '24px',
+          background: 'rgba(0,0,0,0.5)', border: 'none', cursor: 'pointer',
+          borderRadius: '4px', width: '24px', height: '24px',
           display: 'flex', alignItems: 'center', justifyContent: 'center',
-          opacity: isPinned ? 1 : 0.6,
-          color: isPinned ? 'var(--tmd-orange)' : '#333',
-          fontSize: '0.8rem', padding: '2px',
+          color: isPinned ? 'var(--tmd-orange)' : '#fff',
+          fontSize: '1.2rem', padding: '0',
           zIndex: 2,
-          boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
+          boxShadow: '0 2px 4px rgba(0,0,0,0.2)'
         }}
-        title={isPinned ? 'Desafixar' : 'Fixar no topo'}
+        title="Opções"
       >
-        📌
+        &#8942;
       </button>
 
       {/* Texto superpuesto al estilo AutoCAD */}
@@ -229,18 +257,16 @@ export default function ResourcePalette({ isUnified = false }) {
   const [contextMenu, setContextMenu]   = useState(null);
   const [applying, setApplying]         = useState(null);
 
-  // ── Cargar catálogo local (Local JSON) ──
+  // ── Cargar catálogo desde Firestore publicAssets ──
   const fetchCatalog = useCallback(async () => {
     setLoading(true);
     setError(null);
     try {
-      const res = await fetch('/hatches/catalog.json');
-      if (!res.ok) throw new Error(`HTTP ${res.status}`);
-      const data = await res.json();
+      const data = await getPublicAssets('hatch');
       setCatalog(data);
     } catch (err) {
       console.error('[ResourcePalette] fetchCatalog error:', err);
-      setError('Failed to load local catalog.');
+      setError('Failed to load catalog.');
     }
     setLoading(false);
   }, []);
@@ -253,19 +279,12 @@ export default function ResourcePalette({ isUnified = false }) {
     } catch { /* ignore */ }
   }, [fetchCatalog]);
 
-  // ── Insertar hatch/lin en AutoCAD (JIT Nivel 2 + 3) ──
+  // ── Insertar hatch/lin en AutoCAD (JIT) ──
   const handleInsert = async (item) => {
     setApplying(item.id);
     try {
-      let patCode = sessionPatCache[item.id];
-
-      // Nivel 3: no está en cache de sesión, bajar de forma local
-      if (!patCode) {
-        const res = await fetch(item.pat_url);
-        if (!res.ok) throw new Error('Asset file not found.');
-        patCode = await res.text();
-        sessionPatCache[item.id] = patCode;
-      }
+      const patCode = item.code;
+      if (!patCode) throw new Error('Código del patrón no disponible.');
 
       const safeName = item.name.replace(/[^a-zA-Z0-9_]/g, '_').toUpperCase();
 

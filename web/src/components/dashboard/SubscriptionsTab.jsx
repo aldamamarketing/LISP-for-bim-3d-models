@@ -47,16 +47,30 @@ const SubscribedSuiteRow = ({ suite, subObj, devices, handleToggleDevice, handle
       setReviewModalOpen(false);
       showToast(t('store.review_success', '¡Gracias por tu valoración!'), 'success');
       
+      // Non-critical: fire-and-forget counter
       if (reviewTarget.type === 'suite') {
-        updateDoc(doc(db, 'suites', suite.id), {
-          ratingCount: increment(1),
-        }).catch(err => console.warn('Rating counter failed:', err));
+        const suiteRef = doc(db, 'suites', suite.id);
+        const suiteSnap = await getDoc(suiteRef);
+        if (suiteSnap.exists()) {
+          const currentData = suiteSnap.data();
+          const currentCount = currentData.ratingCount || 0;
+          const currentTotal = (currentData.rating || 0) * currentCount;
+          const newCount = currentCount + 1;
+          const newRating = (currentTotal + reviewRating) / newCount;
+          
+          updateDoc(suiteRef, {
+            ratingCount: newCount,
+            rating: newRating
+          }).catch(err => console.warn('Rating update failed:', err));
+        }
       } else {
+        // If it's a command, optionally update local command state so it shows immediately
         setCommands(cmds => cmds.map(c => c.id === reviewTarget.id ? { ...c, rating: reviewRating, ratingCount: (c.ratingCount || 0) + 1 } : c));
       }
+      
     } catch (err) {
       console.error(err);
-      showToast(t('store.review_error', 'Error al enviar valoración.'), 'error');
+      alert(t('store.review_error', 'Error al enviar valoración.'));
     } finally {
       setIsSubmittingReview(false);
     }

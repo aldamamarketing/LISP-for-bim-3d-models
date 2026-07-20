@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SVG Grid Viewer 4x4</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .grid-container {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 16px;
+            padding: 20px;
+        }
+        .svg-card {
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            padding: 12px;
+            background: white;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .svg-wrapper {
+            width: 100%;
+            height: 200px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+            background-color: #f9fafb;
+            border-radius: 4px;
+            margin-bottom: 8px;
+        }
+        .svg-wrapper img {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain; /* Escalar sin deformar */
+        }
+        .svg-name {
+            font-size: 14px;
+            font-weight: 600;
+            color: #374151;
+            text-align: center;
+            word-break: break-all;
+        }
+    </style>
+</head>
+<body class="bg-gray-100 min-h-screen">
+    
+    <div class="p-6">
+        <h1 class="text-2xl font-bold mb-4 text-gray-800">Visor de SVGs (4x4)</h1>
+        <p class="text-gray-600 mb-6">Muestra todos los SVGs disponibles para capturas de pantalla.</p>
+        
+        <div id="grid" class="grid-container">
+            <!-- Cards here -->
+        </div>
+    </div>
+
+    <script>
+        async function loadSvgs() {
+            try {
+                const res = await fetch('/api/data');
+                const data = await res.json();
+                
+                const grid = document.getElementById('grid');
+                grid.innerHTML = '';
+                
+                data.svgs.forEach(svg => {
+                    const card = document.createElement('div');
+                    card.className = 'svg-card';
+                    
+                    const wrapper = document.createElement('div');
+                    wrapper.className = 'svg-wrapper';
+                    
+                    const img = document.createElement('img');
+                    img.src = '/public' + svg.img_url;
+                    img.alt = svg.name;
+                    
+                    const title = document.createElement('div');
+                    title.className = 'svg-name';
+                    title.textContent = svg.file ? svg.file : svg.id;
+                    
+                    wrapper.appendChild(img);
+                    card.appendChild(wrapper);
+                    card.appendChild(title);
+                    
+                    grid.appendChild(card);
+                });
+                
+            } catch (err) {
+                console.error("Error loading SVGs:", err);
+                document.getElementById('grid').innerHTML = '<p class="text-red-500">Error cargando los SVGs. Asegúrate de que el servidor en el puerto 3005 esté corriendo.</p>';
+            }
+        }
+        
+        loadSvgs();
+    </script>
+</body>
+</html>

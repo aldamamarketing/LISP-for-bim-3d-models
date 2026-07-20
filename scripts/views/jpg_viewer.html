@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>JPG Grid Viewer</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 p-8">
+    <h1 class="text-3xl font-bold text-center mb-8">JPG Reference Grid</h1>
+    <div id="grid" class="grid grid-cols-4 gap-4"></div>
+
+    <script>
+        async function loadJpgs() {
+            const res = await fetch('/api/data');
+            const data = await res.json();
+            const grid = document.getElementById('grid');
+            
+            // Collect all pats that have a JPG image
+            let jpgPats = data.pats.filter(p => p.image_url && p.image_url.endsWith('.jpg'));
+            
+            jpgPats.forEach(pat => {
+                const imgName = pat.image_url.split('/').pop();
+                const cleanName = imgName.replace('rf_pat_', '').replace(/\-[a-zA-Z0-9]+\.jpg$/, '');
+                const box = document.createElement('div');
+                box.className = 'bg-white p-4 border rounded shadow flex flex-col items-center text-center';
+                box.innerHTML = `
+                    <div class="w-full aspect-square bg-gray-200 mb-2 flex items-center justify-center overflow-hidden">
+                        <img src="/public${pat.image_url}" class="w-full h-full object-cover" />
+                    </div>
+                    <span class="text-xs font-mono text-gray-800 font-bold break-all">${pat.id}</span>
+                    <span class="text-xs text-blue-600 mt-1">${cleanName}</span>
+                `;
+                grid.appendChild(box);
+            });
+        }
+        window.onload = loadJpgs;
+    </script>
+</body>
+</html>

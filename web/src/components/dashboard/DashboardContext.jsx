@@ -138,7 +138,7 @@ export function DashboardProvider({ children }) {
     const tenantId = userData.id;
     
     switch (activeTab) {
-      case 'lisp':
+      case 'files':
         loadLispData(tenantId);
         break;
       case 'suites':

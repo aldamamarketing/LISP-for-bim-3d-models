@@ -6,6 +6,7 @@ import { showToast } from '../Toast';
 import { useTranslation } from '../../i18n/useTranslation';
 import { useDashboard } from './DashboardContext';
 import BlurInput from '../ui/BlurInput';
+import VersionHistoryModal from './VersionHistoryModal';
 
 function parseLispCommands(fileContent) {
   const regex = /\(defun\s+c:([A-Za-z0-9_-]+)/gi;
@@ -43,6 +44,9 @@ export default function LispFilesCard() {
   const [showFavoritesModal, setShowFavoritesModal] = useState(false);
   const [activeCommandId, setActiveCommandId] = useState(null); 
   const [dropdownOpenFor, setDropdownOpenFor] = useState(null);
+  
+  // History Modal
+  const [historyModalFor, setHistoryModalFor] = useState(null);
 
   const handleFileSelect = async (e) => {
     const files = Array.from(e.target.files).filter(f => f.name.toLowerCase().endsWith('.lsp'));
@@ -51,13 +55,28 @@ export default function LispFilesCard() {
     const newDrafts = [];
     for (const file of files) {
       const content = await file.text();
-      const detectedCommands = parseLispCommands(content);
+      let detectedCommands = parseLispCommands(content);
       
+      // Inherit existing metadata (icon, description, friendlyName) if the command already exists
+      detectedCommands = detectedCommands.map(cmd => {
+        const existing = commands.find(c => c.commandName === cmd.commandName);
+        if (existing) {
+          return {
+            ...cmd,
+            friendlyName: existing.friendlyName || cmd.friendlyName,
+            description: existing.description || cmd.description,
+            svgIcon: existing.svgIcon || cmd.svgIcon
+          };
+        }
+        return cmd;
+      });
+
       newDrafts.push({
         fileObj: file,
         originalName: file.name,
         lispId: file.name.replace('.lsp', '').replace(/[^a-zA-Z0-9_-]/g, '_'),
-        detectedCommands
+        detectedCommands,
+        changelog: ''
       });
     }
     
@@ -80,7 +99,17 @@ export default function LispFilesCard() {
       const tenantSlug = userData.slug || userData.email?.split('@')[0] || 'user';
 
       for (const draft of draftFiles) {
-        const storagePath = `tenants/${userData.id}/lisps/${draft.originalName}`;
+        const fileId = `FILE-${tenantSlug}-${draft.lispId}`;
+        const fileDocRef = doc(db, 'lispFiles', fileId);
+        const fileDocSnap = await getDoc(fileDocRef);
+        
+        let currentVersion = 1;
+        if (fileDocSnap.exists()) {
+          const data = fileDocSnap.data();
+          currentVersion = (data.currentVersion || 1) + 1;
+        }
+
+        const storagePath = `tenants/${userData.id}/lisps/${fileId}/v${currentVersion}/${draft.originalName}`;
         const fileRef = ref(storage, storagePath);
         
         await uploadBytes(fileRef, draft.fileObj);
@@ -91,12 +120,35 @@ export default function LispFilesCard() {
           originalName: draft.originalName,
           storagePath: storagePath,
           commandCount: draft.detectedCommands.length,
-          uploadedAt: new Date().toISOString()
+          currentVersion: currentVersion,
+          updatedAt: new Date().toISOString()
         };
         
-        const fileId = `FILE-${tenantSlug}-${draft.lispId}`;
-        await setDoc(doc(db, 'lispFiles', fileId), fileMeta);
-        newUploaded.push({ id: fileId, ...fileMeta });
+        if (!fileDocSnap.exists()) {
+          fileMeta.uploadedAt = fileMeta.updatedAt;
+        }
+        
+        await setDoc(fileDocRef, fileMeta, { merge: true });
+
+        // Save history version
+        const versionId = `${fileId}-V${currentVersion}`;
+        await setDoc(doc(db, 'lispFileVersions', versionId), {
+          fileId: fileId,
+          version: currentVersion,
+          storagePath: storagePath,
+          uploadedAt: fileMeta.updatedAt,
+          commandCount: draft.detectedCommands.length,
+          changelog: draft.changelog || ''
+        });
+
+        // Update UI State
+        const existingIndex = newUploaded.findIndex(u => u.id === fileId);
+        if (existingIndex === -1 && !tenantLisps.find(l => l.id === fileId)) {
+          newUploaded.push({ id: fileId, ...fileMeta });
+        } else if (existingIndex === -1) {
+          // It's an update, we just modify tenantLisps array later
+          setTenantLisps(prev => prev.map(l => l.id === fileId ? { ...l, ...fileMeta } : l));
+        }
 
         for (const cmd of draft.detectedCommands) {
           const cmdId = `CMD-${tenantSlug}-${cmd.commandName}`;
@@ -108,7 +160,7 @@ export default function LispFilesCard() {
             svgIcon: cmd.svgIcon,
             description: cmd.description
           };
-          await setDoc(doc(db, 'commands', cmdId), cmdMeta);
+          await setDoc(doc(db, 'commands', cmdId), cmdMeta, { merge: true });
           newCommands.push({ id: cmdId, ...cmdMeta });
         }
       }
@@ -287,6 +339,17 @@ export default function LispFilesCard() {
                   <div className="text-xs text-on-surface-variant mt-1">
                     Comandos detectados: {draft.detectedCommands.map(c => c.commandName).join(', ') || 'Nenhum'}
                   </div>
+                  <input 
+                    type="text" 
+                    placeholder="Notas da versão (ex: Correções, novos comandos...)" 
+                    value={draft.changelog} 
+                    onChange={(e) => {
+                      const newDrafts = [...draftFiles];
+                      newDrafts[i].changelog = e.target.value;
+                      setDraftFiles(newDrafts);
+                    }}
+                    className="mt-2 w-full bg-surface-container border border-outline-variant rounded px-2 py-1 text-xs text-on-surface focus:border-primary-container outline-none"
+                  />
                 </div>
                 <button className="text-error hover:text-white" onClick={() => removeDraft(i)}>
                   <span className="material-symbols-outlined text-[18px]">delete</span>
@@ -346,8 +409,19 @@ export default function LispFilesCard() {
                         <span className="px-2 py-0.5 bg-surface-container rounded-full text-[10px] font-bold text-on-surface-variant ml-2">{fileCommands.length} cmds</span>
                       </div>
                     </td>
-                    <td className="py-3 text-on-surface-variant text-sm">
+                    <td className="py-3 text-on-surface-variant text-sm flex items-center justify-end gap-3 pr-4">
                       {new Date(lisp.uploadedAt).toLocaleDateString()}
+                      <button 
+                        onClick={(e) => { 
+                          e.stopPropagation(); 
+                          setHistoryModalFor({ id: lisp.id, name: lisp.originalName }); 
+                        }} 
+                        className="flex items-center gap-1 text-[10px] uppercase font-bold bg-surface-container-highest px-2 py-1 rounded hover:bg-primary-container hover:text-on-primary transition-colors"
+                        title="Ver histórico de versões"
+                      >
+                        <span className="material-symbols-outlined text-[14px]">history</span>
+                        {lisp.currentVersion ? `v${lisp.currentVersion}` : 'Histórico'}
+                      </button>
                     </td>
                   </tr>
 
@@ -431,17 +505,21 @@ export default function LispFilesCard() {
 
       {/* MODALS PLACEHOLDERS */}
       {showGalleryModal && (
-        <div className="fixed inset-0 z-[100] bg-black/80 flex items-center justify-center p-4">
-          <div className="bg-[#141414] border border-[#262626] rounded-xl w-full max-w-[600px] p-6 shadow-2xl">
-            <h3 className="mt-0 mb-4 text-xl flex justify-between items-center">
-              Galeria Pública de Íconos
-              <button className="text-on-surface-variant hover:text-white" onClick={() => setShowGalleryModal(false)}><span className="material-symbols-outlined text-[20px]">close</span></button>
-            </h3>
-            <div className="h-64 flex items-center justify-center border border-dashed border-[#262626] rounded text-on-surface-variant text-sm">
-              [Galeria em desenvolvimento. Aqui aparecerão íconos públicos.]
-            </div>
-          </div>
+        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4" onClick={() => setShowGalleryModal(false)}>
+           <div className="bg-surface p-6 rounded-lg w-full max-w-2xl max-h-[80vh] overflow-y-auto shadow-xl" onClick={e => e.stopPropagation()}>
+             <h3 className="mt-0 mb-4 text-on-surface">Selecionar da Galeria (Em breve)</h3>
+             <p className="text-on-surface-variant text-sm">A galeria pública de ícones será disponibilizada na próxima atualização.</p>
+             <button className="btn mt-4 bg-surface-container text-on-surface" onClick={() => setShowGalleryModal(false)}>Fechar</button>
+           </div>
         </div>
+      )}
+
+      {historyModalFor && (
+        <VersionHistoryModal 
+          fileId={historyModalFor.id} 
+          fileName={historyModalFor.name} 
+          onClose={() => setHistoryModalFor(null)} 
+        />
       )}
 
       {showFavoritesModal && (

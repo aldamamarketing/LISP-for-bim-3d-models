@@ -1,0 +1,4073 @@
+[
+  {
+    "id": "Running_Bond_Brick",
+    "name": "Running Bond Brick",
+    "description": "Standard half-offset brick layout. Joint spacing remains proportional regardless of scale. Used in elevations and wall sections.",
+    "type": "cadauthority",
+    "pat_file": "Running_Bond_Brick.pat",
+    "pat_url": "/hatches-cadauth/assets/Running_Bond_Brick.pat",
+    "img_url": null,
+    "svg_file": null
+  },
+  {
+    "id": "Herringbone_Brick_45",
+    "name": "Herringbone Brick 45",
+    "description": "45° interlocking layout. Requires proper scale to avoid visual distortion.",
+    "type": "cadauthority",
+    "pat_file": "Herringbone_Brick_45.pat",
+    "pat_url": "/hatches-cadauth/assets/Herringbone_Brick_45.pat",
+    "img_url": null,
+    "svg_file": null
+  },
+  {
+    "id": "Subway_Tile_3x6",
+    "name": "Subway Tile 3x6",
+    "description": "Rectangular tile grid. Works for both imperial (3&#215;6&#8243;) and metric equivalents.",
+    "type": "cadauthority",
+    "pat_file": "Subway_Tile_3x6.pat",
+    "pat_url": "/hatches-cadauth/assets/Subway_Tile_3x6.pat",
+    "img_url": null,
+    "svg_file": null
+  },
+  {
+    "id": "Stacked_Bond_Tile",
+    "name": "Stacked Bond Tile",
+    "description": "Clean aligned grid with no offset. Used in modern architectural finishes.",
+    "type": "cadauthority",
+    "pat_file": "Stacked_Bond_Tile.pat",
+    "pat_url": "/hatches-cadauth/assets/Stacked_Bond_Tile.pat",
+    "img_url": null,
+    "svg_file": null
+  },
+  {
+    "id": "Hexagon_Honeycomb",
+    "name": "Hexagon Honeycomb",
+    "description": "Hexagonal tiling pattern. Scale-sensitive for accurate representation.",
+    "type": "cadauthority",
+    "pat_file": "Hexagon_Honeycomb.pat",
+    "pat_url": "/hatches-cadauth/assets/Hexagon_Honeycomb.pat",
+    "img_url": null,
+    "svg_file": null
+  },
+  {
+    "id": "Parquet_Wood_Floor",
+    "name": "Parquet Wood Floor",
+    "description": "Decorative wood block pattern. Used in interior plans.",
+    "type": "cadauthority",
+    "pat_file": "Parquet_Wood_Floor.pat",
+    "pat_url": "/hatches-cadauth/assets/Parquet_Wood_Floor.pat",
+    "img_url": null,
+    "svg_file": null
+  },
+  {
+    "id": "Linear_Wood_Plank",
+    "name": "Linear Wood Plank",
+    "description": "Parallel plank layout with offset joints simulating hardwood flooring.",
+    "type": "cadauthority",
+    "pat_file": "Linear_Wood_Plank.pat",
+    "pat_url": "/hatches-cadauth/assets/Linear_Wood_Plank.pat",
+    "img_url": null,
+    "svg_file": null
+  },
+  {
+    "id": "Wood_Grain_Texture",
+    "name": "Wood Grain Texture",
+    "description": "High-accuracy organic wood grain pattern. Ideal for fine wood joinery details, architectural sections, and cabinet elevations.",
+    "type": "cadauthority",
+    "pat_file": "Wood_Grain_Texture.pat",
+    "pat_url": "/hatches-cadauth/assets/Wood_Grain_Texture.pat",
+    "img_url": null,
+    "svg_file": null
+  },
+  {
+    "id": "Spanish_Roof_Tile",
+    "name": "Spanish Roof Tile",
+    "description": "S-shaped curves representing clay roofing in elevations.",
+    "type": "cadauthority",
+    "pat_file": "Spanish_Roof_Tile.pat",
+    "pat_url": "/hatches-cadauth/assets/Spanish_Roof_Tile.pat",
+    "img_url": null,
+    "svg_file": null
+  },
+  {
+    "id": "Diamond_Pattern_Tile",
+    "name": "Diamond Pattern Tile",
+    "description": "Rotated square layout used in entryways and lobbies.",
+    "type": "cadauthority",
+    "pat_file": "Diamond_Pattern_Tile.pat",
+    "pat_url": "/hatches-cadauth/assets/Diamond_Pattern_Tile.pat",
+    "img_url": null,
+    "svg_file": null
+  },
+  {
+    "id": "Board_Formed_Concrete",
+    "name": "Board Formed Concrete",
+    "description": "Concrete texture showing formwork grain.",
+    "type": "cadauthority",
+    "pat_file": "Board_Formed_Concrete.pat",
+    "pat_url": "/hatches-cadauth/assets/Board_Formed_Concrete.pat",
+    "img_url": null,
+    "svg_file": null
+  },
+  {
+    "id": "Flagstone_Irregular",
+    "name": "Flagstone Irregular",
+    "description": "Random polygonal stone pattern for natural paving.",
+    "type": "cadauthority",
+    "pat_file": "Flagstone_Irregular.pat",
+    "pat_url": "/hatches-cadauth/assets/Flagstone_Irregular.pat",
+    "img_url": null,
+    "svg_file": null
+  },
+  {
+    "id": "Cobblestone_Old_World",
+    "name": "Cobblestone Old World",
+    "description": "Irregular stone blocks for historic paving.",
+    "type": "cadauthority",
+    "pat_file": "Cobblestone_Old_World.pat",
+    "pat_url": "/hatches-cadauth/assets/Cobblestone_Old_World.pat",
+    "img_url": null,
+    "svg_file": null
+  },
+  {
+    "id": "Crushed_Gravel",
+    "name": "Crushed Gravel",
+    "description": "Dense granular pattern. Use low scale in large areas.",
+    "type": "cadauthority",
+    "pat_file": "Crushed_Gravel.pat",
+    "pat_url": "/hatches-cadauth/assets/Crushed_Gravel.pat",
+    "img_url": null,
+    "svg_file": null
+  },
+  {
+    "id": "Gabion_Wall_Mesh",
+    "name": "Gabion Wall Mesh",
+    "description": "Combination of mesh and stone representation.",
+    "type": "cadauthority",
+    "pat_file": "Gabion_Wall_Mesh.pat",
+    "pat_url": "/hatches-cadauth/assets/Gabion_Wall_Mesh.pat",
+    "img_url": null,
+    "svg_file": null
+  },
+  {
+    "id": "Wild_Grass_Tufts",
+    "name": "Wild Grass Tufts",
+    "description": "Sparse pattern for landscape areas.",
+    "type": "cadauthority",
+    "pat_file": "Wild_Grass_Tufts.pat",
+    "pat_url": "/hatches-cadauth/assets/Wild_Grass_Tufts.pat",
+    "img_url": null,
+    "svg_file": null
+  },
+  {
+    "id": "Diamond_Plate_Steel",
+    "name": "Diamond Plate Steel",
+    "description": "Industrial tread plate pattern.",
+    "type": "cadauthority",
+    "pat_file": "Diamond_Plate_Steel.pat",
+    "pat_url": "/hatches-cadauth/assets/Diamond_Plate_Steel.pat",
+    "img_url": null,
+    "svg_file": null
+  },
+  {
+    "id": "Corrugated_Metal_Siding",
+    "name": "Corrugated Metal Siding",
+    "description": "Repeating wave pattern for metal panels.",
+    "type": "cadauthority",
+    "pat_file": "Corrugated_Metal_Siding.pat",
+    "pat_url": "/hatches-cadauth/assets/Corrugated_Metal_Siding.pat",
+    "img_url": null,
+    "svg_file": null
+  },
+  {
+    "id": "Wire_Mesh_Expanded",
+    "name": "Wire Mesh Expanded",
+    "description": "Diamond-shaped mesh pattern.",
+    "type": "cadauthority",
+    "pat_file": "Wire_Mesh_Expanded.pat",
+    "pat_url": "/hatches-cadauth/assets/Wire_Mesh_Expanded.pat",
+    "img_url": null,
+    "svg_file": null
+  },
+  {
+    "id": "Rigid_Insulation_X",
+    "name": "Rigid Insulation X",
+    "description": "Standard insulation pattern.",
+    "type": "cadauthority",
+    "pat_file": "Rigid_Insulation_X.pat",
+    "pat_url": "/hatches-cadauth/assets/Rigid_Insulation_X.pat",
+    "img_url": null,
+    "svg_file": null
+  },
+  {
+    "id": "Batt_Insulation_Fill",
+    "name": "Batt Insulation Fill",
+    "description": "Repeating S-curve pattern.",
+    "type": "cadauthority",
+    "pat_file": "Batt_Insulation_Fill.pat",
+    "pat_url": "/hatches-cadauth/assets/Batt_Insulation_Fill.pat",
+    "img_url": null,
+    "svg_file": null
+  },
+  {
+    "id": "Chain_Link_Fence_Fill",
+    "name": "Chain Link Fence Fill",
+    "description": "Diagonal mesh representation.",
+    "type": "cadauthority",
+    "pat_file": "Chain_Link_Fence_Fill.pat",
+    "pat_url": "/hatches-cadauth/assets/Chain_Link_Fence_Fill.pat",
+    "img_url": null,
+    "svg_file": null
+  },
+  {
+    "id": "Perforated_Metal_Sheet",
+    "name": "Perforated Metal Sheet",
+    "description": "Circular hole grid pattern.",
+    "type": "cadauthority",
+    "pat_file": "Perforated_Metal_Sheet.pat",
+    "pat_url": "/hatches-cadauth/assets/Perforated_Metal_Sheet.pat",
+    "img_url": null,
+    "svg_file": null
+  },
+  {
+    "id": "Firebrick_Refractory",
+    "name": "Firebrick Refractory",
+    "description": "Heavy joint brick pattern.",
+    "type": "cadauthority",
+    "pat_file": "Firebrick_Refractory.pat",
+    "pat_url": "/hatches-cadauth/assets/Firebrick_Refractory.pat",
+    "img_url": null,
+    "svg_file": null
+  },
+  {
+    "id": "Cross_Hatch_Fine",
+    "name": "Cross Hatch Fine",
+    "description": "Dense diagonal mesh for structural shading.",
+    "type": "cadauthority",
+    "pat_file": "Cross_Hatch_Fine.pat",
+    "pat_url": "/hatches-cadauth/assets/Cross_Hatch_Fine.pat",
+    "img_url": null,
+    "svg_file": null
+  },
+  {
+    "id": "Stipple_Gradient",
+    "name": "Stipple Gradient",
+    "description": "Variable density dots for specialized visual effects and material shading.",
+    "type": "cadauthority",
+    "pat_file": "Stipple_Gradient.pat",
+    "pat_url": "/hatches-cadauth/assets/Stipple_Gradient.pat",
+    "img_url": null,
+    "svg_file": null
+  },
+  {
+    "id": "Plywood_End_Grain",
+    "name": "Plywood End Grain",
+    "description": "Layered structural pattern for detailed wood joinery sections.",
+    "type": "cadauthority",
+    "pat_file": "Plywood_End_Grain.pat",
+    "pat_url": "/hatches-cadauth/assets/Plywood_End_Grain.pat",
+    "img_url": null,
+    "svg_file": null
+  },
+  {
+    "id": "1_3_running_bond",
+    "name": "1 3 Running Bond",
+    "description": "Local SVG icon (No pattern file yet)",
+    "type": "local_svg",
+    "pat_file": null,
+    "pat_url": null,
+    "img_url": "/hatches-cadauth/assets/1_3_running_bond.svg",
+    "svg_file": "1_3_running_bond.svg"
+  },
+  {
+    "id": "1_3_stretcher",
+    "name": "1 3 Stretcher",
+    "description": "Local SVG icon (No pattern file yet)",
+    "type": "local_svg",
+    "pat_file": null,
+    "pat_url": null,
+    "img_url": "/hatches-cadauth/assets/1_3_stretcher.svg",
+    "svg_file": "1_3_stretcher.svg"
+  },
+  {
+    "id": "1_4_running_bond",
+    "name": "1 4 Running Bond",
+    "description": "Local SVG icon (No pattern file yet)",
+    "type": "local_svg",
+    "pat_file": null,
+    "pat_url": null,
+    "img_url": "/hatches-cadauth/assets/1_4_running_bond.svg",
+    "svg_file": "1_4_running_bond.svg"
+  },
+  {
+    "id": "1_4_stretcher",
+    "name": "1 4 Stretcher",
+    "description": "Local SVG icon (No pattern file yet)",
+    "type": "local_svg",
+    "pat_file": null,
+    "pat_url": null,
+    "img_url": "/hatches-cadauth/assets/1_4_stretcher.svg",
+    "svg_file": "1_4_stretcher.svg"
+  },
+  {
+    "id": "45_chevron",
+    "name": "45 Chevron",
+    "description": "Local SVG icon (No pattern file yet)",
+    "type": "local_svg",
+    "pat_file": null,
+    "pat_url": null,
+    "img_url": "/hatches-cadauth/assets/45_chevron.svg",
+    "svg_file": "45_chevron.svg"
+  },
+  {
+    "id": "60_chevron",
+    "name": "60 Chevron",
+    "description": "Local SVG icon (No pattern file yet)",
+    "type": "local_svg",
+    "pat_file": null,
+    "pat_url": null,
+    "img_url": "/hatches-cadauth/assets/60_chevron.svg",
+    "svg_file": "60_chevron.svg"
+  },
+  {
+    "id": "6_point_intersecting_circle",
+    "name": "6 Point Intersecting Circle",
+    "description": "Local SVG icon (No pattern file yet)",
+    "type": "local_svg",
+    "pat_file": null,
+    "pat_url": null,
+    "img_url": "/hatches-cadauth/assets/6_point_intersecting_circle.svg",
+    "svg_file": "6_point_intersecting_circle.svg"
+  },
+  {
+    "id": "6_point_star_mosaic",
+    "name": "6 Point Star Mosaic",
+    "description": "Local SVG icon (No pattern file yet)",
+    "type": "local_svg",
+    "pat_file": null,
+    "pat_url": null,
+    "img_url": "/hatches-cadauth/assets/6_point_star_mosaic.svg",
+    "svg_file": "6_point_star_mosaic.svg"
+  },
+  {
+    "id": "aberdeen_bond",
+    "name": "Aberdeen Bond",
+    "description": "Local SVG icon (No pattern file yet)",
+    "type": "local_svg",
+    "pat_file": null,
+    "pat_url": null,
+    "img_url": "/hatches-cadauth/assets/aberdeen_bond.svg",
+    "svg_file": "aberdeen_bond.svg"
+  },
+  {
+    "id": "abstract_checkered_pattern",
+    "name": "Abstract Checkered Pattern",
+    "description": "Local SVG icon (No pattern file yet)",
+    "type": "local_svg",
+    "pat_file": null,
+    "pat_url": null,
+    "img_url": "/hatches-cadauth/assets/abstract_checkered_pattern.svg",
+    "svg_file": "abstract_checkered_pattern.svg"
+  },
+  {
+    "id": "alternating_cross_weave_tile_pattern",
+    "name": "Alternating Cross Weave Tile Pattern",
+    "description": "Local SVG icon (No pattern file yet)",
+    "type": "local_svg",
+    "pat_file": null,
+    "pat_url": null,
+    "img_url": "/hatches-cadauth/assets/alternating_cross_weave_tile_pattern.svg",
+    "svg_file": "alternating_cross_weave_tile_pattern.svg"
+  },
+  {
+    "id": "alternating_fishscale",
+    "name": "Alternating Fishscale",
+    "description": "Local SVG icon (No pattern file yet)",
+    "type": "local_svg",
+    "pat_file": null,
+    "pat_url": null,
+    "img_url": "/hatches-cadauth/assets/alternating_fishscale.svg",
+    "svg_file": "alternating_fishscale.svg"
+  },
+  {
+    "id": "alternating_geometric_split_tile_pattern",
+    "name": "Alternating Geometric Split Tile Pattern",
+    "description": "Local SVG icon (No pattern file yet)",
+    "type": "local_svg",
+    "pat_file": null,
+    "pat_url": null,
+    "img_url": "/hatches-cadauth/assets/alternating_geometric_split_tile_pattern.svg",
+    "svg_file": "alternating_geometric_split_tile_pattern.svg"
+  },
+  {
+    "id": "alternating_geometric_tile_pattern",
+    "name": "Alternating Geometric Tile Pattern",
+    "description": "Local SVG icon (No pattern file yet)",
+    "type": "local_svg",
+    "pat_file": null,
+    "pat_url": null,
+    "img_url": "/hatches-cadauth/assets/alternating_geometric_tile_pattern.svg",
+    "svg_file": "alternating_geometric_tile_pattern.svg"
+  },
+  {
+    "id": "alternating_interlocking_pattern_tile",
+    "name": "Alternating Interlocking Pattern Tile",
+    "description": "Local SVG icon (No pattern file yet)",
+    "type": "local_svg",
+    "pat_file": null,
+    "pat_url": null,
+    "img_url": "/hatches-cadauth/assets/alternating_interlocking_pattern_tile.svg",
+    "svg_file": "alternating_interlocking_pattern_tile.svg"
+  },
+  {
+    "id": "alternating_oval_tiles",
+    "name": "Alternating Oval Tiles",
+    "description": "Local SVG icon (No pattern file yet)",
+    "type": "local_svg",
+    "pat_file": null,
+    "pat_url": null,
+    "img_url": "/hatches-cadauth/assets/alternating_oval_tiles.svg",
+    "svg_file": "alternating_oval_tiles.svg"
+  },
+  {
+    "id": "alternating_oval_tiles_interlocking_pattern",
+    "name": "Alternating Oval Tiles Interlocking Pattern",
+    "description": "Local SVG icon (No pattern file yet)",
+    "type": "local_svg",
+    "pat_file": null,
+    "pat_url": null,
+    "img_url": "/hatches-cadauth/assets/alternating_oval_tiles_interlocking_pattern.svg",
+    "svg_file": "alternating_oval_tiles_interlocking_pattern.svg"
+  },
+  {
+    "id": "alternating_rounded_tiles",
+    "name": "Alternating Rounded Tiles",
+    "description": "Local SVG icon (No pattern file yet)",
+    "type": "local_svg",
+    "pat_file": null,
+    "pat_url": null,
+    "img_url": "/hatches-cadauth/assets/alternating_rounded_tiles.svg",
+    "svg_file": "alternating_rounded_tiles.svg"
+  },
+  {
+    "id": "alternating_round_and_oval_tiles",
+    "name": "Alternating Round And Oval Tiles",
+    "description": "Local SVG icon (No pattern file yet)",
+    "type": "local_svg",
+    "pat_file": null,
+    "pat_url": null,
+    "img_url": "/hatches-cadauth/assets/alternating_round_and_oval_tiles.svg",
+    "svg_file": "alternating_round_and_oval_tiles.svg"
+  },
+  {
+    "id": "alternating_round_pattern",
+    "name": "Alternating Round Pattern",
+    "description": "Local SVG icon (No pattern file yet)",
+    "type": "local_svg",
+    "pat_file": null,
+    "pat_url": null,
+    "img_url": "/hatches-cadauth/assets/alternating_round_pattern.svg",
+    "svg_file": "alternating_round_pattern.svg"
+  },
+  {
+    "id": "alternating_round_tiles",
+    "name": "Alternating Round Tiles",
+    "description": "Local SVG icon (No pattern file yet)",
+    "type": "local_svg",
+    "pat_file": null,
+    "pat_url": null,
+    "img_url": "/hatches-cadauth/assets/alternating_round_tiles.svg",
+    "svg_file": "alternating_round_tiles.svg"
+  },
+  {
+    "id": "alternating_round_tile_pattern",
+    "name": "Alternating Round Tile Pattern",
+    "description": "Local SVG icon (No pattern file yet)",
+    "type": "local_svg",
+    "pat_file": null,
+    "pat_url": null,
+    "img_url": "/hatches-cadauth/assets/alternating_round_tile_pattern.svg",
+    "svg_file": "alternating_round_tile_pattern.svg"
+  },
+  {
+    "id": "alternating_semicircle_split_tiles",
+    "name": "Alternating Semicircle Split Tiles",
+    "description": "Local SVG icon (No pattern file yet)",
+    "type": "local_svg",
+    "pat_file": null,
+    "pat_url": null,
+    "img_url": "/hatches-cadauth/assets/alternating_semicircle_split_tiles.svg",
+    "svg_file": "alternating_semicircle_split_tiles.svg"
+  },
+  {
+    "id": "alternating_semi_circle_pattern",
+    "name": "Alternating Semi Circle Pattern",
+    "description": "Local SVG icon (No pattern file yet)",
+    "type": "local_svg",
+    "pat_file": null,
+    "pat_url": null,
+    "img_url": "/hatches-cadauth/assets/alternating_semi_circle_pattern.svg",
+    "svg_file": "alternating_semi_circle_pattern.svg"
+  },
+  {
+    "id": "alternating_split_square_pattern",
+    "name": "Alternating Split Square Pattern",
+    "description": "Local SVG icon (No pattern file yet)",
+    "type": "local_svg",
+    "pat_file": null,
+    "pat_url": null,
+    "img_url": "/hatches-cadauth/assets/alternating_split_square_pattern.svg",
+    "svg_file": "alternating_split_square_pattern.svg"
+  },
+  {
+    "id": "alternating_split_square_tile_pattern",
+    "name": "Alternating Split Square Tile Pattern",
+    "description": "Local SVG icon (No pattern file yet)",
+    "type": "local_svg",
+    "pat_file": null,
+    "pat_url": null,
+    "img_url": "/hatches-cadauth/assets/alternating_split_square_tile_pattern.svg",
+    "svg_file": "alternating_split_square_tile_pattern.svg"
+  },
+  {
+    "id": "alternating_square_and_metro_tiles",
+    "name": "Alternating Square And Metro Tiles",
+    "description": "Local SVG icon (No pattern file yet)",
+    "type": "local_svg",
+    "pat_file": null,
+    "pat_url": null,
+    "img_url": "/hatches-cadauth/assets/alternating_square_and_metro_tiles.svg",
+    "svg_file": "alternating_square_and_metro_tiles.svg"
+  },
+  {
+    "id": "alternating_square_and_split_tiles",
+    "name": "Alternating Square And Split Tiles",
+    "description": "Local SVG icon (No pattern file yet)",
+    "type": "local_svg",
+    "pat_file": null,
+    "pat_url": null,
+    "img_url": "/hatches-cadauth/assets/alternating_square_and_split_tiles.svg",
+    "svg_file": "alternating_square_and_split_tiles.svg"
+  },
+  {
+    "id": "alternating_square_and_split_tiles_2",
+    "name": "Alternating Square And Split Tiles 2",
+    "description": "Local SVG icon (No pattern file yet)",
+    "type": "local_svg",
+    "pat_file": null,
+    "pat_url": null,
+    "img_url": "/hatches-cadauth/assets/alternating_square_and_split_tiles_2.svg",
+    "svg_file": "alternating_square_and_split_tiles_2.svg"
+  },
+  {
+    "id": "alternating_striped_and_diagonal_tile_pattern",
+    "name": "Alternating Striped And Diagonal Tile Pattern",
+    "description": "Local SVG icon (No pattern file yet)",
+    "type": "local_svg",
+    "pat_file": null,
+    "pat_url": null,
+    "img_url": "/hatches-cadauth/assets/alternating_striped_and_diagonal_tile_pattern.svg",
+    "svg_file": "alternating_striped_and_diagonal_tile_pattern.svg"
+  },
+  {
+    "id": "alternating_stripe_pattern",
+    "name": "Alternating Stripe Pattern",
+    "description": "Local SVG icon (No pattern file yet)",
+    "type": "local_svg",
+    "pat_file": null,
+    "pat_url": null,
+    "img_url": "/hatches-cadauth/assets/alternating_stripe_pattern.svg",
+    "svg_file": "alternating_stripe_pattern.svg"
+  },
+  {
+    "id": "alternating_tile_size_grid",
+    "name": "Alternating Tile Size Grid",
+    "description": "Local SVG icon (No pattern file yet)",
+    "type": "local_svg",
+    "pat_file": null,
+    "pat_url": null,
+    "img_url": "/hatches-cadauth/assets/alternating_tile_size_grid.svg",
+    "svg_file": "alternating_tile_size_grid.svg"
+  },
+  {
+    "id": "alternating_tile_weave",
+    "name": "Alternating Tile Weave",
+    "description": "Local SVG icon (No pattern file yet)",
+    "type": "local_svg",
+    "pat_file": null,
+    "pat_url": null,
+    "img_url": "/hatches-cadauth/assets/alternating_tile_weave.svg",
+    "svg_file": "alternating_tile_weave.svg"
+  },
+  {
+    "id": "alternating_tile_weave_2",
+    "name": "Alternating Tile Weave 2",
+    "description": "Local SVG icon (No pattern file yet)",
+    "type": "local_svg",
+    "pat_file": null,
+    "pat_url": null,
+    "img_url": "/hatches-cadauth/assets/alternating_tile_weave_2.svg",
+    "svg_file": "alternating_tile_weave_2.svg"
+  },
+  {
+    "id": "alternating_tile_weave_3",
+    "name": "Alternating Tile Weave 3",
+    "description": "Local SVG icon (No pattern file yet)",
+    "type": "local_svg",
+    "pat_file": null,
+    "pat_url": null,
+    "img_url": "/hatches-cadauth/assets/alternating_tile_weave_3.svg",
+    "svg_file": "alternating_tile_weave_3.svg"
+  },
+  {
+    "id": "alternating_tile_weave_4",
+    "name": "Alternating Tile Weave 4",
+    "description": "Local SVG icon (No pattern file yet)",
+    "type": "local_svg",
+    "pat_file": null,
+    "pat_url": null,
+    "img_url": "/hatches-cadauth/assets/alternating_tile_weave_4.svg",
+    "svg_file": "alternating_tile_weave_4.svg"
+  },
+  {
+    "id": "angled_chevron",
+    "name": "Angled Chevron",
+    "description": "Local SVG icon (No pattern file yet)",
+    "type": "local_svg",
+    "pat_file": null,
+    "pat_url": null,
+    "img_url": "/hatches-cadauth/assets/angled_chevron.svg",
+    "svg_file": "angled_chevron.svg"
+  },
+  {
+    "id": "angled_trapezoids",
+    "name": "Angled Trapezoids",
+    "description": "Local SVG icon (No pattern file yet)",
+    "type": "local_svg",
+    "pat_file": null,
+    "pat_url": null,
+    "img_url": "/hatches-cadauth/assets/angled_trapezoids.svg",
+    "svg_file": "angled_trapezoids.svg"
+  },
+  {
+    "id": "arabesque_floral",
+    "name": "Arabesque Floral",
+    "description": "Local SVG icon (No pattern file yet)",
+    "type": "local_svg",
+    "pat_file": null,
+    "pat_url": null,
+    "img_url": "/hatches-cadauth/assets/arabesque_floral.svg",
+    "svg_file": "arabesque_floral.svg"
+  },
+  {
+    "id": "arabesque_lantern",
+    "name": "Arabesque Lantern",
+    "description": "Local SVG icon (No pattern file yet)",
+    "type": "local_svg",
+    "pat_file": null,
+    "pat_url": null,
+    "img_url": "/hatches-cadauth/assets/arabesque_lantern.svg",
+    "svg_file": "arabesque_lantern.svg"
+  },
+  {
+    "id": "art_deco_tile_pattern_1",
+    "name": "Art Deco Tile Pattern 1",
+    "description": "Local SVG icon (No pattern file yet)",
+    "type": "local_svg",
+    "pat_file": null,
+    "pat_url": null,
+    "img_url": "/hatches-cadauth/assets/art_deco_tile_pattern_1.svg",
+    "svg_file": "art_deco_tile_pattern_1.svg"
+  },
+  {
+    "id": "art_deco_tile_pattern_2",
+    "name": "Art Deco Tile Pattern 2",
+    "description": "Local SVG icon (No pattern file yet)",
+    "type": "local_svg",
+    "pat_file": null,
+    "pat_url": null,
+    "img_url": "/hatches-cadauth/assets/art_deco_tile_pattern_2.svg",
+    "svg_file": "art_deco_tile_pattern_2.svg"
+  },
+  {
+    "id": "ashlar",
+    "name": "Ashlar",
+    "description": "Local SVG icon (No pattern file yet)",
+    "type": "local_svg",
+    "pat_file": null,
+    "pat_url": null,
+    "img_url": "/hatches-cadauth/assets/ashlar.svg",
+    "svg_file": "ashlar.svg"
+  },
+  {
+    "id": "banner",
+    "name": "Banner",
+    "description": "Local SVG icon (No pattern file yet)",
+    "type": "local_svg",
+    "pat_file": null,
+    "pat_url": null,
+    "img_url": "/hatches-cadauth/assets/banner.svg",
+    "svg_file": "banner.svg"
+  },
+  {
+    "id": "basketweave",
+    "name": "Basketweave",
+    "description": "Local SVG icon (No pattern file yet)",
+    "type": "local_svg",
+    "pat_file": null,
+    "pat_url": null,
+    "img_url": "/hatches-cadauth/assets/basketweave.svg",
+    "svg_file": "basketweave.svg"
+  },
+  {
+    "id": "basketweave_flow",
+    "name": "Basketweave Flow",
+    "description": "Local SVG icon (No pattern file yet)",
+    "type": "local_svg",
+    "pat_file": null,
+    "pat_url": null,
+    "img_url": "/hatches-cadauth/assets/basketweave_flow.svg",
+    "svg_file": "basketweave_flow.svg"
+  },
+  {
+    "id": "basketweave_square",
+    "name": "Basketweave Square",
+    "description": "Local SVG icon (No pattern file yet)",
+    "type": "local_svg",
+    "pat_file": null,
+    "pat_url": null,
+    "img_url": "/hatches-cadauth/assets/basketweave_square.svg",
+    "svg_file": "basketweave_square.svg"
+  },
+  {
+    "id": "bowtie_pavers",
+    "name": "Bowtie Pavers",
+    "description": "Local SVG icon (No pattern file yet)",
+    "type": "local_svg",
+    "pat_file": null,
+    "pat_url": null,
+    "img_url": "/hatches-cadauth/assets/bowtie_pavers.svg",
+    "svg_file": "bowtie_pavers.svg"
+  },
+  {
+    "id": "broken_herringbone",
+    "name": "Broken Herringbone",
+    "description": "Local SVG icon (No pattern file yet)",
+    "type": "local_svg",
+    "pat_file": null,
+    "pat_url": null,
+    "img_url": "/hatches-cadauth/assets/broken_herringbone.svg",
+    "svg_file": "broken_herringbone.svg"
+  },
+  {
+    "id": "broken_range_ashlar",
+    "name": "Broken Range Ashlar",
+    "description": "Local SVG icon (No pattern file yet)",
+    "type": "local_svg",
+    "pat_file": null,
+    "pat_url": null,
+    "img_url": "/hatches-cadauth/assets/broken_range_ashlar.svg",
+    "svg_file": "broken_range_ashlar.svg"
+  },
+  {
+    "id": "cambridge_cobble",
+    "name": "Cambridge Cobble",
+    "description": "Local SVG icon (No pattern file yet)",
+    "type": "local_svg",
+    "pat_file": null,
+    "pat_url": null,
+    "img_url": "/hatches-cadauth/assets/cambridge_cobble.svg",
+    "svg_file": "cambridge_cobble.svg"
+  },
+  {
+    "id": "chantilly",
+    "name": "Chantilly",
+    "description": "Local SVG icon (No pattern file yet)",
+    "type": "local_svg",
+    "pat_file": null,
+    "pat_url": null,
+    "img_url": "/hatches-cadauth/assets/chantilly.svg",
+    "svg_file": "chantilly.svg"
+  },
+  {
+    "id": "checkerboard_split_pattern",
+    "name": "Checkerboard Split Pattern",
+    "description": "Local SVG icon (No pattern file yet)",
+    "type": "local_svg",
+    "pat_file": null,
+    "pat_url": null,
+    "img_url": "/hatches-cadauth/assets/checkerboard_split_pattern.svg",
+    "svg_file": "checkerboard_split_pattern.svg"
+  },
+  {
+    "id": "checkered_stripe_tiles_variation",
+    "name": "Checkered Stripe Tiles Variation",
+    "description": "Local SVG icon (No pattern file yet)",
+    "type": "local_svg",
+    "pat_file": null,
+    "pat_url": null,
+    "img_url": "/hatches-cadauth/assets/checkered_stripe_tiles_variation.svg",
+    "svg_file": "checkered_stripe_tiles_variation.svg"
+  },
+  {
+    "id": "checkered_tiles_variation",
+    "name": "Checkered Tiles Variation",
+    "description": "Local SVG icon (No pattern file yet)",
+    "type": "local_svg",
+    "pat_file": null,
+    "pat_url": null,
+    "img_url": "/hatches-cadauth/assets/checkered_tiles_variation.svg",
+    "svg_file": "checkered_tiles_variation.svg"
+  },
+  {
+    "id": "chevron",
+    "name": "Chevron",
+    "description": "Local SVG icon (No pattern file yet)",
+    "type": "local_svg",
+    "pat_file": null,
+    "pat_url": null,
+    "img_url": "/hatches-cadauth/assets/chevron.svg",
+    "svg_file": "chevron.svg"
+  },
+  {
+    "id": "chevron_diamond",
+    "name": "Chevron Diamond",
+    "description": "Local SVG icon (No pattern file yet)",
+    "type": "local_svg",
+    "pat_file": null,
+    "pat_url": null,
+    "img_url": "/hatches-cadauth/assets/chevron_diamond.svg",
+    "svg_file": "chevron_diamond.svg"
+  },
+  {
+    "id": "circular",
+    "name": "Circular",
+    "description": "Local SVG icon (No pattern file yet)",
+    "type": "local_svg",
+    "pat_file": null,
+    "pat_url": null,
+    "img_url": "/hatches-cadauth/assets/circular.svg",
+    "svg_file": "circular.svg"
+  },
+  {
+    "id": "cloud_weave",
+    "name": "Cloud Weave",
+    "description": "Local SVG icon (No pattern file yet)",
+    "type": "local_svg",
+    "pat_file": null,
+    "pat_url": null,
+    "img_url": "/hatches-cadauth/assets/cloud_weave.svg",
+    "svg_file": "cloud_weave.svg"
+  },
+  {
+    "id": "common",
+    "name": "Common",
+    "description": "Local SVG icon (No pattern file yet)",
+    "type": "local_svg",
+    "pat_file": null,
+    "pat_url": null,
+    "img_url": "/hatches-cadauth/assets/common.svg",
+    "svg_file": "common.svg"
+  },
+  {
+    "id": "compass",
+    "name": "Compass",
+    "description": "Local SVG icon (No pattern file yet)",
+    "type": "local_svg",
+    "pat_file": null,
+    "pat_url": null,
+    "img_url": "/hatches-cadauth/assets/compass.svg",
+    "svg_file": "compass.svg"
+  },
+  {
+    "id": "consistent_width_terrazzo",
+    "name": "Consistent Width Terrazzo",
+    "description": "Local SVG icon (No pattern file yet)",
+    "type": "local_svg",
+    "pat_file": null,
+    "pat_url": null,
+    "img_url": "/hatches-cadauth/assets/consistent_width_terrazzo.svg",
+    "svg_file": "consistent_width_terrazzo.svg"
+  },
+  {
+    "id": "corfiot",
+    "name": "Corfiot",
+    "description": "Local SVG icon (No pattern file yet)",
+    "type": "local_svg",
+    "pat_file": null,
+    "pat_url": null,
+    "img_url": "/hatches-cadauth/assets/corfiot.svg",
+    "svg_file": "corfiot.svg"
+  },
+  {
+    "id": "coursed_ashlar",
+    "name": "Coursed Ashlar",
+    "description": "Local SVG icon (No pattern file yet)",
+    "type": "local_svg",
+    "pat_file": null,
+    "pat_url": null,
+    "img_url": "/hatches-cadauth/assets/coursed_ashlar.svg",
+    "svg_file": "coursed_ashlar.svg"
+  },
+  {
+    "id": "crazy_paving",
+    "name": "Crazy Paving",
+    "description": "Local SVG icon (No pattern file yet)",
+    "type": "local_svg",
+    "pat_file": null,
+    "pat_url": null,
+    "img_url": "/hatches-cadauth/assets/crazy_paving.svg",
+    "svg_file": "crazy_paving.svg"
+  },
+  {
+    "id": "crosshair",
+    "name": "Crosshair",
+    "description": "Local SVG icon (No pattern file yet)",
+    "type": "local_svg",
+    "pat_file": null,
+    "pat_url": null,
+    "img_url": "/hatches-cadauth/assets/crosshair.svg",
+    "svg_file": "crosshair.svg"
+  },
+  {
+    "id": "crosshatch",
+    "name": "Crosshatch",
+    "description": "Local SVG icon (No pattern file yet)",
+    "type": "local_svg",
+    "pat_file": null,
+    "pat_url": null,
+    "img_url": "/hatches-cadauth/assets/crosshatch.svg",
+    "svg_file": "crosshatch.svg"
+  },
+  {
+    "id": "crossing_split_tiles_pattern",
+    "name": "Crossing Split Tiles Pattern",
+    "description": "Local SVG icon (No pattern file yet)",
+    "type": "local_svg",
+    "pat_file": null,
+    "pat_url": null,
+    "img_url": "/hatches-cadauth/assets/crossing_split_tiles_pattern.svg",
+    "svg_file": "crossing_split_tiles_pattern.svg"
+  },
+  {
+    "id": "cross_and_square_pattern",
+    "name": "Cross And Square Pattern",
+    "description": "Local SVG icon (No pattern file yet)",
+    "type": "local_svg",
+    "pat_file": null,
+    "pat_url": null,
+    "img_url": "/hatches-cadauth/assets/cross_and_square_pattern.svg",
+    "svg_file": "cross_and_square_pattern.svg"
+  },
+  {
+    "id": "cross_tile_weave_pattern",
+    "name": "Cross Tile Weave Pattern",
+    "description": "Local SVG icon (No pattern file yet)",
+    "type": "local_svg",
+    "pat_file": null,
+    "pat_url": null,
+    "img_url": "/hatches-cadauth/assets/cross_tile_weave_pattern.svg",
+    "svg_file": "cross_tile_weave_pattern.svg"
+  },
+  {
+    "id": "cross_versailles",
+    "name": "Cross Versailles",
+    "description": "Local SVG icon (No pattern file yet)",
+    "type": "local_svg",
+    "pat_file": null,
+    "pat_url": null,
+    "img_url": "/hatches-cadauth/assets/cross_versailles.svg",
+    "svg_file": "cross_versailles.svg"
+  },
+  {
+    "id": "cubic",
+    "name": "Cubic",
+    "description": "Local SVG icon (No pattern file yet)",
+    "type": "local_svg",
+    "pat_file": null,
+    "pat_url": null,
+    "img_url": "/hatches-cadauth/assets/cubic.svg",
+    "svg_file": "cubic.svg"
+  },
+  {
+    "id": "curved_interlocking_tiles",
+    "name": "Curved Interlocking Tiles",
+    "description": "Local SVG icon (No pattern file yet)",
+    "type": "local_svg",
+    "pat_file": null,
+    "pat_url": null,
+    "img_url": "/hatches-cadauth/assets/curved_interlocking_tiles.svg",
+    "svg_file": "curved_interlocking_tiles.svg"
+  },
+  {
+    "id": "cyclone_versailles",
+    "name": "Cyclone Versailles",
+    "description": "Local SVG icon (No pattern file yet)",
+    "type": "local_svg",
+    "pat_file": null,
+    "pat_url": null,
+    "img_url": "/hatches-cadauth/assets/cyclone_versailles.svg",
+    "svg_file": "cyclone_versailles.svg"
+  },
+  {
+    "id": "diagonal_checkered_pattern",
+    "name": "Diagonal Checkered Pattern",
+    "description": "Local SVG icon (No pattern file yet)",
+    "type": "local_svg",
+    "pat_file": null,
+    "pat_url": null,
+    "img_url": "/hatches-cadauth/assets/diagonal_checkered_pattern.svg",
+    "svg_file": "diagonal_checkered_pattern.svg"
+  },
+  {
+    "id": "diagonal_cross_pattern",
+    "name": "Diagonal Cross Pattern",
+    "description": "Local SVG icon (No pattern file yet)",
+    "type": "local_svg",
+    "pat_file": null,
+    "pat_url": null,
+    "img_url": "/hatches-cadauth/assets/diagonal_cross_pattern.svg",
+    "svg_file": "diagonal_cross_pattern.svg"
+  },
+  {
+    "id": "diagonal_split_tile_pattern",
+    "name": "Diagonal Split Tile Pattern",
+    "description": "Local SVG icon (No pattern file yet)",
+    "type": "local_svg",
+    "pat_file": null,
+    "pat_url": null,
+    "img_url": "/hatches-cadauth/assets/diagonal_split_tile_pattern.svg",
+    "svg_file": "diagonal_split_tile_pattern.svg"
+  },
+  {
+    "id": "diagonal_triangle_split_and_squared_tile_pattern",
+    "name": "Diagonal Triangle Split And Squared Tile Pattern",
+    "description": "Local SVG icon (No pattern file yet)",
+    "type": "local_svg",
+    "pat_file": null,
+    "pat_url": null,
+    "img_url": "/hatches-cadauth/assets/diagonal_triangle_split_and_squared_tile_pattern.svg",
+    "svg_file": "diagonal_triangle_split_and_squared_tile_pattern.svg"
+  },
+  {
+    "id": "diamond",
+    "name": "Diamond",
+    "description": "Local SVG icon (No pattern file yet)",
+    "type": "local_svg",
+    "pat_file": null,
+    "pat_url": null,
+    "img_url": "/hatches-cadauth/assets/diamond.svg",
+    "svg_file": "diamond.svg"
+  },
+  {
+    "id": "diamond_continuous_versailles",
+    "name": "Diamond Continuous Versailles",
+    "description": "Local SVG icon (No pattern file yet)",
+    "type": "local_svg",
+    "pat_file": null,
+    "pat_url": null,
+    "img_url": "/hatches-cadauth/assets/diamond_continuous_versailles.svg",
+    "svg_file": "diamond_continuous_versailles.svg"
+  },
+  {
+    "id": "diamond_cross",
+    "name": "Diamond Cross",
+    "description": "Local SVG icon (No pattern file yet)",
+    "type": "local_svg",
+    "pat_file": null,
+    "pat_url": null,
+    "img_url": "/hatches-cadauth/assets/diamond_cross.svg",
+    "svg_file": "diamond_cross.svg"
+  },
+  {
+    "id": "diamond_in_diamond",
+    "name": "Diamond In Diamond",
+    "description": "Local SVG icon (No pattern file yet)",
+    "type": "local_svg",
+    "pat_file": null,
+    "pat_url": null,
+    "img_url": "/hatches-cadauth/assets/diamond_in_diamond.svg",
+    "svg_file": "diamond_in_diamond.svg"
+  },
+  {
+    "id": "diamond_point_mosaic",
+    "name": "Diamond Point Mosaic",
+    "description": "Local SVG icon (No pattern file yet)",
+    "type": "local_svg",
+    "pat_file": null,
+    "pat_url": null,
+    "img_url": "/hatches-cadauth/assets/diamond_point_mosaic.svg",
+    "svg_file": "diamond_point_mosaic.svg"
+  },
+  {
+    "id": "diamond_square",
+    "name": "Diamond Square",
+    "description": "Local SVG icon (No pattern file yet)",
+    "type": "local_svg",
+    "pat_file": null,
+    "pat_url": null,
+    "img_url": "/hatches-cadauth/assets/diamond_square.svg",
+    "svg_file": "diamond_square.svg"
+  },
+  {
+    "id": "diamond_square_mosaic",
+    "name": "Diamond Square Mosaic",
+    "description": "Local SVG icon (No pattern file yet)",
+    "type": "local_svg",
+    "pat_file": null,
+    "pat_url": null,
+    "img_url": "/hatches-cadauth/assets/diamond_square_mosaic.svg",
+    "svg_file": "diamond_square_mosaic.svg"
+  },
+  {
+    "id": "diamond_weave",
+    "name": "Diamond Weave",
+    "description": "Local SVG icon (No pattern file yet)",
+    "type": "local_svg",
+    "pat_file": null,
+    "pat_url": null,
+    "img_url": "/hatches-cadauth/assets/diamond_weave.svg",
+    "svg_file": "diamond_weave.svg"
+  },
+  {
+    "id": "domino_paving",
+    "name": "Domino Paving",
+    "description": "Local SVG icon (No pattern file yet)",
+    "type": "local_svg",
+    "pat_file": null,
+    "pat_url": null,
+    "img_url": "/hatches-cadauth/assets/domino_paving.svg",
+    "svg_file": "domino_paving.svg"
+  },
+  {
+    "id": "double_basketweave",
+    "name": "Double Basketweave",
+    "description": "Local SVG icon (No pattern file yet)",
+    "type": "local_svg",
+    "pat_file": null,
+    "pat_url": null,
+    "img_url": "/hatches-cadauth/assets/double_basketweave.svg",
+    "svg_file": "double_basketweave.svg"
+  },
+  {
+    "id": "double_chevron_diamond",
+    "name": "Double Chevron Diamond",
+    "description": "Local SVG icon (No pattern file yet)",
+    "type": "local_svg",
+    "pat_file": null,
+    "pat_url": null,
+    "img_url": "/hatches-cadauth/assets/double_chevron_diamond.svg",
+    "svg_file": "double_chevron_diamond.svg"
+  },
+  {
+    "id": "double_flemish",
+    "name": "Double Flemish",
+    "description": "Local SVG icon (No pattern file yet)",
+    "type": "local_svg",
+    "pat_file": null,
+    "pat_url": null,
+    "img_url": "/hatches-cadauth/assets/double_flemish.svg",
+    "svg_file": "double_flemish.svg"
+  },
+  {
+    "id": "double_herringbone",
+    "name": "Double Herringbone",
+    "description": "Local SVG icon (No pattern file yet)",
+    "type": "local_svg",
+    "pat_file": null,
+    "pat_url": null,
+    "img_url": "/hatches-cadauth/assets/double_herringbone.svg",
+    "svg_file": "double_herringbone.svg"
+  },
+  {
+    "id": "double_linear_basketweave",
+    "name": "Double Linear Basketweave",
+    "description": "Local SVG icon (No pattern file yet)",
+    "type": "local_svg",
+    "pat_file": null,
+    "pat_url": null,
+    "img_url": "/hatches-cadauth/assets/double_linear_basketweave.svg",
+    "svg_file": "double_linear_basketweave.svg"
+  },
+  {
+    "id": "double_linear_basketweave_2",
+    "name": "Double Linear Basketweave 2",
+    "description": "Local SVG icon (No pattern file yet)",
+    "type": "local_svg",
+    "pat_file": null,
+    "pat_url": null,
+    "img_url": "/hatches-cadauth/assets/double_linear_basketweave_2.svg",
+    "svg_file": "double_linear_basketweave_2.svg"
+  },
+  {
+    "id": "double_stretcher",
+    "name": "Double Stretcher",
+    "description": "Local SVG icon (No pattern file yet)",
+    "type": "local_svg",
+    "pat_file": null,
+    "pat_url": null,
+    "img_url": "/hatches-cadauth/assets/double_stretcher.svg",
+    "svg_file": "double_stretcher.svg"
+  },
+  {
+    "id": "double_stretcher_with_header",
+    "name": "Double Stretcher With Header",
+    "description": "Local SVG icon (No pattern file yet)",
+    "type": "local_svg",
+    "pat_file": null,
+    "pat_url": null,
+    "img_url": "/hatches-cadauth/assets/double_stretcher_with_header.svg",
+    "svg_file": "double_stretcher_with_header.svg"
+  },
+  {
+    "id": "double_zig_zag",
+    "name": "Double Zig Zag",
+    "description": "Local SVG icon (No pattern file yet)",
+    "type": "local_svg",
+    "pat_file": null,
+    "pat_url": null,
+    "img_url": "/hatches-cadauth/assets/double_zig_zag.svg",
+    "svg_file": "double_zig_zag.svg"
+  },
+  {
+    "id": "drystone",
+    "name": "Drystone",
+    "description": "Local SVG icon (No pattern file yet)",
+    "type": "local_svg",
+    "pat_file": null,
+    "pat_url": null,
+    "img_url": "/hatches-cadauth/assets/drystone.svg",
+    "svg_file": "drystone.svg"
+  },
+  {
+    "id": "english_bond",
+    "name": "English Bond",
+    "description": "Local SVG icon (No pattern file yet)",
+    "type": "local_svg",
+    "pat_file": null,
+    "pat_url": null,
+    "img_url": "/hatches-cadauth/assets/english_bond.svg",
+    "svg_file": "english_bond.svg"
+  },
+  {
+    "id": "european_fan",
+    "name": "European Fan",
+    "description": "Local SVG icon (No pattern file yet)",
+    "type": "local_svg",
+    "pat_file": null,
+    "pat_url": null,
+    "img_url": "/hatches-cadauth/assets/european_fan.svg",
+    "svg_file": "european_fan.svg"
+  },
+  {
+    "id": "fishscale",
+    "name": "Fishscale",
+    "description": "Local SVG icon (No pattern file yet)",
+    "type": "local_svg",
+    "pat_file": null,
+    "pat_url": null,
+    "img_url": "/hatches-cadauth/assets/fishscale.svg",
+    "svg_file": "fishscale.svg"
+  },
+  {
+    "id": "fishtail_circles",
+    "name": "Fishtail Circles",
+    "description": "Local SVG icon (No pattern file yet)",
+    "type": "local_svg",
+    "pat_file": null,
+    "pat_url": null,
+    "img_url": "/hatches-cadauth/assets/fishtail_circles.svg",
+    "svg_file": "fishtail_circles.svg"
+  },
+  {
+    "id": "fishtail_roof_tile",
+    "name": "Fishtail Roof Tile",
+    "description": "Local SVG icon (No pattern file yet)",
+    "type": "local_svg",
+    "pat_file": null,
+    "pat_url": null,
+    "img_url": "/hatches-cadauth/assets/fishtail_roof_tile.svg",
+    "svg_file": "fishtail_roof_tile.svg"
+  },
+  {
+    "id": "fishtail_roof_tiles_2",
+    "name": "Fishtail Roof Tiles 2",
+    "description": "Local SVG icon (No pattern file yet)",
+    "type": "local_svg",
+    "pat_file": null,
+    "pat_url": null,
+    "img_url": "/hatches-cadauth/assets/fishtail_roof_tiles_2.svg",
+    "svg_file": "fishtail_roof_tiles_2.svg"
+  },
+  {
+    "id": "flemish",
+    "name": "Flemish",
+    "description": "Local SVG icon (No pattern file yet)",
+    "type": "local_svg",
+    "pat_file": null,
+    "pat_url": null,
+    "img_url": "/hatches-cadauth/assets/flemish.svg",
+    "svg_file": "flemish.svg"
+  },
+  {
+    "id": "four_leaf",
+    "name": "Four Leaf",
+    "description": "Local SVG icon (No pattern file yet)",
+    "type": "local_svg",
+    "pat_file": null,
+    "pat_url": null,
+    "img_url": "/hatches-cadauth/assets/four_leaf.svg",
+    "svg_file": "four_leaf.svg"
+  },
+  {
+    "id": "four_piece_modular_paver",
+    "name": "Four Piece Modular Paver",
+    "description": "Local SVG icon (No pattern file yet)",
+    "type": "local_svg",
+    "pat_file": null,
+    "pat_url": null,
+    "img_url": "/hatches-cadauth/assets/four_piece_modular_paver.svg",
+    "svg_file": "four_piece_modular_paver.svg"
+  },
+  {
+    "id": "framed_versailles",
+    "name": "Framed Versailles",
+    "description": "Local SVG icon (No pattern file yet)",
+    "type": "local_svg",
+    "pat_file": null,
+    "pat_url": null,
+    "img_url": "/hatches-cadauth/assets/framed_versailles.svg",
+    "svg_file": "framed_versailles.svg"
+  },
+  {
+    "id": "french",
+    "name": "French",
+    "description": "Local SVG icon (No pattern file yet)",
+    "type": "local_svg",
+    "pat_file": null,
+    "pat_url": null,
+    "img_url": "/hatches-cadauth/assets/french.svg",
+    "svg_file": "french.svg"
+  },
+  {
+    "id": "geometric_alternating_circles_pattern",
+    "name": "Geometric Alternating Circles Pattern",
+    "description": "Local SVG icon (No pattern file yet)",
+    "type": "local_svg",
+    "pat_file": null,
+    "pat_url": null,
+    "img_url": "/hatches-cadauth/assets/geometric_alternating_circles_pattern.svg",
+    "svg_file": "geometric_alternating_circles_pattern.svg"
+  },
+  {
+    "id": "geometric_alternating_pattern",
+    "name": "Geometric Alternating Pattern",
+    "description": "Local SVG icon (No pattern file yet)",
+    "type": "local_svg",
+    "pat_file": null,
+    "pat_url": null,
+    "img_url": "/hatches-cadauth/assets/geometric_alternating_pattern.svg",
+    "svg_file": "geometric_alternating_pattern.svg"
+  },
+  {
+    "id": "geometric_compass_pattern",
+    "name": "Geometric Compass Pattern",
+    "description": "Local SVG icon (No pattern file yet)",
+    "type": "local_svg",
+    "pat_file": null,
+    "pat_url": null,
+    "img_url": "/hatches-cadauth/assets/geometric_compass_pattern.svg",
+    "svg_file": "geometric_compass_pattern.svg"
+  },
+  {
+    "id": "geometric_interlocking_pattern",
+    "name": "Geometric Interlocking Pattern",
+    "description": "Local SVG icon (No pattern file yet)",
+    "type": "local_svg",
+    "pat_file": null,
+    "pat_url": null,
+    "img_url": "/hatches-cadauth/assets/geometric_interlocking_pattern.svg",
+    "svg_file": "geometric_interlocking_pattern.svg"
+  },
+  {
+    "id": "geometric_mirrored_pattern",
+    "name": "Geometric Mirrored Pattern",
+    "description": "Local SVG icon (No pattern file yet)",
+    "type": "local_svg",
+    "pat_file": null,
+    "pat_url": null,
+    "img_url": "/hatches-cadauth/assets/geometric_mirrored_pattern.svg",
+    "svg_file": "geometric_mirrored_pattern.svg"
+  },
+  {
+    "id": "geometric_mosaic_pattern",
+    "name": "Geometric Mosaic Pattern",
+    "description": "Local SVG icon (No pattern file yet)",
+    "type": "local_svg",
+    "pat_file": null,
+    "pat_url": null,
+    "img_url": "/hatches-cadauth/assets/geometric_mosaic_pattern.svg",
+    "svg_file": "geometric_mosaic_pattern.svg"
+  },
+  {
+    "id": "geometric_split_tiles",
+    "name": "Geometric Split Tiles",
+    "description": "Local SVG icon (No pattern file yet)",
+    "type": "local_svg",
+    "pat_file": null,
+    "pat_url": null,
+    "img_url": "/hatches-cadauth/assets/geometric_split_tiles.svg",
+    "svg_file": "geometric_split_tiles.svg"
+  },
+  {
+    "id": "geometric_split_tile_pattern",
+    "name": "Geometric Split Tile Pattern",
+    "description": "Local SVG icon (No pattern file yet)",
+    "type": "local_svg",
+    "pat_file": null,
+    "pat_url": null,
+    "img_url": "/hatches-cadauth/assets/geometric_split_tile_pattern.svg",
+    "svg_file": "geometric_split_tile_pattern.svg"
+  },
+  {
+    "id": "geometric_thin_tile_pattern",
+    "name": "Geometric Thin Tile Pattern",
+    "description": "Local SVG icon (No pattern file yet)",
+    "type": "local_svg",
+    "pat_file": null,
+    "pat_url": null,
+    "img_url": "/hatches-cadauth/assets/geometric_thin_tile_pattern.svg",
+    "svg_file": "geometric_thin_tile_pattern.svg"
+  },
+  {
+    "id": "geometric_tile_pattern",
+    "name": "Geometric Tile Pattern",
+    "description": "Local SVG icon (No pattern file yet)",
+    "type": "local_svg",
+    "pat_file": null,
+    "pat_url": null,
+    "img_url": "/hatches-cadauth/assets/geometric_tile_pattern.svg",
+    "svg_file": "geometric_tile_pattern.svg"
+  },
+  {
+    "id": "gothic_bond",
+    "name": "Gothic Bond",
+    "description": "Local SVG icon (No pattern file yet)",
+    "type": "local_svg",
+    "pat_file": null,
+    "pat_url": null,
+    "img_url": "/hatches-cadauth/assets/gothic_bond.svg",
+    "svg_file": "gothic_bond.svg"
+  },
+  {
+    "id": "haddon_hall",
+    "name": "Haddon Hall",
+    "description": "Local SVG icon (No pattern file yet)",
+    "type": "local_svg",
+    "pat_file": null,
+    "pat_url": null,
+    "img_url": "/hatches-cadauth/assets/haddon_hall.svg",
+    "svg_file": "haddon_hall.svg"
+  },
+  {
+    "id": "half_hexagon",
+    "name": "Half Hexagon",
+    "description": "Local SVG icon (No pattern file yet)",
+    "type": "local_svg",
+    "pat_file": null,
+    "pat_url": null,
+    "img_url": "/hatches-cadauth/assets/half_hexagon.svg",
+    "svg_file": "half_hexagon.svg"
+  },
+  {
+    "id": "helix_tile_pattern",
+    "name": "Helix Tile Pattern",
+    "description": "Local SVG icon (No pattern file yet)",
+    "type": "local_svg",
+    "pat_file": null,
+    "pat_url": null,
+    "img_url": "/hatches-cadauth/assets/helix_tile_pattern.svg",
+    "svg_file": "helix_tile_pattern.svg"
+  },
+  {
+    "id": "herringbone",
+    "name": "Herringbone",
+    "description": "Local SVG icon (No pattern file yet)",
+    "type": "local_svg",
+    "pat_file": null,
+    "pat_url": null,
+    "img_url": "/hatches-cadauth/assets/herringbone.svg",
+    "svg_file": "herringbone.svg"
+  },
+  {
+    "id": "hexagonal",
+    "name": "Hexagonal",
+    "description": "Local SVG icon (No pattern file yet)",
+    "type": "local_svg",
+    "pat_file": null,
+    "pat_url": null,
+    "img_url": "/hatches-cadauth/assets/hexagonal.svg",
+    "svg_file": "hexagonal.svg"
+  },
+  {
+    "id": "hexagon_and_dot",
+    "name": "Hexagon And Dot",
+    "description": "Local SVG icon (No pattern file yet)",
+    "type": "local_svg",
+    "pat_file": null,
+    "pat_url": null,
+    "img_url": "/hatches-cadauth/assets/hexagon_and_dot.svg",
+    "svg_file": "hexagon_and_dot.svg"
+  },
+  {
+    "id": "hexagon_and_triangle",
+    "name": "Hexagon And Triangle",
+    "description": "Local SVG icon (No pattern file yet)",
+    "type": "local_svg",
+    "pat_file": null,
+    "pat_url": null,
+    "img_url": "/hatches-cadauth/assets/hexagon_and_triangle.svg",
+    "svg_file": "hexagon_and_triangle.svg"
+  },
+  {
+    "id": "hexagon_diamond",
+    "name": "Hexagon Diamond",
+    "description": "Local SVG icon (No pattern file yet)",
+    "type": "local_svg",
+    "pat_file": null,
+    "pat_url": null,
+    "img_url": "/hatches-cadauth/assets/hexagon_diamond.svg",
+    "svg_file": "hexagon_diamond.svg"
+  },
+  {
+    "id": "hexagon_weave",
+    "name": "Hexagon Weave",
+    "description": "Local SVG icon (No pattern file yet)",
+    "type": "local_svg",
+    "pat_file": null,
+    "pat_url": null,
+    "img_url": "/hatches-cadauth/assets/hexagon_weave.svg",
+    "svg_file": "hexagon_weave.svg"
+  },
+  {
+    "id": "hopscotch",
+    "name": "Hopscotch",
+    "description": "Local SVG icon (No pattern file yet)",
+    "type": "local_svg",
+    "pat_file": null,
+    "pat_url": null,
+    "img_url": "/hatches-cadauth/assets/hopscotch.svg",
+    "svg_file": "hopscotch.svg"
+  },
+  {
+    "id": "houndstooth",
+    "name": "Houndstooth",
+    "description": "Local SVG icon (No pattern file yet)",
+    "type": "local_svg",
+    "pat_file": null,
+    "pat_url": null,
+    "img_url": "/hatches-cadauth/assets/houndstooth.svg",
+    "svg_file": "houndstooth.svg"
+  },
+  {
+    "id": "hourglass",
+    "name": "Hourglass",
+    "description": "Local SVG icon (No pattern file yet)",
+    "type": "local_svg",
+    "pat_file": null,
+    "pat_url": null,
+    "img_url": "/hatches-cadauth/assets/hourglass.svg",
+    "svg_file": "hourglass.svg"
+  },
+  {
+    "id": "h_tiles",
+    "name": "H Tiles",
+    "description": "Local SVG icon (No pattern file yet)",
+    "type": "local_svg",
+    "pat_file": null,
+    "pat_url": null,
+    "img_url": "/hatches-cadauth/assets/h_tiles.svg",
+    "svg_file": "h_tiles.svg"
+  },
+  {
+    "id": "interlocking_curved_tiles",
+    "name": "Interlocking Curved Tiles",
+    "description": "Local SVG icon (No pattern file yet)",
+    "type": "local_svg",
+    "pat_file": null,
+    "pat_url": null,
+    "img_url": "/hatches-cadauth/assets/interlocking_curved_tiles.svg",
+    "svg_file": "interlocking_curved_tiles.svg"
+  },
+  {
+    "id": "interlocking_pattern",
+    "name": "Interlocking Pattern",
+    "description": "Local SVG icon (No pattern file yet)",
+    "type": "local_svg",
+    "pat_file": null,
+    "pat_url": null,
+    "img_url": "/hatches-cadauth/assets/interlocking_pattern.svg",
+    "svg_file": "interlocking_pattern.svg"
+  },
+  {
+    "id": "interlocking_polygons",
+    "name": "Interlocking Polygons",
+    "description": "Local SVG icon (No pattern file yet)",
+    "type": "local_svg",
+    "pat_file": null,
+    "pat_url": null,
+    "img_url": "/hatches-cadauth/assets/interlocking_polygons.svg",
+    "svg_file": "interlocking_polygons.svg"
+  },
+  {
+    "id": "interlocking_rectangle_pavers",
+    "name": "Interlocking Rectangle Pavers",
+    "description": "Local SVG icon (No pattern file yet)",
+    "type": "local_svg",
+    "pat_file": null,
+    "pat_url": null,
+    "img_url": "/hatches-cadauth/assets/interlocking_rectangle_pavers.svg",
+    "svg_file": "interlocking_rectangle_pavers.svg"
+  },
+  {
+    "id": "interlocking_rectangle_with_square",
+    "name": "Interlocking Rectangle With Square",
+    "description": "Local SVG icon (No pattern file yet)",
+    "type": "local_svg",
+    "pat_file": null,
+    "pat_url": null,
+    "img_url": "/hatches-cadauth/assets/interlocking_rectangle_with_square.svg",
+    "svg_file": "interlocking_rectangle_with_square.svg"
+  },
+  {
+    "id": "interlocking_rounded_tiles",
+    "name": "Interlocking Rounded Tiles",
+    "description": "Local SVG icon (No pattern file yet)",
+    "type": "local_svg",
+    "pat_file": null,
+    "pat_url": null,
+    "img_url": "/hatches-cadauth/assets/interlocking_rounded_tiles.svg",
+    "svg_file": "interlocking_rounded_tiles.svg"
+  },
+  {
+    "id": "interlocking_stripe_pattern",
+    "name": "Interlocking Stripe Pattern",
+    "description": "Local SVG icon (No pattern file yet)",
+    "type": "local_svg",
+    "pat_file": null,
+    "pat_url": null,
+    "img_url": "/hatches-cadauth/assets/interlocking_stripe_pattern.svg",
+    "svg_file": "interlocking_stripe_pattern.svg"
+  },
+  {
+    "id": "interlocking_stripe_pattern_2",
+    "name": "Interlocking Stripe Pattern 2",
+    "description": "Local SVG icon (No pattern file yet)",
+    "type": "local_svg",
+    "pat_file": null,
+    "pat_url": null,
+    "img_url": "/hatches-cadauth/assets/interlocking_stripe_pattern_2.svg",
+    "svg_file": "interlocking_stripe_pattern_2.svg"
+  },
+  {
+    "id": "interlocking_triangular_pattern",
+    "name": "Interlocking Triangular Pattern",
+    "description": "Local SVG icon (No pattern file yet)",
+    "type": "local_svg",
+    "pat_file": null,
+    "pat_url": null,
+    "img_url": "/hatches-cadauth/assets/interlocking_triangular_pattern.svg",
+    "svg_file": "interlocking_triangular_pattern.svg"
+  },
+  {
+    "id": "interlocking_v_pavers_hexagon",
+    "name": "Interlocking V Pavers Hexagon",
+    "description": "Local SVG icon (No pattern file yet)",
+    "type": "local_svg",
+    "pat_file": null,
+    "pat_url": null,
+    "img_url": "/hatches-cadauth/assets/interlocking_v_pavers_hexagon.svg",
+    "svg_file": "interlocking_v_pavers_hexagon.svg"
+  },
+  {
+    "id": "interlocking_wave",
+    "name": "Interlocking Wave",
+    "description": "Local SVG icon (No pattern file yet)",
+    "type": "local_svg",
+    "pat_file": null,
+    "pat_url": null,
+    "img_url": "/hatches-cadauth/assets/interlocking_wave.svg",
+    "svg_file": "interlocking_wave.svg"
+  },
+  {
+    "id": "intersecting_circle",
+    "name": "Intersecting Circle",
+    "description": "Local SVG icon (No pattern file yet)",
+    "type": "local_svg",
+    "pat_file": null,
+    "pat_url": null,
+    "img_url": "/hatches-cadauth/assets/intersecting_circle.svg",
+    "svg_file": "intersecting_circle.svg"
+  },
+  {
+    "id": "ionian",
+    "name": "Ionian",
+    "description": "Local SVG icon (No pattern file yet)",
+    "type": "local_svg",
+    "pat_file": null,
+    "pat_url": null,
+    "img_url": "/hatches-cadauth/assets/ionian.svg",
+    "svg_file": "ionian.svg"
+  },
+  {
+    "id": "isosceles",
+    "name": "Isosceles",
+    "description": "Local SVG icon (No pattern file yet)",
+    "type": "local_svg",
+    "pat_file": null,
+    "pat_url": null,
+    "img_url": "/hatches-cadauth/assets/isosceles.svg",
+    "svg_file": "isosceles.svg"
+  },
+  {
+    "id": "kite",
+    "name": "Kite",
+    "description": "Local SVG icon (No pattern file yet)",
+    "type": "local_svg",
+    "pat_file": null,
+    "pat_url": null,
+    "img_url": "/hatches-cadauth/assets/kite.svg",
+    "svg_file": "kite.svg"
+  },
+  {
+    "id": "kruis_bond_dutch",
+    "name": "Kruis Bond Dutch",
+    "description": "Local SVG icon (No pattern file yet)",
+    "type": "local_svg",
+    "pat_file": null,
+    "pat_url": null,
+    "img_url": "/hatches-cadauth/assets/kruis_bond_dutch.svg",
+    "svg_file": "kruis_bond_dutch.svg"
+  },
+  {
+    "id": "kultura",
+    "name": "Kultura",
+    "description": "Local SVG icon (No pattern file yet)",
+    "type": "local_svg",
+    "pat_file": null,
+    "pat_url": null,
+    "img_url": "/hatches-cadauth/assets/kultura.svg",
+    "svg_file": "kultura.svg"
+  },
+  {
+    "id": "leaf",
+    "name": "Leaf",
+    "description": "Local SVG icon (No pattern file yet)",
+    "type": "local_svg",
+    "pat_file": null,
+    "pat_url": null,
+    "img_url": "/hatches-cadauth/assets/leaf.svg",
+    "svg_file": "leaf.svg"
+  },
+  {
+    "id": "linear_basketweave",
+    "name": "Linear Basketweave",
+    "description": "Local SVG icon (No pattern file yet)",
+    "type": "local_svg",
+    "pat_file": null,
+    "pat_url": null,
+    "img_url": "/hatches-cadauth/assets/linear_basketweave.svg",
+    "svg_file": "linear_basketweave.svg"
+  },
+  {
+    "id": "locked_square_pattern_1",
+    "name": "Locked Square Pattern 1",
+    "description": "Local SVG icon (No pattern file yet)",
+    "type": "local_svg",
+    "pat_file": null,
+    "pat_url": null,
+    "img_url": "/hatches-cadauth/assets/locked_square_pattern_1.svg",
+    "svg_file": "locked_square_pattern_1.svg"
+  },
+  {
+    "id": "locked_square_pattern_2",
+    "name": "Locked Square Pattern 2",
+    "description": "Local SVG icon (No pattern file yet)",
+    "type": "local_svg",
+    "pat_file": null,
+    "pat_url": null,
+    "img_url": "/hatches-cadauth/assets/locked_square_pattern_2.svg",
+    "svg_file": "locked_square_pattern_2.svg"
+  },
+  {
+    "id": "long_fish_scale_pattern",
+    "name": "Long Fish Scale Pattern",
+    "description": "Local SVG icon (No pattern file yet)",
+    "type": "local_svg",
+    "pat_file": null,
+    "pat_url": null,
+    "img_url": "/hatches-cadauth/assets/long_fish_scale_pattern.svg",
+    "svg_file": "long_fish_scale_pattern.svg"
+  },
+  {
+    "id": "long_rhombus_and_square_pattern",
+    "name": "Long Rhombus And Square Pattern",
+    "description": "Local SVG icon (No pattern file yet)",
+    "type": "local_svg",
+    "pat_file": null,
+    "pat_url": null,
+    "img_url": "/hatches-cadauth/assets/long_rhombus_and_square_pattern.svg",
+    "svg_file": "long_rhombus_and_square_pattern.svg"
+  },
+  {
+    "id": "mansion_weave",
+    "name": "Mansion Weave",
+    "description": "Local SVG icon (No pattern file yet)",
+    "type": "local_svg",
+    "pat_file": null,
+    "pat_url": null,
+    "img_url": "/hatches-cadauth/assets/mansion_weave.svg",
+    "svg_file": "mansion_weave.svg"
+  },
+  {
+    "id": "mazelike_pattern",
+    "name": "Mazelike Pattern",
+    "description": "Local SVG icon (No pattern file yet)",
+    "type": "local_svg",
+    "pat_file": null,
+    "pat_url": null,
+    "img_url": "/hatches-cadauth/assets/mazelike_pattern.svg",
+    "svg_file": "mazelike_pattern.svg"
+  },
+  {
+    "id": "metro_tiles_with_interlocking_element",
+    "name": "Metro Tiles With Interlocking Element",
+    "description": "Local SVG icon (No pattern file yet)",
+    "type": "local_svg",
+    "pat_file": null,
+    "pat_url": null,
+    "img_url": "/hatches-cadauth/assets/metro_tiles_with_interlocking_element.svg",
+    "svg_file": "metro_tiles_with_interlocking_element.svg"
+  },
+  {
+    "id": "mirrored_caved_tiles",
+    "name": "Mirrored Caved Tiles",
+    "description": "Local SVG icon (No pattern file yet)",
+    "type": "local_svg",
+    "pat_file": null,
+    "pat_url": null,
+    "img_url": "/hatches-cadauth/assets/mirrored_caved_tiles.svg",
+    "svg_file": "mirrored_caved_tiles.svg"
+  },
+  {
+    "id": "mirrored_geometric_pattern_tile",
+    "name": "Mirrored Geometric Pattern Tile",
+    "description": "Local SVG icon (No pattern file yet)",
+    "type": "local_svg",
+    "pat_file": null,
+    "pat_url": null,
+    "img_url": "/hatches-cadauth/assets/mirrored_geometric_pattern_tile.svg",
+    "svg_file": "mirrored_geometric_pattern_tile.svg"
+  },
+  {
+    "id": "mirrored_geometric_pattern_tile_2",
+    "name": "Mirrored Geometric Pattern Tile 2",
+    "description": "Local SVG icon (No pattern file yet)",
+    "type": "local_svg",
+    "pat_file": null,
+    "pat_url": null,
+    "img_url": "/hatches-cadauth/assets/mirrored_geometric_pattern_tile_2.svg",
+    "svg_file": "mirrored_geometric_pattern_tile_2.svg"
+  },
+  {
+    "id": "mirrored_sun_pattern",
+    "name": "Mirrored Sun Pattern",
+    "description": "Local SVG icon (No pattern file yet)",
+    "type": "local_svg",
+    "pat_file": null,
+    "pat_url": null,
+    "img_url": "/hatches-cadauth/assets/mirrored_sun_pattern.svg",
+    "svg_file": "mirrored_sun_pattern.svg"
+  },
+  {
+    "id": "monk_bond",
+    "name": "Monk Bond",
+    "description": "Local SVG icon (No pattern file yet)",
+    "type": "local_svg",
+    "pat_file": null,
+    "pat_url": null,
+    "img_url": "/hatches-cadauth/assets/monk_bond.svg",
+    "svg_file": "monk_bond.svg"
+  },
+  {
+    "id": "moroccan_geometric_tiles",
+    "name": "Moroccan Geometric Tiles",
+    "description": "Local SVG icon (No pattern file yet)",
+    "type": "local_svg",
+    "pat_file": null,
+    "pat_url": null,
+    "img_url": "/hatches-cadauth/assets/moroccan_geometric_tiles.svg",
+    "svg_file": "moroccan_geometric_tiles.svg"
+  },
+  {
+    "id": "moroccan_geometric_tiles_2",
+    "name": "Moroccan Geometric Tiles 2",
+    "description": "Local SVG icon (No pattern file yet)",
+    "type": "local_svg",
+    "pat_file": null,
+    "pat_url": null,
+    "img_url": "/hatches-cadauth/assets/moroccan_geometric_tiles_2.svg",
+    "svg_file": "moroccan_geometric_tiles_2.svg"
+  },
+  {
+    "id": "moroccan_geometric_tiles_3",
+    "name": "Moroccan Geometric Tiles 3",
+    "description": "Local SVG icon (No pattern file yet)",
+    "type": "local_svg",
+    "pat_file": null,
+    "pat_url": null,
+    "img_url": "/hatches-cadauth/assets/moroccan_geometric_tiles_3.svg",
+    "svg_file": "moroccan_geometric_tiles_3.svg"
+  },
+  {
+    "id": "mosaic_tile",
+    "name": "Mosaic Tile",
+    "description": "Local SVG icon (No pattern file yet)",
+    "type": "local_svg",
+    "pat_file": null,
+    "pat_url": null,
+    "img_url": "/hatches-cadauth/assets/mosaic_tile.svg",
+    "svg_file": "mosaic_tile.svg"
+  },
+  {
+    "id": "none",
+    "name": "None",
+    "description": "Local SVG icon (No pattern file yet)",
+    "type": "local_svg",
+    "pat_file": null,
+    "pat_url": null,
+    "img_url": "/hatches-cadauth/assets/none.svg",
+    "svg_file": "none.svg"
+  },
+  {
+    "id": "octagonal_tile_with_corner_squares",
+    "name": "Octagonal Tile With Corner Squares",
+    "description": "Local SVG icon (No pattern file yet)",
+    "type": "local_svg",
+    "pat_file": null,
+    "pat_url": null,
+    "img_url": "/hatches-cadauth/assets/octagonal_tile_with_corner_squares.svg",
+    "svg_file": "octagonal_tile_with_corner_squares.svg"
+  },
+  {
+    "id": "octagon_picket",
+    "name": "Octagon Picket",
+    "description": "Local SVG icon (No pattern file yet)",
+    "type": "local_svg",
+    "pat_file": null,
+    "pat_url": null,
+    "img_url": "/hatches-cadauth/assets/octagon_picket.svg",
+    "svg_file": "octagon_picket.svg"
+  },
+  {
+    "id": "octagon_square",
+    "name": "Octagon Square",
+    "description": "Local SVG icon (No pattern file yet)",
+    "type": "local_svg",
+    "pat_file": null,
+    "pat_url": null,
+    "img_url": "/hatches-cadauth/assets/octagon_square.svg",
+    "svg_file": "octagon_square.svg"
+  },
+  {
+    "id": "octagon_star",
+    "name": "Octagon Star",
+    "description": "Local SVG icon (No pattern file yet)",
+    "type": "local_svg",
+    "pat_file": null,
+    "pat_url": null,
+    "img_url": "/hatches-cadauth/assets/octagon_star.svg",
+    "svg_file": "octagon_star.svg"
+  },
+  {
+    "id": "octagram_mosaic",
+    "name": "Octagram Mosaic",
+    "description": "Local SVG icon (No pattern file yet)",
+    "type": "local_svg",
+    "pat_file": null,
+    "pat_url": null,
+    "img_url": "/hatches-cadauth/assets/octagram_mosaic.svg",
+    "svg_file": "octagram_mosaic.svg"
+  },
+  {
+    "id": "offset_checkered",
+    "name": "Offset Checkered",
+    "description": "Local SVG icon (No pattern file yet)",
+    "type": "local_svg",
+    "pat_file": null,
+    "pat_url": null,
+    "img_url": "/hatches-cadauth/assets/offset_checkered.svg",
+    "svg_file": "offset_checkered.svg"
+  },
+  {
+    "id": "offset_parallelogram",
+    "name": "Offset Parallelogram",
+    "description": "Local SVG icon (No pattern file yet)",
+    "type": "local_svg",
+    "pat_file": null,
+    "pat_url": null,
+    "img_url": "/hatches-cadauth/assets/offset_parallelogram.svg",
+    "svg_file": "offset_parallelogram.svg"
+  },
+  {
+    "id": "ogee_fishscale",
+    "name": "Ogee Fishscale",
+    "description": "Local SVG icon (No pattern file yet)",
+    "type": "local_svg",
+    "pat_file": null,
+    "pat_url": null,
+    "img_url": "/hatches-cadauth/assets/ogee_fishscale.svg",
+    "svg_file": "ogee_fishscale.svg"
+  },
+  {
+    "id": "oval_tiles",
+    "name": "Oval Tiles",
+    "description": "Local SVG icon (No pattern file yet)",
+    "type": "local_svg",
+    "pat_file": null,
+    "pat_url": null,
+    "img_url": "/hatches-cadauth/assets/oval_tiles.svg",
+    "svg_file": "oval_tiles.svg"
+  },
+  {
+    "id": "oval_tiles_interlocking_pattern",
+    "name": "Oval Tiles Interlocking Pattern",
+    "description": "Local SVG icon (No pattern file yet)",
+    "type": "local_svg",
+    "pat_file": null,
+    "pat_url": null,
+    "img_url": "/hatches-cadauth/assets/oval_tiles_interlocking_pattern.svg",
+    "svg_file": "oval_tiles_interlocking_pattern.svg"
+  },
+  {
+    "id": "parallelogram",
+    "name": "Parallelogram",
+    "description": "Local SVG icon (No pattern file yet)",
+    "type": "local_svg",
+    "pat_file": null,
+    "pat_url": null,
+    "img_url": "/hatches-cadauth/assets/parallelogram.svg",
+    "svg_file": "parallelogram.svg"
+  },
+  {
+    "id": "parallelogram_with_vertical_borders",
+    "name": "Parallelogram With Vertical Borders",
+    "description": "Local SVG icon (No pattern file yet)",
+    "type": "local_svg",
+    "pat_file": null,
+    "pat_url": null,
+    "img_url": "/hatches-cadauth/assets/parallelogram_with_vertical_borders.svg",
+    "svg_file": "parallelogram_with_vertical_borders.svg"
+  },
+  {
+    "id": "paseo",
+    "name": "Paseo",
+    "description": "Local SVG icon (No pattern file yet)",
+    "type": "local_svg",
+    "pat_file": null,
+    "pat_url": null,
+    "img_url": "/hatches-cadauth/assets/paseo.svg",
+    "svg_file": "paseo.svg"
+  },
+  {
+    "id": "patterned_edge_tile",
+    "name": "Patterned Edge Tile",
+    "description": "Local SVG icon (No pattern file yet)",
+    "type": "local_svg",
+    "pat_file": null,
+    "pat_url": null,
+    "img_url": "/hatches-cadauth/assets/patterned_edge_tile.svg",
+    "svg_file": "patterned_edge_tile.svg"
+  },
+  {
+    "id": "patterned_tiles_variation",
+    "name": "Patterned Tiles Variation",
+    "description": "Local SVG icon (No pattern file yet)",
+    "type": "local_svg",
+    "pat_file": null,
+    "pat_url": null,
+    "img_url": "/hatches-cadauth/assets/patterned_tiles_variation.svg",
+    "svg_file": "patterned_tiles_variation.svg"
+  },
+  {
+    "id": "petal_mosaic",
+    "name": "Petal Mosaic",
+    "description": "Local SVG icon (No pattern file yet)",
+    "type": "local_svg",
+    "pat_file": null,
+    "pat_url": null,
+    "img_url": "/hatches-cadauth/assets/petal_mosaic.svg",
+    "svg_file": "petal_mosaic.svg"
+  },
+  {
+    "id": "picket_and_square",
+    "name": "Picket And Square",
+    "description": "Local SVG icon (No pattern file yet)",
+    "type": "local_svg",
+    "pat_file": null,
+    "pat_url": null,
+    "img_url": "/hatches-cadauth/assets/picket_and_square.svg",
+    "svg_file": "picket_and_square.svg"
+  },
+  {
+    "id": "playful_curved_tile_pattern",
+    "name": "Playful Curved Tile Pattern",
+    "description": "Local SVG icon (No pattern file yet)",
+    "type": "local_svg",
+    "pat_file": null,
+    "pat_url": null,
+    "img_url": "/hatches-cadauth/assets/playful_curved_tile_pattern.svg",
+    "svg_file": "playful_curved_tile_pattern.svg"
+  },
+  {
+    "id": "plus",
+    "name": "Plus",
+    "description": "Local SVG icon (No pattern file yet)",
+    "type": "local_svg",
+    "pat_file": null,
+    "pat_url": null,
+    "img_url": "/hatches-cadauth/assets/plus.svg",
+    "svg_file": "plus.svg"
+  },
+  {
+    "id": "plus_and_square",
+    "name": "Plus And Square",
+    "description": "Local SVG icon (No pattern file yet)",
+    "type": "local_svg",
+    "pat_file": null,
+    "pat_url": null,
+    "img_url": "/hatches-cadauth/assets/plus_and_square.svg",
+    "svg_file": "plus_and_square.svg"
+  },
+  {
+    "id": "polygonal_interlocking_pattern",
+    "name": "Polygonal Interlocking Pattern",
+    "description": "Local SVG icon (No pattern file yet)",
+    "type": "local_svg",
+    "pat_file": null,
+    "pat_url": null,
+    "img_url": "/hatches-cadauth/assets/polygonal_interlocking_pattern.svg",
+    "svg_file": "polygonal_interlocking_pattern.svg"
+  },
+  {
+    "id": "polygonal_mirrored_pattern",
+    "name": "Polygonal Mirrored Pattern",
+    "description": "Local SVG icon (No pattern file yet)",
+    "type": "local_svg",
+    "pat_file": null,
+    "pat_url": null,
+    "img_url": "/hatches-cadauth/assets/polygonal_mirrored_pattern.svg",
+    "svg_file": "polygonal_mirrored_pattern.svg"
+  },
+  {
+    "id": "polygonal_parallelogram",
+    "name": "Polygonal Parallelogram",
+    "description": "Local SVG icon (No pattern file yet)",
+    "type": "local_svg",
+    "pat_file": null,
+    "pat_url": null,
+    "img_url": "/hatches-cadauth/assets/polygonal_parallelogram.svg",
+    "svg_file": "polygonal_parallelogram.svg"
+  },
+  {
+    "id": "portuguese_azulejo",
+    "name": "Portuguese Azulejo",
+    "description": "Local SVG icon (No pattern file yet)",
+    "type": "local_svg",
+    "pat_file": null,
+    "pat_url": null,
+    "img_url": "/hatches-cadauth/assets/portuguese_azulejo.svg",
+    "svg_file": "portuguese_azulejo.svg"
+  },
+  {
+    "id": "propeller_pavers",
+    "name": "Propeller Pavers",
+    "description": "Local SVG icon (No pattern file yet)",
+    "type": "local_svg",
+    "pat_file": null,
+    "pat_url": null,
+    "img_url": "/hatches-cadauth/assets/propeller_pavers.svg",
+    "svg_file": "propeller_pavers.svg"
+  },
+  {
+    "id": "pyramid_versailles",
+    "name": "Pyramid Versailles",
+    "description": "Local SVG icon (No pattern file yet)",
+    "type": "local_svg",
+    "pat_file": null,
+    "pat_url": null,
+    "img_url": "/hatches-cadauth/assets/pyramid_versailles.svg",
+    "svg_file": "pyramid_versailles.svg"
+  },
+  {
+    "id": "random_bond",
+    "name": "Random Bond",
+    "description": "Local SVG icon (No pattern file yet)",
+    "type": "local_svg",
+    "pat_file": null,
+    "pat_url": null,
+    "img_url": "/hatches-cadauth/assets/random_bond.svg",
+    "svg_file": "random_bond.svg"
+  },
+  {
+    "id": "rectangle_split_pattern",
+    "name": "Rectangle Split Pattern",
+    "description": "Local SVG icon (No pattern file yet)",
+    "type": "local_svg",
+    "pat_file": null,
+    "pat_url": null,
+    "img_url": "/hatches-cadauth/assets/rectangle_split_pattern.svg",
+    "svg_file": "rectangle_split_pattern.svg"
+  },
+  {
+    "id": "rectangular_ashlar",
+    "name": "Rectangular Ashlar",
+    "description": "Local SVG icon (No pattern file yet)",
+    "type": "local_svg",
+    "pat_file": null,
+    "pat_url": null,
+    "img_url": "/hatches-cadauth/assets/rectangular_ashlar.svg",
+    "svg_file": "rectangular_ashlar.svg"
+  },
+  {
+    "id": "rectangular_weave_through_pattern",
+    "name": "Rectangular Weave Through Pattern",
+    "description": "Local SVG icon (No pattern file yet)",
+    "type": "local_svg",
+    "pat_file": null,
+    "pat_url": null,
+    "img_url": "/hatches-cadauth/assets/rectangular_weave_through_pattern.svg",
+    "svg_file": "rectangular_weave_through_pattern.svg"
+  },
+  {
+    "id": "rhombus_split_tile",
+    "name": "Rhombus Split Tile",
+    "description": "Local SVG icon (No pattern file yet)",
+    "type": "local_svg",
+    "pat_file": null,
+    "pat_url": null,
+    "img_url": "/hatches-cadauth/assets/rhombus_split_tile.svg",
+    "svg_file": "rhombus_split_tile.svg"
+  },
+  {
+    "id": "rotating_tile_pattern_1",
+    "name": "Rotating Tile Pattern 1",
+    "description": "Local SVG icon (No pattern file yet)",
+    "type": "local_svg",
+    "pat_file": null,
+    "pat_url": null,
+    "img_url": "/hatches-cadauth/assets/rotating_tile_pattern_1.svg",
+    "svg_file": "rotating_tile_pattern_1.svg"
+  },
+  {
+    "id": "rotating_tile_pattern_2",
+    "name": "Rotating Tile Pattern 2",
+    "description": "Local SVG icon (No pattern file yet)",
+    "type": "local_svg",
+    "pat_file": null,
+    "pat_url": null,
+    "img_url": "/hatches-cadauth/assets/rotating_tile_pattern_2.svg",
+    "svg_file": "rotating_tile_pattern_2.svg"
+  },
+  {
+    "id": "rounded_corner_alternating_tile_pattern",
+    "name": "Rounded Corner Alternating Tile Pattern",
+    "description": "Local SVG icon (No pattern file yet)",
+    "type": "local_svg",
+    "pat_file": null,
+    "pat_url": null,
+    "img_url": "/hatches-cadauth/assets/rounded_corner_alternating_tile_pattern.svg",
+    "svg_file": "rounded_corner_alternating_tile_pattern.svg"
+  },
+  {
+    "id": "rounded_cross_pattern",
+    "name": "Rounded Cross Pattern",
+    "description": "Local SVG icon (No pattern file yet)",
+    "type": "local_svg",
+    "pat_file": null,
+    "pat_url": null,
+    "img_url": "/hatches-cadauth/assets/rounded_cross_pattern.svg",
+    "svg_file": "rounded_cross_pattern.svg"
+  },
+  {
+    "id": "rounded_edge_cross_pattern",
+    "name": "Rounded Edge Cross Pattern",
+    "description": "Local SVG icon (No pattern file yet)",
+    "type": "local_svg",
+    "pat_file": null,
+    "pat_url": null,
+    "img_url": "/hatches-cadauth/assets/rounded_edge_cross_pattern.svg",
+    "svg_file": "rounded_edge_cross_pattern.svg"
+  },
+  {
+    "id": "rounded_edge_tile_pattern",
+    "name": "Rounded Edge Tile Pattern",
+    "description": "Local SVG icon (No pattern file yet)",
+    "type": "local_svg",
+    "pat_file": null,
+    "pat_url": null,
+    "img_url": "/hatches-cadauth/assets/rounded_edge_tile_pattern.svg",
+    "svg_file": "rounded_edge_tile_pattern.svg"
+  },
+  {
+    "id": "rounded_rectangle_terrazzo",
+    "name": "Rounded Rectangle Terrazzo",
+    "description": "Local SVG icon (No pattern file yet)",
+    "type": "local_svg",
+    "pat_file": null,
+    "pat_url": null,
+    "img_url": "/hatches-cadauth/assets/rounded_rectangle_terrazzo.svg",
+    "svg_file": "rounded_rectangle_terrazzo.svg"
+  },
+  {
+    "id": "rounded_rubble",
+    "name": "Rounded Rubble",
+    "description": "Local SVG icon (No pattern file yet)",
+    "type": "local_svg",
+    "pat_file": null,
+    "pat_url": null,
+    "img_url": "/hatches-cadauth/assets/rounded_rubble.svg",
+    "svg_file": "rounded_rubble.svg"
+  },
+  {
+    "id": "rubble",
+    "name": "Rubble",
+    "description": "Local SVG icon (No pattern file yet)",
+    "type": "local_svg",
+    "pat_file": null,
+    "pat_url": null,
+    "img_url": "/hatches-cadauth/assets/rubble.svg",
+    "svg_file": "rubble.svg"
+  },
+  {
+    "id": "scarpa",
+    "name": "Scarpa",
+    "description": "Local SVG icon (No pattern file yet)",
+    "type": "local_svg",
+    "pat_file": null,
+    "pat_url": null,
+    "img_url": "/hatches-cadauth/assets/scarpa.svg",
+    "svg_file": "scarpa.svg"
+  },
+  {
+    "id": "sculptural_diagonal_tile_pattern",
+    "name": "Sculptural Diagonal Tile Pattern",
+    "description": "Local SVG icon (No pattern file yet)",
+    "type": "local_svg",
+    "pat_file": null,
+    "pat_url": null,
+    "img_url": "/hatches-cadauth/assets/sculptural_diagonal_tile_pattern.svg",
+    "svg_file": "sculptural_diagonal_tile_pattern.svg"
+  },
+  {
+    "id": "sculptural_triangle_and_circle_alternating_pattern",
+    "name": "Sculptural Triangle And Circle Alternating Pattern",
+    "description": "Local SVG icon (No pattern file yet)",
+    "type": "local_svg",
+    "pat_file": null,
+    "pat_url": null,
+    "img_url": "/hatches-cadauth/assets/sculptural_triangle_and_circle_alternating_pattern.svg",
+    "svg_file": "sculptural_triangle_and_circle_alternating_pattern.svg"
+  },
+  {
+    "id": "separated_picket",
+    "name": "Separated Picket",
+    "description": "Local SVG icon (No pattern file yet)",
+    "type": "local_svg",
+    "pat_file": null,
+    "pat_url": null,
+    "img_url": "/hatches-cadauth/assets/separated_picket.svg",
+    "svg_file": "separated_picket.svg"
+  },
+  {
+    "id": "silesian_bond",
+    "name": "Silesian Bond",
+    "description": "Local SVG icon (No pattern file yet)",
+    "type": "local_svg",
+    "pat_file": null,
+    "pat_url": null,
+    "img_url": "/hatches-cadauth/assets/silesian_bond.svg",
+    "svg_file": "silesian_bond.svg"
+  },
+  {
+    "id": "single_basketweave",
+    "name": "Single Basketweave",
+    "description": "Local SVG icon (No pattern file yet)",
+    "type": "local_svg",
+    "pat_file": null,
+    "pat_url": null,
+    "img_url": "/hatches-cadauth/assets/single_basketweave.svg",
+    "svg_file": "single_basketweave.svg"
+  },
+  {
+    "id": "single_basketweave_square",
+    "name": "Single Basketweave Square",
+    "description": "Local SVG icon (No pattern file yet)",
+    "type": "local_svg",
+    "pat_file": null,
+    "pat_url": null,
+    "img_url": "/hatches-cadauth/assets/single_basketweave_square.svg",
+    "svg_file": "single_basketweave_square.svg"
+  },
+  {
+    "id": "snowflake",
+    "name": "Snowflake",
+    "description": "Local SVG icon (No pattern file yet)",
+    "type": "local_svg",
+    "pat_file": null,
+    "pat_url": null,
+    "img_url": "/hatches-cadauth/assets/snowflake.svg",
+    "svg_file": "snowflake.svg"
+  },
+  {
+    "id": "spanish_antique_tile",
+    "name": "Spanish Antique Tile",
+    "description": "Local SVG icon (No pattern file yet)",
+    "type": "local_svg",
+    "pat_file": null,
+    "pat_url": null,
+    "img_url": "/hatches-cadauth/assets/spanish_antique_tile.svg",
+    "svg_file": "spanish_antique_tile.svg"
+  },
+  {
+    "id": "split_checkered_pattern",
+    "name": "Split Checkered Pattern",
+    "description": "Local SVG icon (No pattern file yet)",
+    "type": "local_svg",
+    "pat_file": null,
+    "pat_url": null,
+    "img_url": "/hatches-cadauth/assets/split_checkered_pattern.svg",
+    "svg_file": "split_checkered_pattern.svg"
+  },
+  {
+    "id": "split_fishscale",
+    "name": "Split Fishscale",
+    "description": "Local SVG icon (No pattern file yet)",
+    "type": "local_svg",
+    "pat_file": null,
+    "pat_url": null,
+    "img_url": "/hatches-cadauth/assets/split_fishscale.svg",
+    "svg_file": "split_fishscale.svg"
+  },
+  {
+    "id": "split_rectangle_pattern",
+    "name": "Split Rectangle Pattern",
+    "description": "Local SVG icon (No pattern file yet)",
+    "type": "local_svg",
+    "pat_file": null,
+    "pat_url": null,
+    "img_url": "/hatches-cadauth/assets/split_rectangle_pattern.svg",
+    "svg_file": "split_rectangle_pattern.svg"
+  },
+  {
+    "id": "split_rectangle_pattern_2",
+    "name": "Split Rectangle Pattern 2",
+    "description": "Local SVG icon (No pattern file yet)",
+    "type": "local_svg",
+    "pat_file": null,
+    "pat_url": null,
+    "img_url": "/hatches-cadauth/assets/split_rectangle_pattern_2.svg",
+    "svg_file": "split_rectangle_pattern_2.svg"
+  },
+  {
+    "id": "split_round_square_pattern",
+    "name": "Split Round Square Pattern",
+    "description": "Local SVG icon (No pattern file yet)",
+    "type": "local_svg",
+    "pat_file": null,
+    "pat_url": null,
+    "img_url": "/hatches-cadauth/assets/split_round_square_pattern.svg",
+    "svg_file": "split_round_square_pattern.svg"
+  },
+  {
+    "id": "split_square_pattern",
+    "name": "Split Square Pattern",
+    "description": "Local SVG icon (No pattern file yet)",
+    "type": "local_svg",
+    "pat_file": null,
+    "pat_url": null,
+    "img_url": "/hatches-cadauth/assets/split_square_pattern.svg",
+    "svg_file": "split_square_pattern.svg"
+  },
+  {
+    "id": "split_square_pattern_2",
+    "name": "Split Square Pattern 2",
+    "description": "Local SVG icon (No pattern file yet)",
+    "type": "local_svg",
+    "pat_file": null,
+    "pat_url": null,
+    "img_url": "/hatches-cadauth/assets/split_square_pattern_2.svg",
+    "svg_file": "split_square_pattern_2.svg"
+  },
+  {
+    "id": "square_and_a_half_pattern",
+    "name": "Square And A Half Pattern",
+    "description": "Local SVG icon (No pattern file yet)",
+    "type": "local_svg",
+    "pat_file": null,
+    "pat_url": null,
+    "img_url": "/hatches-cadauth/assets/square_and_a_half_pattern.svg",
+    "svg_file": "square_and_a_half_pattern.svg"
+  },
+  {
+    "id": "square_and_cross_pattern",
+    "name": "Square And Cross Pattern",
+    "description": "Local SVG icon (No pattern file yet)",
+    "type": "local_svg",
+    "pat_file": null,
+    "pat_url": null,
+    "img_url": "/hatches-cadauth/assets/square_and_cross_pattern.svg",
+    "svg_file": "square_and_cross_pattern.svg"
+  },
+  {
+    "id": "square_and_metro_tile_pattern",
+    "name": "Square And Metro Tile Pattern",
+    "description": "Local SVG icon (No pattern file yet)",
+    "type": "local_svg",
+    "pat_file": null,
+    "pat_url": null,
+    "img_url": "/hatches-cadauth/assets/square_and_metro_tile_pattern.svg",
+    "svg_file": "square_and_metro_tile_pattern.svg"
+  },
+  {
+    "id": "square_and_split_cross_pattern",
+    "name": "Square And Split Cross Pattern",
+    "description": "Local SVG icon (No pattern file yet)",
+    "type": "local_svg",
+    "pat_file": null,
+    "pat_url": null,
+    "img_url": "/hatches-cadauth/assets/square_and_split_cross_pattern.svg",
+    "svg_file": "square_and_split_cross_pattern.svg"
+  },
+  {
+    "id": "square_and_striped_tiles_variation",
+    "name": "Square And Striped Tiles Variation",
+    "description": "Local SVG icon (No pattern file yet)",
+    "type": "local_svg",
+    "pat_file": null,
+    "pat_url": null,
+    "img_url": "/hatches-cadauth/assets/square_and_striped_tiles_variation.svg",
+    "svg_file": "square_and_striped_tiles_variation.svg"
+  },
+  {
+    "id": "square_pattern_with_flower_element",
+    "name": "Square Pattern With Flower Element",
+    "description": "Local SVG icon (No pattern file yet)",
+    "type": "local_svg",
+    "pat_file": null,
+    "pat_url": null,
+    "img_url": "/hatches-cadauth/assets/square_pattern_with_flower_element.svg",
+    "svg_file": "square_pattern_with_flower_element.svg"
+  },
+  {
+    "id": "square_tile_with_circle_at_corner",
+    "name": "Square Tile With Circle At Corner",
+    "description": "Local SVG icon (No pattern file yet)",
+    "type": "local_svg",
+    "pat_file": null,
+    "pat_url": null,
+    "img_url": "/hatches-cadauth/assets/square_tile_with_circle_at_corner.svg",
+    "svg_file": "square_tile_with_circle_at_corner.svg"
+  },
+  {
+    "id": "square_tile_with_triangle_corner_pattern",
+    "name": "Square Tile With Triangle Corner Pattern",
+    "description": "Local SVG icon (No pattern file yet)",
+    "type": "local_svg",
+    "pat_file": null,
+    "pat_url": null,
+    "img_url": "/hatches-cadauth/assets/square_tile_with_triangle_corner_pattern.svg",
+    "svg_file": "square_tile_with_triangle_corner_pattern.svg"
+  },
+  {
+    "id": "square_with_corner_element_grid",
+    "name": "Square With Corner Element Grid",
+    "description": "Local SVG icon (No pattern file yet)",
+    "type": "local_svg",
+    "pat_file": null,
+    "pat_url": null,
+    "img_url": "/hatches-cadauth/assets/square_with_corner_element_grid.svg",
+    "svg_file": "square_with_corner_element_grid.svg"
+  },
+  {
+    "id": "square_with_corner_element_random",
+    "name": "Square With Corner Element Random",
+    "description": "Local SVG icon (No pattern file yet)",
+    "type": "local_svg",
+    "pat_file": null,
+    "pat_url": null,
+    "img_url": "/hatches-cadauth/assets/square_with_corner_element_random.svg",
+    "svg_file": "square_with_corner_element_random.svg"
+  },
+  {
+    "id": "stack",
+    "name": "Stack",
+    "description": "Local SVG icon (No pattern file yet)",
+    "type": "local_svg",
+    "pat_file": null,
+    "pat_url": null,
+    "img_url": "/hatches-cadauth/assets/stack.svg",
+    "svg_file": "stack.svg"
+  },
+  {
+    "id": "staggered",
+    "name": "Staggered",
+    "description": "Local SVG icon (No pattern file yet)",
+    "type": "local_svg",
+    "pat_file": null,
+    "pat_url": null,
+    "img_url": "/hatches-cadauth/assets/staggered.svg",
+    "svg_file": "staggered.svg"
+  },
+  {
+    "id": "staggered_isosceles",
+    "name": "Staggered Isosceles",
+    "description": "Local SVG icon (No pattern file yet)",
+    "type": "local_svg",
+    "pat_file": null,
+    "pat_url": null,
+    "img_url": "/hatches-cadauth/assets/staggered_isosceles.svg",
+    "svg_file": "staggered_isosceles.svg"
+  },
+  {
+    "id": "stars_and_crosses",
+    "name": "Stars And Crosses",
+    "description": "Local SVG icon (No pattern file yet)",
+    "type": "local_svg",
+    "pat_file": null,
+    "pat_url": null,
+    "img_url": "/hatches-cadauth/assets/stars_and_crosses.svg",
+    "svg_file": "stars_and_crosses.svg"
+  },
+  {
+    "id": "star_and_cross",
+    "name": "Star And Cross",
+    "description": "Local SVG icon (No pattern file yet)",
+    "type": "local_svg",
+    "pat_file": null,
+    "pat_url": null,
+    "img_url": "/hatches-cadauth/assets/star_and_cross.svg",
+    "svg_file": "star_and_cross.svg"
+  },
+  {
+    "id": "star_and_cross_variation",
+    "name": "Star And Cross Variation",
+    "description": "Local SVG icon (No pattern file yet)",
+    "type": "local_svg",
+    "pat_file": null,
+    "pat_url": null,
+    "img_url": "/hatches-cadauth/assets/star_and_cross_variation.svg",
+    "svg_file": "star_and_cross_variation.svg"
+  },
+  {
+    "id": "star_and_cross_variation_2",
+    "name": "Star And Cross Variation 2",
+    "description": "Local SVG icon (No pattern file yet)",
+    "type": "local_svg",
+    "pat_file": null,
+    "pat_url": null,
+    "img_url": "/hatches-cadauth/assets/star_and_cross_variation_2.svg",
+    "svg_file": "star_and_cross_variation_2.svg"
+  },
+  {
+    "id": "star_and_cross_variation_3",
+    "name": "Star And Cross Variation 3",
+    "description": "Local SVG icon (No pattern file yet)",
+    "type": "local_svg",
+    "pat_file": null,
+    "pat_url": null,
+    "img_url": "/hatches-cadauth/assets/star_and_cross_variation_3.svg",
+    "svg_file": "star_and_cross_variation_3.svg"
+  },
+  {
+    "id": "star_and_hexagon",
+    "name": "Star And Hexagon",
+    "description": "Local SVG icon (No pattern file yet)",
+    "type": "local_svg",
+    "pat_file": null,
+    "pat_url": null,
+    "img_url": "/hatches-cadauth/assets/star_and_hexagon.svg",
+    "svg_file": "star_and_hexagon.svg"
+  },
+  {
+    "id": "star_and_square_variation",
+    "name": "Star And Square Variation",
+    "description": "Local SVG icon (No pattern file yet)",
+    "type": "local_svg",
+    "pat_file": null,
+    "pat_url": null,
+    "img_url": "/hatches-cadauth/assets/star_and_square_variation.svg",
+    "svg_file": "star_and_square_variation.svg"
+  },
+  {
+    "id": "star_mosaic",
+    "name": "Star Mosaic",
+    "description": "Local SVG icon (No pattern file yet)",
+    "type": "local_svg",
+    "pat_file": null,
+    "pat_url": null,
+    "img_url": "/hatches-cadauth/assets/star_mosaic.svg",
+    "svg_file": "star_mosaic.svg"
+  },
+  {
+    "id": "star_pattern",
+    "name": "Star Pattern",
+    "description": "Local SVG icon (No pattern file yet)",
+    "type": "local_svg",
+    "pat_file": null,
+    "pat_url": null,
+    "img_url": "/hatches-cadauth/assets/star_pattern.svg",
+    "svg_file": "star_pattern.svg"
+  },
+  {
+    "id": "stretcher",
+    "name": "Stretcher",
+    "description": "Local SVG icon (No pattern file yet)",
+    "type": "local_svg",
+    "pat_file": null,
+    "pat_url": null,
+    "img_url": "/hatches-cadauth/assets/stretcher.svg",
+    "svg_file": "stretcher.svg"
+  },
+  {
+    "id": "swiss_cross",
+    "name": "Swiss Cross",
+    "description": "Local SVG icon (No pattern file yet)",
+    "type": "local_svg",
+    "pat_file": null,
+    "pat_url": null,
+    "img_url": "/hatches-cadauth/assets/swiss_cross.svg",
+    "svg_file": "swiss_cross.svg"
+  },
+  {
+    "id": "swiss_cross_and_square",
+    "name": "Swiss Cross And Square",
+    "description": "Local SVG icon (No pattern file yet)",
+    "type": "local_svg",
+    "pat_file": null,
+    "pat_url": null,
+    "img_url": "/hatches-cadauth/assets/swiss_cross_and_square.svg",
+    "svg_file": "swiss_cross_and_square.svg"
+  },
+  {
+    "id": "tangram_pattern",
+    "name": "Tangram Pattern",
+    "description": "Local SVG icon (No pattern file yet)",
+    "type": "local_svg",
+    "pat_file": null,
+    "pat_url": null,
+    "img_url": "/hatches-cadauth/assets/tangram_pattern.svg",
+    "svg_file": "tangram_pattern.svg"
+  },
+  {
+    "id": "three_piece_modular_paver",
+    "name": "Three Piece Modular Paver",
+    "description": "Local SVG icon (No pattern file yet)",
+    "type": "local_svg",
+    "pat_file": null,
+    "pat_url": null,
+    "img_url": "/hatches-cadauth/assets/three_piece_modular_paver.svg",
+    "svg_file": "three_piece_modular_paver.svg"
+  },
+  {
+    "id": "trapeze",
+    "name": "Trapeze",
+    "description": "Local SVG icon (No pattern file yet)",
+    "type": "local_svg",
+    "pat_file": null,
+    "pat_url": null,
+    "img_url": "/hatches-cadauth/assets/trapeze.svg",
+    "svg_file": "trapeze.svg"
+  },
+  {
+    "id": "trapeze_hex",
+    "name": "Trapeze Hex",
+    "description": "Local SVG icon (No pattern file yet)",
+    "type": "local_svg",
+    "pat_file": null,
+    "pat_url": null,
+    "img_url": "/hatches-cadauth/assets/trapeze_hex.svg",
+    "svg_file": "trapeze_hex.svg"
+  },
+  {
+    "id": "trapezoid_triangle",
+    "name": "Trapezoid Triangle",
+    "description": "Local SVG icon (No pattern file yet)",
+    "type": "local_svg",
+    "pat_file": null,
+    "pat_url": null,
+    "img_url": "/hatches-cadauth/assets/trapezoid_triangle.svg",
+    "svg_file": "trapezoid_triangle.svg"
+  },
+  {
+    "id": "triangle",
+    "name": "Triangle",
+    "description": "Local SVG icon (No pattern file yet)",
+    "type": "local_svg",
+    "pat_file": null,
+    "pat_url": null,
+    "img_url": "/hatches-cadauth/assets/triangle.svg",
+    "svg_file": "triangle.svg"
+  },
+  {
+    "id": "triangle_chevron",
+    "name": "Triangle Chevron",
+    "description": "Local SVG icon (No pattern file yet)",
+    "type": "local_svg",
+    "pat_file": null,
+    "pat_url": null,
+    "img_url": "/hatches-cadauth/assets/triangle_chevron.svg",
+    "svg_file": "triangle_chevron.svg"
+  },
+  {
+    "id": "triangle_diamond",
+    "name": "Triangle Diamond",
+    "description": "Local SVG icon (No pattern file yet)",
+    "type": "local_svg",
+    "pat_file": null,
+    "pat_url": null,
+    "img_url": "/hatches-cadauth/assets/triangle_diamond.svg",
+    "svg_file": "triangle_diamond.svg"
+  },
+  {
+    "id": "triangle_split_rectangle",
+    "name": "Triangle Split Rectangle",
+    "description": "Local SVG icon (No pattern file yet)",
+    "type": "local_svg",
+    "pat_file": null,
+    "pat_url": null,
+    "img_url": "/hatches-cadauth/assets/triangle_split_rectangle.svg",
+    "svg_file": "triangle_split_rectangle.svg"
+  },
+  {
+    "id": "triangle_split_tiles_variation",
+    "name": "Triangle Split Tiles Variation",
+    "description": "Local SVG icon (No pattern file yet)",
+    "type": "local_svg",
+    "pat_file": null,
+    "pat_url": null,
+    "img_url": "/hatches-cadauth/assets/triangle_split_tiles_variation.svg",
+    "svg_file": "triangle_split_tiles_variation.svg"
+  },
+  {
+    "id": "triangle_square_mosaic",
+    "name": "Triangle Square Mosaic",
+    "description": "Local SVG icon (No pattern file yet)",
+    "type": "local_svg",
+    "pat_file": null,
+    "pat_url": null,
+    "img_url": "/hatches-cadauth/assets/triangle_square_mosaic.svg",
+    "svg_file": "triangle_square_mosaic.svg"
+  },
+  {
+    "id": "triangular_houndstooth",
+    "name": "Triangular Houndstooth",
+    "description": "Local SVG icon (No pattern file yet)",
+    "type": "local_svg",
+    "pat_file": null,
+    "pat_url": null,
+    "img_url": "/hatches-cadauth/assets/triangular_houndstooth.svg",
+    "svg_file": "triangular_houndstooth.svg"
+  },
+  {
+    "id": "triple_flemish",
+    "name": "Triple Flemish",
+    "description": "Local SVG icon (No pattern file yet)",
+    "type": "local_svg",
+    "pat_file": null,
+    "pat_url": null,
+    "img_url": "/hatches-cadauth/assets/triple_flemish.svg",
+    "svg_file": "triple_flemish.svg"
+  },
+  {
+    "id": "triple_herringbone",
+    "name": "Triple Herringbone",
+    "description": "Local SVG icon (No pattern file yet)",
+    "type": "local_svg",
+    "pat_file": null,
+    "pat_url": null,
+    "img_url": "/hatches-cadauth/assets/triple_herringbone.svg",
+    "svg_file": "triple_herringbone.svg"
+  },
+  {
+    "id": "triple_stretcher",
+    "name": "Triple Stretcher",
+    "description": "Local SVG icon (No pattern file yet)",
+    "type": "local_svg",
+    "pat_file": null,
+    "pat_url": null,
+    "img_url": "/hatches-cadauth/assets/triple_stretcher.svg",
+    "svg_file": "triple_stretcher.svg"
+  },
+  {
+    "id": "tri_hex_pavers",
+    "name": "Tri Hex Pavers",
+    "description": "Local SVG icon (No pattern file yet)",
+    "type": "local_svg",
+    "pat_file": null,
+    "pat_url": null,
+    "img_url": "/hatches-cadauth/assets/tri_hex_pavers.svg",
+    "svg_file": "tri_hex_pavers.svg"
+  },
+  {
+    "id": "true_chevron",
+    "name": "True Chevron",
+    "description": "Local SVG icon (No pattern file yet)",
+    "type": "local_svg",
+    "pat_file": null,
+    "pat_url": null,
+    "img_url": "/hatches-cadauth/assets/true_chevron.svg",
+    "svg_file": "true_chevron.svg"
+  },
+  {
+    "id": "tumbling_blocks",
+    "name": "Tumbling Blocks",
+    "description": "Local SVG icon (No pattern file yet)",
+    "type": "local_svg",
+    "pat_file": null,
+    "pat_url": null,
+    "img_url": "/hatches-cadauth/assets/tumbling_blocks.svg",
+    "svg_file": "tumbling_blocks.svg"
+  },
+  {
+    "id": "turfstone_paver_2",
+    "name": "Turfstone Paver 2",
+    "description": "Local SVG icon (No pattern file yet)",
+    "type": "local_svg",
+    "pat_file": null,
+    "pat_url": null,
+    "img_url": "/hatches-cadauth/assets/turfstone_paver_2.svg",
+    "svg_file": "turfstone_paver_2.svg"
+  },
+  {
+    "id": "t_vora",
+    "name": "T Vora",
+    "description": "Local SVG icon (No pattern file yet)",
+    "type": "local_svg",
+    "pat_file": null,
+    "pat_url": null,
+    "img_url": "/hatches-cadauth/assets/t_vora.svg",
+    "svg_file": "t_vora.svg"
+  },
+  {
+    "id": "uncoursed_ashlar",
+    "name": "Uncoursed Ashlar",
+    "description": "Local SVG icon (No pattern file yet)",
+    "type": "local_svg",
+    "pat_file": null,
+    "pat_url": null,
+    "img_url": "/hatches-cadauth/assets/uncoursed_ashlar.svg",
+    "svg_file": "uncoursed_ashlar.svg"
+  },
+  {
+    "id": "unified_herringbone",
+    "name": "Unified Herringbone",
+    "description": "Local SVG icon (No pattern file yet)",
+    "type": "local_svg",
+    "pat_file": null,
+    "pat_url": null,
+    "img_url": "/hatches-cadauth/assets/unified_herringbone.svg",
+    "svg_file": "unified_herringbone.svg"
+  },
+  {
+    "id": "variable_hexagon",
+    "name": "Variable Hexagon",
+    "description": "Local SVG icon (No pattern file yet)",
+    "type": "local_svg",
+    "pat_file": null,
+    "pat_url": null,
+    "img_url": "/hatches-cadauth/assets/variable_hexagon.svg",
+    "svg_file": "variable_hexagon.svg"
+  },
+  {
+    "id": "varied_ashlar",
+    "name": "Varied Ashlar",
+    "description": "Local SVG icon (No pattern file yet)",
+    "type": "local_svg",
+    "pat_file": null,
+    "pat_url": null,
+    "img_url": "/hatches-cadauth/assets/varied_ashlar.svg",
+    "svg_file": "varied_ashlar.svg"
+  },
+  {
+    "id": "varied_basketweave",
+    "name": "Varied Basketweave",
+    "description": "Local SVG icon (No pattern file yet)",
+    "type": "local_svg",
+    "pat_file": null,
+    "pat_url": null,
+    "img_url": "/hatches-cadauth/assets/varied_basketweave.svg",
+    "svg_file": "varied_basketweave.svg"
+  },
+  {
+    "id": "varied_size_terrazzo",
+    "name": "Varied Size Terrazzo",
+    "description": "Local SVG icon (No pattern file yet)",
+    "type": "local_svg",
+    "pat_file": null,
+    "pat_url": null,
+    "img_url": "/hatches-cadauth/assets/varied_size_terrazzo.svg",
+    "svg_file": "varied_size_terrazzo.svg"
+  },
+  {
+    "id": "varied_stripe_pattern",
+    "name": "Varied Stripe Pattern",
+    "description": "Local SVG icon (No pattern file yet)",
+    "type": "local_svg",
+    "pat_file": null,
+    "pat_url": null,
+    "img_url": "/hatches-cadauth/assets/varied_stripe_pattern.svg",
+    "svg_file": "varied_stripe_pattern.svg"
+  },
+  {
+    "id": "varied_stripe_pattern_alternating",
+    "name": "Varied Stripe Pattern Alternating",
+    "description": "Local SVG icon (No pattern file yet)",
+    "type": "local_svg",
+    "pat_file": null,
+    "pat_url": null,
+    "img_url": "/hatches-cadauth/assets/varied_stripe_pattern_alternating.svg",
+    "svg_file": "varied_stripe_pattern_alternating.svg"
+  },
+  {
+    "id": "varied_terrazzo",
+    "name": "Varied Terrazzo",
+    "description": "Local SVG icon (No pattern file yet)",
+    "type": "local_svg",
+    "pat_file": null,
+    "pat_url": null,
+    "img_url": "/hatches-cadauth/assets/varied_terrazzo.svg",
+    "svg_file": "varied_terrazzo.svg"
+  },
+  {
+    "id": "venetian",
+    "name": "Venetian",
+    "description": "Local SVG icon (No pattern file yet)",
+    "type": "local_svg",
+    "pat_file": null,
+    "pat_url": null,
+    "img_url": "/hatches-cadauth/assets/venetian.svg",
+    "svg_file": "venetian.svg"
+  },
+  {
+    "id": "venetian_2",
+    "name": "Venetian 2",
+    "description": "Local SVG icon (No pattern file yet)",
+    "type": "local_svg",
+    "pat_file": null,
+    "pat_url": null,
+    "img_url": "/hatches-cadauth/assets/venetian_2.svg",
+    "svg_file": "venetian_2.svg"
+  },
+  {
+    "id": "versailles",
+    "name": "Versailles",
+    "description": "Local SVG icon (No pattern file yet)",
+    "type": "local_svg",
+    "pat_file": null,
+    "pat_url": null,
+    "img_url": "/hatches-cadauth/assets/versailles.svg",
+    "svg_file": "versailles.svg"
+  },
+  {
+    "id": "v_herringbone_varied",
+    "name": "V Herringbone Varied",
+    "description": "Local SVG icon (No pattern file yet)",
+    "type": "local_svg",
+    "pat_file": null,
+    "pat_url": null,
+    "img_url": "/hatches-cadauth/assets/v_herringbone_varied.svg",
+    "svg_file": "v_herringbone_varied.svg"
+  },
+  {
+    "id": "v_pavers",
+    "name": "V Pavers",
+    "description": "Local SVG icon (No pattern file yet)",
+    "type": "local_svg",
+    "pat_file": null,
+    "pat_url": null,
+    "img_url": "/hatches-cadauth/assets/v_pavers.svg",
+    "svg_file": "v_pavers.svg"
+  },
+  {
+    "id": "wave_pattern_tiles",
+    "name": "Wave Pattern Tiles",
+    "description": "Local SVG icon (No pattern file yet)",
+    "type": "local_svg",
+    "pat_file": null,
+    "pat_url": null,
+    "img_url": "/hatches-cadauth/assets/wave_pattern_tiles.svg",
+    "svg_file": "wave_pattern_tiles.svg"
+  },
+  {
+    "id": "wavy_pattern_with_split_tiles",
+    "name": "Wavy Pattern With Split Tiles",
+    "description": "Local SVG icon (No pattern file yet)",
+    "type": "local_svg",
+    "pat_file": null,
+    "pat_url": null,
+    "img_url": "/hatches-cadauth/assets/wavy_pattern_with_split_tiles.svg",
+    "svg_file": "wavy_pattern_with_split_tiles.svg"
+  },
+  {
+    "id": "wavy_rounded_tiles",
+    "name": "Wavy Rounded Tiles",
+    "description": "Local SVG icon (No pattern file yet)",
+    "type": "local_svg",
+    "pat_file": null,
+    "pat_url": null,
+    "img_url": "/hatches-cadauth/assets/wavy_rounded_tiles.svg",
+    "svg_file": "wavy_rounded_tiles.svg"
+  },
+  {
+    "id": "wavy_tile_pattern",
+    "name": "Wavy Tile Pattern",
+    "description": "Local SVG icon (No pattern file yet)",
+    "type": "local_svg",
+    "pat_file": null,
+    "pat_url": null,
+    "img_url": "/hatches-cadauth/assets/wavy_tile_pattern.svg",
+    "svg_file": "wavy_tile_pattern.svg"
+  },
+  {
+    "id": "wavy_triangle_pattern",
+    "name": "Wavy Triangle Pattern",
+    "description": "Local SVG icon (No pattern file yet)",
+    "type": "local_svg",
+    "pat_file": null,
+    "pat_url": null,
+    "img_url": "/hatches-cadauth/assets/wavy_triangle_pattern.svg",
+    "svg_file": "wavy_triangle_pattern.svg"
+  },
+  {
+    "id": "weaved_geometric_pattern",
+    "name": "Weaved Geometric Pattern",
+    "description": "Local SVG icon (No pattern file yet)",
+    "type": "local_svg",
+    "pat_file": null,
+    "pat_url": null,
+    "img_url": "/hatches-cadauth/assets/weaved_geometric_pattern.svg",
+    "svg_file": "weaved_geometric_pattern.svg"
+  },
+  {
+    "id": "wild_bond_dutch",
+    "name": "Wild Bond Dutch",
+    "description": "Local SVG icon (No pattern file yet)",
+    "type": "local_svg",
+    "pat_file": null,
+    "pat_url": null,
+    "img_url": "/hatches-cadauth/assets/wild_bond_dutch.svg",
+    "svg_file": "wild_bond_dutch.svg"
+  },
+  {
+    "id": "windmill",
+    "name": "Windmill",
+    "description": "Local SVG icon (No pattern file yet)",
+    "type": "local_svg",
+    "pat_file": null,
+    "pat_url": null,
+    "img_url": "/hatches-cadauth/assets/windmill.svg",
+    "svg_file": "windmill.svg"
+  },
+  {
+    "id": "wood_planks",
+    "name": "Wood Planks",
+    "description": "Local SVG icon (No pattern file yet)",
+    "type": "local_svg",
+    "pat_file": null,
+    "pat_url": null,
+    "img_url": "/hatches-cadauth/assets/wood_planks.svg",
+    "svg_file": "wood_planks.svg"
+  },
+  {
+    "id": "zellige_square_pattern",
+    "name": "Zellige Square Pattern",
+    "description": "Local SVG icon (No pattern file yet)",
+    "type": "local_svg",
+    "pat_file": null,
+    "pat_url": null,
+    "img_url": "/hatches-cadauth/assets/zellige_square_pattern.svg",
+    "svg_file": "zellige_square_pattern.svg"
+  },
+  {
+    "id": "zellige_tile_pattern_1",
+    "name": "Zellige Tile Pattern 1",
+    "description": "Local SVG icon (No pattern file yet)",
+    "type": "local_svg",
+    "pat_file": null,
+    "pat_url": null,
+    "img_url": "/hatches-cadauth/assets/zellige_tile_pattern_1.svg",
+    "svg_file": "zellige_tile_pattern_1.svg"
+  },
+  {
+    "id": "zellige_tile_pattern_2",
+    "name": "Zellige Tile Pattern 2",
+    "description": "Local SVG icon (No pattern file yet)",
+    "type": "local_svg",
+    "pat_file": null,
+    "pat_url": null,
+    "img_url": "/hatches-cadauth/assets/zellige_tile_pattern_2.svg",
+    "svg_file": "zellige_tile_pattern_2.svg"
+  },
+  {
+    "id": "zellige_tile_pattern_3",
+    "name": "Zellige Tile Pattern 3",
+    "description": "Local SVG icon (No pattern file yet)",
+    "type": "local_svg",
+    "pat_file": null,
+    "pat_url": null,
+    "img_url": "/hatches-cadauth/assets/zellige_tile_pattern_3.svg",
+    "svg_file": "zellige_tile_pattern_3.svg"
+  },
+  {
+    "id": "zellige_tile_pattern_4",
+    "name": "Zellige Tile Pattern 4",
+    "description": "Local SVG icon (No pattern file yet)",
+    "type": "local_svg",
+    "pat_file": null,
+    "pat_url": null,
+    "img_url": "/hatches-cadauth/assets/zellige_tile_pattern_4.svg",
+    "svg_file": "zellige_tile_pattern_4.svg"
+  },
+  {
+    "id": "zig_zag_alternating_tiles",
+    "name": "Zig Zag Alternating Tiles",
+    "description": "Local SVG icon (No pattern file yet)",
+    "type": "local_svg",
+    "pat_file": null,
+    "pat_url": null,
+    "img_url": "/hatches-cadauth/assets/zig_zag_alternating_tiles.svg",
+    "svg_file": "zig_zag_alternating_tiles.svg"
+  },
+  {
+    "id": "zig_zag_cross",
+    "name": "Zig Zag Cross",
+    "description": "Local SVG icon (No pattern file yet)",
+    "type": "local_svg",
+    "pat_file": null,
+    "pat_url": null,
+    "img_url": "/hatches-cadauth/assets/zig_zag_cross.svg",
+    "svg_file": "zig_zag_cross.svg"
+  },
+  {
+    "id": "zig_zag_pavers",
+    "name": "Zig Zag Pavers",
+    "description": "Local SVG icon (No pattern file yet)",
+    "type": "local_svg",
+    "pat_file": null,
+    "pat_url": null,
+    "img_url": "/hatches-cadauth/assets/zig_zag_pavers.svg",
+    "svg_file": "zig_zag_pavers.svg"
+  },
+  {
+    "id": "HSBDR2E0",
+    "name": "HSBDR2E0",
+    "type": "cadauthority",
+    "pat_url": "/hatches/quarantine/HSBDR2E0.pat",
+    "img_url": "",
+    "source": "Firestore",
+    "description": "*HSBDR2E0,Free patterns from www.CADhatch.com"
+  },
+  {
+    "id": "HSBDR2E0",
+    "name": "HSBDR2E0",
+    "type": "cadauthority",
+    "pat_url": "/hatches/quarantine/HSBDR2E0.pat",
+    "img_url": "",
+    "source": "Firestore",
+    "description": "*HSBDR2E0,Free patterns from www.CADhatch.com"
+  },
+  {
+    "id": "HSBDR3E0",
+    "name": "HSBDR3E0",
+    "type": "cadauthority",
+    "pat_url": "/hatches/quarantine/HSBDR3E0.pat",
+    "img_url": "",
+    "source": "Firestore",
+    "description": "*HSBDR3E0,Free patterns from www.CADhatch.com"
+  },
+  {
+    "id": "HSBDR4E0",
+    "name": "HSBDR4E0",
+    "type": "cadauthority",
+    "pat_url": "/hatches/quarantine/HSBDR4E0.pat",
+    "img_url": "",
+    "source": "Firestore",
+    "description": "*HSBDR4E0,Free patterns from www.CADhatch.com"
+  },
+  {
+    "id": "HSHP11E0",
+    "name": "HSHP11E0",
+    "type": "cadauthority",
+    "pat_url": "/hatches/quarantine/HSHP11E0.pat",
+    "img_url": "",
+    "source": "Firestore",
+    "description": "*HSHP11E0,Free patterns from www.CADhatch.com"
+  },
+  {
+    "id": "HSHP21E0",
+    "name": "HSHP21E0",
+    "type": "cadauthority",
+    "pat_url": "/hatches/quarantine/HSHP21E0.pat",
+    "img_url": "",
+    "source": "Firestore",
+    "description": "*HSHP21E0,Free patterns from www.CADhatch.com"
+  },
+  {
+    "id": "HSHP31E0",
+    "name": "HSHP31E0",
+    "type": "cadauthority",
+    "pat_url": "/hatches/quarantine/HSHP31E0.pat",
+    "img_url": "",
+    "source": "Firestore",
+    "description": "*HSHP31E0,Free patterns from www.CADhatch.com"
+  },
+  {
+    "id": "HSHP41E0",
+    "name": "HSHP41E0",
+    "type": "cadauthority",
+    "pat_url": "/hatches/quarantine/HSHP41E0.pat",
+    "img_url": "",
+    "source": "Firestore",
+    "description": "*HSHP41E0,Free patterns from www.CADhatch.com"
+  },
+  {
+    "id": "HSTON1E0",
+    "name": "HSTON1E0",
+    "type": "cadauthority",
+    "pat_url": "/hatches/quarantine/HSTON1E0.pat",
+    "img_url": "",
+    "source": "Firestore",
+    "description": "*HSTON1E0,Free patterns from www.CADhatch.com"
+  },
+  {
+    "id": "HSTON2E0",
+    "name": "HSTON2E0",
+    "type": "cadauthority",
+    "pat_url": "/hatches/quarantine/HSTON2E0.pat",
+    "img_url": "",
+    "source": "Firestore",
+    "description": "*HSTON2E0,Free patterns from www.CADhatch.com"
+  },
+  {
+    "id": "HSTON3E0",
+    "name": "HSTON3E0",
+    "type": "cadauthority",
+    "pat_url": "/hatches/quarantine/HSTON3E0.pat",
+    "img_url": "",
+    "source": "Firestore",
+    "description": "*HSTON3E0,Stone pattern - Free patterns from www.CADhatch.com"
+  },
+  {
+    "id": "HWEND1N0",
+    "name": "HWEND1N0",
+    "type": "cadauthority",
+    "pat_url": "/hatches/quarantine/HWEND1N0.pat",
+    "img_url": "",
+    "source": "Firestore",
+    "description": "*HWEND1N0,Free patterns from www.CADhatch.com"
+  },
+  {
+    "id": "HWEND2N0",
+    "name": "HWEND2N0",
+    "type": "cadauthority",
+    "pat_url": "/hatches/quarantine/HWEND2N0.pat",
+    "img_url": "",
+    "source": "Firestore",
+    "description": "*HWEND2N0,Free patterns from www.CADhatch.com"
+  },
+  {
+    "id": "HWEND3N0",
+    "name": "HWEND3N0",
+    "type": "cadauthority",
+    "pat_url": "/hatches/quarantine/HWEND3N0.pat",
+    "img_url": "",
+    "source": "Firestore",
+    "description": "*HWEND3N0,Free patterns from www.CADhatch.com"
+  },
+  {
+    "id": "HWOOD2E1",
+    "name": "HWOOD2E1",
+    "type": "cadauthority",
+    "pat_url": "/hatches/quarantine/HWOOD2E1.pat",
+    "img_url": "",
+    "source": "Firestore",
+    "description": "*HWOOD2E1,Free patterns from www.CADhatch.com"
+  },
+  {
+    "id": "HWOOD3E1",
+    "name": "HWOOD3E1",
+    "type": "cadauthority",
+    "pat_url": "/hatches/quarantine/HWOOD3E1.pat",
+    "img_url": "",
+    "source": "Firestore",
+    "description": "*HWOOD3E1,Free patterns from www.CADhatch.com"
+  },
+  {
+    "id": "HWOOD4E1",
+    "name": "HWOOD4E1",
+    "type": "cadauthority",
+    "pat_url": "/hatches/quarantine/HWOOD4E1.pat",
+    "img_url": "",
+    "source": "Firestore",
+    "description": "*HWOOD4E1,Free patterns from www.CADhatch.com"
+  },
+  {
+    "id": "HWOOD5E1",
+    "name": "HWOOD5E1",
+    "type": "cadauthority",
+    "pat_url": "/hatches/quarantine/HWOOD5E1.pat",
+    "img_url": "",
+    "source": "Firestore",
+    "description": "*HWOOD5E1,Free patterns from www.CADhatch.com"
+  },
+  {
+    "id": "HWOOD6E1",
+    "name": "HWOOD6E1",
+    "type": "cadauthority",
+    "pat_url": "/hatches/quarantine/HWOOD6E1.pat",
+    "img_url": "",
+    "source": "Firestore",
+    "description": "*HWOOD6E1,Free patterns from www.CADhatch.com"
+  },
+  {
+    "id": "HWOOD7E1",
+    "name": "HWOOD7E1",
+    "type": "cadauthority",
+    "pat_url": "/hatches/quarantine/HWOOD7E1.pat",
+    "img_url": "",
+    "source": "Firestore",
+    "description": "*HWOOD7E1,Free patterns from www.CADhatch.com"
+  },
+  {
+    "id": "HWOOD8E1",
+    "name": "HWOOD8E1",
+    "type": "cadauthority",
+    "pat_url": "/hatches/quarantine/HWOOD8E1.pat",
+    "img_url": "",
+    "source": "Firestore",
+    "description": "*HWOOD8E1,Free patterns from www.CADhatch.com"
+  },
+  {
+    "id": "HWOOD9E1",
+    "name": "HWOOD9E1",
+    "type": "cadauthority",
+    "pat_url": "/hatches/quarantine/HWOOD9E1.pat",
+    "img_url": "",
+    "source": "Firestore",
+    "description": "*HWOOD9E1,Free patterns from www.CADhatch.com"
+  },
+  {
+    "id": "HWPLY3E1",
+    "name": "HWPLY3E1",
+    "type": "cadauthority",
+    "pat_url": "/hatches/quarantine/HWPLY3E1.pat",
+    "img_url": "",
+    "source": "Firestore",
+    "description": "*HWPLY3E1,Free patterns from www.CADhatch.com"
+  },
+  {
+    "id": "HSBDR3E0",
+    "name": "HSBDR3E0",
+    "type": "cadauthority",
+    "pat_url": "/hatches/quarantine/HSBDR3E0.pat",
+    "img_url": "",
+    "source": "Firestore",
+    "description": "*HSBDR3E0,Free patterns from www.CADhatch.com"
+  },
+  {
+    "id": "HSBDR4E0",
+    "name": "HSBDR4E0",
+    "type": "cadauthority",
+    "pat_url": "/hatches/quarantine/HSBDR4E0.pat",
+    "img_url": "",
+    "source": "Firestore",
+    "description": "*HSBDR4E0,Free patterns from www.CADhatch.com"
+  },
+  {
+    "id": "HSHP11E0",
+    "name": "HSHP11E0",
+    "type": "cadauthority",
+    "pat_url": "/hatches/quarantine/HSHP11E0.pat",
+    "img_url": "",
+    "source": "Firestore",
+    "description": "*HSHP11E0,Free patterns from www.CADhatch.com"
+  },
+  {
+    "id": "HSHP21E0",
+    "name": "HSHP21E0",
+    "type": "cadauthority",
+    "pat_url": "/hatches/quarantine/HSHP21E0.pat",
+    "img_url": "",
+    "source": "Firestore",
+    "description": "*HSHP21E0,Free patterns from www.CADhatch.com"
+  },
+  {
+    "id": "HSHP31E0",
+    "name": "HSHP31E0",
+    "type": "cadauthority",
+    "pat_url": "/hatches/quarantine/HSHP31E0.pat",
+    "img_url": "",
+    "source": "Firestore",
+    "description": "*HSHP31E0,Free patterns from www.CADhatch.com"
+  },
+  {
+    "id": "HSHP41E0",
+    "name": "HSHP41E0",
+    "type": "cadauthority",
+    "pat_url": "/hatches/quarantine/HSHP41E0.pat",
+    "img_url": "",
+    "source": "Firestore",
+    "description": "*HSHP41E0,Free patterns from www.CADhatch.com"
+  },
+  {
+    "id": "HRCD35OS",
+    "name": "HRCD35OS",
+    "type": "cadauthority",
+    "pat_url": "/hatches/quarantine/HRCD35OS.pat",
+    "img_url": "",
+    "source": "Firestore",
+    "description": "*HRCD35OS,Free patterns from www.CADhatch.com"
+  },
+  {
+    "id": "HRDD35OS",
+    "name": "HRDD35OS",
+    "type": "cadauthority",
+    "pat_url": "/hatches/quarantine/HRDD35OS.pat",
+    "img_url": "",
+    "source": "Firestore",
+    "description": "*HRDD35OS,Free patterns from www.CADhatch.com"
+  },
+  {
+    "id": "HRPA55O1",
+    "name": "HRPA55O1",
+    "type": "cadauthority",
+    "pat_url": "/hatches/quarantine/HRPA55O1.pat",
+    "img_url": "",
+    "source": "Firestore",
+    "description": "*HRPA55O1,Free patterns from www.CADhatch.com"
+  },
+  {
+    "id": "HRPA55O2",
+    "name": "HRPA55O2",
+    "type": "cadauthority",
+    "pat_url": "/hatches/quarantine/HRPA55O2.pat",
+    "img_url": "",
+    "source": "Firestore",
+    "description": "*HRPA55O2,Free patterns from www.CADhatch.com"
+  },
+  {
+    "id": "HSBDR2E0",
+    "name": "HSBDR2E0",
+    "type": "cadauthority",
+    "pat_url": "/hatches/quarantine/HSBDR2E0.pat",
+    "img_url": "",
+    "source": "Firestore",
+    "description": "*HSBDR2E0,Free patterns from www.CADhatch.com"
+  },
+  {
+    "id": "HSTON1E0",
+    "name": "HSTON1E0",
+    "type": "cadauthority",
+    "pat_url": "/hatches/quarantine/HSTON1E0.pat",
+    "img_url": "",
+    "source": "Firestore",
+    "description": "*HSTON1E0,Free patterns from www.CADhatch.com"
+  },
+  {
+    "id": "HSTON2E0",
+    "name": "HSTON2E0",
+    "type": "cadauthority",
+    "pat_url": "/hatches/quarantine/HSTON2E0.pat",
+    "img_url": "",
+    "source": "Firestore",
+    "description": "*HSTON2E0,Free patterns from www.CADhatch.com"
+  },
+  {
+    "id": "HSTON3E0",
+    "name": "HSTON3E0",
+    "type": "cadauthority",
+    "pat_url": "/hatches/quarantine/HSTON3E0.pat",
+    "img_url": "",
+    "source": "Firestore",
+    "description": "*HSTON3E0,Stone pattern - Free patterns from www.CADhatch.com"
+  },
+  {
+    "id": "HT1009ET",
+    "name": "HT1009ET",
+    "type": "cadauthority",
+    "pat_url": "/hatches/quarantine/HT1009ET.pat",
+    "img_url": "",
+    "source": "Firestore",
+    "description": "*HT1009ET,100mm 1.5mm Free patterns from www.CADhatch.com"
+  },
+  {
+    "id": "HT1081ET",
+    "name": "HT1081ET",
+    "type": "cadauthority",
+    "pat_url": "/hatches/quarantine/HT1081ET.pat",
+    "img_url": "",
+    "source": "Firestore",
+    "description": "*HT1081ET,250x200mm 1mm Free patterns from www.CADhatch.com"
+  },
+  {
+    "id": "HT1082ET",
+    "name": "HT1082ET",
+    "type": "cadauthority",
+    "pat_url": "/hatches/quarantine/HT1082ET.pat",
+    "img_url": "",
+    "source": "Firestore",
+    "description": "*HT1082ET,250x200mm 2mm Free patterns from www.CADhatch.com"
+  },
+  {
+    "id": "HT1083ET",
+    "name": "HT1083ET",
+    "type": "cadauthority",
+    "pat_url": "/hatches/quarantine/HT1083ET.pat",
+    "img_url": "",
+    "source": "Firestore",
+    "description": "*HT1083ET,250x200mm 3mm Free patterns from www.CADhatch.com"
+  },
+  {
+    "id": "HT1085ET",
+    "name": "HT1085ET",
+    "type": "cadauthority",
+    "pat_url": "/hatches/quarantine/HT1085ET.pat",
+    "img_url": "",
+    "source": "Firestore",
+    "description": "*HT1085ET,250x200mm 5mm Free patterns from www.CADhatch.com"
+  },
+  {
+    "id": "HT1251ET",
+    "name": "HT1251ET",
+    "type": "cadauthority",
+    "pat_url": "/hatches/quarantine/HT1251ET.pat",
+    "img_url": "",
+    "source": "Firestore",
+    "description": "*HT1251ET,125mm 1.0mm Free patterns from www.CADhatch.com"
+  },
+  {
+    "id": "HT1252ET",
+    "name": "HT1252ET",
+    "type": "cadauthority",
+    "pat_url": "/hatches/quarantine/HT1252ET.pat",
+    "img_url": "",
+    "source": "Firestore",
+    "description": "*HT1252ET,125mm 2.0mm Free patterns from www.CADhatch.com"
+  },
+  {
+    "id": "HT1253ET",
+    "name": "HT1253ET",
+    "type": "cadauthority",
+    "pat_url": "/hatches/quarantine/HT1253ET.pat",
+    "img_url": "",
+    "source": "Firestore",
+    "description": "*HT1253ET,125mm 3.0mm Free patterns from www.CADhatch.com"
+  },
+  {
+    "id": "HT1254ET",
+    "name": "HT1254ET",
+    "type": "cadauthority",
+    "pat_url": "/hatches/quarantine/HT1254ET.pat",
+    "img_url": "",
+    "source": "Firestore",
+    "description": "*HT1254ET,125mm 4.0mm Free patterns from www.CADhatch.com"
+  },
+  {
+    "id": "HT1259ET",
+    "name": "HT1259ET",
+    "type": "cadauthority",
+    "pat_url": "/hatches/quarantine/HT1259ET.pat",
+    "img_url": "",
+    "source": "Firestore",
+    "description": "*HT1259ET,125mm 1.5mm Free patterns from www.CADhatch.com"
+  },
+  {
+    "id": "HT1501ET",
+    "name": "HT1501ET",
+    "type": "cadauthority",
+    "pat_url": "/hatches/quarantine/HT1501ET.pat",
+    "img_url": "",
+    "source": "Firestore",
+    "description": "*HT1501ET,150mm 1.0mm Free patterns from www.CADhatch.com"
+  },
+  {
+    "id": "HT1502ET",
+    "name": "HT1502ET",
+    "type": "cadauthority",
+    "pat_url": "/hatches/quarantine/HT1502ET.pat",
+    "img_url": "",
+    "source": "Firestore",
+    "description": "*HT1502ET,150mm 2.0mm Free patterns from www.CADhatch.com"
+  },
+  {
+    "id": "HT1503ET",
+    "name": "HT1503ET",
+    "type": "cadauthority",
+    "pat_url": "/hatches/quarantine/HT1503ET.pat",
+    "img_url": "",
+    "source": "Firestore",
+    "description": "*HT1503ET,150mm 3.0mm Free patterns from www.CADhatch.com"
+  },
+  {
+    "id": "HT1504ET",
+    "name": "HT1504ET",
+    "type": "cadauthority",
+    "pat_url": "/hatches/quarantine/HT1504ET.pat",
+    "img_url": "",
+    "source": "Firestore",
+    "description": "*HT1504ET,150mm 4.0mm Free patterns from www.CADhatch.com"
+  },
+  {
+    "id": "HT1509ET",
+    "name": "HT1509ET",
+    "type": "cadauthority",
+    "pat_url": "/hatches/quarantine/HT1509ET.pat",
+    "img_url": "",
+    "source": "Firestore",
+    "description": "*HT1509ET,150mm 1.5mm Free patterns from www.CADhatch.com"
+  },
+  {
+    "id": "HT2000ET",
+    "name": "HT2000ET",
+    "type": "cadauthority",
+    "pat_url": "/hatches/quarantine/HT2000ET.pat",
+    "img_url": "",
+    "source": "Firestore",
+    "description": "*HT2000ET,200mm 0.0mm Free patterns from www.CADhatch.com"
+  },
+  {
+    "id": "HT2001ET",
+    "name": "HT2001ET",
+    "type": "cadauthority",
+    "pat_url": "/hatches/quarantine/HT2001ET.pat",
+    "img_url": "",
+    "source": "Firestore",
+    "description": "*HT2001ET,200mm 1.0mm Free patterns from www.CADhatch.com"
+  },
+  {
+    "id": "HT2002ET",
+    "name": "HT2002ET",
+    "type": "cadauthority",
+    "pat_url": "/hatches/quarantine/HT2002ET.pat",
+    "img_url": "",
+    "source": "Firestore",
+    "description": "*HT2002ET,200mm 2.0mm Free patterns from www.CADhatch.com"
+  },
+  {
+    "id": "HT2003ET",
+    "name": "HT2003ET",
+    "type": "cadauthority",
+    "pat_url": "/hatches/quarantine/HT2003ET.pat",
+    "img_url": "",
+    "source": "Firestore",
+    "description": "*HT2003ET,200mm 3.0mm Free patterns from www.CADhatch.com"
+  },
+  {
+    "id": "HT4x80ET",
+    "name": "HT4x80ET",
+    "type": "cadauthority",
+    "pat_url": "/hatches/quarantine/HT4x80ET.pat",
+    "img_url": "",
+    "source": "Firestore",
+    "description": "*HT4x80ET,100x200mm 0mm Free patterns from www.CADhatch.com"
+  },
+  {
+    "id": "HT4x81ET",
+    "name": "HT4x81ET",
+    "type": "cadauthority",
+    "pat_url": "/hatches/quarantine/HT4x81ET.pat",
+    "img_url": "",
+    "source": "Firestore",
+    "description": "*HT4x81ET,100x200mm 1mm Free patterns from www.CADhatch.com"
+  },
+  {
+    "id": "HT4x82ET",
+    "name": "HT4x82ET",
+    "type": "cadauthority",
+    "pat_url": "/hatches/quarantine/HT4x82ET.pat",
+    "img_url": "",
+    "source": "Firestore",
+    "description": "*HT4x82ET,100x200mm 2mm Free patterns from www.CADhatch.com"
+  },
+  {
+    "id": "HT4x83ET",
+    "name": "HT4x83ET",
+    "type": "cadauthority",
+    "pat_url": "/hatches/quarantine/HT4x83ET.pat",
+    "img_url": "",
+    "source": "Firestore",
+    "description": "*HT4x83ET,100x200mm 3mm Free patterns from www.CADhatch.com"
+  },
+  {
+    "id": "HT4x84ET",
+    "name": "HT4x84ET",
+    "type": "cadauthority",
+    "pat_url": "/hatches/quarantine/HT4x84ET.pat",
+    "img_url": "",
+    "source": "Firestore",
+    "description": "*HT4x84ET,100x200mm 4mm Free patterns from www.CADhatch.com"
+  },
+  {
+    "id": "HT600x3006ET",
+    "name": "HT600x3006ET",
+    "type": "cadauthority",
+    "pat_url": "/hatches/quarantine/HT600x3006ET.pat",
+    "img_url": "",
+    "source": "Firestore",
+    "description": "*HT600x3006ET,600x300mm 6mm Free patterns from www.CADhatch.com"
+  },
+  {
+    "id": "HTREEC1S",
+    "name": "HTREEC1S",
+    "type": "cadauthority",
+    "pat_url": "/hatches/quarantine/HTREEC1S.pat",
+    "img_url": "",
+    "source": "Firestore",
+    "description": "*HTREEC1S,CONFIER www.cadhatch.com"
+  },
+  {
+    "id": "HTREECPS",
+    "name": "HTREECPS",
+    "type": "cadauthority",
+    "pat_url": "/hatches/quarantine/HTREECPS.pat",
+    "img_url": "",
+    "source": "Firestore",
+    "description": "*HTREECPS,CONIFERS WWW.CADHATCH.COM"
+  },
+  {
+    "id": "HTREECRS",
+    "name": "HTREECRS",
+    "type": "cadauthority",
+    "pat_url": "/hatches/quarantine/HTREECRS.pat",
+    "img_url": "",
+    "source": "Firestore",
+    "description": "*HTREECRS,CONFIFER WWW.CADHATCH.COM"
+  },
+  {
+    "id": "HTREED1S",
+    "name": "HTREED1S",
+    "type": "cadauthority",
+    "pat_url": "/hatches/quarantine/HTREED1S.pat",
+    "img_url": "",
+    "source": "Firestore",
+    "description": "*HTREED1S,TREES www.cadhatch.com"
+  },
+  {
+    "id": "HTREEDCS",
+    "name": "HTREEDCS",
+    "type": "cadauthority",
+    "pat_url": "/hatches/quarantine/HTREEDCS.pat",
+    "img_url": "",
+    "source": "Firestore",
+    "description": "*HTREEDCS,DECIDUOUS CONFIFER WWW.CADHATCH.COM"
+  },
+  {
+    "id": "HTREEP1S",
+    "name": "HTREEP1S",
+    "type": "cadauthority",
+    "pat_url": "/hatches/quarantine/HTREEP1S.pat",
+    "img_url": "",
+    "source": "Firestore",
+    "description": "*HTREEP1S,TREE2 www.cadhatch.com"
+  },
+  {
+    "id": "HVEGE100",
+    "name": "HVEGE100",
+    "type": "cadauthority",
+    "pat_url": "/hatches/quarantine/HVEGE100.pat",
+    "img_url": "",
+    "source": "Firestore",
+    "description": "*HVEGE100,CadHatch.com"
+  },
+  {
+    "id": "HVSPR1E0",
+    "name": "HVSPR1E0",
+    "type": "cadauthority",
+    "pat_url": "/hatches/quarantine/HVSPR1E0.pat",
+    "img_url": "",
+    "source": "Firestore",
+    "description": "*HVSPR1E0,Free patterns from www.CADhatch.com"
+  },
+  {
+    "id": "HVSPR1E1",
+    "name": "HVSPR1E1",
+    "type": "cadauthority",
+    "pat_url": "/hatches/quarantine/HVSPR1E1.pat",
+    "img_url": "",
+    "source": "Firestore",
+    "description": "*HVSPR1E1,Free patterns from www.CADhatch.com"
+  },
+  {
+    "id": "HVSPR1E2",
+    "name": "HVSPR1E2",
+    "type": "cadauthority",
+    "pat_url": "/hatches/quarantine/HVSPR1E2.pat",
+    "img_url": "",
+    "source": "Firestore",
+    "description": "*HVSPR1E2,Free patterns from www.CADhatch.com"
+  },
+  {
+    "id": "HVSPR1E3",
+    "name": "HVSPR1E3",
+    "type": "cadauthority",
+    "pat_url": "/hatches/quarantine/HVSPR1E3.pat",
+    "img_url": "",
+    "source": "Firestore",
+    "description": "*HVSPR1E3,Free patterns from www.CADhatch.com"
+  },
+  {
+    "id": "HVSPR1E4",
+    "name": "HVSPR1E4",
+    "type": "cadauthority",
+    "pat_url": "/hatches/quarantine/HVSPR1E4.pat",
+    "img_url": "",
+    "source": "Firestore",
+    "description": "*HVSPR1E4,Free patterns from www.CADhatch.com"
+  },
+  {
+    "id": "HVSPR1E5",
+    "name": "HVSPR1E5",
+    "type": "cadauthority",
+    "pat_url": "/hatches/quarantine/HVSPR1E5.pat",
+    "img_url": "",
+    "source": "Firestore",
+    "description": "*HVSPR1E5,Free patterns from www.CADhatch.com"
+  },
+  {
+    "id": "HVSPR1E6",
+    "name": "HVSPR1E6",
+    "type": "cadauthority",
+    "pat_url": "/hatches/quarantine/HVSPR1E6.pat",
+    "img_url": "",
+    "source": "Firestore",
+    "description": "*HVSPR1E6,Free patterns from www.CADhatch.com"
+  },
+  {
+    "id": "HVSPR1E7",
+    "name": "HVSPR1E7",
+    "type": "cadauthority",
+    "pat_url": "/hatches/quarantine/HVSPR1E7.pat",
+    "img_url": "",
+    "source": "Firestore",
+    "description": "*HVSPR1E7,Free patterns from www.CADhatch.com"
+  },
+  {
+    "id": "HWEND1N0",
+    "name": "HWEND1N0",
+    "type": "cadauthority",
+    "pat_url": "/hatches/quarantine/HWEND1N0.pat",
+    "img_url": "",
+    "source": "Firestore",
+    "description": "*HWEND1N0,Free patterns from www.CADhatch.com"
+  },
+  {
+    "id": "HWEND2N0",
+    "name": "HWEND2N0",
+    "type": "cadauthority",
+    "pat_url": "/hatches/quarantine/HWEND2N0.pat",
+    "img_url": "",
+    "source": "Firestore",
+    "description": "*HWEND2N0,Free patterns from www.CADhatch.com"
+  },
+  {
+    "id": "HWEND3N0",
+    "name": "HWEND3N0",
+    "type": "cadauthority",
+    "pat_url": "/hatches/quarantine/HWEND3N0.pat",
+    "img_url": "",
+    "source": "Firestore",
+    "description": "*HWEND3N0,Free patterns from www.CADhatch.com"
+  },
+  {
+    "id": "HWOOD2E1",
+    "name": "HWOOD2E1",
+    "type": "cadauthority",
+    "pat_url": "/hatches/quarantine/HWOOD2E1.pat",
+    "img_url": "",
+    "source": "Firestore",
+    "description": "*HWOOD2E1,Free patterns from www.CADhatch.com"
+  },
+  {
+    "id": "HWOOD3E1",
+    "name": "HWOOD3E1",
+    "type": "cadauthority",
+    "pat_url": "/hatches/quarantine/HWOOD3E1.pat",
+    "img_url": "",
+    "source": "Firestore",
+    "description": "*HWOOD3E1,Free patterns from www.CADhatch.com"
+  },
+  {
+    "id": "HWOOD4E1",
+    "name": "HWOOD4E1",
+    "type": "cadauthority",
+    "pat_url": "/hatches/quarantine/HWOOD4E1.pat",
+    "img_url": "",
+    "source": "Firestore",
+    "description": "*HWOOD4E1,Free patterns from www.CADhatch.com"
+  },
+  {
+    "id": "HWOOD5E1",
+    "name": "HWOOD5E1",
+    "type": "cadauthority",
+    "pat_url": "/hatches/quarantine/HWOOD5E1.pat",
+    "img_url": "",
+    "source": "Firestore",
+    "description": "*HWOOD5E1,Free patterns from www.CADhatch.com"
+  },
+  {
+    "id": "HWOOD6E1",
+    "name": "HWOOD6E1",
+    "type": "cadauthority",
+    "pat_url": "/hatches/quarantine/HWOOD6E1.pat",
+    "img_url": "",
+    "source": "Firestore",
+    "description": "*HWOOD6E1,Free patterns from www.CADhatch.com"
+  },
+  {
+    "id": "HWOOD7E1",
+    "name": "HWOOD7E1",
+    "type": "cadauthority",
+    "pat_url": "/hatches/quarantine/HWOOD7E1.pat",
+    "img_url": "",
+    "source": "Firestore",
+    "description": "*HWOOD7E1,Free patterns from www.CADhatch.com"
+  },
+  {
+    "id": "HWOOD8E1",
+    "name": "HWOOD8E1",
+    "type": "cadauthority",
+    "pat_url": "/hatches/quarantine/HWOOD8E1.pat",
+    "img_url": "",
+    "source": "Firestore",
+    "description": "*HWOOD8E1,Free patterns from www.CADhatch.com"
+  },
+  {
+    "id": "HWOOD9E1",
+    "name": "HWOOD9E1",
+    "type": "cadauthority",
+    "pat_url": "/hatches/quarantine/HWOOD9E1.pat",
+    "img_url": "",
+    "source": "Firestore",
+    "description": "*HWOOD9E1,Free patterns from www.CADhatch.com"
+  },
+  {
+    "id": "HWPLY3E1",
+    "name": "HWPLY3E1",
+    "type": "cadauthority",
+    "pat_url": "/hatches/quarantine/HWPLY3E1.pat",
+    "img_url": "",
+    "source": "Firestore",
+    "description": "*HWPLY3E1,Free patterns from www.CADhatch.com"
+  }
+]

@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Validador Visual de Patrones</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .tinder-card { transition: transform 0.3s ease; }
+        .swiped-right { transform: translateX(100vw) rotate(30deg); opacity: 0; }
+        .swiped-left { transform: translateX(-100vw) rotate(-30deg); opacity: 0; }
+    </style>
+</head>
+<body class="bg-gray-100 p-8 h-screen flex flex-col">
+    <h1 class="text-3xl font-bold text-center mb-4">Validador Visual (Tinder de Patrones)</h1>
+    <p class="text-center text-gray-600 mb-8">Compara el JPG original (izquierda) con el SVG asignado visualmente (derecha). Aprueba o Deniega.</p>
+
+    <div id="loading" class="text-center text-xl text-gray-500">Cargando datos...</div>
+
+    <div id="matchArea" class="hidden flex-1 flex flex-col items-center justify-center">
+        <!-- Main Card -->
+        <div id="activeCard" class="tinder-card bg-white rounded-xl shadow-2xl p-6 w-[800px] flex flex-col items-center border border-gray-200">
+            <h2 id="patName" class="text-xl font-bold text-gray-800 mb-4 w-full text-center pb-4 border-b border-gray-200"></h2>
+            
+            <div class="flex w-full gap-8">
+                <!-- Left JPG -->
+                <div class="flex-1 flex flex-col items-center">
+                    <span class="text-sm font-bold text-blue-600 uppercase mb-2">Original JPG</span>
+                    <div class="w-full aspect-square bg-gray-50 border rounded-lg overflow-hidden flex items-center justify-center">
+                        <img id="jpgImg" src="" class="w-full h-full object-contain" />
+                    </div>
+                </div>
+                
+                <!-- Divider -->
+                <div class="w-1 bg-gray-200 rounded"></div>
+
+                <!-- Right SVG -->
+                <div class="flex-1 flex flex-col items-center">
+                    <span class="text-sm font-bold text-amber-600 uppercase mb-2">SVG Propuesto</span>
+                    <div class="w-full aspect-square bg-white border rounded-lg overflow-hidden flex items-center justify-center">
+                        <img id="svgImg" src="" class="w-full h-full object-contain opacity-80" onerror="this.src=''" />
+                    </div>
+                    <span id="svgName" class="text-xs mt-2 text-gray-500 font-mono"></span>
+                </div>
+            </div>
+
+            <!-- Buttons -->
+            <div class="flex w-full mt-8 gap-4 px-12">
+                <button id="btnDeny" class="flex-1 py-4 bg-red-100 hover:bg-red-200 text-red-700 rounded-full font-bold text-xl shadow hover:shadow-lg transition flex items-center justify-center gap-2">
+                    <span class="text-2xl">❌</span> Denegar
+                </button>
+                <button id="btnApprove" class="flex-1 py-4 bg-green-100 hover:bg-green-200 text-green-700 rounded-full font-bold text-xl shadow hover:shadow-lg transition flex items-center justify-center gap-2">
+                    <span class="text-2xl">✅</span> Aprobar
+                </button>
+            </div>
+        </div>
+        
+        <div class="mt-6 text-gray-500 font-bold text-lg">
+            Progreso: <span id="progress"></span>
+        </div>
+    </div>
+
+    <!-- Done Area -->
+    <div id="doneArea" class="hidden flex-1 flex flex-col items-center justify-center">
+        <div class="text-6xl mb-4">🎉</div>
+        <h2 class="text-3xl font-bold text-gray-800 mb-2">¡Validación Terminada!</h2>
+        <p class="text-gray-600 mb-8">Todos los emparejamientos visuales han sido procesados.</p>
+        
+        <h3 class="text-xl font-bold text-gray-800 mb-4 border-b pb-2 w-full max-w-4xl">Patrones No Coincidentes (Denegados o sin propuesta)</h3>
+        <div id="unmatchedList" class="grid grid-cols-4 gap-4 w-full max-w-4xl"></div>
+    </div>
+
+    <script>
+        let allPats = [];
+        let visualMap = {};
+        let candidates = [];
+        let currentIndex = 0;
+        let unmatched = [];
+
+        async function init() {
+            try {
+                // Fetch DB
+                const res = await fetch('/api/data');
+                const data = await res.json();
+                allPats = data.pats || [];
+
+                // Fetch Maps
+                const res2 = await fetch('/api/matches');
+                visualMap = await res2.json();
+
+                // Find all pats that have a JPG image and are not yet linked to an SVG
+                let jpgPats = allPats.filter(p => p.image_url && p.image_url.endsWith('.jpg') && !p.matched);
+
+                // Create candidates
+                jpgPats.forEach(pat => {
+                    const suggestedSvg = visualMap[pat.id];
+                    if (suggestedSvg) {
+                        candidates.push({
+                            pat: pat,
+                            svg: suggestedSvg
+                        });
+                    } else {
+                        unmatched.push(pat);
+                    }
+                });
+
+                document.getElementById('loading').classList.add('hidden');
+                
+                if (candidates.length > 0) {
+                    document.getElementById('matchArea').classList.remove('hidden');
+                    document.getElementById('matchArea').classList.add('flex');
+                    showCurrentCard();
+                } else {
+                    showDone();
+                }
+            } catch (err) {
+                document.getElementById('loading').innerText = "Error: " + err.message;
+                alert("Hubo un error cargando los datos: " + err.message);
+                console.error(err);
+            }
+        }
+
+        function showCurrentCard() {
+            if (currentIndex >= candidates.length) {
+                document.getElementById('matchArea').classList.add('hidden');
+                document.getElementById('matchArea').classList.remove('flex');
+                showDone();
+                return;
+            }
+
+            const item = candidates[currentIndex];
+            const cleanName = item.pat.image_url.split('/').pop().replace('rf_pat_', '').replace(/\-[a-zA-Z0-9]+\.jpg$/, '');
+            
+            document.getElementById('patName').innerText = `${item.pat.id} - ${cleanName}`;
+            document.getElementById('jpgImg').src = '/public' + item.pat.image_url;
+            
+            // Render SVG
+            // Need to know if it's in /patterns/ or /hatches-cadauth/assets/
+            // For now just try /patterns/. If it doesn't load, try the other.
+            document.getElementById('svgImg').src = '/public/patterns/' + item.svg;
+            document.getElementById('svgImg').onerror = function() {
+                this.src = '/public/hatches-cadauth/assets/' + item.svg;
+                this.onerror = null;
+            };
+            document.getElementById('svgName').innerText = item.svg;
+            
+            document.getElementById('progress').innerText = `${currentIndex + 1} / ${candidates.length}`;
+
+            // Reset classes
+            const card = document.getElementById('activeCard');
+            card.className = 'tinder-card bg-white rounded-xl shadow-2xl p-6 w-[800px] flex flex-col items-center border border-gray-200';
+        }
+
+        async function approveMatch() {
+            const item = candidates[currentIndex];
+            
+            const card = document.getElementById('activeCard');
+            card.classList.add('swiped-right');
+
+            // Send to API
+            await fetch('/api/validate-match', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ patId: item.pat.id, svgId: item.svg })
+            });
+
+            setTimeout(() => {
+                currentIndex++;
+                showCurrentCard();
+            }, 300);
+        }
+
+        function denyMatch() {
+            const item = candidates[currentIndex];
+            unmatched.push(item.pat);
+
+            const card = document.getElementById('activeCard');
+            card.classList.add('swiped-left');
+
+            setTimeout(() => {
+                currentIndex++;
+                showCurrentCard();
+            }, 300);
+        }
+
+        function showDone() {
+            document.getElementById('doneArea').classList.remove('hidden');
+            document.getElementById('doneArea').classList.add('flex');
+            
+            const list = document.getElementById('unmatchedList');
+            unmatched.forEach(pat => {
+                const cleanName = pat.image_url.split('/').pop().replace('rf_pat_', '').replace(/\-[a-zA-Z0-9]+\.jpg$/, '');
+                list.innerHTML += `
+                    <div class="bg-white p-4 border rounded shadow flex flex-col items-center text-center">
+                        <div class="w-full aspect-square bg-gray-200 mb-2 overflow-hidden flex items-center justify-center">
+                            <img src="/public${pat.image_url}" class="w-full h-full object-cover" />
+                        </div>
+                        <span class="text-xs font-mono text-gray-800 font-bold">${pat.id}</span>
+                        <span class="text-xs text-blue-600">${cleanName}</span>
+                    </div>
+                `;
+            });
+        }
+
+        document.getElementById('btnApprove').addEventListener('click', approveMatch);
+        document.getElementById('btnDeny').addEventListener('click', denyMatch);
+
+        window.onload = init;
+    </script>
+</body>
+</html>

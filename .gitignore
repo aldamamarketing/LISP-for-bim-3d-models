@@ -108,3 +108,5 @@ serviceAccountKey.json
 
 # Backup folder
 SALVA/
+# Hatches locales (proteccion IP)
+web/public/hatches/
