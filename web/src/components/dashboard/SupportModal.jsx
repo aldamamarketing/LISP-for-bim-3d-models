@@ -43,6 +43,7 @@ export default function SupportModal() {
         <button 
           onClick={() => setShowSupportModal(false)} 
           className="absolute top-4 right-4 text-on-surface-variant hover:text-white transition-colors"
+          aria-label="Close modal"
         >
           <span className="material-symbols-outlined">close</span>
         </button>
